@@ -958,7 +958,7 @@
     </div>
   </div>
   <div id="modeSelectHint" data-i18n="modeSelectHint">Knooppunten, navigatie, GPX, offline-gebruik — alles werkt voor beide.</div>
-  <div id="appVersionStart">v2.194 · 6 aug</div>
+  <div id="appVersionStart">v2.195 · 7 aug</div>
 </div>
 
 <div id="mapViewport">
@@ -1015,7 +1015,7 @@
   <button class="menu-item" id="menuHelpBtn"><span class="mi-icon">❓</span><span class="mi-text"><b data-i18n="menuHelp">Hulp</b><small data-i18n="menuHelpSub">uitleg over alle functies</small></span></button>
   <button class="menu-item" id="menuDevNotesBtn"><span class="mi-icon">🛠️</span><span class="mi-text"><b data-i18n="menuDevNotes">Technische werking</b><small data-i18n="menuDevNotesSub">hoe wegdektype, routering en fallbacks precies werken</small></span></button>
   <button class="menu-item" id="menuLogbookBtn"><span class="mi-icon">📋</span><span class="mi-text"><b data-i18n="menuLogbook">Logboek</b><small data-i18n="menuLogbookSub">overzicht van alle meldingen, ook stille</small></span></button>
-  <div id="menuVersion">v2.194 · 6 aug</div>
+  <div id="menuVersion">v2.195 · 7 aug</div>
 </div>
 
 <div id="hint" data-i18n="hintInitial">Zoom of pan naar je gebied, tik dan op "Laad knooppunten"</div>
@@ -1901,7 +1901,7 @@
     <button id="clearBtn" class="small"><span class="ic">🗑️</span><span data-i18n="actionWis">Wis</span></button>
     <button id="toStartBtn" class="small" title="Aan: route vertrekt vanaf je huidige locatie. Uit: route vertrekt vanaf je eerste geselecteerde punt." data-i18n-title="titleVertrekToggle"><span class="ic">🚴</span><span data-i18n="actionVertrek">Vertrek</span></button>
     <button id="elevationBtn" class="small"><span class="ic">📈</span><span data-i18n="actionHoogte">Hoogte</span></button>
-    <button id="detourBtn" class="small"><span class="ic">🔀</span><span data-i18n="actionOmweg">Omweg</span></button>
+    <button id="detourBtn" class="small" style="display:none;"><span class="ic">🔀</span><span data-i18n="actionOmweg">Omweg</span></button>
     <button id="navBtn" class="small" disabled><span class="ic">▶</span><span data-i18n="actionStart">Start</span></button>
   </div>
 </div>
@@ -4197,6 +4197,9 @@ const TRANSLATIONS = {
   toastNavOnly: { nl:'Enkel te gebruiken tijdens actieve navigatie.', en:'Only usable during active navigation.' },
   toastNoGps: { nl:'GPS niet beschikbaar in deze browser', en:'GPS not available in this browser' },
   toastNoAltRoute: { nl:'Geen alternatieve route gevonden voor dit stuk. Probeer een klein stukje verder te rijden/wandelen en opnieuw te proberen.', en:'No alternative route found for this stretch. Try riding/walking a bit further and try again.' },
+  toastDetourNeedsOrs: { nl:'Deze functie heeft een gratis OpenRouteService-sleutel nodig (bij 🔑 API-sleutels in Instellingen).', en:'This feature needs a free OpenRouteService key (under 🔑 API keys in Settings).' },
+  toastDetourTooShort: { nl:'Dat aantal km ligt te dicht bij het einde van je route — kies een kleiner aantal.', en:'That many km is too close to the end of your route — choose a smaller number.' },
+  toastDetourInvalidKm: { nl:'Vul een geldig aantal km in (groter dan 0).', en:'Enter a valid number of km (greater than 0).' },
   toastNoNewNodes: { nl:'Geen nieuwe knooppunten in dit gebied', en:'No new nodes in this area' },
   toastNoWalkNodes: { nl:'Geen wandelknooppunten hier — die bestaan in OSM enkel binnen specifieke wandelnetwerken (natuurgebieden, provinciedomeinen), niet overal zoals fietsknooppunten. Probeer een bekend wandelgebied, of importeer een GPX/dataset.', en:'No walking nodes here — in OSM these only exist within specific walking networks (nature reserves, provincial estates), not everywhere like cycling nodes. Try a known hiking area, or import a GPX/dataset.' },
   toastGraphhopperDown: { nl:'GraphHopper niet bereikbaar, val terug op standaard routering.', en:'GraphHopper unavailable, falling back to standard routing.' },
@@ -6609,6 +6612,61 @@ async function drawRoutePath(fromCurrentLocation){
 // het alternatief dat het meest afwijkt van de (mogelijk geblokkeerde) hoofdroute. Geen garantie, maar in
 // de meeste gevallen omzeilt dit de afgesloten weg wél.
 let autoRerouteInProgress = false; // voorkomt dat we tijdens het herberekenen zelf nóg eens automatisch triggeren
+async function detourAroundClosedRoad(kmWanted){
+  if (!navActive || !lastPosition){ toast(tr('toastNavOnly')); return; }
+  if (!appSettings.orsKey){ toast(tr('toastDetourNeedsOrs'), 5000); return; }
+  const myPos = { lat: lastPosition.coords.latitude, lon: lastPosition.coords.longitude };
+  const linePts = routeLine.getLatLngs();
+  if (linePts.length < 2){ toast(tr('toastNavOnly')); return; }
+
+  // Vind het punt op de al getekende route dat het dichtst bij je huidige positie ligt — vanaf daar
+  // tellen we vooruit.
+  let myIdx = 0, myIdxDist = Infinity;
+  linePts.forEach((p, i) => { const d = haversine(myPos.lat, myPos.lon, p.lat, p.lng); if (d < myIdxDist){ myIdxDist = d; myIdx = i; } });
+
+  // Loop vanaf daar vooruit tot het gevraagde aantal km afgelegd is — dat wordt het aansluitpunt.
+  let acc = 0, rejoinIdx = linePts.length - 1;
+  for (let i = myIdx + 1; i < linePts.length; i++){
+    acc += haversine(linePts[i-1].lat, linePts[i-1].lng, linePts[i].lat, linePts[i].lng);
+    if (acc >= kmWanted * 1000){ rejoinIdx = i; break; }
+  }
+  if (rejoinIdx - myIdx < 3){ toast(tr('toastDetourTooShort'), 4000); return; }
+  const rejoinPt = { lat: linePts[rejoinIdx].lat, lon: linePts[rejoinIdx].lng };
+
+  // Zelfde techniek als de vroegere Omweg-functie: een vermijdzone rond het rechtstreekse stuk ertussen,
+  // zodat de motor verplicht is een écht ander tracé te zoeken, niet gewoon dezelfde weg terug te geven.
+  const directSegment = linePts.slice(myIdx, rejoinIdx + 1).map(p => [p.lat, p.lng]);
+  const avoidPolygon = bufferPolylineToPolygon(downsampleCoords(directSegment, 40), 18);
+  const baseProfile = cfg().routeProfile;
+
+  toast(curLang()==='en' ? `Finding a detour of about ${kmWanted} km…` : `Omweg van ongeveer ${kmWanted} km zoeken…`, 3000);
+  try{
+    const detour = await fetchOrsRouteWithAvoidPolygon([myPos, rejoinPt], avoidPolygon, baseProfile, {});
+    // Zoek in route[] het eerste punt (vanaf je huidige doel) dat het dichtst bij het aansluitpunt ligt —
+    // alles daarna blijft exact zoals het was, alles ervoor wordt vervangen door de nieuwe omweg.
+    let rejoinRouteIdx = route.length;
+    let bestD = Infinity;
+    for (let i = navTargetIndex; i < route.length; i++){
+      const d = haversine(rejoinPt.lat, rejoinPt.lon, route[i].lat, route[i].lon);
+      if (d < bestD){ bestD = d; rejoinRouteIdx = i; }
+    }
+    const sampledVia = sampleGeometryAsViaPoints(detour.coordsLatLng, 8).map(p => ({
+      id:'detourfix-' + Math.random().toString(36).slice(2,9), ref:'↔', lat:p.lat, lon:p.lon, isVia:true
+    }));
+    // Oude, nu vervangen tussenpunten netjes van de kaart halen vóór de nieuwe erbij komen.
+    for (let i = navTargetIndex; i < rejoinRouteIdx; i++){
+      const oldId = route[i].id;
+      if (pinMarkers[oldId]){ map.removeLayer(pinMarkers[oldId]); delete pinMarkers[oldId]; }
+    }
+    route.splice(navTargetIndex, rejoinRouteIdx - navTargetIndex, ...sampledVia);
+    sampledVia.forEach(addDraggableRoutePointMarker);
+    renderRoute();
+    await drawRoutePath(true);
+    toast(curLang()==='en' ? '✅ Detour found — rejoins your route further ahead.' : '✅ Omweg gevonden — sluit verderop weer aan op je route.', 4000);
+  }catch(e){
+    toast(tr('toastNoAltRoute'), 5000);
+  }
+}
 async function rerouteFromCurrentPosition(isAutomatic){
   if (!navActive || !lastPosition || navTargetIndex >= route.length){
     if (!isAutomatic) toast(tr('toastNavOnly'));
@@ -6677,7 +6735,13 @@ async function rerouteFromCurrentPosition(isAutomatic){
     autoRerouteInProgress = false;
   }
 }
-$('roadClosedBtn').addEventListener('click', () => rerouteFromCurrentPosition(false));
+$('roadClosedBtn').addEventListener('click', () => {
+  const raw = prompt(curLang()==='en' ? 'Roughly how many km should the detour be?' : 'Hoeveel km mag de omweg ongeveer zijn?', '2');
+  if (raw === null) return; // geannuleerd
+  const km = parseFloat(raw.replace(',', '.'));
+  if (!km || km <= 0){ toast(tr('toastDetourInvalidKm'), 3500); return; }
+  detourAroundClosedRoad(km);
+});
 
 // ---------- Turn-by-turn: verwerkt de OSRM-'steps' tot een platte lijst met cumulatieve afstand ----------
 let routeSteps = [];
