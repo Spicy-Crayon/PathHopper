@@ -695,7 +695,8 @@
   #bikeSetupBackBtn{
     position:absolute; left:16px; top:calc(16px + env(safe-area-inset-top,0px) + var(--extra-top-inset));
     border:2px solid var(--amber); background:rgba(226,161,60,0.16); color:var(--amber);
-    width:42px; height:38px; border-radius:14px; font-size:20px; font-weight:900; box-shadow:0 2px 6px rgba(0,0,0,0.25);
+    width:42px; height:38px; border-radius:14px; box-shadow:0 2px 6px rgba(0,0,0,0.25);
+    display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:900; line-height:1;
   }
   #bikeSetupBackBtn:active{ background:rgba(226,161,60,0.3); }
   .bike-setup-inner{ width:100%; max-width:380px; text-align:center; margin-top:-25px; }
@@ -1032,7 +1033,7 @@
     </div>
   </div>
   <div id="modeSelectHint" data-i18n="modeSelectHint">Knooppunten, navigatie, GPX, offline-gebruik — alles werkt voor beide.</div>
-  <div id="appVersionStart">v2.204 · 7 aug</div>
+  <div id="appVersionStart">v2.206 · 7 aug</div>
 </div>
 
 <div id="bikeSetupScreen" class="hidden">
@@ -1115,7 +1116,7 @@
   <button class="menu-item" id="menuHelpBtn"><span class="mi-icon">❓</span><span class="mi-text"><b data-i18n="menuHelp">Hulp</b><small data-i18n="menuHelpSub">uitleg over alle functies</small></span></button>
   <button class="menu-item" id="menuDevNotesBtn"><span class="mi-icon">🛠️</span><span class="mi-text"><b data-i18n="menuDevNotes">Technische werking</b><small data-i18n="menuDevNotesSub">hoe wegdektype, routering en fallbacks precies werken</small></span></button>
   <button class="menu-item" id="menuLogbookBtn"><span class="mi-icon">📋</span><span class="mi-text"><b data-i18n="menuLogbook">Logboek</b><small data-i18n="menuLogbookSub">overzicht van alle meldingen, ook stille</small></span></button>
-  <div id="menuVersion">v2.204 · 7 aug</div>
+  <div id="menuVersion">v2.206 · 7 aug</div>
 </div>
 
 <div id="hint" data-i18n="hintInitial">Zoom of pan naar je gebied, tik dan op "Laad knooppunten"</div>
@@ -4304,6 +4305,7 @@ const TRANSLATIONS = {
   analyseElevationFail: { nl:'Hoogtegegevens konden niet opgehaald worden.', en:'Could not fetch elevation data.' },
   analyseNoRoute: { nl:'Nog geen route om te analyseren — zet eerst je punten en druk op "Klaar".', en:'No route to analyse yet — set your points first and press "Ready".' },
   analyseComingSoon: { nl:'Deze tab komt in een latere stap.', en:'This tab is coming in a later step.' },
+  analyseSurfaceFail: { nl:'Kon het wegdektype nergens ophalen.', en:'Could not fetch surface type anywhere.' },
   settingsBikeRoad: { nl:'🚴 Racefiets — vermijdt onverhard', en:'🚴 Road bike — avoids unpaved' },
   settingsBikeMountain: { nl:'🚵 Mountainbike — zoekt paden op', en:'🚵 Mountain bike — seeks out trails' },
   settingsBikeElectric: { nl:'🔋 E-bike', en:'🔋 E-bike' },
@@ -6611,6 +6613,7 @@ async function fetchOsrmRoute(waypoints, baseProfile, needSteps){
 // ---------- Route inkleuren op de kaart: op wind (rugwind/tegenwind/zijwind) of op hoogte (stijging/daling) ----------
 const WIND_COLORS = { tail:'#2e9e4f', cross:'#e2a13c', head:'#d5443a' };
 const ELEV_COLORS = { up:'#d5443a', down:'#2e9e4f', flat:'#8a8a8a' };
+const SURFACE_COLORS = { paved:'#2e9e4f', medium:'#e2a13c', unpaved:'#d5443a', unknown:'#8a8a8a' };
 
 async function applyRouteColoring(){
   routeColorLayer.clearLayers();
@@ -6681,7 +6684,6 @@ async function applyRouteColoring(){
     catch(e){ toast(tr('toastSurfaceAllSourcesFailed'), 4000); return; } // onverwachte fout — dit zou normaal niet meer mogen gebeuren, fetchSurfaceDataWithFallback geeft nu altijd iets terug
     if (result.approximate) toast(tr('toastSurfaceApproximate'), 4500);
     routeLine.setStyle({ opacity:0.15 });
-    const SURFACE_COLORS = { paved:'#2e9e4f', medium:'#e2a13c', unpaved:'#d5443a', unknown:'#8a8a8a' };
     result.surfaceValues.forEach(([startIdx, endIdx, bucket]) => {
       const segPts = result.coordsLatLng.slice(startIdx, endIdx + 1);
       if (segPts.length >= 2) L.polyline(segPts, { color:SURFACE_COLORS[bucket] || SURFACE_COLORS.unpaved, weight:5, opacity:0.95 }).addTo(routeColorLayer);
@@ -10508,6 +10510,33 @@ $('passiveAnalyseBtn').addEventListener('click', () => {
   openAnalyseScreen();
 });
 let analyseMapInstance = null;
+// Toont segmenten als een proportionele, gekleurde balk over de volledige breedte — geschikt voor
+// categorische data (bv. wegdektype: elk stukje krijgt gewoon zijn eigen kleur, breedte = aandeel in de
+// totale afstand), in tegenstelling tot een lijngrafiek die een continue waarde nodig heeft.
+function renderSegmentBarChart(coordsLatLng, segments, colorMap, svgId){
+  const svg = $(svgId);
+  const wrap = svg.parentElement;
+  const w = wrap.clientWidth || window.innerWidth, h = wrap.clientHeight || 120;
+  svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+  // Cumulatieve afstand per coördinaat, zodat we elk segment naar een precieze breedte kunnen omzetten.
+  const cum = [0];
+  for (let i = 1; i < coordsLatLng.length; i++){
+    const [la1, lo1] = Array.isArray(coordsLatLng[i-1]) ? coordsLatLng[i-1] : [coordsLatLng[i-1].lat, coordsLatLng[i-1].lng];
+    const [la2, lo2] = Array.isArray(coordsLatLng[i]) ? coordsLatLng[i] : [coordsLatLng[i].lat, coordsLatLng[i].lng];
+    cum.push(cum[i-1] + haversine(la1, lo1, la2, lo2));
+  }
+  const total = cum[cum.length - 1] || 1;
+  const barY = h * 0.35, barH = h * 0.3;
+  let bars = '';
+  segments.forEach(([startIdx, endIdx, bucket]) => {
+    const x1 = (cum[startIdx] / total) * w, x2 = (cum[endIdx] / total) * w;
+    bars += `<rect x="${x1.toFixed(1)}" y="${barY}" width="${Math.max(0, x2-x1).toFixed(1)}" height="${barH}" fill="${colorMap[bucket] || colorMap.unknown || '#8a8a8a'}"/>`;
+  });
+  const distLabel = total >= 1000 ? (total/1000).toFixed(1) + ' km' : Math.round(total) + ' m';
+  svg.innerHTML = `${bars}
+    <text x="0" y="${h-6}" font-size="11" fill="#cfe0d4">0 km</text>
+    <text x="${w}" y="${h-6}" text-anchor="end" font-size="11" fill="#cfe0d4">${distLabel}</text>`;
+}
 function openAnalyseScreen(){
   $('analyseScreen').classList.remove('hidden');
   if (!analyseMapInstance){
@@ -10554,6 +10583,31 @@ async function loadAnalyseTab(tabName){
     analyseMapInstance.invalidateSize();
     analyseMapInstance.fitBounds(L.latLngBounds(profile.lat.map((la,i) => [la, profile.lon[i]])), { padding:[20,20] });
     setTimeout(() => renderElevationChart(profile, 'analyseSvg', 'analyseChartWrap'), 60);
+    return;
+  }
+
+  if (tabName === 'surface'){
+    $('analysePlaceholder').innerHTML = `<div>${tr('analyseLoading')}</div>`;
+    $('analysePlaceholder').style.display = 'flex';
+    const pts = getElevationSourcePoints(); // zelfde bron als de hoogte-tab: geïmporteerde track, of anders de getekende route
+    if (pts.length < 2){
+      $('analysePlaceholder').innerHTML = `<div>${tr('analyseNoRoute')}</div>`;
+      return;
+    }
+    let result;
+    try{ result = await fetchSurfaceDataWithFallback(pts.map(p => ({lat:p.lat, lon:p.lon})), pts.map(p => [p.lat, p.lon])); }
+    catch(e){ $('analysePlaceholder').innerHTML = `<div>${tr('analyseSurfaceFail')}</div>`; return; }
+    $('analysePlaceholder').style.display = 'none';
+    $('analyseMapWrap').style.display = 'block';
+    $('analyseChartWrap').style.display = 'block';
+    analyseRouteLayer = L.layerGroup().addTo(analyseMapInstance);
+    result.surfaceValues.forEach(([startIdx, endIdx, bucket]) => {
+      const segPts = result.coordsLatLng.slice(startIdx, endIdx + 1);
+      if (segPts.length >= 2) L.polyline(segPts, { color:SURFACE_COLORS[bucket] || SURFACE_COLORS.unknown, weight:5, opacity:0.95 }).addTo(analyseRouteLayer);
+    });
+    analyseMapInstance.invalidateSize();
+    analyseMapInstance.fitBounds(L.latLngBounds(result.coordsLatLng), { padding:[20,20] });
+    renderSegmentBarChart(result.coordsLatLng, result.surfaceValues, SURFACE_COLORS, 'analyseSvg');
     return;
   }
 
