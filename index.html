@@ -539,6 +539,14 @@
   #emptyMsg{ font-size:13px; color:#5a6d61; padding:10px 4px; }
 
   #actions{ display:flex; gap:4px; margin-top:6px; }
+  #passiveActionsRow{ display:flex; gap:6px; margin-top:6px; }
+  #passiveActionsRow button{
+    flex:1; border:none; border-radius:11px; padding:11px 4px; font-weight:800; font-size:12.5px;
+  }
+  #passiveReadyBtn{ background:var(--amber); color:var(--green-900); }
+  #passiveReadyBtn.editing{ background:#2d5240; color:var(--cream); }
+  #passiveAnalyseBtn{ background:#2d5240; color:var(--cream); }
+  #passiveAnalyseBtn:disabled{ opacity:0.45; }
   #actions button{
     flex:1; min-width:0; border:none; border-radius:11px; padding:9px 1px; font-weight:800; font-size:9.5px;
     display:flex; flex-direction:column; align-items:center; gap:2px; line-height:1.1;
@@ -999,7 +1007,7 @@
     </div>
   </div>
   <div id="modeSelectHint" data-i18n="modeSelectHint">Knooppunten, navigatie, GPX, offline-gebruik — alles werkt voor beide.</div>
-  <div id="appVersionStart">v2.199 · 7 aug</div>
+  <div id="appVersionStart">v2.201 · 7 aug</div>
 </div>
 
 <div id="bikeSetupScreen" class="hidden">
@@ -1018,9 +1026,9 @@
         <span class="nav-type-icon">🟢</span>
         <span class="nav-type-text"><b data-i18n="navTypeActiveTitle">Actief Live</b><small data-i18n="navTypeActiveSub">Live routelijn, spelden verslepen, meteen herberekenen — zoals nu</small></span>
       </button>
-      <button class="nav-type-card" data-navtype="passive" disabled>
+      <button class="nav-type-card" data-navtype="passive">
         <span class="nav-type-icon">🧭</span>
-        <span class="nav-type-text"><b data-i18n="navTypePassiveTitle">Passief Pro</b><small data-i18n="navTypePassiveSub">Diepgaande wegdek-analyse, geen live herberekening — binnenkort beschikbaar</small></span>
+        <span class="nav-type-text"><b data-i18n="navTypePassiveTitle">Passief Pro</b><small data-i18n="navTypePassiveSub">Punten zetten zonder live herberekening — druk op "Klaar" om te berekenen</small></span>
       </button>
     </div>
 
@@ -1082,7 +1090,7 @@
   <button class="menu-item" id="menuHelpBtn"><span class="mi-icon">❓</span><span class="mi-text"><b data-i18n="menuHelp">Hulp</b><small data-i18n="menuHelpSub">uitleg over alle functies</small></span></button>
   <button class="menu-item" id="menuDevNotesBtn"><span class="mi-icon">🛠️</span><span class="mi-text"><b data-i18n="menuDevNotes">Technische werking</b><small data-i18n="menuDevNotesSub">hoe wegdektype, routering en fallbacks precies werken</small></span></button>
   <button class="menu-item" id="menuLogbookBtn"><span class="mi-icon">📋</span><span class="mi-text"><b data-i18n="menuLogbook">Logboek</b><small data-i18n="menuLogbookSub">overzicht van alle meldingen, ook stille</small></span></button>
-  <div id="menuVersion">v2.199 · 7 aug</div>
+  <div id="menuVersion">v2.201 · 7 aug</div>
 </div>
 
 <div id="hint" data-i18n="hintInitial">Zoom of pan naar je gebied, tik dan op "Laad knooppunten"</div>
@@ -1976,6 +1984,10 @@
   </div>
   <ul id="routeList"></ul>
   <div id="emptyMsg" data-i18n="emptyMsgInitial">Tik op een groen knooppunt op de kaart om je route samen te stellen.</div>
+  <div id="passiveActionsRow" style="display:none;">
+    <button id="passiveReadyBtn" data-i18n="passiveReadyBtn">✅ Klaar</button>
+    <button id="passiveAnalyseBtn" data-i18n="passiveAnalyseBtn">📊 Analyse</button>
+  </div>
   <div id="actions">
     <button id="clearBtn" class="small"><span class="ic">🗑️</span><span data-i18n="actionWis">Wis</span></button>
     <button id="toStartBtn" class="small" title="Aan: route vertrekt vanaf je huidige locatie. Uit: route vertrekt vanaf je eerste geselecteerde punt." data-i18n-title="titleVertrekToggle"><span class="ic">🚴</span><span data-i18n="actionVertrek">Vertrek</span></button>
@@ -2454,6 +2466,8 @@ const MODE_CONFIG = {
             title:'Wandelroute', titleEn:'Walking route', markerColor:'#2a5f8f' }
 };
 let appMode = null; // wordt gezet zodra de gebruiker een tegel kiest op het startscherm
+let navType = 'active'; // 'active' (zoals nu, live) of 'passive' (Passief Pro: enkel herberekenen na 'Klaar')
+let passiveEditingDone = false; // in Passief Pro: is er al op 'Klaar' gedrukt voor de huidige route?
 function cfg(){ return MODE_CONFIG[appMode || 'fiets']; }
 function curLang(){ return appSettings.language === 'en' ? 'en' : 'nl'; }
 function modeLabel(){ return curLang() === 'en' ? cfg().labelEn : cfg().label; }
@@ -3858,7 +3872,7 @@ let appSettings = {
   dashTextSize:'normal', dashBold:true, offRouteDist:35, autoReroute:false, silentReroute:false,
   overlays:{ cycling:false, hiking:false, mtb:false },
   poiLayers:{ cafe:false, restaurant:false, bakery:false, supermarket:false, pharmacy:false, bike:false, water:false, toilet:false, money:false, camping:false, charging:false, playground:false, parking:false, hotel:false }, showPoiDetails:false,
-  showWindDirection:true, autoPause:false, redNavDot:false, topOffsetPx:0, tabGapPx:0, bodyWeightKg:null, voiceOnlyMode:false, routeColorMode:'off', showWindInNav:false, eatReminderOn:false, eatIntervalMin:45, drinkReminderOn:false, drinkIntervalMin:20, segmentPrOn:true, darkArrivalWarning:true, quietRoutingMode:false, historyAudioOn:false, shakeToSurpriseOn:false, shakeKm:30, vertrekFromGps:false, avoidBufferM:18, maxOverlapPct:30, lowerGpsAccuracy:false, disableMapRotation:false, posUpdateIntervalSec:1, overpassSurfaceTimeoutSec:15, smartUnpavedAvoidance:false, fallDetectionOn:false, sosContactNumber:'', sosContactName:'', routePreference:'balanced', routeLineColor:'#e2a13c', language:'en',
+  showWindDirection:true, autoPause:false, redNavDot:false, topOffsetPx:0, tabGapPx:0, bodyWeightKg:null, voiceOnlyMode:false, routeColorMode:'off', showWindInNav:false, eatReminderOn:false, eatIntervalMin:45, drinkReminderOn:false, drinkIntervalMin:20, segmentPrOn:true, darkArrivalWarning:true, quietRoutingMode:false, historyAudioOn:false, shakeToSurpriseOn:false, shakeKm:30, vertrekFromGps:false, avoidBufferM:18, maxOverlapPct:30, lowerGpsAccuracy:false, disableMapRotation:false, posUpdateIntervalSec:1, overpassSurfaceTimeoutSec:15, smartUnpavedAvoidance:false, navType:'active', fallDetectionOn:false, sosContactNumber:'', sosContactName:'', routePreference:'balanced', routeLineColor:'#e2a13c', language:'en',
   bundledCountries:{ be:true, nl:false }, routingEngine:'brouter'
 };
 
@@ -4235,8 +4249,10 @@ const TRANSLATIONS = {
   navTypeActiveTitle: { nl:'Actief Live', en:'Active Live' },
   navTypeActiveSub: { nl:'Live routelijn, spelden verslepen, meteen herberekenen — zoals nu', en:'Live route line, drag pins, instant recalculation — like now' },
   navTypePassiveTitle: { nl:'Passief Pro', en:'Passive Pro' },
-  navTypePassiveSub: { nl:'Diepgaande wegdek-analyse, geen live herberekening — binnenkort beschikbaar', en:'In-depth surface analysis, no live recalculation — coming soon' },
+  navTypePassiveSub: { nl:'Punten zetten zonder live herberekening — druk op "Klaar" om te berekenen', en:'Place points without live recalculation — press "Ready" to calculate' },
   bikeSetupContinueBtn: { nl:'Doorgaan →', en:'Continue →' },
+  passiveReadyBtn: { nl:'✅ Klaar', en:'✅ Ready' },
+  passiveAnalyseBtn: { nl:'📊 Analyse', en:'📊 Analysis' },
   settingsBikeRoad: { nl:'🚴 Racefiets — vermijdt onverhard', en:'🚴 Road bike — avoids unpaved' },
   settingsBikeMountain: { nl:'🚵 Mountainbike — zoekt paden op', en:'🚵 Mountain bike — seeks out trails' },
   settingsBikeElectric: { nl:'🔋 E-bike', en:'🔋 E-bike' },
@@ -5216,7 +5232,7 @@ $('settingsResetBtn').addEventListener('click', () => {
     dashTextSize:'normal', dashBold:true, offRouteDist:35, autoReroute:false, silentReroute:false,
     overlays:{ cycling:false, hiking:false, mtb:false },
     poiLayers:{ cafe:false, restaurant:false, bakery:false, supermarket:false, pharmacy:false, bike:false, water:false, toilet:false, money:false, camping:false, charging:false, playground:false, parking:false, hotel:false }, showPoiDetails:false,
-    showWindDirection:true, autoPause:false, redNavDot:false, topOffsetPx:0, tabGapPx:0, bodyWeightKg:null, voiceOnlyMode:false, routeColorMode:'off', showWindInNav:false, eatReminderOn:false, eatIntervalMin:45, drinkReminderOn:false, drinkIntervalMin:20, segmentPrOn:true, darkArrivalWarning:true, quietRoutingMode:false, historyAudioOn:false, shakeToSurpriseOn:false, shakeKm:30, vertrekFromGps:false, avoidBufferM:18, maxOverlapPct:30, lowerGpsAccuracy:false, disableMapRotation:false, posUpdateIntervalSec:1, overpassSurfaceTimeoutSec:15, smartUnpavedAvoidance:false, fallDetectionOn:false, sosContactNumber:'', sosContactName:'', routePreference:'balanced', routeLineColor:'#e2a13c', language:'en',
+    showWindDirection:true, autoPause:false, redNavDot:false, topOffsetPx:0, tabGapPx:0, bodyWeightKg:null, voiceOnlyMode:false, routeColorMode:'off', showWindInNav:false, eatReminderOn:false, eatIntervalMin:45, drinkReminderOn:false, drinkIntervalMin:20, segmentPrOn:true, darkArrivalWarning:true, quietRoutingMode:false, historyAudioOn:false, shakeToSurpriseOn:false, shakeKm:30, vertrekFromGps:false, avoidBufferM:18, maxOverlapPct:30, lowerGpsAccuracy:false, disableMapRotation:false, posUpdateIntervalSec:1, overpassSurfaceTimeoutSec:15, smartUnpavedAvoidance:false, navType:'active', fallDetectionOn:false, sosContactNumber:'', sosContactName:'', routePreference:'balanced', routeLineColor:'#e2a13c', language:'en',
     bundledCountries:{ be:true, nl:false }, routingEngine:'brouter'
   };
   saveSettings();
@@ -6025,6 +6041,12 @@ $('clearBtn').addEventListener('click', () => {
   Object.values(pinMarkers).forEach(m => map.removeLayer(m));
   pinMarkers = {};
   ids.forEach(refreshNodeIcon);
+  if (navType === 'passive'){
+    passiveEditingDone = false;
+    $('passiveReadyBtn').classList.remove('editing');
+    $('passiveReadyBtn').textContent = tr('passiveReadyBtn');
+    $('passiveAnalyseBtn').disabled = true;
+  }
   renderRoute();
   drawRoutePath();
   applyRouteColoring();
@@ -6639,6 +6661,16 @@ $('routeColorLegend').addEventListener('click', () => {
 });
 let drawRoutePathToken = 0;
 async function drawRoutePath(fromCurrentLocation){
+  if (navType === 'passive' && !passiveEditingDone && !navActive){
+    // Passief Pro, nog aan het bewerken: helemaal geen lijn tonen (ook geen rechte-lijn-voorbeeld) —
+    // enkel je gezette punten zelf, om niet de indruk te wekken dat dit al een echte route is. De lijn
+    // verschijnt pas nadat je op 'Klaar' gedrukt hebt en de echte berekening gebeurd is.
+    routeLine.setLatLngs([]);
+    routeSteps = [];
+    actualRouteKm = null; // nog geen echte afstand gekend zolang er geen route berekend is
+    updateSheetMetaText();
+    return;
+  }
   const myToken = ++drawRoutePathToken;
   routeStartsFromGps = !!(fromCurrentLocation && lastPosition);
   const profile = cfg().routeProfile; // 'bike' of 'foot'
@@ -6887,9 +6919,15 @@ const MANEUVER_ARROW_CHAR = {
   'slight right':'↗️', 'right':'➡️', 'sharp right':'↱'
 };
 
-function maneuverText(step){
+function maneuverText(step, isFinalArrival){
   if (step.type === 'depart') return tr('maneuverDepart');
-  if (step.type === 'arrive') return tr('maneuverArrive');
+  if (step.type === 'arrive'){
+    if (isFinalArrival === false){
+      const target = route[navTargetIndex];
+      return curLang()==='en' ? `You've reached ${pointLabel(target).toLowerCase()} — continuing` : `Je bent bij ${pointLabel(target).toLowerCase()} — je route gaat verder`;
+    }
+    return tr('maneuverArrive');
+  }
   if (step.type === 'roundabout' || step.type === 'rotary' || step.type === 'roundabout turn') return tr('maneuverRoundabout');
   if (step.type === 'fork') return curLang()==='en'
     ? `Fork, ${maneuverWords()[step.modifier] || 'straight ahead'} 🔀`
@@ -6903,13 +6941,14 @@ function maneuverText(step){
 function updateTurnBanners(){
   const prog = computeProgressKm();
   const maneuver = routeSteps.length ? nextManeuver(prog.done * 1000) : null;
+  const isFinalArrival = navTargetIndex >= route.length - 1;
 
   const setBanner = (bannerId, arrowId, textId) => {
     const banner = $(bannerId);
     if (!maneuver){ banner.classList.remove('show'); return; }
     banner.classList.add('show');
     const distText = maneuver.distM >= 1000 ? (maneuver.distM/1000).toFixed(1) + ' km' : Math.round(maneuver.distM) + ' m';
-    $(textId).innerHTML = curLang()==='en' ? `In <b>${distText}</b>: ${maneuverText(maneuver.step)}` : `Over <b>${distText}</b>: ${maneuverText(maneuver.step)}`;
+    $(textId).innerHTML = curLang()==='en' ? `In <b>${distText}</b>: ${maneuverText(maneuver.step, isFinalArrival)}` : `Over <b>${distText}</b>: ${maneuverText(maneuver.step, isFinalArrival)}`;
     $(arrowId).style.transform = `rotate(${MANEUVER_ARROW_DEG[maneuver.step.modifier] ?? 0}deg)`;
   };
   setBanner('turnBanner', 'turnArrow', 'turnText');
@@ -6946,16 +6985,17 @@ function speak(text){
 
 function announceManeuver(maneuver){
   if (!maneuver || !voiceEnabled) return;
+  const isFinalArrival = navTargetIndex >= route.length - 1;
   const key = maneuver.step.startDistM;
   // eerste aankondiging: zodra de afslag binnen ~250m komt
   if (maneuver.distM <= 250 && announcedStepStart !== key){
     announcedStepStart = key;
-    speak(curLang()==='en' ? `In ${Math.round(maneuver.distM/10)*10} metres, ${maneuverText(maneuver.step)}.` : `Over ${Math.round(maneuver.distM/10)*10} meter, ${maneuverText(maneuver.step)}.`);
+    speak(curLang()==='en' ? `In ${Math.round(maneuver.distM/10)*10} metres, ${maneuverText(maneuver.step, isFinalArrival)}.` : `Over ${Math.round(maneuver.distM/10)*10} meter, ${maneuverText(maneuver.step, isFinalArrival)}.`);
   }
   // korte herinnering vlak voor de afslag zelf
   if (maneuver.distM <= 30 && announcedStepNear !== key){
     announcedStepNear = key;
-    speak(maneuverText(maneuver.step) + '.');
+    speak(maneuverText(maneuver.step, isFinalArrival) + '.');
   }
 }
 
@@ -7808,15 +7848,15 @@ function findAheadPoiCandidates(catKey, poiPool, aheadInfo, maxDistFromLineM, ma
     if (seen.has(key)) return;
     const distFromMe = haversine(myLat, myLon, p.lat, p.lon);
     if (distFromMe > maxSearchKm * 1000) return;
-    let closestToLine = Infinity;
+    let closestToLine = Infinity, closestLineCoord = null;
     for (let i = 0; i < aheadPts.length; i += 6){ // grovere steekproef — restaurants zijn talrijker dan cafés, dus dit blijft snel genoeg
       const d = haversine(p.lat, p.lon, aheadPts[i].lat, aheadPts[i].lng);
-      if (d < closestToLine) closestToLine = d;
+      if (d < closestToLine){ closestToLine = d; closestLineCoord = aheadPts[i]; }
       if (closestToLine <= maxDistFromLineM) break; // al dicht genoeg gevonden, de rest van de lijn hoeft niet meer gecheckt
     }
     if (closestToLine > maxDistFromLineM) return;
     seen.add(key);
-    candidates.push({ name:p.name, lat:p.lat, lon:p.lon, catKey:p.catKey, distFromMe, openingHours:p.openingHours || '' });
+    candidates.push({ name:p.name, lat:p.lat, lon:p.lon, catKey:p.catKey, distFromMe, openingHours:p.openingHours || '', lineCoord:closestLineCoord });
   });
   return candidates;
 }
@@ -7891,9 +7931,19 @@ function renderFoodBreakResults(candidates, aheadInfo){
 }
 function useFoodBreakOption(c){
   const stopPoint = { id:'foodbreak-' + Math.random().toString(36).slice(2,9), ref:'📍', lat:c.lat, lon:c.lon, poiName:c.name };
-  // Invoegen net vóór je huidige eerstvolgende doel — dus: jij nu → deze stop → je oorspronkelijke
-  // volgende punt → de rest van je route blijft ongewijzigd.
-  const insertAt = Math.min(navTargetIndex, route.length);
+  // Zoek het bestaande routepunt (vanaf je huidige doel) dat het dichtst bij de plek ligt waar deze stop
+  // écht gevonden werd langs je route — dat is de juiste invoegplek, ook als dat verder ligt dan je
+  // allereerstvolgende doel. Zonder dit kon de stop bij het naderen van je laatste punt foutief helemaal
+  // achteraan de route belanden.
+  let insertAt = navTargetIndex;
+  if (c.lineCoord){
+    let bestD = Infinity;
+    for (let i = navTargetIndex; i < route.length; i++){
+      const d = haversine(c.lineCoord.lat, c.lineCoord.lng, route[i].lat, route[i].lon);
+      if (d < bestD){ bestD = d; insertAt = i; }
+    }
+  }
+  insertAt = Math.min(insertAt, route.length);
   route.splice(insertAt, 0, stopPoint);
   addDraggableRoutePointMarker(stopPoint);
   renderRoute();
@@ -8701,6 +8751,11 @@ function renderPosition(){
     travelHeading = pos.coords.heading;
   } else if (deviceHeading != null){
     travelHeading = deviceHeading;
+  } else if (navActive && route[navTargetIndex]){
+    // Geen betrouwbare GPS-koers én geen kompas beschikbaar (bv. stilstaand na een herberekening zoals
+    // 'terug naar start') — val terug op de richting naar je huidige doel, zodat de pijl niet blijft hangen
+    // op een mogelijk allang niet meer kloppende, oude richting.
+    travelHeading = bearing(lat, lon, route[navTargetIndex].lat, route[navTargetIndex].lon);
   }
 
   // "Beweeg je?" — voor de optionele rode stip: gebruik GPS-snelheid indien beschikbaar (>0.3 m/s = ~1 km/u,
@@ -10287,6 +10342,12 @@ async function initModeData(){
 
 function selectMode(mode){
   appMode = mode;
+  navType = mode === 'fiets' ? (appSettings.navType || 'active') : 'active'; // Passief Pro bestaat voorlopig enkel bij Fiets
+  passiveEditingDone = false;
+  $('passiveActionsRow').style.display = navType === 'passive' ? 'flex' : 'none';
+  $('passiveReadyBtn').classList.remove('editing');
+  $('passiveReadyBtn').textContent = curLang()==='en' ? '✅ Ready' : '✅ Klaar';
+  $('passiveAnalyseBtn').disabled = true;
   document.body.classList.toggle('mode-wandel', mode === 'wandel');
   $('modeSelectScreen').classList.add('hidden');
   const lang = appSettings.language === 'en' ? 'en' : 'nl';
@@ -10339,7 +10400,7 @@ function openBikeSetupScreen(){
   // Toon de huidige, al opgeslagen keuze — zo blijft dit scherm altijd in sync met Instellingen,
   // ook als je die daar ooit rechtstreeks wijzigde zonder via dit scherm te gaan.
   document.querySelectorAll('.bike-type-tile').forEach(t => t.classList.toggle('active', t.dataset.biketype === appSettings.bikeType));
-  document.querySelectorAll('.nav-type-card').forEach(c => c.classList.toggle('active', c.dataset.navtype === 'active'));
+  document.querySelectorAll('.nav-type-card').forEach(c => c.classList.toggle('active', c.dataset.navtype === (appSettings.navType || 'active')));
   $('modeSelectScreen').classList.add('hidden');
   $('bikeSetupScreen').classList.remove('hidden');
 }
@@ -10359,6 +10420,8 @@ document.querySelectorAll('.nav-type-card').forEach(card => {
     if (card.disabled) return; // Passief Pro is nog niet beschikbaar
     document.querySelectorAll('.nav-type-card').forEach(c => c.classList.remove('active'));
     card.classList.add('active');
+    appSettings.navType = card.dataset.navtype;
+    saveSettings();
   });
 });
 $('bikeSetupContinueBtn').addEventListener('click', () => {
@@ -10368,6 +10431,30 @@ $('bikeSetupContinueBtn').addEventListener('click', () => {
 $('bikeSetupBackBtn').addEventListener('click', () => {
   $('bikeSetupScreen').classList.add('hidden');
   $('modeSelectScreen').classList.remove('hidden');
+});
+$('passiveReadyBtn').addEventListener('click', async () => {
+  if (!passiveEditingDone){
+    if (route.length < 2){ toast(tr('toastEditNeedsTwoPoints'), 4000); return; }
+    passiveEditingDone = true;
+    $('passiveReadyBtn').classList.add('editing');
+    $('passiveReadyBtn').textContent = curLang()==='en' ? '✏️ Edit' : '✏️ Edit';
+    $('passiveAnalyseBtn').disabled = false;
+    toast(curLang()==='en' ? '🔄 Calculating your route…' : '🔄 Je route wordt berekend…', 2500);
+    await drawRoutePath(routeStartsFromGps);
+  } else {
+    // Terug naar bewerken: lijn weer weghalen, opnieuw punten kunnen verschuiven zonder herberekening.
+    passiveEditingDone = false;
+    $('passiveReadyBtn').classList.remove('editing');
+    $('passiveReadyBtn').textContent = curLang()==='en' ? '✅ Ready' : '✅ Klaar';
+    $('passiveAnalyseBtn').disabled = true;
+    routeLine.setLatLngs([]);
+    routeSteps = [];
+    actualRouteKm = null;
+    updateSheetMetaText();
+  }
+});
+$('passiveAnalyseBtn').addEventListener('click', () => {
+  toast(curLang()==='en' ? '📊 Analysis page — coming in a later step.' : '📊 Analyse-pagina — komt in een latere stap.', 3000);
 });
 $('modeWandelBtn').addEventListener('click', () => selectMode('wandel'));
 $('modeWeatherBtn').addEventListener('click', () => {
