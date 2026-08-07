@@ -689,14 +689,15 @@
   #bikeSetupScreen{
     position:fixed; top:0;left:0;right:0;bottom:0; z-index:3000; background:var(--green-900);
     display:flex; align-items:center; justify-content:center; overflow-y:auto;
-    padding:calc(20px + env(safe-area-inset-top,0px) + var(--extra-top-inset)) 20px calc(24px + env(safe-area-inset-bottom,0px) + var(--extra-bottom-inset));
+    padding:calc(env(safe-area-inset-top,0px) + var(--extra-top-inset)) 20px calc(24px + env(safe-area-inset-bottom,0px) + var(--extra-bottom-inset));
   }
   #bikeSetupScreen.hidden{ display:none; }
   #bikeSetupBackBtn{
     position:absolute; left:16px; top:calc(16px + env(safe-area-inset-top,0px) + var(--extra-top-inset));
-    border:none; background:rgba(255,255,255,0.08); color:var(--cream); width:38px; height:38px;
-    border-radius:50%; font-size:18px;
+    border:1.5px solid rgba(246,244,238,0.25); background:rgba(255,255,255,0.1); color:var(--cream);
+    width:42px; height:38px; border-radius:14px; font-size:18px; box-shadow:0 2px 6px rgba(0,0,0,0.2);
   }
+  #bikeSetupBackBtn:active{ background:rgba(255,255,255,0.18); }
   .bike-setup-inner{ width:100%; max-width:380px; text-align:center; }
   .bike-setup-title{ color:var(--cream); font-size:16px; font-weight:800; margin-bottom:12px; }
   .bike-type-grid{ display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; }
@@ -875,6 +876,30 @@
   .rh-del{ border:none; background:none; color:#a33; font-size:17px; flex-shrink:0; }
   .rh-nav{ border:none; background:none; color:#1a7a4a; font-size:17px; flex-shrink:0; }
 
+  #analyseScreen{
+    position:fixed; top:0;left:0;right:0;bottom:0; z-index:3500; background:var(--green-900);
+    display:flex; flex-direction:column;
+    padding-top:env(safe-area-inset-top,0px);
+  }
+  #analyseScreen.hidden{ display:none; }
+  #analyseHeader{ display:flex; align-items:center; gap:8px; padding:10px 12px 6px; flex-shrink:0; }
+  #analyseCloseBtn{ border:none; background:rgba(255,255,255,0.1); color:var(--cream); width:34px; height:34px; border-radius:50%; font-size:15px; flex-shrink:0; }
+  #analyseTabBar{ display:flex; gap:4px; overflow-x:auto; flex:1; }
+  .analyse-tab{
+    flex-shrink:0; border:none; background:rgba(255,255,255,0.06); color:rgba(246,244,238,0.7);
+    padding:8px 12px; border-radius:10px; font-size:11.5px; font-weight:700; white-space:nowrap;
+  }
+  .analyse-tab.active{ background:var(--amber); color:var(--green-900); }
+  #analyseBody{ flex:1; display:flex; flex-direction:column; min-height:0; padding:8px 12px 16px; gap:8px; }
+  #analyseMapWrap{ flex:1.1; min-height:0; border-radius:14px; overflow:hidden; }
+  #analyseMap{ width:100%; height:100%; }
+  #analyseChartWrap{ flex:0.7; min-height:0; background:rgba(255,255,255,0.05); border-radius:14px; padding:8px; }
+  #analyseSvg{ width:100%; height:100%; }
+  #analysePlaceholder{
+    flex:1; display:flex; align-items:center; justify-content:center; text-align:center;
+    color:rgba(246,244,238,0.6); font-size:13px; padding:20px; line-height:1.6;
+  }
+
   #elevationModal{
     position:fixed; top:0;left:0;right:0;bottom:0; z-index:2000; background:var(--green-900);
     display:none; flex-direction:column; overflow-y:auto;
@@ -1007,7 +1032,7 @@
     </div>
   </div>
   <div id="modeSelectHint" data-i18n="modeSelectHint">Knooppunten, navigatie, GPX, offline-gebruik — alles werkt voor beide.</div>
-  <div id="appVersionStart">v2.201 · 7 aug</div>
+  <div id="appVersionStart">v2.203 · 7 aug</div>
 </div>
 
 <div id="bikeSetupScreen" class="hidden">
@@ -1090,7 +1115,7 @@
   <button class="menu-item" id="menuHelpBtn"><span class="mi-icon">❓</span><span class="mi-text"><b data-i18n="menuHelp">Hulp</b><small data-i18n="menuHelpSub">uitleg over alle functies</small></span></button>
   <button class="menu-item" id="menuDevNotesBtn"><span class="mi-icon">🛠️</span><span class="mi-text"><b data-i18n="menuDevNotes">Technische werking</b><small data-i18n="menuDevNotesSub">hoe wegdektype, routering en fallbacks precies werken</small></span></button>
   <button class="menu-item" id="menuLogbookBtn"><span class="mi-icon">📋</span><span class="mi-text"><b data-i18n="menuLogbook">Logboek</b><small data-i18n="menuLogbookSub">overzicht van alle meldingen, ook stille</small></span></button>
-  <div id="menuVersion">v2.201 · 7 aug</div>
+  <div id="menuVersion">v2.203 · 7 aug</div>
 </div>
 
 <div id="hint" data-i18n="hintInitial">Zoom of pan naar je gebied, tik dan op "Laad knooppunten"</div>
@@ -1656,6 +1681,26 @@
   <div class="simple-modal-card" id="devNotesCard">
     <div class="simple-modal-head"><b id="devNotesTitle">🛠️ Technische werking</b><button class="simple-modal-close" data-close="devNotesModal">✕</button></div>
     <div id="devNotesContent"></div>
+  </div>
+</div>
+
+<div id="analyseScreen" class="hidden">
+  <div id="analyseHeader">
+    <button id="analyseCloseBtn" aria-label="Sluiten">✕</button>
+    <div id="analyseTabBar">
+      <button class="analyse-tab active" data-tab="surface" data-i18n="analyseTabSurface">🛣️ Wegdektype</button>
+      <button class="analyse-tab" data-tab="wind" data-i18n="analyseTabWind">💨 Wind</button>
+      <button class="analyse-tab" data-tab="elevation" data-i18n="analyseTabElevation">⛰️ Hoogte</button>
+      <button class="analyse-tab" data-tab="slope" data-i18n="analyseTabSlope">📐 Helling</button>
+      <button class="analyse-tab" data-tab="logs" data-i18n="analyseTabLogs">📋 Logs</button>
+    </div>
+  </div>
+  <div id="analyseBody">
+    <div id="analyseMapWrap"><div id="analyseMap"></div></div>
+    <div id="analyseChartWrap">
+      <svg id="analyseSvg" viewBox="0 0 100 40" preserveAspectRatio="none"></svg>
+    </div>
+    <div id="analysePlaceholder" style="display:none;"></div>
   </div>
 </div>
 
@@ -2648,12 +2693,9 @@ function showPinPopup(lat, lon){
   pinMarker.on('dragstart', () => { teardownRotationAwareDragging(); map.dragging.disable(); });
   pinMarker.on('drag', (e) => { pinLatLng = { lat: e.target.getLatLng().lat, lon: e.target.getLatLng().lng }; });
   pinMarker.on('dragend', () => { map.dragging.enable(); });
-  tempBikeTypeOverride = null; // start telkens terug bij je algemene instelling
-  document.querySelectorAll('.pin-biketype-opt').forEach(btn => btn.classList.toggle('active', btn.dataset.type === appSettings.bikeType));
-  // Fietstype-keuze (racefiets/mountainbike/e-bike) is enkel relevant in fietsmodus
-  const showBikeType = appMode !== 'wandel';
-  $('pinBikeTypeLabelEl').style.display = showBikeType ? 'block' : 'none';
-  $('pinBikeTypeRow').style.display = showBikeType ? 'flex' : 'none';
+  tempBikeTypeOverride = null; // fietstype kies je nu globaal op het startscherm/in instellingen, niet meer per speld
+  $('pinBikeTypeLabelEl').style.display = 'none';
+  $('pinBikeTypeRow').style.display = 'none';
   $('pinRouteDirectBtn').innerHTML = (appMode === 'wandel' ? '🥾' : '🚴') + ' ' + tr('pinRouteDirect').replace(/^\S+\s/, '');
   openModal('pinActionSheet');
 }
@@ -4253,6 +4295,15 @@ const TRANSLATIONS = {
   bikeSetupContinueBtn: { nl:'Doorgaan →', en:'Continue →' },
   passiveReadyBtn: { nl:'✅ Klaar', en:'✅ Ready' },
   passiveAnalyseBtn: { nl:'📊 Analyse', en:'📊 Analysis' },
+  analyseTabSurface: { nl:'🛣️ Wegdektype', en:'🛣️ Surface' },
+  analyseTabWind: { nl:'💨 Wind', en:'💨 Wind' },
+  analyseTabElevation: { nl:'⛰️ Hoogte', en:'⛰️ Elevation' },
+  analyseTabSlope: { nl:'📐 Helling', en:'📐 Slope' },
+  analyseTabLogs: { nl:'📋 Logs', en:'📋 Logs' },
+  analyseLoading: { nl:'Bezig met analyseren…', en:'Analysing…' },
+  analyseElevationFail: { nl:'Hoogtegegevens konden niet opgehaald worden.', en:'Could not fetch elevation data.' },
+  analyseNoRoute: { nl:'Nog geen route om te analyseren — zet eerst je punten en druk op "Klaar".', en:'No route to analyse yet — set your points first and press "Ready".' },
+  analyseComingSoon: { nl:'Deze tab komt in een latere stap.', en:'This tab is coming in a later step.' },
   settingsBikeRoad: { nl:'🚴 Racefiets — vermijdt onverhard', en:'🚴 Road bike — avoids unpaved' },
   settingsBikeMountain: { nl:'🚵 Mountainbike — zoekt paden op', en:'🚵 Mountain bike — seeks out trails' },
   settingsBikeElectric: { nl:'🔋 E-bike', en:'🔋 E-bike' },
@@ -10454,8 +10505,62 @@ $('passiveReadyBtn').addEventListener('click', async () => {
   }
 });
 $('passiveAnalyseBtn').addEventListener('click', () => {
-  toast(curLang()==='en' ? '📊 Analysis page — coming in a later step.' : '📊 Analyse-pagina — komt in een latere stap.', 3000);
+  openAnalyseScreen();
 });
+let analyseMapInstance = null;
+function openAnalyseScreen(){
+  $('analyseScreen').classList.remove('hidden');
+  if (!analyseMapInstance){
+    analyseMapInstance = L.map('analyseMap', { zoomControl:false, attributionControl:false });
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { maxZoom:19 }).addTo(analyseMapInstance);
+  }
+  setTimeout(() => analyseMapInstance.invalidateSize(), 50);
+  loadAnalyseTab('surface');
+}
+$('analyseCloseBtn').addEventListener('click', () => { $('analyseScreen').classList.add('hidden'); });
+document.querySelectorAll('.analyse-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.analyse-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    loadAnalyseTab(tab.dataset.tab);
+  });
+});
+let analyseRouteLayer = null;
+async function loadAnalyseTab(tabName){
+  $('analyseMapWrap').style.display = 'none';
+  $('analyseChartWrap').style.display = 'none';
+  $('analysePlaceholder').style.display = 'none';
+  if (analyseRouteLayer){ analyseMapInstance.removeLayer(analyseRouteLayer); analyseRouteLayer = null; }
+
+  if (tabName === 'elevation'){
+    $('analysePlaceholder').innerHTML = `<div>${tr('analyseLoading')}</div>`;
+    $('analysePlaceholder').style.display = 'flex';
+    let profile;
+    try{ profile = await ensureElevationProfile(); }
+    catch(e){ $('analysePlaceholder').innerHTML = `<div>${tr('analyseElevationFail')}</div>`; return; }
+    if (!profile || !profile.lat || profile.lat.length < 2){
+      $('analysePlaceholder').innerHTML = `<div>${tr('analyseNoRoute')}</div>`;
+      return;
+    }
+    $('analysePlaceholder').style.display = 'none';
+    $('analyseMapWrap').style.display = 'block';
+    $('analyseChartWrap').style.display = 'block';
+    analyseRouteLayer = L.layerGroup().addTo(analyseMapInstance);
+    for (let i = 1; i < profile.lat.length; i++){
+      const d = profile.ele[i] - profile.ele[i-1];
+      const cls = d > 0.6 ? 'up' : d < -0.6 ? 'down' : 'flat';
+      L.polyline([[profile.lat[i-1], profile.lon[i-1]], [profile.lat[i], profile.lon[i]]], { color:ELEV_COLORS[cls], weight:5, opacity:0.95 }).addTo(analyseRouteLayer);
+    }
+    analyseMapInstance.invalidateSize();
+    analyseMapInstance.fitBounds(L.latLngBounds(profile.lat.map((la,i) => [la, profile.lon[i]])), { padding:[20,20] });
+    setTimeout(() => renderElevationChart(profile, 'analyseSvg', 'analyseChartWrap'), 60);
+    return;
+  }
+
+  // Overige tabs: nog niet gebouwd, volgen in een latere stap.
+  $('analysePlaceholder').innerHTML = `<div>${tr('analyseComingSoon')}</div>`;
+  $('analysePlaceholder').style.display = 'flex';
+}
 $('modeWandelBtn').addEventListener('click', () => selectMode('wandel'));
 $('modeWeatherBtn').addEventListener('click', () => {
   selectMode(appMode || 'fiets');
