@@ -694,11 +694,11 @@
   #bikeSetupScreen.hidden{ display:none; }
   #bikeSetupBackBtn{
     position:absolute; left:16px; top:calc(16px + env(safe-area-inset-top,0px) + var(--extra-top-inset));
-    border:1.5px solid rgba(246,244,238,0.25); background:rgba(255,255,255,0.1); color:var(--cream);
-    width:42px; height:38px; border-radius:14px; font-size:18px; box-shadow:0 2px 6px rgba(0,0,0,0.2);
+    border:2px solid var(--amber); background:rgba(226,161,60,0.16); color:var(--amber);
+    width:42px; height:38px; border-radius:14px; font-size:20px; font-weight:900; box-shadow:0 2px 6px rgba(0,0,0,0.25);
   }
-  #bikeSetupBackBtn:active{ background:rgba(255,255,255,0.18); }
-  .bike-setup-inner{ width:100%; max-width:380px; text-align:center; }
+  #bikeSetupBackBtn:active{ background:rgba(226,161,60,0.3); }
+  .bike-setup-inner{ width:100%; max-width:380px; text-align:center; margin-top:-25px; }
   .bike-setup-title{ color:var(--cream); font-size:16px; font-weight:800; margin-bottom:12px; }
   .bike-type-grid{ display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; }
   .bike-type-tile{
@@ -1032,7 +1032,7 @@
     </div>
   </div>
   <div id="modeSelectHint" data-i18n="modeSelectHint">Knooppunten, navigatie, GPX, offline-gebruik — alles werkt voor beide.</div>
-  <div id="appVersionStart">v2.203 · 7 aug</div>
+  <div id="appVersionStart">v2.204 · 7 aug</div>
 </div>
 
 <div id="bikeSetupScreen" class="hidden">
@@ -1115,7 +1115,7 @@
   <button class="menu-item" id="menuHelpBtn"><span class="mi-icon">❓</span><span class="mi-text"><b data-i18n="menuHelp">Hulp</b><small data-i18n="menuHelpSub">uitleg over alle functies</small></span></button>
   <button class="menu-item" id="menuDevNotesBtn"><span class="mi-icon">🛠️</span><span class="mi-text"><b data-i18n="menuDevNotes">Technische werking</b><small data-i18n="menuDevNotesSub">hoe wegdektype, routering en fallbacks precies werken</small></span></button>
   <button class="menu-item" id="menuLogbookBtn"><span class="mi-icon">📋</span><span class="mi-text"><b data-i18n="menuLogbook">Logboek</b><small data-i18n="menuLogbookSub">overzicht van alle meldingen, ook stille</small></span></button>
-  <div id="menuVersion">v2.203 · 7 aug</div>
+  <div id="menuVersion">v2.204 · 7 aug</div>
 </div>
 
 <div id="hint" data-i18n="hintInitial">Zoom of pan naar je gebied, tik dan op "Laad knooppunten"</div>
