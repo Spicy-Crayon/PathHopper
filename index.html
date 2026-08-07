@@ -677,6 +677,47 @@
   .mode-label{ color:var(--cream); font-weight:800; font-size:15px; }
   .mode-tile:active .mode-hex{ transform:scale(0.96); }
   #modeSelectHint{ color:rgba(246,244,238,0.6); font-size:12.5px; max-width:280px; flex-shrink:0; }
+
+  #bikeSetupScreen{
+    position:fixed; top:0;left:0;right:0;bottom:0; z-index:3000; background:var(--green-900);
+    display:flex; align-items:center; justify-content:center; overflow-y:auto;
+    padding:calc(20px + env(safe-area-inset-top,0px) + var(--extra-top-inset)) 20px calc(24px + env(safe-area-inset-bottom,0px) + var(--extra-bottom-inset));
+  }
+  #bikeSetupScreen.hidden{ display:none; }
+  #bikeSetupBackBtn{
+    position:absolute; left:16px; top:calc(16px + env(safe-area-inset-top,0px) + var(--extra-top-inset));
+    border:none; background:rgba(255,255,255,0.08); color:var(--cream); width:38px; height:38px;
+    border-radius:50%; font-size:18px;
+  }
+  .bike-setup-inner{ width:100%; max-width:380px; text-align:center; }
+  .bike-setup-title{ color:var(--cream); font-size:16px; font-weight:800; margin-bottom:12px; }
+  .bike-type-grid{ display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; }
+  .bike-type-tile{
+    border:2px solid transparent; background:rgba(255,255,255,0.06); border-radius:14px;
+    padding:12px 4px; display:flex; flex-direction:column; align-items:center; gap:5px; cursor:pointer;
+  }
+  .bike-type-tile.active{ background:var(--amber); border-color:var(--cream); }
+  .bike-type-icon{ font-size:28px; }
+  .bike-type-label{ color:var(--cream); font-size:10.5px; font-weight:700; line-height:1.2; }
+  .bike-type-tile.active .bike-type-label{ color:var(--green-900); }
+
+  .nav-type-choice{ display:flex; flex-direction:column; gap:10px; }
+  .nav-type-card{
+    display:flex; align-items:center; gap:12px; text-align:left;
+    border:2px solid transparent; background:rgba(255,255,255,0.06); border-radius:16px; padding:14px 16px; cursor:pointer;
+  }
+  .nav-type-card.active{ background:rgba(226,161,60,0.16); border-color:var(--amber); }
+  .nav-type-card:disabled{ opacity:0.45; cursor:default; }
+  .nav-type-icon{ font-size:26px; flex-shrink:0; }
+  .nav-type-text{ display:flex; flex-direction:column; gap:2px; }
+  .nav-type-text b{ color:var(--cream); font-size:14.5px; }
+  .nav-type-text small{ color:rgba(246,244,238,0.65); font-size:11.5px; line-height:1.4; }
+
+  #bikeSetupContinueBtn{
+    width:100%; margin-top:26px; border:none; border-radius:16px; padding:14px;
+    background:var(--amber); color:var(--green-900); font-size:15px; font-weight:800;
+  }
+  #bikeSetupContinueBtn:active{ filter:brightness(0.92); }
   #appVersionStart{ margin-top:10px; color:rgba(246,244,238,0.35); font-size:11px; letter-spacing:.5px; flex-shrink:0; align-self:flex-end; }
 
   #mapViewport{ position:absolute; top:0;left:0;right:0;bottom:0; overflow:hidden; background:var(--green-900); }
@@ -958,7 +999,33 @@
     </div>
   </div>
   <div id="modeSelectHint" data-i18n="modeSelectHint">Knooppunten, navigatie, GPX, offline-gebruik — alles werkt voor beide.</div>
-  <div id="appVersionStart">v2.195 · 7 aug</div>
+  <div id="appVersionStart">v2.199 · 7 aug</div>
+</div>
+
+<div id="bikeSetupScreen" class="hidden">
+  <button id="bikeSetupBackBtn" aria-label="Terug">←</button>
+  <div class="bike-setup-inner">
+    <div class="bike-setup-title" data-i18n="bikeSetupBikeTypeTitle">🚲 Kies je fietstype</div>
+    <div class="bike-type-grid" style="grid-template-columns:repeat(3, 1fr);">
+      <button class="bike-type-tile" data-biketype="regular"><span class="bike-type-icon">🚲</span><span class="bike-type-label" data-i18n="settingsBikeRegularShort">Stadsfiets</span></button>
+      <button class="bike-type-tile" data-biketype="road"><span class="bike-type-icon">🚴</span><span class="bike-type-label" data-i18n="settingsBikeRoadShort">Racefiets</span></button>
+      <button class="bike-type-tile" data-biketype="mountain"><span class="bike-type-icon">🚵</span><span class="bike-type-label" data-i18n="settingsBikeMountainShort">Mountainbike</span></button>
+    </div>
+
+    <div class="bike-setup-title" style="margin-top:26px;" data-i18n="bikeSetupNavTypeTitle">Welk type navigatie kies je?</div>
+    <div class="nav-type-choice">
+      <button class="nav-type-card" data-navtype="active">
+        <span class="nav-type-icon">🟢</span>
+        <span class="nav-type-text"><b data-i18n="navTypeActiveTitle">Actief Live</b><small data-i18n="navTypeActiveSub">Live routelijn, spelden verslepen, meteen herberekenen — zoals nu</small></span>
+      </button>
+      <button class="nav-type-card" data-navtype="passive" disabled>
+        <span class="nav-type-icon">🧭</span>
+        <span class="nav-type-text"><b data-i18n="navTypePassiveTitle">Passief Pro</b><small data-i18n="navTypePassiveSub">Diepgaande wegdek-analyse, geen live herberekening — binnenkort beschikbaar</small></span>
+      </button>
+    </div>
+
+    <button id="bikeSetupContinueBtn" data-i18n="bikeSetupContinueBtn">Doorgaan →</button>
+  </div>
 </div>
 
 <div id="mapViewport">
@@ -1015,7 +1082,7 @@
   <button class="menu-item" id="menuHelpBtn"><span class="mi-icon">❓</span><span class="mi-text"><b data-i18n="menuHelp">Hulp</b><small data-i18n="menuHelpSub">uitleg over alle functies</small></span></button>
   <button class="menu-item" id="menuDevNotesBtn"><span class="mi-icon">🛠️</span><span class="mi-text"><b data-i18n="menuDevNotes">Technische werking</b><small data-i18n="menuDevNotesSub">hoe wegdektype, routering en fallbacks precies werken</small></span></button>
   <button class="menu-item" id="menuLogbookBtn"><span class="mi-icon">📋</span><span class="mi-text"><b data-i18n="menuLogbook">Logboek</b><small data-i18n="menuLogbookSub">overzicht van alle meldingen, ook stille</small></span></button>
-  <div id="menuVersion">v2.195 · 7 aug</div>
+  <div id="menuVersion">v2.199 · 7 aug</div>
 </div>
 
 <div id="hint" data-i18n="hintInitial">Zoom of pan naar je gebied, tik dan op "Laad knooppunten"</div>
@@ -1170,6 +1237,15 @@
   </div>
 </div>
 
+<div id="detourKmModal" class="simple-modal">
+  <div class="simple-modal-card">
+    <div class="simple-modal-head"><b data-i18n="detourKmTitle">🚧 Omweg zoeken</b><button class="simple-modal-close" data-close="detourKmModal">✕</button></div>
+    <p class="settings-note" data-i18n="detourKmNote">Hoeveel km mag de omweg ongeveer zijn? Je route sluit daarna vanzelf weer aan op je oorspronkelijke pad.</p>
+    <input type="number" id="detourKmInput" value="2" min="0.5" max="30" step="0.5" class="settings-text-input" style="max-width:140px; font-size:20px; text-align:center;">
+    <button id="detourKmConfirmBtn" class="settings-btn" style="margin-top:14px;" data-i18n="detourKmConfirmBtn">🚧 Omweg zoeken</button>
+  </div>
+</div>
+
 <div id="preNavModal" class="simple-modal">
   <div class="simple-modal-card">
     <div class="simple-modal-head"><b id="preNavTitle">🚴 Klaar om te starten?</b></div>
@@ -1277,13 +1353,17 @@
     </details>
 
     <details class="settings-accordion"><summary data-i18n="settingsGroupNav">🧭 Onderweg & navigatie</summary>
-    <div class="settings-section">
+    <div class="settings-section" style="display:none;">
       <h4 data-i18n="settingsRouteColorHeading">Route inkleuren op de kaart</h4>
       <p class="settings-note" data-i18n="settingsRouteColorNote">Kleurt je getekende route op de kaart zelf — handig om in één oogopslag te zien waar het zwaar wordt.</p>
       <label class="settings-radio"><input type="radio" name="routeColorMode" value="off" checked> <span data-i18n="settingsRouteColorOff">⚪ Uit (standaardkleur)</span></label>
       <label class="settings-radio"><input type="radio" name="routeColorMode" value="wind"> <span data-i18n="settingsRouteColorWind">💨 Wind (rugwind/tegenwind/zijwind)</span></label>
       <label class="settings-radio"><input type="radio" name="routeColorMode" value="elevation"> <span data-i18n="settingsRouteColorElevation">⛰️ Hoogte (stijging/daling)</span></label>
       <label class="settings-radio"><input type="radio" name="routeColorMode" value="surface"> <span data-i18n="settingsRouteColorSurface">🛣️ Wegdektype (vereist gratis OpenRouteService-sleutel hieronder)</span></label>
+    </div>
+
+    <div class="settings-section">
+      <h4 data-i18n="settingsRoutePrefsHeading">Routevoorkeuren</h4>
       <label class="settings-check-label" style="margin-top:10px;"><span data-i18n="settingsOverpassTimeoutLabel">🛣️ Wegdektype: max. wachttijd voor OpenStreetMap-bron (seconden)</span></label>
       <input type="number" id="settingOverpassSurfaceTimeout" value="15" min="5" max="40" step="1" class="settings-text-input" style="max-width:110px;">
       <div class="settings-subnote" data-i18n="settingsOverpassTimeoutSub">Hoger = meer geduld voor het gratis, sleutelloze vangnet (kan soms wat trager zijn), maar je wacht ook langer voor je een resultaat ziet. Standaard 15s.</div>
@@ -1295,7 +1375,6 @@
 
     <div class="settings-section">
       <h4 data-i18n="settingsRouteLineColorHeading">Kleur van de routelijn</h4>
-      <p class="settings-note" data-i18n="settingsRouteLineColorNote">Geldt enkel wanneer "Route inkleuren" hierboven op "Uit" staat.</p>
       <label class="settings-radio"><input type="radio" name="routeLineColor" value="#e2a13c" checked> <span data-i18n="settingsRouteLineDefault">🟠 Standaard (amberkleur)</span></label>
       <label class="settings-radio"><input type="radio" name="routeLineColor" value="#8e2fd0"> <span data-i18n="settingsRouteLinePurple">🟣 Paars</span></label>
       <label class="settings-radio"><input type="radio" name="routeLineColor" value="#e0158a"> <span data-i18n="settingsRouteLineMagenta">💗 Magenta</span></label>
@@ -1430,7 +1509,7 @@
       <label class="settings-radio"><input type="radio" name="bikeType" value="regular" checked> <span><span data-i18n="settingsBikeRegular">🚲 Gewone fiets / hybride</span></span></label>
       <label class="settings-radio"><input type="radio" name="bikeType" value="road"> <span><span data-i18n="settingsBikeRoad">🚴 Racefiets — vermijdt onverhard</span></span></label>
       <label class="settings-radio"><input type="radio" name="bikeType" value="mountain"> <span><span data-i18n="settingsBikeMountain">🚵 Mountainbike — zoekt paden op</span></span></label>
-      <label class="settings-radio"><input type="radio" name="bikeType" value="electric"> <span><span data-i18n="settingsBikeElectric">🔋 E-bike</span></span></label>
+      <label class="settings-radio" style="display:none;"><input type="radio" name="bikeType" value="electric"> <span><span data-i18n="settingsBikeElectric">🔋 E-bike</span></span></label>
     </div>
 
     </details>
@@ -3975,6 +4054,7 @@ const TRANSLATIONS = {
   settingsApkHeading: { nl:'Positionering', en:'Positioning' },
   settingsApkNote: { nl:'Enkel relevant als je de app via een geïnstalleerd app-icoon gebruikt (niet in de browser) en de knoppen bovenaan niet goed staan. Laat op 0 voor normaal browsergebruik.', en:"Only relevant if you're using the app via an installed app icon (not in the browser) and the top buttons aren't positioned correctly. Leave at 0 for normal browser use." },
   settingsRouteColorHeading: { nl:'Route inkleuren op de kaart', en:'Colour the route on the map' },
+  settingsRoutePrefsHeading: { nl:'Routevoorkeuren', en:'Route preferences' },
   settingsRouteColorNote: { nl:'Kleurt je getekende route op de kaart zelf — handig om in één oogopslag te zien waar het zwaar wordt.', en:'Colours your drawn route on the map itself — handy to see at a glance where it gets tough.' },
   settingsRouteColorOff: { nl:'⚪ Uit (standaardkleur)', en:'⚪ Off (default colour)' },
   settingsRouteColorWind: { nl:'💨 Wind (rugwind/tegenwind/zijwind)', en:'💨 Wind (tailwind/headwind/crosswind)' },
@@ -4146,6 +4226,17 @@ const TRANSLATIONS = {
   settingsEngineOsrm: { nl:'🌍 OSRM — kaartdata soms wat verouderd', en:'🌍 OSRM — map data sometimes a bit outdated' },
   settingsEngineGraphhopper: { nl:'🐇 GraphHopper — vereist gratis sleutel hierboven', en:'🐇 GraphHopper — requires free key above' },
   settingsBikeRegular: { nl:'🚲 Gewone fiets / hybride', en:'🚲 Regular bike / hybrid' },
+  settingsBikeRegularShort: { nl:'Stadsfiets', en:'City bike' },
+  settingsBikeRoadShort: { nl:'Racefiets', en:'Road bike' },
+  settingsBikeMountainShort: { nl:'Mountainbike', en:'Mountain bike' },
+  settingsBikeElectricShort: { nl:'E-bike', en:'E-bike' },
+  bikeSetupBikeTypeTitle: { nl:'🚲 Kies je fietstype', en:'🚲 Choose your bike type' },
+  bikeSetupNavTypeTitle: { nl:'Welk type navigatie kies je?', en:'Which navigation type do you choose?' },
+  navTypeActiveTitle: { nl:'Actief Live', en:'Active Live' },
+  navTypeActiveSub: { nl:'Live routelijn, spelden verslepen, meteen herberekenen — zoals nu', en:'Live route line, drag pins, instant recalculation — like now' },
+  navTypePassiveTitle: { nl:'Passief Pro', en:'Passive Pro' },
+  navTypePassiveSub: { nl:'Diepgaande wegdek-analyse, geen live herberekening — binnenkort beschikbaar', en:'In-depth surface analysis, no live recalculation — coming soon' },
+  bikeSetupContinueBtn: { nl:'Doorgaan →', en:'Continue →' },
   settingsBikeRoad: { nl:'🚴 Racefiets — vermijdt onverhard', en:'🚴 Road bike — avoids unpaved' },
   settingsBikeMountain: { nl:'🚵 Mountainbike — zoekt paden op', en:'🚵 Mountain bike — seeks out trails' },
   settingsBikeElectric: { nl:'🔋 E-bike', en:'🔋 E-bike' },
@@ -4200,6 +4291,9 @@ const TRANSLATIONS = {
   toastDetourNeedsOrs: { nl:'Deze functie heeft een gratis OpenRouteService-sleutel nodig (bij 🔑 API-sleutels in Instellingen).', en:'This feature needs a free OpenRouteService key (under 🔑 API keys in Settings).' },
   toastDetourTooShort: { nl:'Dat aantal km ligt te dicht bij het einde van je route — kies een kleiner aantal.', en:'That many km is too close to the end of your route — choose a smaller number.' },
   toastDetourInvalidKm: { nl:'Vul een geldig aantal km in (groter dan 0).', en:'Enter a valid number of km (greater than 0).' },
+  detourKmTitle: { nl:'🚧 Omweg zoeken', en:'🚧 Find a detour' },
+  detourKmNote: { nl:'Hoeveel km mag de omweg ongeveer zijn? Je route sluit daarna vanzelf weer aan op je oorspronkelijke pad.', en:'Roughly how many km should the detour be? Your route automatically rejoins your original path afterwards.' },
+  detourKmConfirmBtn: { nl:'🚧 Omweg zoeken', en:'🚧 Find detour' },
   toastNoNewNodes: { nl:'Geen nieuwe knooppunten in dit gebied', en:'No new nodes in this area' },
   toastNoWalkNodes: { nl:'Geen wandelknooppunten hier — die bestaan in OSM enkel binnen specifieke wandelnetwerken (natuurgebieden, provinciedomeinen), niet overal zoals fietsknooppunten. Probeer een bekend wandelgebied, of importeer een GPX/dataset.', en:'No walking nodes here — in OSM these only exist within specific walking networks (nature reserves, provincial estates), not everywhere like cycling nodes. Try a known hiking area, or import a GPX/dataset.' },
   toastGraphhopperDown: { nl:'GraphHopper niet bereikbaar, val terug op standaard routering.', en:'GraphHopper unavailable, falling back to standard routing.' },
@@ -4726,6 +4820,12 @@ async function loadSettings(){
   // "Vertrek vanaf GPS" is bewust een instelling voor de huidige rit, geen blijvende voorkeur — staat dus
   // altijd standaard uit bij het opstarten, ook al stond hij de vorige keer aan toen je de app sloot.
   appSettings.vertrekFromGps = false;
+  // Route inkleuren (wind/hoogte/wegdektype) is niet meer bereikbaar via de instellingen — forceer 'uit',
+  // ook als dit ooit op iets anders stond vóór deze wijziging. De code zelf blijft intact voor later.
+  appSettings.routeColorMode = 'off';
+  // E-bike is niet meer bereikbaar als keuze — was je er ooit op ingesteld, val dan stil terug op
+  // gewone fiets (die intern sowieso al bijna hetzelfde gedrag gaf bij de meeste routeringsengines).
+  if (appSettings.bikeType === 'electric') appSettings.bikeType = 'regular';
   // Veilig een radioknop selecteren: als de opgeslagen waarde niet meer bestaat (bv. een verwijderde stijl
   // uit een oudere versie), val terug op de eerste beschikbare optie i.p.v. te crashen op een niet-bestaand element.
   function selectRadio(name, value, fallback){
@@ -6736,10 +6836,13 @@ async function rerouteFromCurrentPosition(isAutomatic){
   }
 }
 $('roadClosedBtn').addEventListener('click', () => {
-  const raw = prompt(curLang()==='en' ? 'Roughly how many km should the detour be?' : 'Hoeveel km mag de omweg ongeveer zijn?', '2');
-  if (raw === null) return; // geannuleerd
-  const km = parseFloat(raw.replace(',', '.'));
+  $('detourKmInput').value = 2;
+  openModal('detourKmModal');
+});
+$('detourKmConfirmBtn').addEventListener('click', () => {
+  const km = parseFloat(String($('detourKmInput').value).replace(',', '.'));
   if (!km || km <= 0){ toast(tr('toastDetourInvalidKm'), 3500); return; }
+  closeModal('detourKmModal');
   detourAroundClosedRoad(km);
 });
 
@@ -10231,7 +10334,41 @@ function autoLocateOnStartup(){
     map.setView([pos.coords.latitude, pos.coords.longitude], 17, { animate:false });
   }, () => { /* geen toestemming of geen fix — geen probleem, gewoon niets doen */ }, { enableHighAccuracy:true, timeout:6000 });
 }
-$('modeFietsBtn').addEventListener('click', () => selectMode('fiets'));
+$('modeFietsBtn').addEventListener('click', () => openBikeSetupScreen());
+function openBikeSetupScreen(){
+  // Toon de huidige, al opgeslagen keuze — zo blijft dit scherm altijd in sync met Instellingen,
+  // ook als je die daar ooit rechtstreeks wijzigde zonder via dit scherm te gaan.
+  document.querySelectorAll('.bike-type-tile').forEach(t => t.classList.toggle('active', t.dataset.biketype === appSettings.bikeType));
+  document.querySelectorAll('.nav-type-card').forEach(c => c.classList.toggle('active', c.dataset.navtype === 'active'));
+  $('modeSelectScreen').classList.add('hidden');
+  $('bikeSetupScreen').classList.remove('hidden');
+}
+document.querySelectorAll('.bike-type-tile').forEach(tile => {
+  tile.addEventListener('click', () => {
+    document.querySelectorAll('.bike-type-tile').forEach(t => t.classList.remove('active'));
+    tile.classList.add('active');
+    // Meteen naar Instellingen doorschrijven — dit scherm en Instellingen tonen dus altijd dezelfde keuze.
+    appSettings.bikeType = tile.dataset.biketype;
+    saveSettings();
+    const radio = document.querySelector(`input[name="bikeType"][value="${tile.dataset.biketype}"]`);
+    if (radio) radio.checked = true;
+  });
+});
+document.querySelectorAll('.nav-type-card').forEach(card => {
+  card.addEventListener('click', () => {
+    if (card.disabled) return; // Passief Pro is nog niet beschikbaar
+    document.querySelectorAll('.nav-type-card').forEach(c => c.classList.remove('active'));
+    card.classList.add('active');
+  });
+});
+$('bikeSetupContinueBtn').addEventListener('click', () => {
+  $('bikeSetupScreen').classList.add('hidden');
+  selectMode('fiets');
+});
+$('bikeSetupBackBtn').addEventListener('click', () => {
+  $('bikeSetupScreen').classList.add('hidden');
+  $('modeSelectScreen').classList.remove('hidden');
+});
 $('modeWandelBtn').addEventListener('click', () => selectMode('wandel'));
 $('modeWeatherBtn').addEventListener('click', () => {
   selectMode(appMode || 'fiets');
