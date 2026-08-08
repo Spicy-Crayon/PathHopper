@@ -1080,7 +1080,7 @@
     </div>
   </div>
   <div id="modeSelectHint" data-i18n="modeSelectHint">Knooppunten, navigatie, GPX, offline-gebruik — alles werkt voor beide.</div>
-  <div id="appVersionStart">v2.226 · 7 aug</div>
+  <div id="appVersionStart">v2.227 · 7 aug</div>
 </div>
 
 <div id="bikeSetupScreen" class="hidden">
@@ -1165,7 +1165,7 @@
   <button class="menu-item" id="menuHelpBtn"><span class="mi-icon">❓</span><span class="mi-text"><b data-i18n="menuHelp">Hulp</b><small data-i18n="menuHelpSub">uitleg over alle functies</small></span></button>
   <button class="menu-item" id="menuDevNotesBtn"><span class="mi-icon">🛠️</span><span class="mi-text"><b data-i18n="menuDevNotes">Technische werking</b><small data-i18n="menuDevNotesSub">hoe wegdektype, routering en fallbacks precies werken</small></span></button>
   <button class="menu-item" id="menuLogbookBtn"><span class="mi-icon">📋</span><span class="mi-text"><b data-i18n="menuLogbook">Logboek</b><small data-i18n="menuLogbookSub">overzicht van alle meldingen, ook stille</small></span></button>
-  <div id="menuVersion">v2.226 · 7 aug</div>
+  <div id="menuVersion">v2.227 · 7 aug</div>
 </div>
 
 <div id="hint" data-i18n="hintInitial">Zoom of pan naar je gebied, tik dan op "Laad knooppunten"</div>
@@ -5742,7 +5742,8 @@ function renderClimbMiniChart(profile, climb, doneKm){
 function renderElevationChart(profile, svgId='elevationSvg', wrapId='elevationChartWrap', opts={}){
   const svg = $(svgId);
   const wrap = $(wrapId);
-  const w = svg.clientWidth || wrap.clientWidth || window.innerWidth, h = svg.clientHeight || wrap.clientHeight || 300;
+  const rect0 = svg.getBoundingClientRect();
+  const w = rect0.width || wrap.clientWidth || window.innerWidth, h = rect0.height || wrap.clientHeight || 300;
   svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
   const compact = h < 100;
   const pad = compact ? { l:32, r:6, t:16, b:6 } : { l:46, r:14, t:26, b:26 };
@@ -7064,10 +7065,12 @@ $('routeColorLegend').addEventListener('click', () => {
 });
 let drawRoutePathToken = 0;
 async function drawRoutePath(fromCurrentLocation){
+  routeStartsFromGps = !!(fromCurrentLocation && lastPosition);
   if (navType === 'passive' && !passiveEditingDone){
     // Passief Pro, nog aan het bewerken: helemaal geen lijn tonen (ook geen rechte-lijn-voorbeeld) —
     // enkel je gezette punten zelf, om niet de indruk te wekken dat dit al een echte route is. De lijn
-    // verschijnt pas nadat je op 'Klaar' gedrukt hebt en de echte berekening gebeurd is.
+    // verschijnt pas nadat je op 'Klaar' gedrukt hebt en de echte berekening gebeurd is. routeStartsFromGps
+    // staat hierboven al wel goed, dus 'Vertrek' aanzetten tijdens het bewerken wordt correct onthouden.
     routeLine.setLatLngs([]);
     routeSteps = [];
     actualRouteKm = null; // nog geen echte afstand gekend zolang er geen route berekend is
@@ -7075,7 +7078,6 @@ async function drawRoutePath(fromCurrentLocation){
     return;
   }
   const myToken = ++drawRoutePathToken;
-  routeStartsFromGps = !!(fromCurrentLocation && lastPosition);
   const profile = cfg().routeProfile; // 'bike' of 'foot'
   if (routeIsFromGpx){
     if (!fromCurrentLocation || !lastPosition){
@@ -11064,7 +11066,8 @@ function showAnalyseChartDot(frac, lat, lon, km, ele){
 function renderSlopeChart(profile, grads, svgId){
   const svg = $(svgId);
   const wrap = svg.parentElement;
-  const w = svg.clientWidth || wrap.clientWidth || window.innerWidth, h = svg.clientHeight || wrap.clientHeight || 120;
+  const rect0 = svg.getBoundingClientRect();
+  const w = rect0.width || wrap.clientWidth || window.innerWidth, h = rect0.height || wrap.clientHeight || 120;
   svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
   const totalKm = profile.distKm[profile.distKm.length - 1] || 1;
   const maxAbsGrad = Math.max(4, ...grads.map(g => Math.abs(g))); // minstens een lichte schaal, ook op een quasi-vlakke route
@@ -11092,7 +11095,8 @@ function renderSlopeChart(profile, grads, svgId){
 function renderSegmentBarChart(coordsLatLng, segments, colorMap, svgId){
   const svg = $(svgId);
   const wrap = svg.parentElement;
-  const w = svg.clientWidth || wrap.clientWidth || window.innerWidth, h = svg.clientHeight || wrap.clientHeight || 120;
+  const rect0 = svg.getBoundingClientRect();
+  const w = rect0.width || wrap.clientWidth || window.innerWidth, h = rect0.height || wrap.clientHeight || 120;
   svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
   // Cumulatieve afstand per coördinaat, zodat we elk segment naar een precieze breedte kunnen omzetten.
   const cum = [0];
