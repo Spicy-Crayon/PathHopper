@@ -1075,7 +1075,7 @@
     </div>
   </div>
   <div id="modeSelectHint" data-i18n="modeSelectHint">Knooppunten, navigatie, GPX, offline-gebruik — alles werkt voor beide.</div>
-  <div id="appVersionStart">v2.218 · 7 aug</div>
+  <div id="appVersionStart">v2.219 · 7 aug</div>
 </div>
 
 <div id="bikeSetupScreen" class="hidden">
@@ -1158,7 +1158,7 @@
   <button class="menu-item" id="menuHelpBtn"><span class="mi-icon">❓</span><span class="mi-text"><b data-i18n="menuHelp">Hulp</b><small data-i18n="menuHelpSub">uitleg over alle functies</small></span></button>
   <button class="menu-item" id="menuDevNotesBtn"><span class="mi-icon">🛠️</span><span class="mi-text"><b data-i18n="menuDevNotes">Technische werking</b><small data-i18n="menuDevNotesSub">hoe wegdektype, routering en fallbacks precies werken</small></span></button>
   <button class="menu-item" id="menuLogbookBtn"><span class="mi-icon">📋</span><span class="mi-text"><b data-i18n="menuLogbook">Logboek</b><small data-i18n="menuLogbookSub">overzicht van alle meldingen, ook stille</small></span></button>
-  <div id="menuVersion">v2.218 · 7 aug</div>
+  <div id="menuVersion">v2.219 · 7 aug</div>
 </div>
 
 <div id="hint" data-i18n="hintInitial">Zoom of pan naar je gebied, tik dan op "Laad knooppunten"</div>
@@ -1449,7 +1449,7 @@
       <label class="settings-radio"><input type="radio" name="routingWeighting" value="option1"> <span data-i18n="settingsWeightingOption1">1️⃣ Route → verifiëren → corrigeren</span></label>
       <label class="settings-radio"><input type="radio" name="routingWeighting" value="option2"> <span data-i18n="settingsWeightingOption2">2️⃣ Eerst hele gebied opvragen → dan pas routeren</span></label>
       <label class="settings-radio"><input type="radio" name="routingWeighting" value="option3"> <span data-i18n="settingsWeightingOption3">3️⃣ BRouter eigen kostprofiel (experimenteel)</span></label>
-      <div class="settings-subnote" data-i18n="settingsSmartUnpavedAvoidanceSub">Standaard bepaalt OpenRouteService zelf, met hun eigen (minder verfijnde) logica, wat een goede fietsweg is. De 3 opties hieronder gebruiken in plaats daarvan de volledige tag-matrix (wegdektype, fietsinfrastructuur, snelheidszones, wegtype) om elk stukje een comfort-score te geven — elk met een eigen aanpak en snelheid/nauwkeurigheid-afweging, meer uitleg bij 🛠️ Technische werking. Optie 1 en 2 vereisen een OpenRouteService-sleutel, optie 3 vereist BRouter als routeringsengine.</div>
+      <div class="settings-subnote" data-i18n="settingsSmartUnpavedAvoidanceSub">Standaard bepaalt OpenRouteService zelf, met hun eigen (minder verfijnde) logica, wat een goede fietsweg is. De 3 opties hieronder gebruiken in plaats daarvan de volledige tag-matrix (wegdektype, fietsinfrastructuur, snelheidszones, wegtype) om elk stukje een comfort-score te geven — elk met een eigen aanpak en snelheid/nauwkeurigheid-afweging, meer uitleg bij 🛠️ Technische werking. Optie 1 en 2 vereisen een OpenRouteService-sleutel. Optie 3 roept altijd zelf BRouter aan, los van je algemene "Routeringsengine"-keuze hierboven.</div>
       <label class="settings-check" style="margin-top:10px;"><input type="checkbox" id="settingQuietRouting"> <span data-i18n="settingsQuietRouting">🤫 Verkeersluwe routering (vermijdt hoofdwegen)</span></label>
       <div class="settings-subnote" data-i18n="settingsQuietRoutingSub">Werkt het best met een OpenRouteService-sleutel (bij 🔑 API-sleutels), maar geeft ook zonder sleutel al een merkbaar rustiger resultaat bij BRouter en Valhalla. Bij OSRM/GraphHopper (gratis niveau) is hier helaas geen extra sturing mogelijk.</div>
     </div>
@@ -6613,6 +6613,7 @@ async function routeWithAreaPrequery(waypoints, baseProfile, opts){
     }
     return { coordsLatLng, distanceM: feature.properties.summary.distance, steps, source:'ors-area-prequery' };
   }catch(e){
+    logSilent(curLang()==='en' ? `🎯 Comfort routing (option 2): OpenRouteService avoidance request failed (${e.message}) — route was not corrected.` : `🎯 Comfort-routering (optie 2): ORS-vermijdaanvraag mislukte (${e.message}) — route werd niet gecorrigeerd.`);
     return await fetchRoadRoute(waypoints, opts); // vermijdzone-route mislukte (bv. onmogelijk met zoveel vermeden gebied) — gewone route blijft altijd nog werken
   }
 }
@@ -6730,7 +6731,10 @@ async function routeWithSmartUnpavedAvoidance(waypoints, baseProfile, opts){
         });
       }
       current = { coordsLatLng, distanceM: feature.properties.summary.distance, steps, source:'ors-smart-avoid' };
-    }catch(e){ break; } // herberekenen met vermijdzone mislukte — val terug op de beste route die we al hebben
+    }catch(e){
+      logSilent(curLang()==='en' ? `🎯 Comfort routing (option 1): OpenRouteService avoidance request failed (${e.message}) — route was not corrected.` : `🎯 Comfort-routering (optie 1): ORS-vermijdaanvraag mislukte (${e.message}) — route werd niet gecorrigeerd.`);
+      break; // herberekenen met vermijdzone mislukte — val terug op de beste route die we al hebben
+    }
   }
   return current;
 }
@@ -7013,7 +7017,7 @@ $('routeColorLegend').addEventListener('click', () => {
 });
 let drawRoutePathToken = 0;
 async function drawRoutePath(fromCurrentLocation){
-  if (navType === 'passive' && !passiveEditingDone && !navActive){
+  if (navType === 'passive' && !passiveEditingDone){
     // Passief Pro, nog aan het bewerken: helemaal geen lijn tonen (ook geen rechte-lijn-voorbeeld) —
     // enkel je gezette punten zelf, om niet de indruk te wekken dat dit al een echte route is. De lijn
     // verschijnt pas nadat je op 'Klaar' gedrukt hebt en de echte berekening gebeurd is.
@@ -7071,7 +7075,7 @@ async function drawRoutePath(fromCurrentLocation){
       result = await routeWithSmartUnpavedAvoidance(pts, profile, routeOpts);
     } else if (weightingApplies && appSettings.routingWeighting === 'option2' && appSettings.orsKey){
       result = await routeWithAreaPrequery(pts, profile, routeOpts);
-    } else if (weightingApplies && appSettings.routingWeighting === 'option3' && appSettings.routingEngine === 'brouter'){
+    } else if (weightingApplies && appSettings.routingWeighting === 'option3'){
       result = await routeWithBrouterCustomProfile(pts, routeOpts);
     } else {
       result = await fetchRoadRoute(pts, routeOpts);
@@ -11229,7 +11233,7 @@ async function loadAnalyseTab(tabName){
     }
     let ways;
     try{
-      const built = await buildOverpassBucketFn(pts.map(p => [p.lat, p.lon]));
+      const built = await withTimeout(buildOverpassBucketFn(pts.map(p => [p.lat, p.lon])), (appSettings.overpassSurfaceTimeoutSec || 15) * 1000, 'Overpass-logs');
       ways = built.ways;
     }catch(e){
       $('analysePlaceholder').innerHTML = `<div>${tr('analyseLogsFail')}</div>`;
