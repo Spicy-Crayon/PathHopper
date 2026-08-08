@@ -1144,7 +1144,7 @@
     </div>
   </div>
   <div id="modeSelectHint" data-i18n="modeSelectHint">Knooppunten, navigatie, GPX, offline-gebruik — alles werkt voor beide.</div>
-  <div id="appVersionStart">v2.234 · 8 aug</div>
+  <div id="appVersionStart">v2.235 · 8 aug</div>
 </div>
 
 <div id="bikeSetupScreen" class="hidden">
@@ -1232,7 +1232,7 @@
   <button class="menu-item" id="menuHelpBtn"><span class="mi-icon">❓</span><span class="mi-text"><b data-i18n="menuHelp">Hulp</b><small data-i18n="menuHelpSub">uitleg over alle functies</small></span></button>
   <button class="menu-item" id="menuDevNotesBtn"><span class="mi-icon">🛠️</span><span class="mi-text"><b data-i18n="menuDevNotes">Technische werking</b><small data-i18n="menuDevNotesSub">hoe wegdektype, routering en fallbacks precies werken</small></span></button>
   <button class="menu-item" id="menuLogbookBtn"><span class="mi-icon">📋</span><span class="mi-text"><b data-i18n="menuLogbook">Logboek</b><small data-i18n="menuLogbookSub">overzicht van alle meldingen, ook stille</small></span></button>
-  <div id="menuVersion">v2.234 · 8 aug</div>
+  <div id="menuVersion">v2.235 · 8 aug</div>
 </div>
 
 <div id="hint" data-i18n="hintInitial">Zoom of pan naar je gebied, tik dan op "Laad knooppunten"</div>
@@ -2710,7 +2710,7 @@ function rotDragMove(x, y){
   const rad = -lastMapRotation * Math.PI / 180; // terugdraaien naar Leaflet's eigen, ongedraaide coördinatenstelsel
   const rx = dx * Math.cos(rad) - dy * Math.sin(rad);
   const ry = dx * Math.sin(rad) + dy * Math.cos(rad);
-  map.panBy([-rx, -ry], { animate:false, noMoveStart:true });
+  map.panBy([-rx, -ry], { animate:false });
 }
 function rotDragEnd(){ rotDragActive = false; }
 function rotTouchStartHandler(e){ if (e.touches.length === 1) rotDragStart(e.touches[0].clientX, e.touches[0].clientY); }
@@ -4122,7 +4122,7 @@ const TRANSLATIONS = {
   sheetEmptyTitle: { nl:'Jouw route', en:'Your route' },
   navMoreDetails: { nl:'⌄ Meer details', en:'⌄ More details' },
   navLessDetails: { nl:'⌃ Minder details', en:'⌃ Less details' },
-  roadClosedBtn: { nl:'🚧 Weg hier afgesloten — herbereken', en:'🚧 Road closed here — recalculate' },
+  roadClosedBtn: { nl:'🚧 Afsluiting - via punt', en:'🚧 Closure - via point' },
   menuSettings: { nl:'Instellingen', en:'Settings' },
   menuSettingsSub: { nl:'uiterlijk, wegvoorkeuren', en:'appearance, road preferences' },
   menuHelp: { nl:'Hulp', en:'Help' },
@@ -7379,14 +7379,19 @@ async function rerouteFromCurrentPosition(isAutomatic){
   }
 }
 $('roadClosedBtn').addEventListener('click', () => {
+  wasMapRotationEnabledBeforePin = !appSettings.disableMapRotation;
+  if (wasMapRotationEnabledBeforePin) disableMapRotation();
   $('detourKmInput').value = 2;
   openModal('detourKmModal');
+});
+$('detourKmModal').querySelector('.simple-modal-close').addEventListener('click', () => {
+  if (wasMapRotationEnabledBeforePin) enableMapRotation(); // je annuleerde het venster zelf, rotatie terug aanzetten
 });
 $('detourKmConfirmBtn').addEventListener('click', () => {
   const km = parseFloat(String($('detourKmInput').value).replace(',', '.'));
   if (!km || km <= 0){ toast(tr('toastDetourInvalidKm'), 3500); return; }
   closeModal('detourKmModal');
-  detourAroundClosedRoad(km);
+  detourAroundClosedRoad(km).finally(() => { if (wasMapRotationEnabledBeforePin) enableMapRotation(); });
 });
 $('detourKmManualBtn').addEventListener('click', () => {
   const km = parseFloat(String($('detourKmInput').value).replace(',', '.'));
@@ -7403,7 +7408,9 @@ function startManualDetourPinMode(km){
   manualDetourCircle = L.circle([myPos.lat, myPos.lon], {
     radius: km * 1000, color:'#4a9fd8', weight:2, fillColor:'#4a9fd8', fillOpacity:0.12, dashArray:'6,6'
   }).addTo(map);
-  map.fitBounds(manualDetourCircle.getBounds(), { padding:[40,40] });
+  // Geen fitBounds hier — dat gaf een storende, onverwachte sprong in het beeld net op het moment dat je
+  // je vinger op de kaart zet om de speld te plaatsen. Je kijkt tijdens navigatie toch al naar je eigen
+  // positie; de cirkel verschijnt gewoon als overlay zonder de weergave zelf te wijzigen.
   toast(tr('toastManualDetourHint'), 5000);
   // Kaart-rotatie tijdelijk stilzetten zolang je aan het plaatsen bent — anders draait de kaart soms
   // onder je vinger vandaan tijdens het tikken/verslepen (dezelfde bug die we al eerder hadden).
