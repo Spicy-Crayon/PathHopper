@@ -2644,6 +2644,7 @@ let arrivalActual = [];     // index in route -> Date.now() op moment van aankom
 let lastSpeedKmh = null;    // meest recent gemeten fietssnelheid, voor tijdsinschattingen
 let lastMapRotation = 0;    // huidige rotatiehoek van de kaart zelf (koers-boven tijdens navigeren)
 let lastElevationProfile = null; // laatst berekende hoogteprofiel-data, voor herrenderen bij schermdraai
+let rotatorInvalidateTimer = null; // zie enableMapRotation/disableMapRotation hieronder
 
 // ---------- Modus: fiets of wandel ----------
 const MODE_CONFIG = {
@@ -2687,14 +2688,26 @@ map.on('dragstart', markNavMapUserPan);
 
 function enableMapRotation(){
   document.getElementById('mapRotator').classList.add('rotating');
-  requestAnimationFrame(() => map.invalidateSize());
+  // #mapRotator groeit via een CSS-transition (.3s) naar 230% breedte/hoogte, zodat draaien geen
+  // lege hoeken toont. invalidateSize() meteen aanroepen (op de eerstvolgende animatieframe) gebeurde
+  // vroeger vóórdat die transition klaar was — Leaflet mat dan een tussentijdse, te kleine containergrootte
+  // en laadde tegels enkel voor dát kleinere gebied. Zodra de transition daarna alsnog naar 230% doorgroeide,
+  // bleef de rest van de (gedraaide) kaart grijs/leeg staan, met een duidelijke diagonale rand.
+  // Fix: meteen een eerste invalidateSize (voor snelle eerste tegels), én nog een tweede nadat de
+  // transition écht is afgerond, zodat Leaflet de uiteindelijke 230%-afmeting kent en de ontbrekende
+  // tegels alsnog opvraagt.
+  map.invalidateSize();
+  clearTimeout(rotatorInvalidateTimer);
+  rotatorInvalidateTimer = setTimeout(() => map.invalidateSize(), 320);
   setupRotationAwareDragging();
 }
 function disableMapRotation(){
   lastMapRotation = 0;
   setMapRotation(0);
   document.getElementById('mapRotator').classList.remove('rotating');
-  requestAnimationFrame(() => map.invalidateSize());
+  clearTimeout(rotatorInvalidateTimer);
+  map.invalidateSize();
+  rotatorInvalidateTimer = setTimeout(() => map.invalidateSize(), 320);
   teardownRotationAwareDragging();
 }
 
