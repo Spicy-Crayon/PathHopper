@@ -47,6 +47,7 @@
   }
   .num-marker.picked{ background:var(--amber); border-color:var(--green-900); color:var(--green-900); }
   .num-marker.next{ background:var(--amber-dark); border-color:var(--cream); color:var(--cream); animation:pulse 1.4s infinite; }
+  .num-marker-large{ font-size:18px; border-width:3.5px; }
   body.mode-wandel .num-marker{ background:#2a5f8f; }
   .poi-toggle-marker{
     width:26px; height:26px; border-radius:50%;
@@ -941,6 +942,9 @@
   }
   #analyseReliabilityBadge.ok{ background:rgba(46,158,79,0.18); color:#8fdba8; }
   #analyseReliabilityBadge.warn{ background:rgba(213,68,58,0.18); color:#f0a89c; }
+  #analyseLegend{ display:flex; flex-wrap:wrap; gap:8px 14px; padding:2px 2px 0; flex-shrink:0; }
+  .analyse-legend-item{ display:flex; align-items:center; gap:5px; font-size:10.5px; font-weight:700; color:rgba(246,244,238,0.85); }
+  .analyse-legend-dot{ width:10px; height:10px; border-radius:50%; flex-shrink:0; }
   #analysePlaceholder.analyse-logs-list{ display:block !important; overflow-y:auto; text-align:left; flex:1; padding:10px 4px; }
 
   #elevationModal{
@@ -1075,17 +1079,19 @@
     </div>
   </div>
   <div id="modeSelectHint" data-i18n="modeSelectHint">Knooppunten, navigatie, GPX, offline-gebruik — alles werkt voor beide.</div>
-  <div id="appVersionStart">v2.219 · 7 aug</div>
+  <div id="appVersionStart">v2.220 · 7 aug</div>
 </div>
 
 <div id="bikeSetupScreen" class="hidden">
   <button id="bikeSetupBackBtn" aria-label="Terug">←</button>
   <div class="bike-setup-inner">
-    <div class="bike-setup-title" data-i18n="bikeSetupBikeTypeTitle">🚲 Kies je fietstype</div>
-    <div class="bike-type-grid" style="grid-template-columns:repeat(3, 1fr);">
-      <button class="bike-type-tile" data-biketype="regular"><span class="bike-type-icon">🚲</span><span class="bike-type-label" data-i18n="settingsBikeRegularShort">Stadsfiets</span></button>
-      <button class="bike-type-tile" data-biketype="road"><span class="bike-type-icon">🚴</span><span class="bike-type-label" data-i18n="settingsBikeRoadShort">Racefiets</span></button>
-      <button class="bike-type-tile" data-biketype="mountain"><span class="bike-type-icon">🚵</span><span class="bike-type-label" data-i18n="settingsBikeMountainShort">Mountainbike</span></button>
+    <div id="bikeTypeSection">
+      <div class="bike-setup-title" id="bikeSetupTitle" data-i18n="bikeSetupBikeTypeTitle">🚲 Kies je fietstype</div>
+      <div class="bike-type-grid" style="grid-template-columns:repeat(3, 1fr);">
+        <button class="bike-type-tile" data-biketype="regular"><span class="bike-type-icon">🚲</span><span class="bike-type-label" data-i18n="settingsBikeRegularShort">Stadsfiets</span></button>
+        <button class="bike-type-tile" data-biketype="road"><span class="bike-type-icon">🚴</span><span class="bike-type-label" data-i18n="settingsBikeRoadShort">Racefiets</span></button>
+        <button class="bike-type-tile" data-biketype="mountain"><span class="bike-type-icon">🚵</span><span class="bike-type-label" data-i18n="settingsBikeMountainShort">Mountainbike</span></button>
+      </div>
     </div>
 
     <div class="bike-setup-title" style="margin-top:26px;" data-i18n="bikeSetupNavTypeTitle">Welk type navigatie kies je?</div>
@@ -1158,7 +1164,7 @@
   <button class="menu-item" id="menuHelpBtn"><span class="mi-icon">❓</span><span class="mi-text"><b data-i18n="menuHelp">Hulp</b><small data-i18n="menuHelpSub">uitleg over alle functies</small></span></button>
   <button class="menu-item" id="menuDevNotesBtn"><span class="mi-icon">🛠️</span><span class="mi-text"><b data-i18n="menuDevNotes">Technische werking</b><small data-i18n="menuDevNotesSub">hoe wegdektype, routering en fallbacks precies werken</small></span></button>
   <button class="menu-item" id="menuLogbookBtn"><span class="mi-icon">📋</span><span class="mi-text"><b data-i18n="menuLogbook">Logboek</b><small data-i18n="menuLogbookSub">overzicht van alle meldingen, ook stille</small></span></button>
-  <div id="menuVersion">v2.219 · 7 aug</div>
+  <div id="menuVersion">v2.220 · 7 aug</div>
 </div>
 
 <div id="hint" data-i18n="hintInitial">Zoom of pan naar je gebied, tik dan op "Laad knooppunten"</div>
@@ -1602,6 +1608,7 @@
       <label class="settings-radio"><input type="radio" name="dashTextSize" value="small"> <span><span data-i18n="settingsTextSmaller">🔎 Kleiner (handig op kleinere schermen)</span></span></label>
       <label class="settings-check" style="margin-top:6px;"><input type="checkbox" id="settingDashBold" checked> <span><span data-i18n="settingsBold">🅱️ Vetgedrukt</span></span></label>
       <label class="settings-check" style="margin-top:10px;"><input type="checkbox" id="settingGarminStyle"> <span data-i18n="settingsGarminStyle">⌚ Garmin-stijl (donkerder, grotere tegels, ronde snelheidsmeter)</span></label>
+      <label class="settings-check" style="margin-top:10px;"><input type="checkbox" id="settingLargeNodes"> <span data-i18n="settingsLargeNodes">🔍 Grotere knopen en cijfers op de kaart (slechtziend-vriendelijk)</span></label>
     </div>
 
     <div class="settings-section">
@@ -1749,6 +1756,7 @@
   <div id="analyseBody">
     <div id="analyseReliabilityBadge" style="display:none;"></div>
     <div id="analyseMapWrap"><div id="analyseMap"></div></div>
+    <div id="analyseLegend" style="display:none;"></div>
     <div id="analyseChartWrap">
       <svg id="analyseSvg" viewBox="0 0 100 40" preserveAspectRatio="none"></svg>
     </div>
@@ -3034,7 +3042,9 @@ async function getCell(cell){
 }
 
 function iconFor(ref, cls){
-  return L.divIcon({ className:'', html:`<div class="num-marker${cls?' '+cls:''}">${ref}</div>`, iconSize:[30,30], iconAnchor:[15,15] });
+  const big = appSettings.largeNodesAccessibility;
+  const size = big ? 40 : 30;
+  return L.divIcon({ className:'', html:`<div class="num-marker${cls?' '+cls:''}${big?' num-marker-large':''}">${ref}</div>`, iconSize:[size,size], iconAnchor:[size/2,size/2] });
 }
 function classForNode(id){
   const idx = route.findIndex(r => r.id === id);
@@ -3989,7 +3999,7 @@ async function runOfflineDiagnostics(){
 const SETTINGS_KEY = 'app_settings_v1';
 let appSettings = {
   theme:'default', showCompassBtn:true, orsKey:'', graphhopperKey:'', geoapifyKey:'', bikeType:'regular', mapStyle:'standard', thunderforestKey:'',
-  dashTextSize:'normal', dashBold:true, garminStyleNav:false, offRouteDist:35, autoReroute:false, silentReroute:false,
+  dashTextSize:'normal', dashBold:true, garminStyleNav:false, largeNodesAccessibility:false, offRouteDist:35, autoReroute:false, silentReroute:false,
   overlays:{ cycling:false, hiking:false, mtb:false },
   poiLayers:{ cafe:false, restaurant:false, bakery:false, supermarket:false, pharmacy:false, bike:false, water:false, toilet:false, money:false, camping:false, charging:false, playground:false, parking:false, hotel:false }, showPoiDetails:false,
   showWindDirection:true, autoPause:false, redNavDot:false, topOffsetPx:0, tabGapPx:0, bodyWeightKg:null, voiceOnlyMode:false, routeColorMode:'off', showWindInNav:false, eatReminderOn:false, eatIntervalMin:45, drinkReminderOn:false, drinkIntervalMin:20, segmentPrOn:true, darkArrivalWarning:true, quietRoutingMode:false, historyAudioOn:false, shakeToSurpriseOn:false, shakeKm:30, vertrekFromGps:false, avoidBufferM:18, maxOverlapPct:8, lowerGpsAccuracy:false, disableMapRotation:false, posUpdateIntervalSec:1, overpassSurfaceTimeoutSec:15, routingWeighting:'off', navType:'active', fallDetectionOn:false, sosContactNumber:'', sosContactName:'', routePreference:'balanced', routeLineColor:'#e2a13c', language:'en',
@@ -4371,6 +4381,8 @@ const TRANSLATIONS = {
   settingsBikeMountainShort: { nl:'Mountainbike', en:'Mountain bike' },
   settingsBikeElectricShort: { nl:'E-bike', en:'E-bike' },
   bikeSetupBikeTypeTitle: { nl:'🚲 Kies je fietstype', en:'🚲 Choose your bike type' },
+  bikeSetupTitleFiets: { nl:'🚲 Kies je fietstype', en:'🚲 Choose your bike type' },
+  bikeSetupTitleWandel: { nl:'🥾 Wandelen', en:'🥾 Walking' },
   bikeSetupNavTypeTitle: { nl:'Welk type navigatie kies je?', en:'Which navigation type do you choose?' },
   navTypeActiveTitle: { nl:'Actief Live', en:'Active Live' },
   navTypeActiveSub: { nl:'Live routelijn, spelden verslepen, meteen herberekenen — zoals nu', en:'Live route line, drag pins, instant recalculation — like now' },
@@ -4402,6 +4414,7 @@ const TRANSLATIONS = {
   settingsTextSmaller: { nl:'🔎 Kleiner (handig op kleinere schermen)', en:'🔎 Smaller (handy on smaller screens)' },
   settingsBold: { nl:'🅱️ Vetgedrukt', en:'🅱️ Bold' },
   settingsGarminStyle: { nl:'⌚ Garmin-stijl (donkerder, grotere tegels, ronde snelheidsmeter)', en:'⌚ Garmin style (darker, bigger tiles, circular speed gauge)' },
+  settingsLargeNodes: { nl:'🔍 Grotere knopen en cijfers op de kaart (slechtziend-vriendelijk)', en:'🔍 Larger nodes and numbers on the map (accessible for low vision)' },
   settingsDevSensitive: { nl:'🎯 Gevoelig (20 m)', en:'🎯 Sensitive (20 m)' },
   settingsDevNormal: { nl:'⚖️ Normaal (35 m)', en:'⚖️ Normal (35 m)' },
   settingsDevRelaxed: { nl:'😌 Soepel (60 m)', en:'😌 Relaxed (60 m)' },
@@ -4982,6 +4995,7 @@ function applySettings(){
   document.body.classList.toggle('dash-text-small', appSettings.dashTextSize === 'small');
   document.body.classList.toggle('garmin-nav-style', !!appSettings.garminStyleNav);
   $('settingGarminStyle').checked = !!appSettings.garminStyleNav;
+  $('settingLargeNodes').checked = !!appSettings.largeNodesAccessibility;
   document.body.classList.toggle('dash-not-bold', !appSettings.dashBold);
   // De handmatige instelling wint altijd van de vroege automatische gok bovenaan het bestand —
   // die gok bleek niet betrouwbaar voor elke "app van PWA maken"-tool.
@@ -5152,6 +5166,11 @@ $('settingGarminStyle').addEventListener('change', (e) => {
   appSettings.garminStyleNav = e.target.checked;
   document.body.classList.toggle('garmin-nav-style', e.target.checked);
   saveSettings();
+});
+$('settingLargeNodes').addEventListener('change', (e) => {
+  appSettings.largeNodesAccessibility = e.target.checked;
+  saveSettings();
+  refreshAllNodeIcons();
 });
 $('settingAutoReroute').addEventListener('change', (e) => { appSettings.autoReroute = e.target.checked; saveSettings(); });
 $('settingSilentReroute').addEventListener('change', (e) => { appSettings.silentReroute = e.target.checked; saveSettings(); });
@@ -5403,7 +5422,7 @@ $('overlayMtb').addEventListener('change', (e) => { appSettings.overlays.mtb = e
 $('settingsResetBtn').addEventListener('click', () => {
   appSettings = {
     theme:'default', showCompassBtn:true, orsKey:'', graphhopperKey:'', geoapifyKey:'', bikeType:'regular', mapStyle:'standard', thunderforestKey:'',
-    dashTextSize:'normal', dashBold:true, garminStyleNav:false, offRouteDist:35, autoReroute:false, silentReroute:false,
+    dashTextSize:'normal', dashBold:true, garminStyleNav:false, largeNodesAccessibility:false, offRouteDist:35, autoReroute:false, silentReroute:false,
     overlays:{ cycling:false, hiking:false, mtb:false },
     poiLayers:{ cafe:false, restaurant:false, bakery:false, supermarket:false, pharmacy:false, bike:false, water:false, toilet:false, money:false, camping:false, charging:false, playground:false, parking:false, hotel:false }, showPoiDetails:false,
     showWindDirection:true, autoPause:false, redNavDot:false, topOffsetPx:0, tabGapPx:0, bodyWeightKg:null, voiceOnlyMode:false, routeColorMode:'off', showWindInNav:false, eatReminderOn:false, eatIntervalMin:45, drinkReminderOn:false, drinkIntervalMin:20, segmentPrOn:true, darkArrivalWarning:true, quietRoutingMode:false, historyAudioOn:false, shakeToSurpriseOn:false, shakeKm:30, vertrekFromGps:false, avoidBufferM:18, maxOverlapPct:8, lowerGpsAccuracy:false, disableMapRotation:false, posUpdateIntervalSec:1, overpassSurfaceTimeoutSec:15, routingWeighting:'off', navType:'active', fallDetectionOn:false, sosContactNumber:'', sosContactName:'', routePreference:'balanced', routeLineColor:'#e2a13c', language:'en',
@@ -5425,6 +5444,7 @@ $('settingsResetBtn').addEventListener('click', () => {
   $('settingDashBold').checked = true;
   $('settingGarminStyle').checked = false;
   document.body.classList.remove('garmin-nav-style');
+  $('settingLargeNodes').checked = false;
   $('settingAutoReroute').checked = false;
   $('settingSilentReroute').checked = false;
   $('settingShowWind').checked = true;
@@ -5867,6 +5887,9 @@ window.addEventListener('orientationchange', () => {
 function refreshNodeIcon(id){
   const n = loadedNodes.get(id);
   if (n) n.marker.setIcon(iconFor(n.ref, classForNode(id)));
+}
+function refreshAllNodeIcons(){
+  loadedNodes.forEach((n, id) => n.marker.setIcon(iconFor(n.ref, classForNode(id))));
 }
 
 function toggleNode(id){
@@ -10786,7 +10809,7 @@ async function initModeData(){
 
 function selectMode(mode){
   appMode = mode;
-  navType = mode === 'fiets' ? (appSettings.navType || 'active') : 'active'; // Passief Pro bestaat voorlopig enkel bij Fiets
+  navType = appSettings.navType || 'active'; // Passief Pro geldt nu voor zowel fiets als wandelen
   passiveEditingDone = false;
   $('passiveActionsRow').style.display = navType === 'passive' ? 'flex' : 'none';
   $('passiveReadyBtn').classList.remove('editing');
@@ -10839,12 +10862,16 @@ function autoLocateOnStartup(){
     map.setView([pos.coords.latitude, pos.coords.longitude], 17, { animate:false });
   }, () => { /* geen toestemming of geen fix — geen probleem, gewoon niets doen */ }, { enableHighAccuracy:true, timeout:6000 });
 }
-$('modeFietsBtn').addEventListener('click', () => openBikeSetupScreen());
-function openBikeSetupScreen(){
+$('modeFietsBtn').addEventListener('click', () => openBikeSetupScreen('fiets'));
+let bikeSetupTargetMode = 'fiets';
+function openBikeSetupScreen(mode){
+  bikeSetupTargetMode = mode;
   // Toon de huidige, al opgeslagen keuze — zo blijft dit scherm altijd in sync met Instellingen,
   // ook als je die daar ooit rechtstreeks wijzigde zonder via dit scherm te gaan.
   document.querySelectorAll('.bike-type-tile').forEach(t => t.classList.toggle('active', t.dataset.biketype === appSettings.bikeType));
   document.querySelectorAll('.nav-type-card').forEach(c => c.classList.toggle('active', c.dataset.navtype === (appSettings.navType || 'active')));
+  $('bikeTypeSection').style.display = mode === 'fiets' ? 'block' : 'none';
+  $('bikeSetupTitle').textContent = mode === 'fiets' ? tr('bikeSetupTitleFiets') : tr('bikeSetupTitleWandel');
   $('modeSelectScreen').classList.add('hidden');
   $('bikeSetupScreen').classList.remove('hidden');
 }
@@ -10870,7 +10897,7 @@ document.querySelectorAll('.nav-type-card').forEach(card => {
 });
 $('bikeSetupContinueBtn').addEventListener('click', () => {
   $('bikeSetupScreen').classList.add('hidden');
-  selectMode('fiets');
+  selectMode(bikeSetupTargetMode);
 });
 $('bikeSetupBackBtn').addEventListener('click', () => {
   $('bikeSetupScreen').classList.add('hidden');
@@ -11069,12 +11096,21 @@ document.querySelectorAll('.analyse-tab').forEach(tab => {
   });
 });
 let analyseRouteLayer = null;
+function showAnalyseLegend(items){
+  // items: [[kleur, label], ...]
+  if (!items || !items.length){ $('analyseLegend').style.display = 'none'; return; }
+  $('analyseLegend').innerHTML = items.map(([color, label]) =>
+    `<div class="analyse-legend-item"><span class="analyse-legend-dot" style="background:${color};"></span>${label}</div>`
+  ).join('');
+  $('analyseLegend').style.display = 'flex';
+}
 async function loadAnalyseTab(tabName){
   $('analyseMapWrap').style.display = 'none';
   $('analyseChartWrap').style.display = 'none';
   $('analysePlaceholder').style.display = 'none';
   $('analysePlaceholder').classList.remove('analyse-logs-list');
   $('analyseReliabilityBadge').style.display = 'none';
+  $('analyseLegend').style.display = 'none';
   analyseCurrentProfile = null;
   teardownAnalyseChartDrag();
   if (analyseRouteLayer){ analyseMapInstance.removeLayer(analyseRouteLayer); analyseRouteLayer = null; }
@@ -11103,6 +11139,7 @@ async function loadAnalyseTab(tabName){
     setTimeout(() => renderElevationChart(profile, 'analyseSvg', 'analyseChartWrap'), 60);
     analyseCurrentProfile = profile;
     setupAnalyseChartDrag();
+    showAnalyseLegend([[ELEV_COLORS.up, curLang()==='en'?'Ascent':'Stijging'], [ELEV_COLORS.down, curLang()==='en'?'Descent':'Daling'], [ELEV_COLORS.flat, curLang()==='en'?'Flat':'Vlak']]);
     return;
   }
 
@@ -11144,6 +11181,7 @@ async function loadAnalyseTab(tabName){
     analyseMapInstance.invalidateSize();
     analyseMapInstance.fitBounds(L.latLngBounds(result.coordsLatLng), { padding:[20,20] });
     renderSegmentBarChart(result.coordsLatLng, result.surfaceValues, SURFACE_COLORS, 'analyseSvg');
+    showAnalyseLegend([[SURFACE_COLORS.paved, tr('legendPaved')], [SURFACE_COLORS.medium, tr('legendMediumSurface')], [SURFACE_COLORS.unpaved, tr('legendUnpaved')], [SURFACE_COLORS.unknown, tr('legendUnknownSurface')]]);
     return;
   }
 
@@ -11190,6 +11228,7 @@ async function loadAnalyseTab(tabName){
     analyseMapInstance.invalidateSize();
     analyseMapInstance.fitBounds(L.latLngBounds(coordsLatLng), { padding:[20,20] });
     renderSegmentBarChart(coordsLatLng, segments, WIND_COLORS, 'analyseSvg');
+    showAnalyseLegend([[WIND_COLORS.tail, tr('legendTailwind')], [WIND_COLORS.cross, tr('legendCrosswind')], [WIND_COLORS.head, tr('legendHeadwind')]]);
     return;
   }
 
@@ -11220,6 +11259,7 @@ async function loadAnalyseTab(tabName){
     renderSlopeChart(profile, grads, 'analyseSvg');
     analyseCurrentProfile = profile;
     setupAnalyseChartDrag();
+    showAnalyseLegend([[gradientColor(-8), '-8%'], [gradientColor(-3), '-3%'], [gradientColor(0), '0%'], [gradientColor(3), '+3%'], [gradientColor(8), '+8%']]);
     return;
   }
 
@@ -11280,6 +11320,7 @@ async function loadAnalyseTab(tabName){
     analyseMapInstance.invalidateSize();
     analyseMapInstance.fitBounds(L.latLngBounds(coordsLatLng), { padding:[20,20] });
     renderSegmentBarChart(coordsLatLng, segments, SPEED_COLORS, 'analyseSvg');
+    showAnalyseLegend([[SPEED_COLORS.slow, curLang()==='en'?'Slower than avg':'Trager dan gem.'], [SPEED_COLORS.normal, curLang()==='en'?'Around average':'Rond gemiddeld'], [SPEED_COLORS.fast, curLang()==='en'?'Faster than avg':'Sneller dan gem.']]);
     return;
   }
 
@@ -11287,7 +11328,7 @@ async function loadAnalyseTab(tabName){
   $('analysePlaceholder').innerHTML = `<div>${tr('analyseComingSoon')}</div>`;
   $('analysePlaceholder').style.display = 'flex';
 }
-$('modeWandelBtn').addEventListener('click', () => selectMode('wandel'));
+$('modeWandelBtn').addEventListener('click', () => openBikeSetupScreen('wandel'));
 $('modeWeatherBtn').addEventListener('click', () => {
   selectMode(appMode || 'fiets');
   setTimeout(() => setActiveTab('weather'), 50);
