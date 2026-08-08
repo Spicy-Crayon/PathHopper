@@ -574,6 +574,8 @@
   #routeList li.dragging{ opacity:.55; background:#eef6ef; }
   #routeList li.drag-over-top{ box-shadow: inset 0 3px 0 0 var(--amber-dark); }
   #routeList li.drag-over-bottom{ box-shadow: inset 0 -3px 0 0 var(--amber-dark); }
+  #routeList li.li-flash{ animation: liFlash 1.4s ease-out; }
+  @keyframes liFlash{ 0%, 40%{ background:rgba(226,161,60,0.35); } 100%{ background:transparent; } }
   .li-drag{ cursor:grab; touch-action:none; color:#8a9a90; font-size:18px; padding:2px 5px 2px 0; flex-shrink:0; line-height:1; }
   #routeList li > span{ display:flex; flex-direction:column; line-height:1.3; }
   .li-time{ font-size:11px; font-weight:600; color:#6b7d70; }
@@ -801,7 +803,7 @@
   #mapRotator{
     position:absolute; top:50%; left:50%; width:100%; height:100%;
     transform: translate(-50%,-50%) rotate(0deg);
-    transition: transform .3s linear;
+    transition: transform .3s linear, width .3s linear, height .3s linear;
   }
   #mapRotator.rotating{ width:230%; height:230%; } /* groot genoeg zodat draaien geen lege hoeken toont */
 
@@ -1144,7 +1146,7 @@
     </div>
   </div>
   <div id="modeSelectHint" data-i18n="modeSelectHint">Knooppunten, navigatie, GPX, offline-gebruik — alles werkt voor beide.</div>
-  <div id="appVersionStart">v2.241 · 8 aug</div>
+  <div id="appVersionStart">v2.242 · 8 aug</div>
 </div>
 
 <div id="bikeSetupScreen" class="hidden">
@@ -1232,7 +1234,7 @@
   <button class="menu-item" id="menuHelpBtn"><span class="mi-icon">❓</span><span class="mi-text"><b data-i18n="menuHelp">Hulp</b><small data-i18n="menuHelpSub">uitleg over alle functies</small></span></button>
   <button class="menu-item" id="menuDevNotesBtn"><span class="mi-icon">🛠️</span><span class="mi-text"><b data-i18n="menuDevNotes">Technische werking</b><small data-i18n="menuDevNotesSub">hoe wegdektype, routering en fallbacks precies werken</small></span></button>
   <button class="menu-item" id="menuLogbookBtn"><span class="mi-icon">📋</span><span class="mi-text"><b data-i18n="menuLogbook">Logboek</b><small data-i18n="menuLogbookSub">overzicht van alle meldingen, ook stille</small></span></button>
-  <div id="menuVersion">v2.241 · 8 aug</div>
+  <div id="menuVersion">v2.242 · 8 aug</div>
 </div>
 
 <div id="hint" data-i18n="hintInitial">Zoom of pan naar je gebied, tik dan op "Laad knooppunten"</div>
@@ -9122,6 +9124,16 @@ function addDraggableRoutePointMarker(p){
     }),
     draggable:!navActive, autoPan:false
   }).addTo(map);
+  marker.on('click', () => {
+    const idx = route.findIndex(r => r.id === p.id);
+    if (idx === -1) return;
+    const li = document.querySelector(`#routeList li[data-i="${idx}"]`);
+    if (li){
+      li.scrollIntoView({ behavior:'smooth', block:'center' });
+      li.classList.add('li-flash');
+      setTimeout(() => li.classList.remove('li-flash'), 1400);
+    }
+  });
   marker.on('dragstart', () => { teardownRotationAwareDragging(); map.dragging.disable(); });
   marker.on('dragend', async (e) => {
     const shouldRestoreRotationDrag = navActive && !appSettings.disableMapRotation;
