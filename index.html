@@ -1144,7 +1144,7 @@
     </div>
   </div>
   <div id="modeSelectHint" data-i18n="modeSelectHint">Knooppunten, navigatie, GPX, offline-gebruik — alles werkt voor beide.</div>
-  <div id="appVersionStart">v2.240 · 8 aug</div>
+  <div id="appVersionStart">v2.241 · 8 aug</div>
 </div>
 
 <div id="bikeSetupScreen" class="hidden">
@@ -1232,7 +1232,7 @@
   <button class="menu-item" id="menuHelpBtn"><span class="mi-icon">❓</span><span class="mi-text"><b data-i18n="menuHelp">Hulp</b><small data-i18n="menuHelpSub">uitleg over alle functies</small></span></button>
   <button class="menu-item" id="menuDevNotesBtn"><span class="mi-icon">🛠️</span><span class="mi-text"><b data-i18n="menuDevNotes">Technische werking</b><small data-i18n="menuDevNotesSub">hoe wegdektype, routering en fallbacks precies werken</small></span></button>
   <button class="menu-item" id="menuLogbookBtn"><span class="mi-icon">📋</span><span class="mi-text"><b data-i18n="menuLogbook">Logboek</b><small data-i18n="menuLogbookSub">overzicht van alle meldingen, ook stille</small></span></button>
-  <div id="menuVersion">v2.240 · 8 aug</div>
+  <div id="menuVersion">v2.241 · 8 aug</div>
 </div>
 
 <div id="hint" data-i18n="hintInitial">Zoom of pan naar je gebied, tik dan op "Laad knooppunten"</div>
@@ -7285,16 +7285,19 @@ async function detourAroundClosedRoad(kmWanted){
 
   toast(curLang()==='en' ? `Finding a detour of about ${kmWanted} km…` : `Omweg van ongeveer ${kmWanted} km zoeken…`, 3000);
   try{
-    let detour, bufferM = 18;
-    for (let attempt = 0; attempt < 3; attempt++){
+    let detour, bufferM = appSettings.avoidBufferM || 18; // begin bij jouw eigen instelling, niet bij een vaste waarde
+    const overlapLimit = (appSettings.maxOverlapPct || 8) / 100; // zelfde 'nooit terugkeren'-strengheid als de generator
+    let cleanFound = false;
+    for (let attempt = 0; attempt < 5; attempt++){
       const polygon = bufferPolylineToPolygon(downsampleCoords(directSegment, 40), bufferM);
       detour = await fetchOrsRouteWithAvoidPolygon([myPos, rejoinPt], polygon, baseProfile, {});
       // Keert de gevonden omweg toch op zijn eigen stappen terug (bv. naar een knooppunt en weer terug)?
       // Dan is de vermijdzone blijkbaar nog te smal — verbreden en opnieuw proberen, i.p.v. dat te
       // aanvaarden. Zelfde controle als de rondrit-generator al gebruikt.
-      if (computeAnySelfOverlap(detour.coordsLatLng) <= 0.08) break;
-      bufferM += 25;
+      if (computeAnySelfOverlap(detour.coordsLatLng) <= overlapLimit){ cleanFound = true; break; }
+      bufferM += 40;
     }
+    if (!cleanFound) toast(curLang()==='en' ? '⚠️ Could not fully avoid backtracking on itself — best option found, check the route.' : '⚠️ Kon terugkeren op eigen stappen niet volledig vermijden — beste gevonden optie, controleer de route.', 5000);
     // Zoek in route[] het eerste punt (vanaf je huidige doel) dat het dichtst bij het aansluitpunt ligt —
     // alles daarna blijft exact zoals het was, alles ervoor wordt vervangen door de nieuwe omweg.
     let rejoinRouteIdx = route.length;
@@ -9107,8 +9110,16 @@ function renderLoopGenResults(){
 // de rondrit-generator, "harde vermijding", of het slepen van de route zelf toevoegen (geen echt
 // knooppunt, gewoon een coördinaat) mogen net als een handmatige speld wél bijgestuurd worden.
 function addDraggableRoutePointMarker(p){
+  const isVia = !!p.isVia;
   const marker = L.marker([p.lat, p.lon], {
-    icon: L.divIcon({ className:'', html:`<div class="drop-pin">${p.isVia ? '↔' : '📍'}</div>`, iconSize:[34,34], iconAnchor:[17,32] }),
+    icon: L.divIcon({
+      className:'',
+      html: isVia
+        ? `<div class="drop-pin"><div style="background:#4a9fd8; border:2px solid white; border-radius:50%; width:26px; height:26px; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 6px rgba(0,0,0,0.4);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V8"/><path d="M8 12L12 8L16 12"/><path d="M12 12 Q12 16 8 16 L5 16"/><path d="M7 14L5 16L7 18"/></svg></div></div>`
+        : `<div class="drop-pin">📍</div>`,
+      iconSize:[34,34],
+      iconAnchor: isVia ? [17,17] : [17,32]
+    }),
     draggable:!navActive, autoPan:false
   }).addTo(map);
   marker.on('dragstart', () => { teardownRotationAwareDragging(); map.dragging.disable(); });
