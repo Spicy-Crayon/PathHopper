@@ -418,6 +418,30 @@
   body.dash-text-small .dash-stat{ padding:11px 6px; }
   body.dash-text-small #dashSummary2 .dash-stat{ padding:9px 6px; }
   body.dash-text-small #dashSummary3 .dash-stat{ padding:8px 6px; }
+
+  /* ---------- Garmin-stijl navigatiescherm (optioneel, via Instellingen) ---------- */
+  #garminSpeedGauge{ display:none; }
+  body.garmin-nav-style #dashboardPanel{ background:#0a1410; }
+  body.garmin-nav-style #dashSummary,
+  body.garmin-nav-style #dashSummary2,
+  body.garmin-nav-style #dashSummary3{
+    display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px;
+  }
+  body.garmin-nav-style .dash-stat{
+    background:linear-gradient(160deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02));
+    border:1px solid rgba(255,255,255,0.08); border-radius:18px; padding:14px 8px;
+    position:relative; overflow:hidden;
+  }
+  body.garmin-nav-style .dash-stat span{ font-size:26px; font-weight:900; letter-spacing:-0.5px; color:#f0f5ee; }
+  body.garmin-nav-style .dash-stat small{ color:rgba(230,240,225,0.5); font-weight:700; }
+  body.garmin-nav-style #dashSpeedTile{ display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  body.garmin-nav-style #garminSpeedGauge{ display:block; width:64px; height:64px; margin-bottom:2px; }
+  body.garmin-nav-style #dashSpeedTile span{ font-size:22px; }
+  body.garmin-nav-style #dashElevSection,
+  body.garmin-nav-style #dashChartSection{
+    background:linear-gradient(160deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02));
+    border:1px solid rgba(255,255,255,0.08); border-radius:18px; padding:10px;
+  }
   body.dash-text-small .dash-stat span{ font-size:20px; }
   body.dash-text-small #dashSummary2 .dash-stat span{ font-size:15px; }
   body.dash-text-small #dashSummary3 .dash-stat span{ font-size:14px; }
@@ -884,22 +908,40 @@
   }
   #analyseScreen.hidden{ display:none; }
   #analyseHeader{ display:flex; align-items:center; gap:8px; padding:10px 12px 6px; flex-shrink:0; }
-  #analyseCloseBtn{ border:none; background:rgba(255,255,255,0.1); color:var(--cream); width:34px; height:34px; border-radius:50%; font-size:15px; flex-shrink:0; }
-  #analyseTabBar{ display:flex; gap:4px; overflow-x:auto; flex:1; }
-  .analyse-tab{
-    flex-shrink:0; border:none; background:rgba(255,255,255,0.06); color:rgba(246,244,238,0.7);
-    padding:8px 12px; border-radius:10px; font-size:11.5px; font-weight:700; white-space:nowrap;
+  #analyseStatsPanel{
+    display:grid; grid-template-columns:repeat(4, 1fr); gap:6px; padding:0 12px 8px; flex-shrink:0;
   }
-  .analyse-tab.active{ background:var(--amber); color:var(--green-900); }
+  .analyse-stat-tile{ background:linear-gradient(160deg, rgba(255,255,255,0.09), rgba(255,255,255,0.03)); border-radius:12px; padding:9px 4px; text-align:center; border:1px solid rgba(255,255,255,0.06); }
+  .analyse-stat-val{ color:var(--cream); font-weight:800; font-size:16px; letter-spacing:-0.3px; }
+  .analyse-stat-label{ color:rgba(246,244,238,0.55); font-size:9px; text-transform:uppercase; letter-spacing:0.5px; margin-top:1px; }
+  #analyseCloseBtn{
+    border:none; background:var(--amber); color:var(--green-900); width:36px; height:36px; border-radius:50%;
+    font-size:16px; font-weight:900; flex-shrink:0; box-shadow:0 3px 10px rgba(0,0,0,0.35);
+  }
+  #analyseTabBar{
+    display:flex; gap:3px; overflow-x:auto; flex:1; background:rgba(15,20,15,0.55); backdrop-filter:blur(6px);
+    border-radius:16px; padding:4px; box-shadow:0 3px 10px rgba(0,0,0,0.3);
+  }
+  .analyse-tab{
+    flex-shrink:0; border:none; background:transparent; color:rgba(246,244,238,0.65);
+    padding:8px 12px; border-radius:13px; font-size:11px; font-weight:700; white-space:nowrap; transition:background .15s;
+  }
+  .analyse-tab.active{ background:var(--amber); color:var(--green-900); box-shadow:0 2px 6px rgba(0,0,0,0.25); }
   #analyseBody{ flex:1; display:flex; flex-direction:column; min-height:0; padding:8px 12px 16px; gap:8px; }
-  #analyseMapWrap{ flex:1.1; min-height:0; border-radius:14px; overflow:hidden; }
+  #analyseMapWrap{ flex:1.15; min-height:0; border-radius:18px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,0.35); }
   #analyseMap{ width:100%; height:100%; }
-  #analyseChartWrap{ flex:0.7; min-height:0; background:rgba(255,255,255,0.05); border-radius:14px; padding:8px; }
+  #analyseChartWrap{ flex:0.65; min-height:0; background:linear-gradient(160deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02)); border-radius:18px; padding:10px; border:1px solid rgba(255,255,255,0.06); }
   #analyseSvg{ width:100%; height:100%; }
   #analysePlaceholder{
     flex:1; display:flex; align-items:center; justify-content:center; text-align:center;
     color:rgba(246,244,238,0.6); font-size:13px; padding:20px; line-height:1.6;
   }
+  #analyseReliabilityBadge{
+    font-size:11px; font-weight:700; padding:5px 10px; border-radius:8px; text-align:center; flex-shrink:0;
+  }
+  #analyseReliabilityBadge.ok{ background:rgba(46,158,79,0.18); color:#8fdba8; }
+  #analyseReliabilityBadge.warn{ background:rgba(213,68,58,0.18); color:#f0a89c; }
+  #analysePlaceholder.analyse-logs-list{ display:block !important; overflow-y:auto; text-align:left; flex:1; padding:10px 4px; }
 
   #elevationModal{
     position:fixed; top:0;left:0;right:0;bottom:0; z-index:2000; background:var(--green-900);
@@ -1033,7 +1075,7 @@
     </div>
   </div>
   <div id="modeSelectHint" data-i18n="modeSelectHint">Knooppunten, navigatie, GPX, offline-gebruik — alles werkt voor beide.</div>
-  <div id="appVersionStart">v2.206 · 7 aug</div>
+  <div id="appVersionStart">v2.218 · 7 aug</div>
 </div>
 
 <div id="bikeSetupScreen" class="hidden">
@@ -1116,7 +1158,7 @@
   <button class="menu-item" id="menuHelpBtn"><span class="mi-icon">❓</span><span class="mi-text"><b data-i18n="menuHelp">Hulp</b><small data-i18n="menuHelpSub">uitleg over alle functies</small></span></button>
   <button class="menu-item" id="menuDevNotesBtn"><span class="mi-icon">🛠️</span><span class="mi-text"><b data-i18n="menuDevNotes">Technische werking</b><small data-i18n="menuDevNotesSub">hoe wegdektype, routering en fallbacks precies werken</small></span></button>
   <button class="menu-item" id="menuLogbookBtn"><span class="mi-icon">📋</span><span class="mi-text"><b data-i18n="menuLogbook">Logboek</b><small data-i18n="menuLogbookSub">overzicht van alle meldingen, ook stille</small></span></button>
-  <div id="menuVersion">v2.206 · 7 aug</div>
+  <div id="menuVersion">v2.218 · 7 aug</div>
 </div>
 
 <div id="hint" data-i18n="hintInitial">Zoom of pan naar je gebied, tik dan op "Laad knooppunten"</div>
@@ -1304,6 +1346,7 @@
       <button id="reverseTripYesBtn" class="reverse-trip-yes" data-i18n="reverseTripYes">↩️ Ja, breng me terug</button>
       <button id="reverseTripNoBtn" class="reverse-trip-no" data-i18n="reverseTripNo">Nee, bedankt</button>
     </div>
+    <button id="reverseTripAnalyseBtn" style="width:100%; margin-top:10px; border:none; border-radius:12px; padding:11px; background:rgba(255,255,255,0.08); color:var(--green-900); font-weight:700;" data-i18n="reverseTripAnalyseBtn">📊 Bekijk rit-analyse</button>
   </div>
 </div>
 
@@ -1401,8 +1444,12 @@
       <label class="settings-check-label" style="margin-top:10px;"><span data-i18n="settingsOverpassTimeoutLabel">🛣️ Wegdektype: max. wachttijd voor OpenStreetMap-bron (seconden)</span></label>
       <input type="number" id="settingOverpassSurfaceTimeout" value="15" min="5" max="40" step="1" class="settings-text-input" style="max-width:110px;">
       <div class="settings-subnote" data-i18n="settingsOverpassTimeoutSub">Hoger = meer geduld voor het gratis, sleutelloze vangnet (kan soms wat trager zijn), maar je wacht ook langer voor je een resultaat ziet. Standaard 15s.</div>
-      <label class="settings-check" style="margin-top:14px;"><input type="checkbox" id="settingSmartUnpavedAvoidance"> <span data-i18n="settingsSmartUnpavedAvoidance">🎯 Slimme onverhard-vermijding bij Racefiets (i.p.v. OpenRouteService's eigen inschatting)</span></label>
-      <div class="settings-subnote" data-i18n="settingsSmartUnpavedAvoidanceSub">Standaard bepaalt OpenRouteService zelf, met hun eigen (minder verfijnde) logica, wat een "onverharde weg" is om te vermijden. Deze optie gebruikt in plaats daarvan dezelfde grondige classificatie als de kleuring hierboven (surface + tracktype + smoothness + sidewalk/snelheidscontrole), en herberekent zo nodig tot 3 keer met een vermijdzone rond elk écht onverhard stuk. Preciezer, maar duidelijk trager (meerdere aanvragen na elkaar) — en vereist een OpenRouteService-sleutel.</div>
+      <label class="settings-check-label" style="margin-top:14px;"><span data-i18n="settingsRoutingWeightingLabel">🎯 Comfort-routering op basis van je tag-matrix (racefiets/gewone fiets/e-bike, niet bij mountainbike)</span></label>
+      <label class="settings-radio"><input type="radio" name="routingWeighting" value="off" checked> <span data-i18n="settingsWeightingOff">⚪ Uit — OpenRouteService's eigen inschatting</span></label>
+      <label class="settings-radio"><input type="radio" name="routingWeighting" value="option1"> <span data-i18n="settingsWeightingOption1">1️⃣ Route → verifiëren → corrigeren</span></label>
+      <label class="settings-radio"><input type="radio" name="routingWeighting" value="option2"> <span data-i18n="settingsWeightingOption2">2️⃣ Eerst hele gebied opvragen → dan pas routeren</span></label>
+      <label class="settings-radio"><input type="radio" name="routingWeighting" value="option3"> <span data-i18n="settingsWeightingOption3">3️⃣ BRouter eigen kostprofiel (experimenteel)</span></label>
+      <div class="settings-subnote" data-i18n="settingsSmartUnpavedAvoidanceSub">Standaard bepaalt OpenRouteService zelf, met hun eigen (minder verfijnde) logica, wat een goede fietsweg is. De 3 opties hieronder gebruiken in plaats daarvan de volledige tag-matrix (wegdektype, fietsinfrastructuur, snelheidszones, wegtype) om elk stukje een comfort-score te geven — elk met een eigen aanpak en snelheid/nauwkeurigheid-afweging, meer uitleg bij 🛠️ Technische werking. Optie 1 en 2 vereisen een OpenRouteService-sleutel, optie 3 vereist BRouter als routeringsengine.</div>
       <label class="settings-check" style="margin-top:10px;"><input type="checkbox" id="settingQuietRouting"> <span data-i18n="settingsQuietRouting">🤫 Verkeersluwe routering (vermijdt hoofdwegen)</span></label>
       <div class="settings-subnote" data-i18n="settingsQuietRoutingSub">Werkt het best met een OpenRouteService-sleutel (bij 🔑 API-sleutels), maar geeft ook zonder sleutel al een merkbaar rustiger resultaat bij BRouter en Valhalla. Bij OSRM/GraphHopper (gratis niveau) is hier helaas geen extra sturing mogelijk.</div>
     </div>
@@ -1554,6 +1601,7 @@
       <label class="settings-radio"><input type="radio" name="dashTextSize" value="normal" checked> <span><span data-i18n="settingsTextNormal">🔤 Normaal</span></span></label>
       <label class="settings-radio"><input type="radio" name="dashTextSize" value="small"> <span><span data-i18n="settingsTextSmaller">🔎 Kleiner (handig op kleinere schermen)</span></span></label>
       <label class="settings-check" style="margin-top:6px;"><input type="checkbox" id="settingDashBold" checked> <span><span data-i18n="settingsBold">🅱️ Vetgedrukt</span></span></label>
+      <label class="settings-check" style="margin-top:10px;"><input type="checkbox" id="settingGarminStyle"> <span data-i18n="settingsGarminStyle">⌚ Garmin-stijl (donkerder, grotere tegels, ronde snelheidsmeter)</span></label>
     </div>
 
     <div class="settings-section">
@@ -1579,7 +1627,7 @@
       <div class="settings-subnote" data-i18n="loopAdvancedBufferSub">Kleiner = enkel de letterlijke weg zelf wordt verboden (laat straten er vlak naast met rust). Groter = ook straten in de buurt worden vermeden, maar dat kan onnodig grote omwegen geven in een stedelijk rasterpatroon. Werkt enkel met een OpenRouteService-sleutel.</div>
 
       <label class="settings-check-label" style="margin-top:14px;" data-i18n="loopAdvancedOverlapLabel">Maximaal toegestane heen-terug-overlap (%)</label>
-      <input type="number" id="settingMaxOverlapPct" value="30" min="5" max="90" step="5" class="settings-text-input" style="max-width:110px;">
+      <input type="number" id="settingMaxOverlapPct" value="8" min="3" max="90" step="1" class="settings-text-input" style="max-width:110px;">
       <div class="settings-subnote" data-i18n="loopAdvancedOverlapSub">Een voorstel dat voor meer dan dit percentage over hetzelfde tracé heen en terug loopt, telt niet meer als een "echte" lus/omweg en wordt apart gemarkeerd. Kleiner = strenger (meer kans op de ⚠️-melding "geen echte lus gevonden"), groter = soepeler.</div>
 
       <button id="settingsLoopAdvancedResetBtn" class="settings-btn" style="margin-top:14px;" data-i18n="loopAdvancedResetBtn">↺ Terug naar standaardwaarden (18 m / 30%)</button>
@@ -1694,9 +1742,12 @@
       <button class="analyse-tab" data-tab="elevation" data-i18n="analyseTabElevation">⛰️ Hoogte</button>
       <button class="analyse-tab" data-tab="slope" data-i18n="analyseTabSlope">📐 Helling</button>
       <button class="analyse-tab" data-tab="logs" data-i18n="analyseTabLogs">📋 Logs</button>
+      <button class="analyse-tab" data-tab="speed" data-i18n="analyseTabSpeed" id="analyseSpeedTabBtn" style="display:none;">🏃 Snelheid</button>
     </div>
   </div>
+  <div id="analyseStatsPanel" style="display:none;"></div>
   <div id="analyseBody">
+    <div id="analyseReliabilityBadge" style="display:none;"></div>
     <div id="analyseMapWrap"><div id="analyseMap"></div></div>
     <div id="analyseChartWrap">
       <svg id="analyseSvg" viewBox="0 0 100 40" preserveAspectRatio="none"></svg>
@@ -1766,7 +1817,10 @@
     <span id="dashTurnText">–</span>
   </div>
   <div id="dashSummary">
-    <div class="dash-stat"><span id="dashSpeed">–</span><small data-i18n="dashKmu">km/u</small></div>
+    <div class="dash-stat" id="dashSpeedTile">
+      <svg id="garminSpeedGauge" viewBox="0 0 100 100"><circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="8"/><circle id="garminSpeedGaugeFill" cx="50" cy="50" r="42" fill="none" stroke="#c6e84f" stroke-width="8" stroke-linecap="round" stroke-dasharray="264" stroke-dashoffset="264" transform="rotate(-90 50 50)"/></svg>
+      <span id="dashSpeed">–</span><small data-i18n="dashKmu">km/u</small>
+    </div>
     <div class="dash-stat"><span id="dashDone">0.0 km</span><small data-i18n="dashAfgelegd">afgelegd</small></div>
     <div class="dash-stat"><span id="dashRemaining">0.0 km</span><small data-i18n="dashNogAfTeLeggen">nog af te leggen</small></div>
   </div>
@@ -3574,6 +3628,16 @@ async function saveRideToHistory(){
     const t0 = arrivalActual[i-1] || navStartTime, t1 = arrivalActual[i];
     if (t0 && t1 && t1 > t0) segments.push({ from: route[i-1].ref, to: route[i].ref, sec: Math.round((t1 - t0) / 1000) });
   }
+  // Uit het kruimelspoor (positie + tijdstip, om de ~12s bijgehouden): de route zelf én de snelheid per
+  // stuk. Dat laatste kan niet achteraf herberekend worden (in tegenstelling tot wegdektype/hoogte), dus
+  // moet nu, tijdens de rit zelf, vastgelegd worden.
+  const geometry = navBreadcrumbs.map(b => [Math.round(b.lat*100000)/100000, Math.round(b.lon*100000)/100000]);
+  const speeds = [];
+  for (let i = 1; i < navBreadcrumbs.length; i++){
+    const dtSec = (navBreadcrumbs[i].t - navBreadcrumbs[i-1].t) / 1000;
+    const distM = haversine(navBreadcrumbs[i-1].lat, navBreadcrumbs[i-1].lon, navBreadcrumbs[i].lat, navBreadcrumbs[i].lon);
+    speeds.push(dtSec > 0 ? Math.round((distM / dtSec) * 3.6 * 10) / 10 : 0); // m/s -> km/u
+  }
   const entry = {
     date: new Date().toISOString(),
     km: Math.round(km*10)/10,
@@ -3582,6 +3646,8 @@ async function saveRideToHistory(){
     points: route.length,
     nodeRefs: route.map(p => p.ref), // volledig traject, niet enkel start/eind
     segments,
+    geometry,
+    speeds,
     ascent: lastElevationProfile ? Math.round(lastElevationProfile.ascent) : null,
     label: routeIsFromGpx ? 'GPX-route' : `${route[0]?.ref ?? '?'} → ${route[route.length-1]?.ref ?? '?'}`
   };
@@ -3590,6 +3656,7 @@ async function saveRideToHistory(){
   if (history.length > 100) history.length = 100; // niet oneindig laten groeien
   await storageSet(RIDE_HISTORY_KEY(), JSON.stringify(history));
   checkAchievements(entry, history);
+  return entry;
 }
 
 // Kleine, luchtige prestatie-meldingen na een rit — puur leuk bedoeld, geen puntensysteem of database,
@@ -3704,6 +3771,7 @@ async function renderRideHistory(){
       <div id="${detailId}" class="rh-detail" style="display:none;">
         ${r.avgKmh!=null ? `<div>${tr('rhAvgSpeed')}: <b>${r.avgKmh} km/u</b></div>` : ''}
         ${r.nodeRefs && r.nodeRefs.length ? `<div style="margin-top:4px;">${tr('rhNodeSequence')}: ${r.nodeRefs.join(' → ')}</div>` : ''}
+        ${r.geometry && r.geometry.length > 1 ? `<button class="rh-analyse-btn" data-i="${i}" style="margin-top:8px; width:100%; border:none; border-radius:10px; padding:9px; background:var(--amber); color:var(--green-900); font-weight:700;">${tr('rhViewAnalyse')}</button>` : ''}
       </div>`;
     list.appendChild(li);
   });
@@ -3711,6 +3779,15 @@ async function renderRideHistory(){
     el.addEventListener('click', () => {
       const detail = document.getElementById(el.dataset.toggle);
       if (detail) detail.style.display = (detail.style.display === 'none') ? 'block' : 'none';
+    });
+  });
+  list.querySelectorAll('.rh-analyse-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      const h = await getRideHistory();
+      const entry = h[+e.target.dataset.i];
+      if (!entry) return;
+      closeModal('rideHistoryModal');
+      openAnalyseScreen({ ...entry, isHistorical:true });
     });
   });
   list.querySelectorAll('.rh-del').forEach(btn => {
@@ -3912,10 +3989,10 @@ async function runOfflineDiagnostics(){
 const SETTINGS_KEY = 'app_settings_v1';
 let appSettings = {
   theme:'default', showCompassBtn:true, orsKey:'', graphhopperKey:'', geoapifyKey:'', bikeType:'regular', mapStyle:'standard', thunderforestKey:'',
-  dashTextSize:'normal', dashBold:true, offRouteDist:35, autoReroute:false, silentReroute:false,
+  dashTextSize:'normal', dashBold:true, garminStyleNav:false, offRouteDist:35, autoReroute:false, silentReroute:false,
   overlays:{ cycling:false, hiking:false, mtb:false },
   poiLayers:{ cafe:false, restaurant:false, bakery:false, supermarket:false, pharmacy:false, bike:false, water:false, toilet:false, money:false, camping:false, charging:false, playground:false, parking:false, hotel:false }, showPoiDetails:false,
-  showWindDirection:true, autoPause:false, redNavDot:false, topOffsetPx:0, tabGapPx:0, bodyWeightKg:null, voiceOnlyMode:false, routeColorMode:'off', showWindInNav:false, eatReminderOn:false, eatIntervalMin:45, drinkReminderOn:false, drinkIntervalMin:20, segmentPrOn:true, darkArrivalWarning:true, quietRoutingMode:false, historyAudioOn:false, shakeToSurpriseOn:false, shakeKm:30, vertrekFromGps:false, avoidBufferM:18, maxOverlapPct:30, lowerGpsAccuracy:false, disableMapRotation:false, posUpdateIntervalSec:1, overpassSurfaceTimeoutSec:15, smartUnpavedAvoidance:false, navType:'active', fallDetectionOn:false, sosContactNumber:'', sosContactName:'', routePreference:'balanced', routeLineColor:'#e2a13c', language:'en',
+  showWindDirection:true, autoPause:false, redNavDot:false, topOffsetPx:0, tabGapPx:0, bodyWeightKg:null, voiceOnlyMode:false, routeColorMode:'off', showWindInNav:false, eatReminderOn:false, eatIntervalMin:45, drinkReminderOn:false, drinkIntervalMin:20, segmentPrOn:true, darkArrivalWarning:true, quietRoutingMode:false, historyAudioOn:false, shakeToSurpriseOn:false, shakeKm:30, vertrekFromGps:false, avoidBufferM:18, maxOverlapPct:8, lowerGpsAccuracy:false, disableMapRotation:false, posUpdateIntervalSec:1, overpassSurfaceTimeoutSec:15, routingWeighting:'off', navType:'active', fallDetectionOn:false, sosContactNumber:'', sosContactName:'', routePreference:'balanced', routeLineColor:'#e2a13c', language:'en',
   bundledCountries:{ be:true, nl:false }, routingEngine:'brouter'
 };
 
@@ -4104,7 +4181,7 @@ const TRANSLATIONS = {
   loopAdvancedBufferSub: { nl:'Kleiner = enkel de letterlijke weg zelf wordt verboden (laat straten er vlak naast met rust). Groter = ook straten in de buurt worden vermeden, maar dat kan onnodig grote omwegen geven in een stedelijk rasterpatroon. Werkt enkel met een OpenRouteService-sleutel.', en:'Smaller = only the literal road itself is forbidden (leaves nearby streets alone). Larger = nearby streets are also avoided, but that can cause unnecessarily large detours in an urban grid pattern. Only works with an OpenRouteService key.' },
   loopAdvancedOverlapLabel: { nl:'Maximaal toegestane heen-terug-overlap (%)', en:'Maximum allowed back-and-forth overlap (%)' },
   loopAdvancedOverlapSub: { nl:'Een voorstel dat voor meer dan dit percentage over hetzelfde tracé heen en terug loopt, telt niet meer als een "echte" lus/omweg en wordt apart gemarkeerd. Kleiner = strenger (meer kans op de ⚠️-melding "geen echte lus gevonden"), groter = soepeler.', en:'A suggestion that runs back and forth over the same path for more than this percentage no longer counts as a "real" loop/detour and gets flagged separately. Smaller = stricter (more chance of the ⚠️ "no real loop found" message), larger = more lenient.' },
-  loopAdvancedResetBtn: { nl:'↺ Terug naar standaardwaarden (18 m / 30%)', en:'↺ Reset to defaults (18 m / 30%)' },
+  loopAdvancedResetBtn: { nl:'↺ Terug naar standaardwaarden (18 m / 8%)', en:'↺ Reset to defaults (18 m / 8%)' },
   settingsCompassHeading: { nl:'Kompas-kalibratie', en:'Compass calibration' },
   settingsWeightHeading: { nl:'Lichaamsgewicht', en:'Body weight' },
   settingsWeightNote: { nl:'Optioneel — enkel gebruikt voor de ruwe calorie-schatting bij je rit-statistieken.', en:'Optional — only used for the rough calorie estimate in your ride statistics.' },
@@ -4119,8 +4196,13 @@ const TRANSLATIONS = {
   settingsRouteColorSurface: { nl:'🛣️ Wegdektype (werkt altijd — beter met een gratis sleutel bij 🔑 API-sleutels)', en:'🛣️ Surface type (always works — better with a free key under 🔑 API keys)' },
   settingsOverpassTimeoutLabel: { nl:'🛣️ Wegdektype: max. wachttijd voor OpenStreetMap-bron (seconden)', en:'🛣️ Surface type: max. wait time for OpenStreetMap source (seconds)' },
   settingsOverpassTimeoutSub: { nl:'Hoger = meer geduld voor het gratis, sleutelloze vangnet (kan soms wat trager zijn), maar je wacht ook langer voor je een resultaat ziet. Standaard 15s.', en:'Higher = more patience for the free, keyless fallback (can sometimes be a bit slower), but you also wait longer before seeing a result. Default 15s.' },
-  settingsSmartUnpavedAvoidance: { nl:'🎯 Slimme onverhard-vermijding (racefiets/gewone fiets/e-bike, niet bij mountainbike)', en:'🎯 Smart unpaved avoidance (road/regular/e-bike, not for mountain bike)' },
-  settingsSmartUnpavedAvoidanceSub: { nl:'Standaard bepaalt OpenRouteService zelf, met hun eigen (minder verfijnde) logica, wat een "onverharde weg" is om te vermijden. Deze optie gebruikt in plaats daarvan dezelfde grondige classificatie als de kleuring hierboven (surface + tracktype + smoothness + sidewalk/snelheidscontrole), en herberekent zo nodig tot 3 keer met een vermijdzone rond elk écht onverhard stuk. Preciezer, maar duidelijk trager (meerdere aanvragen na elkaar) — en vereist een OpenRouteService-sleutel.', en:'By default OpenRouteService decides for itself, with its own (less refined) logic, what counts as an "unpaved road" to avoid. This option instead uses the same thorough classification as the coloring above (surface + tracktype + smoothness + sidewalk/speed check), and recalculates up to 3 times with an avoidance zone around each genuinely unpaved stretch found. More precise, but noticeably slower (several requests in sequence) — and requires an OpenRouteService key.' },
+  settingsSmartUnpavedAvoidance: { nl:'🎯 Slimme comfort-routering (racefiets/gewone fiets/e-bike, niet bij mountainbike)', en:'🎯 Smart comfort routing (road/regular/e-bike, not for mountain bike)' },
+  settingsRoutingWeightingLabel: { nl:'🎯 Comfort-routering op basis van je tag-matrix (racefiets/gewone fiets/e-bike, niet bij mountainbike)', en:'🎯 Comfort routing based on your tag matrix (road/regular/e-bike, not for mountain bike)' },
+  settingsWeightingOff: { nl:'⚪ Uit — OpenRouteService\u2019s eigen inschatting', en:'⚪ Off — OpenRouteService\u2019s own assessment' },
+  settingsWeightingOption1: { nl:'1️⃣ Route → verifiëren → corrigeren', en:'1️⃣ Route → verify → correct' },
+  settingsWeightingOption2: { nl:'2️⃣ Eerst hele gebied opvragen → dan pas routeren', en:'2️⃣ Query whole area first → then route' },
+  settingsWeightingOption3: { nl:'3️⃣ BRouter eigen kostprofiel (experimenteel)', en:'3️⃣ BRouter custom cost profile (experimental)' },
+  settingsSmartUnpavedAvoidanceSub: { nl:'Standaard bepaalt OpenRouteService zelf, met hun eigen (minder verfijnde) logica, wat een goede fietsweg is. Deze optie gebruikt in plaats daarvan de volledige tag-matrix (wegdektype, fietsinfrastructuur, snelheidszones, wegtype) om elk stukje een comfort-score te geven, en herberekent zo nodig tot 3 keer met een vermijdzone rond elk stuk dat te laag scoort voor je fietstype. Preciezer, maar duidelijk trager (meerdere aanvragen na elkaar) — en vereist een OpenRouteService-sleutel.', en:'By default OpenRouteService decides for itself, with its own (less refined) logic, what counts as a good cycling road. This option instead uses the full tag matrix (surface, cycling infrastructure, speed zones, road type) to give every stretch a comfort score, and recalculates up to 3 times with an avoidance zone around each stretch that scores too low for your bike type. More precise, but noticeably slower (several requests in sequence) — and requires an OpenRouteService key.' },
   legendTailwind: { nl:'Rugwind', en:'Tailwind' },
   legendCrosswind: { nl:'Zijwind', en:'Crosswind' },
   legendHeadwind: { nl:'Tegenwind', en:'Headwind' },
@@ -4202,6 +4284,7 @@ const TRANSLATIONS = {
   settingsPoiHotel: { nl:'🏨 Hotel & B&B', en:'🏨 Hotel & B&B' },
   loopGenStopSuggestion: { nl:'Pauze-suggestie', en:'Stop suggestion' },
   loopGenOverlapWarning: { nl:'Loopt een flink stuk heen en terug via hetzelfde pad', en:'Runs a fair stretch back and forth along the same path' },
+  loopGenGrownDistance: { nl:'Iets langer dan gevraagd — zo kon een écht schone lus zonder herhaling gevonden worden', en:'A bit longer than requested — this allowed finding a truly clean loop with no repeats' },
   loopGenRemoveOption: { nl:'Dit voorstel verwijderen', en:'Remove this suggestion' },
   foodBreakBtn: { nl:'☕ Pauze zoeken', en:'☕ Find a break' },
   foodBreakTitle: { nl:'☕ Pauze zoeken', en:'☕ Find a break' },
@@ -4301,17 +4384,24 @@ const TRANSLATIONS = {
   analyseTabElevation: { nl:'⛰️ Hoogte', en:'⛰️ Elevation' },
   analyseTabSlope: { nl:'📐 Helling', en:'📐 Slope' },
   analyseTabLogs: { nl:'📋 Logs', en:'📋 Logs' },
+  analyseTabSpeed: { nl:'🏃 Snelheid', en:'🏃 Speed' },
+  rhViewAnalyse: { nl:'📊 Bekijk analyse', en:'📊 View analysis' },
   analyseLoading: { nl:'Bezig met analyseren…', en:'Analysing…' },
   analyseElevationFail: { nl:'Hoogtegegevens konden niet opgehaald worden.', en:'Could not fetch elevation data.' },
   analyseNoRoute: { nl:'Nog geen route om te analyseren — zet eerst je punten en druk op "Klaar".', en:'No route to analyse yet — set your points first and press "Ready".' },
   analyseComingSoon: { nl:'Deze tab komt in een latere stap.', en:'This tab is coming in a later step.' },
   analyseSurfaceFail: { nl:'Kon het wegdektype nergens ophalen.', en:'Could not fetch surface type anywhere.' },
+  analyseCrossCheckOk: { nl:'✅ Gecontroleerd via OpenStreetMap — betrouwbaar resultaat', en:'✅ Verified via OpenStreetMap — reliable result' },
+  analyseCrossCheckFailed: { nl:'⚠️ Kruiscontrole niet gelukt — dit resultaat kan te optimistisch zijn (te veel groen)', en:'⚠️ Cross-check failed — this result may be too optimistic (too much green)' },
+  analyseWindFail: { nl:'Kon de windrichting nergens ophalen.', en:'Could not fetch wind direction anywhere.' },
+  analyseLogsFail: { nl:'Geen wegdata gevonden rond deze route.', en:'No road data found around this route.' },
   settingsBikeRoad: { nl:'🚴 Racefiets — vermijdt onverhard', en:'🚴 Road bike — avoids unpaved' },
   settingsBikeMountain: { nl:'🚵 Mountainbike — zoekt paden op', en:'🚵 Mountain bike — seeks out trails' },
   settingsBikeElectric: { nl:'🔋 E-bike', en:'🔋 E-bike' },
   settingsTextNormal: { nl:'🔤 Normaal', en:'🔤 Normal' },
   settingsTextSmaller: { nl:'🔎 Kleiner (handig op kleinere schermen)', en:'🔎 Smaller (handy on smaller screens)' },
   settingsBold: { nl:'🅱️ Vetgedrukt', en:'🅱️ Bold' },
+  settingsGarminStyle: { nl:'⌚ Garmin-stijl (donkerder, grotere tegels, ronde snelheidsmeter)', en:'⌚ Garmin style (darker, bigger tiles, circular speed gauge)' },
   settingsDevSensitive: { nl:'🎯 Gevoelig (20 m)', en:'🎯 Sensitive (20 m)' },
   settingsDevNormal: { nl:'⚖️ Normaal (35 m)', en:'⚖️ Normal (35 m)' },
   settingsDevRelaxed: { nl:'😌 Soepel (60 m)', en:'😌 Relaxed (60 m)' },
@@ -4458,6 +4548,7 @@ const TRANSLATIONS = {
   pinRouteViaNode: { nl:'🔗 Via dichtstbijzijnd knooppunt', en:'🔗 Via nearest node' },
   reverseTripYes: { nl:'↩️ Ja, breng me terug', en:'↩️ Yes, take me back' },
   reverseTripNo: { nl:'Nee, bedankt', en:'No thanks' },
+  reverseTripAnalyseBtn: { nl:'📊 Bekijk rit-analyse', en:'📊 View ride analysis' },
   navStartLabel: { nl:'Start navigatie', en:'Start navigation' },
   navArrivedDone: { nl:'Aangekomen — route voltooid', en:'Arrived — route complete' },
   maneuverDepart: { nl:'Vertrek', en:'Depart' },
@@ -4510,6 +4601,7 @@ const HELP_CONTENT = {
       <p>📳 Heb je "Schud voor verrassingsroute" aangezet in Instellingen? Schud dan gewoon je toestel op het kaartscherm voor 3 willekeurige voorstellen. De gewenste afstand daarvoor stel je in vlak onder die schakelaar in Instellingen.</p>
       <p>⚠️ De "rustig" en "verhard"-voorkeuren werken enkel écht als je een gratis OpenRouteService-sleutel hebt ingevuld bij Instellingen — zonder sleutel krijg je nog steeds 3 routes, maar zonder die extra sturing.</p>
       <p>🔁 Heb je die OpenRouteService-sleutel wél ingevuld? Dan wordt bovendien geprobeerd om de terugweg <b>letterlijk te verbieden</b> om over de al gevolgde heenweg te gaan (in plaats van dat gewoon te hopen) — geeft merkbaar meer kans op een echte lus zonder heen-en-terug. Zonder sleutel valt de app terug op een aanpak die het gewoon vaker probeert. Lukt het toch niet, dan zie je een duidelijke ⚠️-melding in plaats van dat het stilletjes verdoezeld wordt.</p>
+      <p>⚙️ Bij Instellingen → "Geavanceerd: rondrit & omweg" staan 2 fijnafstellingen: de breedte van de "verboden zone" rond een al gevolgd stuk (standaard 18m — enkel de letterlijke weg zelf), en het <b>maximaal toegestane percentage heen-terug-overlap</b> (standaard 8% — hoe kleiner, hoe strenger de app een lus die toch een stuk weg herhaalt afkeurt). Vindt de app op de gevraagde afstand geen enkele schone lus, dan probeert hij automatisch een iets grotere lus vóór hij ooit een overlappende optie toont.</p>
       <p>🧪 Wil je zelf finetunen hoe streng dit gebeurt? Instellingen → onderaan → <b>"Geavanceerd: rondrit &amp; omweg"</b> laat je de breedte van die "verboden zone" en de maximaal toegestane heen-terug-overlap zelf instellen.</p>
       <h3>🔀 Omweg</h3>
       <p>Naast "Vertrek" en "Hoogte" onderaan: zoekt een ander tracé tussen je huidige start- en eindpunt, met dezelfde bescherming tegen heen-en-terug als de rondrit-generator hierboven (en dezelfde geavanceerde instellingen). Bevalt een voorstel niet? Tik op de ✕ naast dat voorstel om enkel die ene lijn van de kaart te halen, zonder de vergelijking te moeten sluiten.</p>
@@ -4602,6 +4694,13 @@ const HELP_CONTENT = {
       <h3>🔁 Fiets ↔ wandel</h3>
       <p>Via "Wissel modus" spring je terug naar het keuzescherm. Elke modus houdt zijn eigen knooppunten, route, rit-geschiedenis en opgeslagen links volledig apart bij.</p>
     </section>
+    <section>
+      <h3>🚴 Actief Live vs. Passief Pro</h3>
+      <p>Kies je "Fiets", dan kies je eerst je fietstype en 1 van 2 navigatiestijlen:</p>
+      <p><b>🟢 Actief Live</b> — zoals je de app al kende: live route-lijn, spelden verslepen, meteen herberekenen.</p>
+      <p><b>🧭 Passief Pro</b> — zet rustig al je punten zonder dat er telkens herberekend wordt. Druk pas op <b>"✅ Klaar"</b> als je tevreden bent — dan wordt de echte route in 1 keer berekend (de knop wordt "Edit" om terug te bewerken). Ernaast verschijnt <b>"📊 Analyse"</b>: een volledig scherm met 5 tabbladen (Wegdektype, Wind, Hoogte, Helling, Logs) — elk met een kaart én grafiek, zodat je vooraf precies weet wat je te wachten staat.</p>
+      <p>Na een rit kan je via het "🎉 Aangekomen!"-venster ook "📊 Bekijk rit-analyse" openen — dezelfde soort pagina, maar dan met je échte cijfers (afstand, tijd, snelheid) én een 6de tab "🏃 Snelheid" die toont waar je sneller/trager reed. Bij "📖 Mijn ritten" kan je dit ook later, voor eender welke rit sinds deze functie, terug opvragen.</p>
+    </section>
   `,
   en: `
     <section>
@@ -4637,7 +4736,7 @@ const HELP_CONTENT = {
       <p>📳 Turned on "Shake for a surprise route" in Settings? Just shake your device on the map screen for 3 random suggestions. Set the desired distance for this right below that toggle in Settings.</p>
       <p>⚠️ The "quiet" and "paved" preferences only truly work if you've entered a free OpenRouteService key in Settings — without a key you still get 3 routes, just without that extra steering.</p>
       <p>🔁 Got that OpenRouteService key filled in? Then the app also tries to <b>explicitly forbid</b> the return leg from using the already-travelled outbound path (rather than just hoping) — noticeably better odds of a real loop without backtracking. Without a key, the app falls back to an approach that simply tries more variations. Still doesn't work out? You'll get a clear ⚠️ message instead of it being quietly glossed over.</p>
-      <p>🧪 Want to fine-tune how strict this is yourself? Settings → near the bottom → <b>"Advanced: round-trip &amp; detour"</b> lets you set the width of that "forbidden zone" and the maximum allowed back-and-forth overlap yourself.</p>
+      <p>🧪 Want to fine-tune how strict this is yourself? Settings → near the bottom → <b>"Advanced: round-trip &amp; detour"</b> lets you set the width of that "forbidden zone" (default 18m) and the <b>maximum allowed back-and-forth overlap percentage</b> (default 8% — the smaller, the stricter the app rejects a loop that still repeats a stretch of road). If no clean loop exists at the requested distance, the app automatically tries a slightly bigger loop before ever showing an overlapping option.</p>
       <h3>🔀 Detour</h3>
       <p>Next to "Depart" and "Elevation" at the bottom: looks for a different path between your current start and end point, with the same anti-backtracking protection as the round-trip generator above (and the same advanced settings). Don't like a suggestion? Tap the ✕ next to it to remove just that one line from the map, without having to close the whole comparison.</p>
       <h3>☕ Find a break (while navigating)</h3>
@@ -4729,6 +4828,13 @@ const HELP_CONTENT = {
       <h3>🔁 Bike ↔ walk</h3>
       <p>Use "Switch mode" to jump back to the choice screen. Each mode keeps its own nodes, route, ride history and saved links completely separate.</p>
     </section>
+    <section>
+      <h3>🚴 Active Live vs. Passive Pro</h3>
+      <p>Choosing "Bike" first has you pick your bike type and 1 of 2 navigation styles:</p>
+      <p><b>🟢 Active Live</b> — as you already knew the app: live route line, drag pins, instant recalculation.</p>
+      <p><b>🧭 Passive Pro</b> — place all your points calmly without any recalculation happening in between. Press <b>"✅ Ready"</b> once you're happy — the real route is then calculated in one go (the button becomes "Edit" to go back to editing). Next to it appears <b>"📊 Analysis"</b>: a full screen with 5 tabs (Surface, Wind, Elevation, Slope, Logs) — each with a map and graph, so you know exactly what to expect beforehand.</p>
+      <p>After a ride, the "🎉 Arrived!" popup also offers "📊 View ride analysis" — the same kind of page, but with your actual numbers (distance, time, speed) and a 6th "🏃 Speed" tab showing where you rode faster/slower. Under "📖 My rides" you can also pull this up later, for any ride since this feature was added.</p>
+    </section>
   `
 };
 function renderHelp(){
@@ -4760,9 +4866,12 @@ const DEV_NOTES_CONTENT = {
       <b>⚪ Onbekend (grijs):</b> een 4de categorie, specifiek voor een weg getagd als "track"/"path" zonder eigen surface-info — een gok, geen bevestigde data. Wordt bewust apart getoond i.p.v. blind als "onverhard" (rood), om een gok niet te laten overkomen als een zekerheid. Wordt bij "slimme onverhard-vermijding" wel nog steeds voorzichtigheidshalve vermeden. Vindt de app daarentegen helemaal geen weg in de buurt (zelfs geen ongetagde), dan wordt aangenomen dat het een gewone verharde straat is met een ontbrekende tag.</p>
     </section>
     <section>
-      <h3>🎯 Slimme onverhard-vermijding</h3>
-      <p>Instelling bij "Route inkleuren", enkel voor racefiets/gewone fiets/e-bike (niet mountainbike, niet wandelen). Standaard gebruikt "Racefiets vermijdt onverhard" de eigen, minder verfijnde inschatting van OpenRouteService. Zet je deze instelling aan, dan gebeurt dit in plaats daarvan: bereken een route → kleur ze met bovenstaande, grondige classificatie → vind je een écht onverhard stuk, teken er een vermijdzone rond en bereken opnieuw (tot 3 keer). Preciezer, maar merkbaar trager (tot 4 aanvragen na elkaar). Vereist een OpenRouteService-sleutel.</p>
-      <p>Geldt automatisch ook zodra je een rondrit-generator- of Omweg-voorstel <i>kiest</i> (niet tijdens het doorbladeren van de voorstellen zelf — dat zou te traag worden bij 6+ voorstellen tegelijk).</p>
+      <h3>🎯 Comfort-routering: 3 opties</h3>
+      <p>Instelling bij "Routevoorkeuren", enkel voor racefiets/gewone fiets/e-bike (niet mountainbike, niet wandelen). Alle 3 gebruiken dezelfde <b>comfort-score-matrix</b> (1-5), rechtstreeks gebaseerd op wegdektype, tracktype, fietsinfrastructuur (cyclestreet, cycleway, jaagpaden), snelheidszones en wegtype — het onderscheid zit in <i>wanneer en hoe</i> die score gebruikt wordt:</p>
+      <p><b>1️⃣ Route → verifiëren → corrigeren:</b> bereken eerst een gewone route, haal de tags op langs dat tracé, en teken een vermijdzone rond elk stuk dat te laag scoort voor je fietstype (tot 3 keer herberekend). Vereist een OpenRouteService-sleutel.</p>
+      <p><b>2️⃣ Eerst hele gebied opvragen → dan pas routeren:</b> vraagt eerst alle wegen op in een ruime zone rond je vertrek/aankomst, classificeert alles in 1 keer, en routeert dan meteen met alle laag-scorende wegen al vooraf als vermijdzone — grondiger dan optie 1, maar een zwaardere eerste aanvraag. Bij een te groot gebied (>60km overspanning) valt dit automatisch terug op optie 1's aanpak. Vereist een OpenRouteService-sleutel.</p>
+      <p><b>3️⃣ BRouter eigen kostprofiel (experimenteel):</b> zet de comfort-score rechtstreeks om naar BRouter-kostfactoren (score 5 → kost 0.7, score 1 → kost 20) en laat de routeringsmotor zelf, in 1 berekening, de beste weg kiezen — de score wordt hier dus geen correctie-achteraf, maar de kern van de routekeuze zelf. Vereist BRouter als routeringsengine. <b>Let op:</b> gebruikt een niet-officieel gedocumenteerd mechanisme van BRouter's publieke server — lukt dit niet, dan valt de app automatisch terug op optie 1's aanpak.</p>
+      <p>Alle 3 gelden automatisch ook zodra je een rondrit-generator- of Omweg-voorstel <i>kiest</i> (niet tijdens het doorbladeren van de voorstellen zelf — dat zou te traag worden bij 6+ voorstellen tegelijk).</p>
     </section>
     <section>
       <h3>🚴 Routeringsengines: volgorde en terugval</h3>
@@ -4796,9 +4905,12 @@ const DEV_NOTES_CONTENT = {
       <b>⚪ Unknown (grey):</b> a 4th category, specifically for a road tagged "track"/"path" with no surface info of its own — a guess, not confirmed data. Shown separately on purpose instead of blindly as "unpaved" (red), so a guess doesn't come across as a certainty. Still avoided as a precaution under "smart unpaved avoidance". If the app finds no road nearby at all (not even an untagged one), it assumes it's an ordinary paved street with a missing tag.</p>
     </section>
     <section>
-      <h3>🎯 Smart unpaved avoidance</h3>
-      <p>Setting under "Colour the route", only for road/regular/e-bike (not mountain bike, not walking). By default, "Road bike avoids unpaved" uses OpenRouteService's own, less refined assessment. Turn this setting on, and instead: calculate a route → colour it with the thorough classification above → find a genuinely unpaved stretch, draw an avoidance zone around it and recalculate (up to 3 times). More precise, but noticeably slower (up to 4 requests in sequence). Requires an OpenRouteService key.</p>
-      <p>Also applies automatically as soon as you <i>choose</i> a round-trip generator or Detour suggestion (not while browsing the suggestions themselves — that would get too slow with 6+ suggestions at once).</p>
+      <h3>🎯 Comfort routing: 3 options</h3>
+      <p>Setting under "Route preferences", only for road/regular/e-bike (not mountain bike, not walking). All 3 use the same <b>comfort-score matrix</b> (1-5), based directly on surface type, tracktype, cycling infrastructure (cyclestreet, cycleway, towpaths), speed zones and road type — the difference is <i>when and how</i> that score gets applied:</p>
+      <p><b>1️⃣ Route → verify → correct:</b> calculate a normal route first, fetch the tags along that path, and draw an avoidance zone around any stretch that scores too low for your bike type (recalculated up to 3 times). Requires an OpenRouteService key.</p>
+      <p><b>2️⃣ Query whole area first → then route:</b> fetches all roads in a wide zone around your start/end first, classifies everything at once, and routes immediately with all low-scoring roads already set as an avoidance zone — more thorough than option 1, but a heavier initial request. Falls back to option 1's approach automatically for a very large area (>60km span). Requires an OpenRouteService key.</p>
+      <p><b>3️⃣ BRouter custom cost profile (experimental):</b> converts the comfort score directly into BRouter cost factors (score 5 → cost 0.7, score 1 → cost 20) and lets the routing engine itself pick the best road in a single calculation — here the score becomes the core of the route choice itself, not an after-the-fact correction. Requires BRouter as the routing engine. <b>Note:</b> uses an undocumented mechanism of BRouter's public server — if this doesn't work, the app automatically falls back to option 1's approach.</p>
+      <p>All 3 also apply automatically as soon as you <i>choose</i> a round-trip generator or Detour suggestion (not while browsing the suggestions themselves — that would get too slow with 6+ suggestions at once).</p>
     </section>
     <section>
       <h3>🚴 Routing engines: order and fallback</h3>
@@ -4868,6 +4980,8 @@ function applySettings(){
   setMapStyle(appSettings.mapStyle, appSettings.thunderforestKey);
   applyOverlaySettings();
   document.body.classList.toggle('dash-text-small', appSettings.dashTextSize === 'small');
+  document.body.classList.toggle('garmin-nav-style', !!appSettings.garminStyleNav);
+  $('settingGarminStyle').checked = !!appSettings.garminStyleNav;
   document.body.classList.toggle('dash-not-bold', !appSettings.dashBold);
   // De handmatige instelling wint altijd van de vroege automatische gok bovenaan het bestand —
   // die gok bleek niet betrouwbaar voor elke "app van PWA maken"-tool.
@@ -4926,7 +5040,7 @@ async function loadSettings(){
   $('settingDisableMapRotation').checked = !!appSettings.disableMapRotation;
   $('settingPosUpdateInterval').value = appSettings.posUpdateIntervalSec || 1;
   $('settingOverpassSurfaceTimeout').value = appSettings.overpassSurfaceTimeoutSec || 15;
-  $('settingSmartUnpavedAvoidance').checked = !!appSettings.smartUnpavedAvoidance;
+  selectRadio('routingWeighting', appSettings.routingWeighting || 'off', 'off');
   $('settingShowWindInNav').checked = !!appSettings.showWindInNav;
   $('settingSegmentPr').checked = !!appSettings.segmentPrOn;
   $('settingDarkArrival').checked = !!appSettings.darkArrivalWarning;
@@ -4934,7 +5048,7 @@ async function loadSettings(){
   $('settingShakeToSurprise').checked = !!appSettings.shakeToSurpriseOn;
   $('settingShakeKm').value = appSettings.shakeKm || 30;
   $('settingAvoidBufferM').value = appSettings.avoidBufferM || 18;
-  $('settingMaxOverlapPct').value = appSettings.maxOverlapPct || 30;
+  $('settingMaxOverlapPct').value = appSettings.maxOverlapPct || 8;
   if (typeof updateVertrekBtnStyle === 'function') updateVertrekBtnStyle();
   $('settingFallDetection').checked = !!appSettings.fallDetectionOn;
   $('sosContactNumber').value = appSettings.sosContactNumber || '';
@@ -5034,6 +5148,11 @@ document.querySelectorAll('input[name="offRouteDist"]').forEach(radio => {
 });
 $('settingShowCompassBtn').addEventListener('change', (e) => { appSettings.showCompassBtn = e.target.checked; saveSettings(); });
 $('settingDashBold').addEventListener('change', (e) => { appSettings.dashBold = e.target.checked; saveSettings(); });
+$('settingGarminStyle').addEventListener('change', (e) => {
+  appSettings.garminStyleNav = e.target.checked;
+  document.body.classList.toggle('garmin-nav-style', e.target.checked);
+  saveSettings();
+});
 $('settingAutoReroute').addEventListener('change', (e) => { appSettings.autoReroute = e.target.checked; saveSettings(); });
 $('settingSilentReroute').addEventListener('change', (e) => { appSettings.silentReroute = e.target.checked; saveSettings(); });
 $('settingShowWind').addEventListener('change', (e) => { appSettings.showWindDirection = e.target.checked; saveSettings(); });
@@ -5072,10 +5191,12 @@ $('settingOverpassSurfaceTimeout').addEventListener('change', (e) => {
   appSettings.overpassSurfaceTimeoutSec = Math.max(5, Math.min(40, parseInt(e.target.value) || 15));
   saveSettings();
 });
-$('settingSmartUnpavedAvoidance').addEventListener('change', (e) => {
-  appSettings.smartUnpavedAvoidance = e.target.checked;
-  saveSettings();
-  rerouteCurrentRouteIfAny();
+document.querySelectorAll('input[name="routingWeighting"]').forEach(radio => {
+  radio.addEventListener('change', () => {
+    appSettings.routingWeighting = radio.value;
+    saveSettings();
+    rerouteCurrentRouteIfAny();
+  });
 });
 $('settingSegmentPr').addEventListener('change', (e) => { appSettings.segmentPrOn = e.target.checked; saveSettings(); });
 $('settingDarkArrival').addEventListener('change', (e) => { appSettings.darkArrivalWarning = e.target.checked; saveSettings(); });
@@ -5083,10 +5204,10 @@ $('settingHistoryAudio').addEventListener('change', (e) => { appSettings.history
 $('settingShakeToSurprise').addEventListener('change', (e) => { appSettings.shakeToSurpriseOn = e.target.checked; saveSettings(); if (e.target.checked) requestShakeMotionPermission(); });
 $('settingShakeKm').addEventListener('change', (e) => { appSettings.shakeKm = parseFloat(e.target.value) || 30; saveSettings(); });
 $('settingAvoidBufferM').addEventListener('change', (e) => { appSettings.avoidBufferM = parseFloat(e.target.value) || 18; saveSettings(); });
-$('settingMaxOverlapPct').addEventListener('change', (e) => { appSettings.maxOverlapPct = parseFloat(e.target.value) || 30; saveSettings(); });
+$('settingMaxOverlapPct').addEventListener('change', (e) => { appSettings.maxOverlapPct = parseFloat(e.target.value) || 8; saveSettings(); });
 $('settingsLoopAdvancedResetBtn').addEventListener('click', () => {
   appSettings.avoidBufferM = 18;
-  appSettings.maxOverlapPct = 30;
+  appSettings.maxOverlapPct = 8;
   saveSettings();
   $('settingAvoidBufferM').value = 18;
   $('settingMaxOverlapPct').value = 30;
@@ -5282,10 +5403,10 @@ $('overlayMtb').addEventListener('change', (e) => { appSettings.overlays.mtb = e
 $('settingsResetBtn').addEventListener('click', () => {
   appSettings = {
     theme:'default', showCompassBtn:true, orsKey:'', graphhopperKey:'', geoapifyKey:'', bikeType:'regular', mapStyle:'standard', thunderforestKey:'',
-    dashTextSize:'normal', dashBold:true, offRouteDist:35, autoReroute:false, silentReroute:false,
+    dashTextSize:'normal', dashBold:true, garminStyleNav:false, offRouteDist:35, autoReroute:false, silentReroute:false,
     overlays:{ cycling:false, hiking:false, mtb:false },
     poiLayers:{ cafe:false, restaurant:false, bakery:false, supermarket:false, pharmacy:false, bike:false, water:false, toilet:false, money:false, camping:false, charging:false, playground:false, parking:false, hotel:false }, showPoiDetails:false,
-    showWindDirection:true, autoPause:false, redNavDot:false, topOffsetPx:0, tabGapPx:0, bodyWeightKg:null, voiceOnlyMode:false, routeColorMode:'off', showWindInNav:false, eatReminderOn:false, eatIntervalMin:45, drinkReminderOn:false, drinkIntervalMin:20, segmentPrOn:true, darkArrivalWarning:true, quietRoutingMode:false, historyAudioOn:false, shakeToSurpriseOn:false, shakeKm:30, vertrekFromGps:false, avoidBufferM:18, maxOverlapPct:30, lowerGpsAccuracy:false, disableMapRotation:false, posUpdateIntervalSec:1, overpassSurfaceTimeoutSec:15, smartUnpavedAvoidance:false, navType:'active', fallDetectionOn:false, sosContactNumber:'', sosContactName:'', routePreference:'balanced', routeLineColor:'#e2a13c', language:'en',
+    showWindDirection:true, autoPause:false, redNavDot:false, topOffsetPx:0, tabGapPx:0, bodyWeightKg:null, voiceOnlyMode:false, routeColorMode:'off', showWindInNav:false, eatReminderOn:false, eatIntervalMin:45, drinkReminderOn:false, drinkIntervalMin:20, segmentPrOn:true, darkArrivalWarning:true, quietRoutingMode:false, historyAudioOn:false, shakeToSurpriseOn:false, shakeKm:30, vertrekFromGps:false, avoidBufferM:18, maxOverlapPct:8, lowerGpsAccuracy:false, disableMapRotation:false, posUpdateIntervalSec:1, overpassSurfaceTimeoutSec:15, routingWeighting:'off', navType:'active', fallDetectionOn:false, sosContactNumber:'', sosContactName:'', routePreference:'balanced', routeLineColor:'#e2a13c', language:'en',
     bundledCountries:{ be:true, nl:false }, routingEngine:'brouter'
   };
   saveSettings();
@@ -5302,6 +5423,8 @@ $('settingsResetBtn').addEventListener('click', () => {
   document.querySelector('input[name="offRouteDist"][value="35"]').checked = true;
   $('settingShowCompassBtn').checked = true;
   $('settingDashBold').checked = true;
+  $('settingGarminStyle').checked = false;
+  document.body.classList.remove('garmin-nav-style');
   $('settingAutoReroute').checked = false;
   $('settingSilentReroute').checked = false;
   $('settingShowWind').checked = true;
@@ -5314,7 +5437,8 @@ $('settingsResetBtn').addEventListener('click', () => {
   $('settingDisableMapRotation').checked = false;
   $('settingPosUpdateInterval').value = 1;
   $('settingOverpassSurfaceTimeout').value = 15;
-  $('settingSmartUnpavedAvoidance').checked = false;
+  const routingWeightingOffRadio = document.querySelector('input[name="routingWeighting"][value="off"]');
+  if (routingWeightingOffRadio) routingWeightingOffRadio.checked = true;
   $('settingShowWindInNav').checked = false;
   $('settingSegmentPr').checked = true;
   $('settingDarkArrival').checked = true;
@@ -6351,7 +6475,7 @@ async function buildOverpassBucketFn(coordsLatLngIn){
     });
     return { bucket: best, confident: bestConfident };
   };
-  return { sampled, bucketFor };
+  return { sampled, bucketFor, ways };
 }
 // ---------- Overpass: laatste, gratis en sleutelloze vangnet voor wegdektype ----------
 // Vraagt gewoon alle wegen met een surface/track_type-tag op rond de al getekende route (geen nieuwe
@@ -6381,7 +6505,7 @@ async function withTimeout(promise, ms, label){
   try{ return await Promise.race([promise, timeout]); }
   finally{ clearTimeout(timer); }
 }
-async function fetchSurfaceDataWithFallback(waypoints, currentRouteCoords){
+async function fetchSurfaceDataWithFallback(waypoints, currentRouteCoords, crossCheckTimeoutMs=7000){
   const attempts = [];
   if (appSettings.orsKey) attempts.push({ label:'OpenRouteService', fn: () => fetchOrsSurfaceData(waypoints), timeoutMs:7000 });
   if (appSettings.graphhopperKey) attempts.push({ label:'GraphHopper', fn: () => fetchGraphHopperSurfaceData(waypoints), timeoutMs:7000 });
@@ -6395,7 +6519,12 @@ async function fetchSurfaceDataWithFallback(waypoints, currentRouteCoords){
     try{
       const result = await withTimeout(attempt.fn(), attempt.timeoutMs, attempt.label);
       if (!result.surfaceValues || !result.surfaceValues.length) throw new Error(attempt.label + ' gaf een leeg resultaat terug (geen enkel wegdektype-segment)');
-      if (attempt.label !== 'Overpass') await withTimeout(upgradeUncertainSurfaceSegments(result), 7000, 'Overpass-kruiscontrole');
+      if (attempt.label !== 'Overpass'){
+        try{ result.crossChecked = await withTimeout(upgradeUncertainSurfaceSegments(result), crossCheckTimeoutMs, 'Overpass-kruiscontrole'); }
+        catch(e){ result.crossChecked = false; }
+      } else {
+        result.crossChecked = true; // Overpass was zelf al de hoofdbron, geen aparte kruiscontrole nodig
+      }
       return result;
     }
     catch(e){ lastErr = e; /* deze bron mislukte, gaf niets bruikbaars terug, of duurde te lang — probeer de volgende */ }
@@ -6403,14 +6532,14 @@ async function fetchSurfaceDataWithFallback(waypoints, currentRouteCoords){
   // Écht alles mislukt (zeldzaam, meestal door netwerkproblemen) — dan liever de hele route als
   // "waarschijnlijk verhard" tonen dan niets, met een duidelijke melding dat dit een aanname is.
   // De meeste fietsroutes lopen nu eenmaal grotendeels over gewone, verharde wegen.
-  return { coordsLatLng: currentRouteCoords, surfaceValues: [[0, currentRouteCoords.length - 1, 'paved']], sourceLabel:'benadering (geen enkele bron bereikbaar)', approximate:true };
+  return { coordsLatLng: currentRouteCoords, surfaceValues: [[0, currentRouteCoords.length - 1, 'paved']], sourceLabel:'benadering (geen enkele bron bereikbaar)', approximate:true, crossChecked:false };
 }
 // Kruiscontrole: voor elk stukje dat de hoofdbron enkel kon gokken (geen expliciete tag, 4de element =
 // false), een 2de opinie ophalen bij Overpass — gratis, sleutelloos, en met rechtstreekse toegang tot alle
 // ruwe OSM-tags (surface, track_type, smoothness) tegelijk. Is Overpass daar wél zeker van, dan nemen we
 // die waarde over; blijft het onzeker, dan houden we de oorspronkelijke gok gewoon aan (nooit erop achteruit).
 async function upgradeUncertainSurfaceSegments(result){
-  if (!result.surfaceValues.length) return;
+  if (!result.surfaceValues.length) return false;
   try{
     const { bucketFor } = await buildOverpassBucketFn(result.coordsLatLng);
     // Overpass haalt rechtstreeks de actuele OpenStreetMap-tags op — bleek betrouwbaarder dan wat
@@ -6431,21 +6560,151 @@ async function upgradeUncertainSurfaceSegments(result){
         seg[2] = 'paved';
       }
     });
-  }catch(e){ /* Overpass niet bereikbaar voor de kruiscontrole — geen probleem, de hoofdbron blijft gewoon staan */ }
+    return true;
+  }catch(e){ return false; } // Overpass niet bereikbaar voor de kruiscontrole — hoofdbron blijft ongecontroleerd staan
+}
+
+// ---------- Optie 2: eerst het hele gebied bevragen, dan pas routeren ----------
+async function routeWithAreaPrequery(waypoints, baseProfile, opts){
+  if (!appSettings.orsKey) return await fetchRoadRoute(waypoints, opts); // vermijdzones vereisen ORS
+  const bikeTypeForScore = tempBikeTypeOverride || appSettings.bikeType;
+  const lats = waypoints.map(p => p.lat), lons = waypoints.map(p => p.lon);
+  // Ruime rechthoek rond al je punten samen (niet enkel rond de uiteindelijke route, want die kennen we
+  // hier nog niet) — begrensd zodat de aanvraag bij een lange route niet buitensporig groot wordt.
+  const pad = 0.01; // ruwweg ~1.1km
+  const south = Math.min(...lats) - pad, north = Math.max(...lats) + pad;
+  const west = Math.min(...lons) - pad, east = Math.max(...lons) + pad;
+  const areaSpanKm = haversine(south, west, north, east) / 1000;
+  if (areaSpanKm > 60){ // te groot gebied voor een verantwoorde 1-op-1-opvraging — val terug op optie 1's aanpak
+    return await routeWithSmartUnpavedAvoidance(waypoints, baseProfile, opts);
+  }
+  let ways;
+  try{
+    const query = `[out:json][timeout:25];way["highway"](${south},${west},${north},${east});(._;>;);out geom;`;
+    const data = await withTimeout(fetchOverpass(query), (appSettings.overpassSurfaceTimeoutSec || 15) * 1000 + 5000, 'Overpass-gebiedsopvraging');
+    ways = data.elements.filter(el => el.type === 'way' && el.tags && el.geometry);
+  }catch(e){
+    return await routeWithSmartUnpavedAvoidance(waypoints, baseProfile, opts); // gebiedsopvraging mislukte — optie 1's aanpak is een prima terugval
+  }
+  const badWays = ways.filter(w => scoreWayComfort(w.tags, bikeTypeForScore) <= 2);
+  if (!badWays.length) return await fetchRoadRoute(waypoints, opts); // niets te vermijden in dit hele gebied, gewoon normaal routeren
+  const polygons = badWays.map(w => bufferPolylineToPolygon(w.geometry.map(g => [g.lat, g.lon]), 15)).filter(Boolean);
+  if (!polygons.length) return await fetchRoadRoute(waypoints, opts);
+  const avoidPolygon = { type:'MultiPolygon', coordinates: polygons.map(p => p.coordinates) };
+  try{
+    const orsProfile = getOrsProfile(baseProfile);
+    const body = { coordinates: waypoints.map(p => [p.lon, p.lat]), options: { avoid_polygons: avoidPolygon } };
+    if (appSettings.routePreference === 'shortest' || appSettings.routePreference === 'fastest') body.preference = appSettings.routePreference;
+    const res = await fetchOrsPost(`https://api.heigit.org/openrouteservice/v2/directions/${orsProfile}/geojson`, body);
+    if (!res.ok) throw new Error('ORS status ' + res.status);
+    const data = await res.json();
+    const feature = data.features[0];
+    const coordsLatLng = feature.geometry.coordinates.map(c => [c[1], c[0]]);
+    let steps = [];
+    if (opts.needSteps){
+      let cum = 0;
+      (feature.properties.segments || []).forEach(seg => {
+        (seg.steps || []).forEach(step => {
+          const m = ORS_STEP_TYPE_MAP[step.type] || { type:'turn', modifier:'straight' };
+          steps.push({ startDistM: cum, distanceM: step.distance, type: m.type, modifier: m.modifier || 'straight', name: step.name || '' });
+          cum += step.distance;
+        });
+      });
+    }
+    return { coordsLatLng, distanceM: feature.properties.summary.distance, steps, source:'ors-area-prequery' };
+  }catch(e){
+    return await fetchRoadRoute(waypoints, opts); // vermijdzone-route mislukte (bv. onmogelijk met zoveel vermeden gebied) — gewone route blijft altijd nog werken
+  }
+}
+
+// ---------- Optie 3: BRouter met een eigen kostprofiel (experimenteel — vereist dat de publieke server
+// het 'custom'-profiel accepteert, wat niet officieel gedocumenteerd is) ----------
+function buildBrouterCustomProfile(bikeType){
+  // Zet de comfort-score-matrix om naar BRouter-kostfactoren: hoe lager de kost, hoe liever de motor die
+  // weg kiest. Score 5 -> kost 0.7 (extra aantrekkelijk), score 1 -> kost 20 (praktisch vermeden).
+  const costFor = (s) => ({ 5:0.7, 4:0.85, 3:1, 2:3, 1:20 }[s] || 1);
+  return `---context:bike
+assign  validForBikes = true
+assign  turnInstructionMode = 1
+
+# Kostfactoren per comfort-categorie, rechtstreeks afgeleid van de tag-matrix
+assign  costfactor =
+  switch cyclestreet=yes ${costFor(5)}
+  switch highway=cycleway ${costFor(5)}
+  switch vehicle=no ${costFor(5)}
+  switch cycleway=track ${costFor(4)}
+  switch and highway=track tracktype=grade1 ${costFor(4)}
+  switch cycleway=lane ${costFor(3)}
+  switch and highway=track tracktype=grade2 ${costFor(2)}
+  switch or tracktype=grade3 tracktype=grade4 ${costFor(1)}
+  switch tracktype=grade5 ${costFor(1)}
+  switch or surface=dirt surface=ground ${costFor(bikeType === 'road' ? 1 : 2)}
+  switch or surface=sand surface=mud ${costFor(1)}
+  1
+
+assign  initialcost = 0
+`;
+}
+async function routeWithBrouterCustomProfile(waypoints, opts){
+  const bikeTypeForScore = tempBikeTypeOverride || appSettings.bikeType;
+  try{
+    const lonlats = waypoints.map(p => `${p.lon},${p.lat}`).join('|');
+    const profileText = buildBrouterCustomProfile(bikeTypeForScore);
+    const res = await withTimeout(fetch(`https://brouter.de/brouter?lonlats=${lonlats}&profile=custom&alternativeidx=0&format=geojson`, {
+      method:'POST', headers:{ 'Content-Type':'text/plain' }, body: 'remoteProfile=' + encodeURIComponent(profileText)
+    }), 15000, 'BRouter-eigen-profiel');
+    if (!res.ok) throw new Error('BRouter status ' + res.status);
+    const data = await res.json();
+    const feature = data.features.find(f => f.geometry.type === 'LineString');
+    if (!feature) throw new Error('geen route in BRouter-antwoord');
+    const coordsLatLng = feature.geometry.coordinates.map(c => [c[1], c[0]]);
+    return { coordsLatLng, distanceM: Number(feature.properties['track-length']) || 0, steps: [], source:'brouter-custom' };
+  }catch(e){
+    // Experimenteel, geen garantie dat de server dit ondersteunt — val terug op optie 1's aanpak zodat je
+    // sowieso nog altijd een zinvol, comfort-bewust resultaat krijgt.
+    console.info('BRouter eigen kostprofiel niet gelukt, terugvallen op optie 1:', e.message);
+    return await routeWithSmartUnpavedAvoidance(waypoints, cfg().routeProfile, opts);
+  }
 }
 
 async function routeWithSmartUnpavedAvoidance(waypoints, baseProfile, opts){
   let current = await fetchRoadRoute(waypoints, opts);
   if (!appSettings.orsKey) return current; // harde vermijdzones vereisen ORS, zonder sleutel blijft het bij deze ene, normale poging
+  const bikeTypeForScore = tempBikeTypeOverride || appSettings.bikeType;
+  const SCORE_THRESHOLD = 2; // alles met score <= dit getal telt als 'te vermijden'
   const MAX_ITERATIONS = 3;
   for (let iter = 0; iter < MAX_ITERATIONS; iter++){
-    let surfaceResult;
-    try{ surfaceResult = await fetchSurfaceDataWithFallback(waypoints, current.coordsLatLng); }
-    catch(e){ break; } // classificatie mislukte — val terug op de route die we al hebben
-    const unpavedSegs = surfaceResult.surfaceValues.filter(([,,bucket]) => bucket === 'unpaved' || bucket === 'unknown');
-    if (!unpavedSegs.length) break; // niets (meer) te vermijden gevonden, klaar
-    const polygons = unpavedSegs.map(([from, to]) => {
-      const segCoords = downsampleCoords(surfaceResult.coordsLatLng.slice(from, to + 1), 30);
+    let built;
+    try{ built = await withTimeout(buildOverpassBucketFn(current.coordsLatLng), (appSettings.overpassSurfaceTimeoutSec || 15) * 1000, 'Overpass-tag-matrix'); }
+    catch(e){ break; } // ophalen van de ruwe tags mislukte — val terug op de route die we al hebben
+
+    // Loop over de route en zoek stukken waar de comfort-score te laag is voor dit fietstype
+    const sampled = built.sampled;
+    const badSegs = [];
+    let segStart = -1;
+    for (let i = 0; i < sampled.length; i++){
+      let worstScore = 5, worstTags = null;
+      built.ways.forEach(w => {
+        for (let j = 0; j < w.geometry.length; j += 3){
+          const d = haversine(sampled[i][0], sampled[i][1], w.geometry[j].lat, w.geometry[j].lon);
+          if (d < 30){
+            const s = scoreWayComfort(w.tags, bikeTypeForScore);
+            if (s < worstScore){ worstScore = s; worstTags = w.tags; }
+          }
+        }
+      });
+      if (worstScore <= SCORE_THRESHOLD){
+        if (segStart === -1) segStart = i;
+      } else if (segStart !== -1){
+        badSegs.push([segStart, i - 1]);
+        segStart = -1;
+      }
+    }
+    if (segStart !== -1) badSegs.push([segStart, sampled.length - 1]);
+    if (!badSegs.length) break; // niets (meer) te vermijden gevonden, klaar
+
+    const polygons = badSegs.map(([from, to]) => {
+      const segCoords = downsampleCoords(sampled.slice(from, to + 1), 30);
       return bufferPolylineToPolygon(segCoords, 15);
     }).filter(Boolean);
     if (!polygons.length) break;
@@ -6614,6 +6873,46 @@ async function fetchOsrmRoute(waypoints, baseProfile, needSteps){
 const WIND_COLORS = { tail:'#2e9e4f', cross:'#e2a13c', head:'#d5443a' };
 const ELEV_COLORS = { up:'#d5443a', down:'#2e9e4f', flat:'#8a8a8a' };
 const SURFACE_COLORS = { paved:'#2e9e4f', medium:'#e2a13c', unpaved:'#d5443a', unknown:'#8a8a8a' };
+// ---------- Optie 1 van de 3 routerings-aanpakken: comfort-score per weg o.b.v. de volledige tag-matrix ----------
+// Rechtstreeks gebaseerd op het aangeleverde document (fiets.docx) + de comfort-categorieën A-D die daaruit
+// volgden: elke combinatie van tags krijgt een score 1 (vermijden) t/m 5 (ideaal), per fietstype.
+function scoreWayComfort(tags, bikeType){
+  if (bikeType === 'mountain') return 5; // MTB mag praktisch overal, geen enkele van deze wegen is een probleem
+  const maxspeed = tags.maxspeed ? parseInt(tags.maxspeed) : null;
+  const ROUGH = new Set(['bad','very_bad','horrible','very_horrible','impassable']);
+  const UNPAVED_SURFACE = new Set(['unpaved','ground','dirt','grass','sand','mud']);
+  const MEDIUM_SURFACE = new Set(['compacted','fine_gravel','gravel','sett','cobblestone','paving_stones']);
+
+  let score = 3; // neutraal startpunt — een gewone weg zonder bijzondere kenmerken
+
+  // 🌟 Categorie A (score 5): vrijliggend fietspad, fietsstraat, jaagpad, erf/30km-zone
+  if (tags.cyclestreet === 'yes') score = 5;
+  else if (tags.highway === 'cycleway') score = 5;
+  else if (tags.highway === 'path' && tags.bicycle === 'designated' && tags.segregated === 'yes') score = 5;
+  else if (tags.vehicle === 'no' && (tags.bicycle === 'yes' || tags.bicycle === 'designated')) score = 5; // bv. jaagpad: auto's verboden, fietsers wel toegelaten
+  else if ((tags.highway === 'residential' || tags.highway === 'unclassified') && maxspeed != null && maxspeed <= 30) score = 5;
+  else if (tags['zone:traffic'] && /urban/i.test(tags['zone:traffic']) && maxspeed != null && maxspeed <= 30) score = 5;
+  // 🟡 Categorie B (score 4): fietspad naast de rijbaan, verharde landbouwweg
+  else if (tags.cycleway === 'track' || tags['cycleway:left'] === 'track' || tags['cycleway:right'] === 'track') score = 4;
+  else if (tags.highway === 'track' && tags.tracktype === 'grade1') score = 4;
+  // 🟠 Categorie C (score 2-3): fietsstrook op de rijbaan, drukkere straat met fietsvoorziening
+  else if (tags.cycleway === 'lane') score = 3;
+  else if (['tertiary','secondary'].includes(tags.highway) && tags.cycleway) score = 2;
+  else if (tags.highway === 'residential' && maxspeed != null && maxspeed > 30) score = 2;
+  else if (tags.highway === 'track' && tags.tracktype === 'grade2') score = 2;
+  // 🔴 Categorie D (score 1): drukke gewestweg zonder fietspad, verplicht ander fietspad, ruw/onverhard
+  if (['primary','trunk'].includes(tags.highway) && !tags.cycleway) score = Math.min(score, 1);
+  if (tags.bicycle === 'use_sidepath') score = Math.min(score, 1);
+  if (tags.tracktype && ['grade3','grade4','grade5'].includes(tags.tracktype)) score = Math.min(score, 1);
+  if (tags.surface && UNPAVED_SURFACE.has(tags.surface)) score = Math.min(score, 1);
+  if (tags.smoothness && ROUGH.has(tags.smoothness)) score = Math.min(score, 2);
+  if (tags.surface && MEDIUM_SURFACE.has(tags.surface)) score = Math.min(score, bikeType === 'road' ? 2 : 3);
+
+  // Racefiets is strenger voor alles wat niet volledig verhard is dan gewone fiets
+  if (bikeType === 'road' && tags.surface && (UNPAVED_SURFACE.has(tags.surface) || MEDIUM_SURFACE.has(tags.surface))) score = Math.min(score, 1);
+
+  return score;
+}
 
 async function applyRouteColoring(){
   routeColorLayer.clearLayers();
@@ -6766,8 +7065,17 @@ async function drawRoutePath(fromCurrentLocation){
     const routeOpts = { needSteps:true };
     if (appSettings.quietRoutingMode) routeOpts.avoidFeatures = ['highways', 'steps', 'ferries'];
     const bikeTypeForSmartAvoid = tempBikeTypeOverride || appSettings.bikeType;
-    const useSmartAvoidance = appSettings.smartUnpavedAvoidance && appSettings.orsKey && profile !== 'foot' && bikeTypeForSmartAvoid !== 'mountain';
-    const result = useSmartAvoidance ? await routeWithSmartUnpavedAvoidance(pts, profile, routeOpts) : await fetchRoadRoute(pts, routeOpts);
+    const weightingApplies = profile !== 'foot' && bikeTypeForSmartAvoid !== 'mountain';
+    let result;
+    if (weightingApplies && appSettings.routingWeighting === 'option1' && appSettings.orsKey){
+      result = await routeWithSmartUnpavedAvoidance(pts, profile, routeOpts);
+    } else if (weightingApplies && appSettings.routingWeighting === 'option2' && appSettings.orsKey){
+      result = await routeWithAreaPrequery(pts, profile, routeOpts);
+    } else if (weightingApplies && appSettings.routingWeighting === 'option3' && appSettings.routingEngine === 'brouter'){
+      result = await routeWithBrouterCustomProfile(pts, routeOpts);
+    } else {
+      result = await fetchRoadRoute(pts, routeOpts);
+    }
     if (myToken !== drawRoutePathToken) return; // ondertussen alweer een nieuwere routeaanvraag onderweg — deze verouderde negeren, voorkomt dat een trage oudere aanvraag een nieuwer resultaat overschrijft
     routeLine.setLatLngs(result.coordsLatLng);
     routeSteps = result.steps;
@@ -8129,7 +8437,7 @@ async function generateDetourCandidates(startPt, endPt, extraKm, viaNodesOnly){
   try{ const directResult = await fetchRoadRoute([startPt, endPt], {}); directGeometry = directResult.coordsLatLng; }catch(e){ /* geen probleem, dan slaan we de overlap-check hieronder gewoon over */ }
 
   const baseProfile = cfg().routeProfile;
-  const HARD_OVERLAP_LIMIT_DETOUR = (appSettings.maxOverlapPct || 30) / 100;
+  const HARD_OVERLAP_LIMIT_DETOUR = (appSettings.maxOverlapPct || 8) / 100;
   // Heb je een OpenRouteService-sleutel? Probeer dan eerst de harde aanpak: de omweg wordt berekend met
   // de directe route zelf (een dunne zone erlangs) als verboden gebied — hij MOET er dan omheen, i.p.v.
   // dat we gewoon een paar zijwaartse punten proberen en hopen dat die toevallig ergens anders lopen.
@@ -8145,7 +8453,7 @@ async function generateDetourCandidates(startPt, endPt, extraKm, viaNodesOnly){
   }
 
   let results = await tryDetourSides(startPt, endPt, midLat, midLon, directBearing, offsetKm, [-1, 1, -1.6, 1.6, -0.5, 0.5], viaNodesOnly, directGeometry);
-  const HARD_OVERLAP_LIMIT = (appSettings.maxOverlapPct || 30) / 100; // hierboven telt een voorstel niet meer als een "echte" omweg
+  const HARD_OVERLAP_LIMIT = (appSettings.maxOverlapPct || 8) / 100; // hierboven telt een voorstel niet meer als een "echte" omweg
 
   // Overlapt zelfs de beste kandidaat nog fors met de directe route, probeer dan automatisch een grotere
   // zijwaartse afwijking — zonder dat jij daar zelf iets voor moet instellen.
@@ -8305,6 +8613,33 @@ function computeOutAndBackOverlap(coordsLatLng){
   const mid = Math.floor(coordsLatLng.length / 2);
   return computeRouteOverlapFraction(coordsLatLng.slice(mid), coordsLatLng.slice(0, mid), 25);
 }
+// Grondiger dan computeOutAndBackOverlap: vergelijkt ELK stuk van de route met elk ander, voldoende ver
+// verwijderd (niet gewoon aangrenzend) stuk — vindt dus ook een lokale terugkeer ergens middenin de route,
+// niet enkel een volledige heen-terug-overlap tussen de 2 helften. Precies dit soort "koos een route en
+// keerde dan verderop op zijn passen terug"-gedrag moest opgevangen worden.
+function computeAnySelfOverlap(coordsLatLng, bufferM=25){
+  if (!coordsLatLng || coordsLatLng.length < 8) return 0;
+  const pts = downsampleCoords(coordsLatLng, 150);
+  const n = pts.length;
+  const minSeqGap = Math.max(6, Math.floor(n * 0.08)); // pas als "verdacht" tellen als de stukken ver genoeg uit elkaar liggen ìn de route-volgorde
+  let overlapLen = 0, totalLen = 0;
+  for (let i = 1; i < n; i++){
+    const segLen = haversine(pts[i-1][0], pts[i-1][1], pts[i][0], pts[i][1]);
+    totalLen += segLen;
+    const midLat = (pts[i-1][0] + pts[i][0]) / 2, midLon = (pts[i-1][1] + pts[i][1]) / 2;
+    const segBearing = bearing(pts[i-1][0], pts[i-1][1], pts[i][0], pts[i][1]);
+    for (let j = 0; j < n - 1; j++){
+      if (Math.abs(j - i) < minSeqGap) continue; // te dicht bij zichzelf in de route-volgorde, geen "andere" weg
+      const d = haversine(midLat, midLon, pts[j][0], pts[j][1]);
+      if (d > bufferM) continue;
+      const otherBearing = bearing(pts[j][0], pts[j][1], pts[j+1][0], pts[j+1][1]);
+      let diff = Math.abs(segBearing - otherBearing);
+      if (diff > 180) diff = 360 - diff;
+      if (diff > 135){ overlapLen += segLen; break; } // zelfde plek, quasi-tegenovergestelde richting = hetzelfde stuk weg opnieuw gevolgd
+    }
+  }
+  return totalLen > 0 ? overlapLen / totalLen : 0;
+}
 // Eén "poging" om lus-kandidaten te vinden met een gegeven aantal punten en hoek-spreiding rond het
 // vertrekpunt. Wordt hieronder eerst met een standaardconfiguratie geprobeerd; blijkt de overlap dan nog
 // te hoog, dan proberen we automatisch een steviger configuratie (meer punten, breder verspreid) — de
@@ -8371,7 +8706,7 @@ async function generateHardAvoidLoop(start, targetKm, theme, viaNodesOnly, baseP
   const inbound = await fetchOrsRouteWithAvoidPolygon([wp2, start], avoidPolygon, baseProfile, routeOpts);
   const fullGeometry = outbound.coordsLatLng.concat(inbound.coordsLatLng);
   const totalKm = (outbound.distanceM + inbound.distanceM) / 1000;
-  const overlap = computeOutAndBackOverlap(fullGeometry);
+  const overlap = computeAnySelfOverlap(fullGeometry);
   const stop = findNearbyHorecaStop(wp1.lat, wp1.lon);
   return {
     points: [wp1, wp2, { lat:start.lat, lon:start.lon, ref:'🏁' }],
@@ -8413,7 +8748,7 @@ async function tryLoopCandidates(start, reach, pointCount, spreadDeg, theme, via
       // zonder dit erbij te voegen leek de gegenereerde route wel de juiste afstand te tonen, maar sloot
       // ze in werkelijkheid niet af op het vertrekpunt zodra je ze effectief laadde/gebruikte.
       const pointsWithReturn = [...cand.waypoints, { lat: start.lat, lon: start.lon, ref: '🏁' }];
-      const overlap = computeOutAndBackOverlap(result.coordsLatLng);
+      const overlap = computeAnySelfOverlap(result.coordsLatLng);
       results.push({ points: pointsWithReturn, km: result.distanceM/1000, geometry: result.coordsLatLng || null, baseBearing: cand.baseBearing, stop, overlap });
     }catch(e){ /* deze kandidaat mislukte, gewoon overslaan */ }
   }
@@ -8428,7 +8763,7 @@ async function generateLoopCandidates(start, targetKm, theme, viaNodesOnly){
   if (viaNodesOnly) await ensureNodesLoadedAround(start.lat, start.lon, reach * 1.6);
   await loadBundledPois();
   const startAngle = Math.random() * 360;
-  const HARD_OVERLAP_LIMIT = (appSettings.maxOverlapPct || 30) / 100; // hierboven telt een kandidaat niet meer als een "echte" lus
+  const HARD_OVERLAP_LIMIT = (appSettings.maxOverlapPct || 8) / 100; // hierboven telt een kandidaat niet meer als een "echte" lus
   const baseProfile = cfg().routeProfile;
 
   // Heb je een OpenRouteService-sleutel? Probeer dan eerst de harde aanpak: de terugweg wordt dan
@@ -8468,6 +8803,22 @@ async function generateLoopCandidates(start, targetKm, theme, viaNodesOnly){
     const extra2 = await tryLoopCandidates(start, reach * 0.65, 5, 150, theme, viaNodesOnly, (startAngle + 65) % 360);
     results = results.concat(extra2);
     bestOverlap = results.length ? Math.min(...results.map(r => r.overlap)) : 1;
+  }
+
+  // Tier 4: nog steeds geen enkele schone lus op de gevraagde afstand? Dan liever een GROTERE lus
+  // aanbieden dan een lus die toch een stuk weg 2 keer volgt — op de gevraagde afstand blijkt er dan
+  // simpelweg te weinig wegkeuze te zijn rond dit vertrekpunt.
+  let grownDistance = false;
+  if (bestOverlap > HARD_OVERLAP_LIMIT){
+    const biggerReach = (targetKm * 1.4) / 4.2;
+    const extra3 = await tryLoopCandidates(start, biggerReach, 4, 130, theme, viaNodesOnly, (startAngle + 95) % 360);
+    const cleanBigger = extra3.filter(r => r.overlap <= HARD_OVERLAP_LIMIT);
+    if (cleanBigger.length){
+      cleanBigger.forEach(r => { r.grownDistance = true; });
+      results = results.concat(cleanBigger);
+      bestOverlap = 0; // we hebben nu minstens 1 werkelijk schone kandidaat, geen "minst slechte" fallback meer nodig
+      grownDistance = true;
+    }
   }
 
   // Harde grens: kandidaten die nog altijd te veel overlappen tellen niet mee als "echte" lus-opties.
@@ -8510,7 +8861,7 @@ function renderLoopGenResults(){
   $('loopGenResults').innerHTML = introHtml + loopGenResults.map((r, i) => `
     <div class="loopgen-card">
       <div class="loopgen-card-title">${tr('loopGenOption')} ${i+1}${r.tailwindScore != null && i===0 ? ' 💨' : ''}</div>
-      <div class="loopgen-card-meta">${r.km.toFixed(1)} km · ${r.points.length - 1} ${modeLabelPlural()}${r.stop ? `<br>${r.stop.catKey === 'cafe' ? '☕' : '🍴'} ${tr('loopGenStopSuggestion')}: ${r.stop.name}` : ''}${(!noCleanLoop && r.overlap > 0.15) ? `<br>⚠️ ${tr('loopGenOverlapWarning')}` : ''}</div>
+      <div class="loopgen-card-meta">${r.km.toFixed(1)} km · ${r.points.length - 1} ${modeLabelPlural()}${r.stop ? `<br>${r.stop.catKey === 'cafe' ? '☕' : '🍴'} ${tr('loopGenStopSuggestion')}: ${r.stop.name}` : ''}${r.grownDistance ? `<br>ℹ️ ${tr('loopGenGrownDistance')}` : ''}</div>
       <div class="loopgen-card-actions">
         <button class="loopgen-use-btn" data-i="${i}" data-action="use">${tr('loopGenUseBtn')}</button>
         <button class="loopgen-save-btn" data-i="${i}" data-action="save">${tr('loopGenSaveBtn')}</button>
@@ -8615,6 +8966,9 @@ function startNav(){
   lastArrowRotation = 0;
   isOffRoute = false;
   navStartTime = Date.now();
+  rideSavedThisSession = false;
+  navBreadcrumbs = [{ lat: lastPosition ? lastPosition.coords.latitude : route[0].lat, lon: lastPosition ? lastPosition.coords.longitude : route[0].lon, t: Date.now() }];
+  lastBreadcrumbTime = Date.now();
   totalPausedMs = 0;
   pauseStartTime = null;
   lastMovementTime = null;
@@ -8694,6 +9048,15 @@ function stopVoiceOnlyDim(){
 document.addEventListener('click', () => { if (navActive && appSettings.voiceOnlyMode) resetVoiceOnlyDimTimer(); }, { passive:true });
 
 function stopNav(){
+  if (navStartTime && !rideSavedThisSession){
+    const km = actualRouteKm != null ? actualRouteKm : straightLineKm();
+    // Enkel bewaren als er ook echt iets gebeurd is — een paar seconden per ongeluk op Start drukken en
+    // meteen weer Stop hoeft niet als "rit" te tellen.
+    if (km > 0.15 || arrivalActual.length > 0){
+      saveRideToHistory().then(entry => { lastCompletedRide = entry; });
+    }
+    rideSavedThisSession = true;
+  }
   stopVoiceOnlyDim();
   clearFuelReminders();
   stopHistoryAudio();
@@ -8730,6 +9093,10 @@ $('reverseTripYesBtn').addEventListener('click', () => {
   setTimeout(() => startNav(), 300); // stopNav ruimt eerst netjes op, dan starten we de terugweg meteen
 });
 $('reverseTripNoBtn').addEventListener('click', () => closeModal('reverseTripModal'));
+$('reverseTripAnalyseBtn').addEventListener('click', () => {
+  closeModal('reverseTripModal');
+  openAnalyseScreen(lastCompletedRide);
+});
 
 let smoothedHeadingVec = null; // gemiddelde richting als vector, zodat 359°→0° geen sprong geeft
 let headingIsAbsolute = null;  // true = "echt" kompas (gekalibreerd/absoluut), false = enkel relatieve sensor
@@ -8795,6 +9162,16 @@ function renderPosition(){
   updateNavWindLine();
   const pos = lastPosition;
   const { latitude:lat, longitude:lon, accuracy } = pos.coords;
+
+  // Kruimelspoor voor de post-rit-analyse (snelheid per stuk) — om de ~12s een punt bijhouden, dat is
+  // ruim voldoende voor een zinvolle snelheids-heatmap achteraf, zonder de opslag te laten opzwellen.
+  if (navActive){
+    const now = Date.now();
+    if (!lastBreadcrumbTime || now - lastBreadcrumbTime >= 12000){
+      navBreadcrumbs.push({ lat, lon, t: now });
+      lastBreadcrumbTime = now;
+    }
+  }
 
   // Richting waarin je echt fietst/wandelt: bij voorkeur koers-over-grond van de GPS zelf (enkel betrouwbaar
   // bij beweging — bij wandelen ligt die drempel lager, want je bent sowieso trager en het kompas is te
@@ -8898,7 +9275,8 @@ function renderPosition(){
       $('distVal').textContent = '✓';
       document.querySelector('.navDist small').textContent = '';
       if (appSettings.darkArrivalWarning) announceDarkArrivalIfNeeded();
-      saveRideToHistory();
+      rideSavedThisSession = true;
+      saveRideToHistory().then(entry => { lastCompletedRide = entry; });
       if (!routeIsFromGpx) setTimeout(() => openModal('reverseTripModal'), 1200); // even laten ademen na de aankomst-melding
     } else {
       toast(pointLabel(target) + ' bereikt → op naar ' + route[navTargetIndex].ref);
@@ -8954,6 +9332,14 @@ function highlightTarget(){
 function wpWord(){ return routeIsFromGpx ? modeGpxLabel() : modeLabel(); }
 function pointLabel(r){ if (r.poiName) return r.poiName; if (r.ref === '•') return curLang()==='en' ? 'Edited point' : 'Bewerkt punt'; if (r.ref === '📍') return curLang()==='en' ? 'Tapped point' : 'Aangeklikt punt'; if (r.isVia) return curLang()==='en' ? 'Via point (dragged)' : 'Tussenpunt (versleept)'; return `${wpWord()} ${r.ref}`; }
 
+function updateGarminSpeedGauge(speedKmh){
+  const el = $('garminSpeedGaugeFill');
+  if (!el) return;
+  const maxScale = appMode === 'wandel' ? 8 : 45; // redelijke bovengrens per modus, enkel om de ring optisch te vullen
+  const frac = Math.max(0, Math.min(1, (speedKmh || 0) / maxScale));
+  const circumference = 264; // 2·π·42, afgerond
+  el.setAttribute('stroke-dashoffset', (circumference * (1 - frac)).toFixed(1));
+}
 function updateProgressUI(){
   const total = route.length;
   const done = Math.min(navTargetIndex, total);
@@ -9083,6 +9469,7 @@ async function renderLifetimeStats(period){
 function renderDashboard(){
   const prog = computeProgressKm();
   $('dashSpeed').textContent = (navActive && lastSpeedKmh != null) ? Math.round(lastSpeedKmh) : '–';
+  updateGarminSpeedGauge(lastSpeedKmh);
   $('dashDone').textContent = prog.done.toFixed(1) + ' km';
   $('dashRemaining').textContent = prog.remaining.toFixed(1) + ' km';
 
@@ -10510,9 +10897,93 @@ $('passiveAnalyseBtn').addEventListener('click', () => {
   openAnalyseScreen();
 });
 let analyseMapInstance = null;
+let analyseSurfaceCache = null, analyseSurfaceCacheKey = null;
+let analyseCurrentProfile = null;
+let lastCompletedRide = null; // gegevens van de rit die je net voltooide, voor de post-rit-analyse
+let rideSavedThisSession = false; // voorkomt dat een rit dubbel bewaard wordt (bv. aankomst + daarna toch nog Stop drukken)
+let navBreadcrumbs = []; // {lat, lon, t} — voor de snelheid-per-stuk in de post-rit-analyse
+let lastBreadcrumbTime = 0;
+let analyseRideEntry = null, analyseWindTabBtn = null, analysePrevImportedTrack = [];
+let analyseMapDot = null;
+let analyseChartDragHandler = null;
+function setupAnalyseChartDrag(){
+  teardownAnalyseChartDrag();
+  const svg = $('analyseSvg');
+  const handler = (evt) => {
+    if (!analyseCurrentProfile) return;
+    const rect = svg.getBoundingClientRect();
+    const clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
+    const frac = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    const profile = analyseCurrentProfile;
+    const targetKm = frac * (profile.distKm[profile.distKm.length - 1] || 0);
+    // Dichtstbijzijnde punt in het profiel zoeken bij die afstand
+    let idx = 0, bestD = Infinity;
+    for (let i = 0; i < profile.distKm.length; i++){
+      const d = Math.abs(profile.distKm[i] - targetKm);
+      if (d < bestD){ bestD = d; idx = i; }
+    }
+    showAnalyseChartDot(frac, profile.lat[idx], profile.lon[idx], targetKm, profile.ele ? profile.ele[idx] : null);
+  };
+  svg.addEventListener('pointerdown', e => { handler(e); svg.setPointerCapture(e.pointerId); });
+  svg.addEventListener('pointermove', e => { if (e.pressure > 0 || e.buttons > 0) handler(e); });
+  analyseChartDragHandler = handler;
+}
+function teardownAnalyseChartDrag(){
+  analyseChartDragHandler = null;
+  if (analyseMapDot){ analyseMapInstance.removeLayer(analyseMapDot); analyseMapDot = null; }
+  const svg = $('analyseSvg');
+  const dot = svg.querySelector('.analyse-chart-drag-dot');
+  if (dot) dot.remove();
+}
+function showAnalyseChartDot(frac, lat, lon, km, ele){
+  const svg = $('analyseSvg');
+  const vb = svg.viewBox.baseVal;
+  let dot = svg.querySelector('.analyse-chart-drag-dot');
+  if (!dot){
+    dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    dot.setAttribute('class', 'analyse-chart-drag-dot');
+    dot.setAttribute('r', '6');
+    dot.setAttribute('fill', '#e0392e');
+    dot.setAttribute('stroke', 'white');
+    dot.setAttribute('stroke-width', '2');
+    svg.appendChild(dot);
+  }
+  const proj = chartProjections['analyseSvg'];
+  const cy = (proj && ele != null) ? proj.y(ele) : vb.height / 2; // op de Hoogte-grafiek: precies op de lijn zelf i.p.v. los in het midden
+  dot.setAttribute('cx', (frac * vb.width).toFixed(1));
+  dot.setAttribute('cy', cy.toFixed(1));
+  if (!analyseMapDot){
+    analyseMapDot = L.circleMarker([lat, lon], { radius:8, color:'white', weight:2, fillColor:'#e0392e', fillOpacity:1 }).addTo(analyseMapInstance);
+  } else {
+    analyseMapDot.setLatLng([lat, lon]);
+  }
+}
 // Toont segmenten als een proportionele, gekleurde balk over de volledige breedte — geschikt voor
 // categorische data (bv. wegdektype: elk stukje krijgt gewoon zijn eigen kleur, breedte = aandeel in de
 // totale afstand), in tegenstelling tot een lijngrafiek die een continue waarde nodig heeft.
+function renderSlopeChart(profile, grads, svgId){
+  const svg = $(svgId);
+  const wrap = svg.parentElement;
+  const w = wrap.clientWidth || window.innerWidth, h = wrap.clientHeight || 120;
+  svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+  const totalKm = profile.distKm[profile.distKm.length - 1] || 1;
+  const maxAbsGrad = Math.max(4, ...grads.map(g => Math.abs(g))); // minstens een lichte schaal, ook op een quasi-vlakke route
+  const zeroY = h / 2;
+  const pad = { l:2, r:2 };
+  const barW = Math.max(1, (w - pad.l - pad.r) / grads.length);
+  let bars = '';
+  grads.forEach((g, i) => {
+    const x = pad.l + (profile.distKm[i] / totalKm) * (w - pad.l - pad.r);
+    const barH = (Math.abs(g) / maxAbsGrad) * (h/2 - 10);
+    const y = g >= 0 ? zeroY - barH : zeroY;
+    bars += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${Math.max(1, barW).toFixed(1)}" height="${barH.toFixed(1)}" rx="1.5" fill="${gradientColor(g)}" opacity="0.92"/>`;
+  });
+  const distLabel = totalKm.toFixed(1) + ' km';
+  svg.innerHTML = `${bars}
+    <line x1="0" y1="${zeroY}" x2="${w}" y2="${zeroY}" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>
+    <text x="0" y="${h-4}" font-size="11" fill="#cfe0d4">0 km</text>
+    <text x="${w}" y="${h-4}" text-anchor="end" font-size="11" fill="#cfe0d4">${distLabel}</text>`;
+}
 function renderSegmentBarChart(coordsLatLng, segments, colorMap, svgId){
   const svg = $(svgId);
   const wrap = svg.parentElement;
@@ -10526,27 +10997,66 @@ function renderSegmentBarChart(coordsLatLng, segments, colorMap, svgId){
     cum.push(cum[i-1] + haversine(la1, lo1, la2, lo2));
   }
   const total = cum[cum.length - 1] || 1;
-  const barY = h * 0.35, barH = h * 0.3;
-  let bars = '';
-  segments.forEach(([startIdx, endIdx, bucket]) => {
+  const barY = h * 0.08, barH = h * 0.72, radius = 3;
+  let defs = '', bars = '';
+  const seenColors = new Set();
+  segments.forEach(([startIdx, endIdx, bucket], i) => {
+    const color = colorMap[bucket] || colorMap.unknown || '#8a8a8a';
+    const gradId = 'barGrad_' + svgId + '_' + bucket;
+    if (!seenColors.has(bucket)){
+      seenColors.add(bucket);
+      defs += `<linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="${color}" stop-opacity="1"/>
+        <stop offset="100%" stop-color="${color}" stop-opacity="0.55"/>
+      </linearGradient>`;
+    }
     const x1 = (cum[startIdx] / total) * w, x2 = (cum[endIdx] / total) * w;
-    bars += `<rect x="${x1.toFixed(1)}" y="${barY}" width="${Math.max(0, x2-x1).toFixed(1)}" height="${barH}" fill="${colorMap[bucket] || colorMap.unknown || '#8a8a8a'}"/>`;
+    bars += `<rect x="${x1.toFixed(1)}" y="${barY}" width="${Math.max(0, x2-x1).toFixed(1)}" height="${barH}" rx="${radius}" fill="url(#${gradId})"/>`;
   });
   const distLabel = total >= 1000 ? (total/1000).toFixed(1) + ' km' : Math.round(total) + ' m';
-  svg.innerHTML = `${bars}
-    <text x="0" y="${h-6}" font-size="11" fill="#cfe0d4">0 km</text>
-    <text x="${w}" y="${h-6}" text-anchor="end" font-size="11" fill="#cfe0d4">${distLabel}</text>`;
+  svg.innerHTML = `<defs>${defs}</defs>${bars}
+    <text x="2" y="${h-4}" font-size="11" font-weight="700" fill="#cfe0d4">0 km</text>
+    <text x="${w-2}" y="${h-4}" text-anchor="end" font-size="11" font-weight="700" fill="#cfe0d4">${distLabel}</text>`;
 }
-function openAnalyseScreen(){
+function openAnalyseScreen(rideEntry){
   $('analyseScreen').classList.remove('hidden');
   if (!analyseMapInstance){
     analyseMapInstance = L.map('analyseMap', { zoomControl:false, attributionControl:false });
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { maxZoom:19 }).addTo(analyseMapInstance);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { subdomains:'abcd', maxZoom:19 }).addTo(analyseMapInstance);
   }
   setTimeout(() => analyseMapInstance.invalidateSize(), 50);
+  analyseRideEntry = rideEntry || null;
+  analyseWindTabBtn = analyseWindTabBtn || document.querySelector('.analyse-tab[data-tab="wind"]');
+  if (rideEntry){
+    $('analyseStatsPanel').style.display = 'grid';
+    const durText = rideEntry.durationMin != null ? (rideEntry.durationMin >= 60 ? `${Math.floor(rideEntry.durationMin/60)}u${String(rideEntry.durationMin%60).padStart(2,'0')}` : `${rideEntry.durationMin} min`) : '–';
+    $('analyseStatsPanel').innerHTML = `
+      <div class="analyse-stat-tile" style="border-top:3px solid #e2a13c;"><div class="analyse-stat-val">${rideEntry.km}</div><div class="analyse-stat-label">km</div></div>
+      <div class="analyse-stat-tile" style="border-top:3px solid #4a9fd8;"><div class="analyse-stat-val">${durText}</div><div class="analyse-stat-label">${curLang()==='en'?'time':'tijd'}</div></div>
+      <div class="analyse-stat-tile" style="border-top:3px solid #2e9e4f;"><div class="analyse-stat-val">${rideEntry.avgKmh ?? '–'}</div><div class="analyse-stat-label">${curLang()==='en'?'avg km/h':'gem km/u'}</div></div>
+      <div class="analyse-stat-tile" style="border-top:3px solid #d5443a;"><div class="analyse-stat-val">↑${rideEntry.ascent ?? '–'}</div><div class="analyse-stat-label">m</div></div>`;
+    // Wind is per definitie enkel zinvol op het moment van de rit zelf, niet achteraf op te vragen —
+    // die tab heeft dus geen nut bij het bekijken van rit-data, in tegenstelling tot de andere tabs.
+    if (analyseWindTabBtn) analyseWindTabBtn.style.display = 'none';
+    $('analyseSpeedTabBtn').style.display = (rideEntry.geometry && rideEntry.geometry.length > 1) ? 'block' : 'none';
+    // Een OUDE, uit de geschiedenis heropende rit heeft geen live routeLine meer — laad de bewaarde
+    // geometrie tijdelijk in importedTrack, dat is precies de bron die alle andere tabs (via
+    // getElevationSourcePoints) toch al gebruiken. Bij het sluiten wordt dit weer teruggezet.
+    if (rideEntry.isHistorical && rideEntry.geometry){
+      analysePrevImportedTrack = importedTrack;
+      importedTrack = rideEntry.geometry.map(([la,lo]) => ({ lat:la, lon:lo, ele:null }));
+    }
+  } else {
+    $('analyseStatsPanel').style.display = 'none';
+    if (analyseWindTabBtn) analyseWindTabBtn.style.display = 'block';
+    $('analyseSpeedTabBtn').style.display = 'none';
+  }
   loadAnalyseTab('surface');
 }
-$('analyseCloseBtn').addEventListener('click', () => { $('analyseScreen').classList.add('hidden'); });
+$('analyseCloseBtn').addEventListener('click', () => {
+  $('analyseScreen').classList.add('hidden');
+  if (analyseRideEntry && analyseRideEntry.isHistorical) importedTrack = analysePrevImportedTrack; // teruggeven wat er stond vóór we de oude rit inlaadden
+});
 document.querySelectorAll('.analyse-tab').forEach(tab => {
   tab.addEventListener('click', () => {
     document.querySelectorAll('.analyse-tab').forEach(t => t.classList.remove('active'));
@@ -10559,6 +11069,10 @@ async function loadAnalyseTab(tabName){
   $('analyseMapWrap').style.display = 'none';
   $('analyseChartWrap').style.display = 'none';
   $('analysePlaceholder').style.display = 'none';
+  $('analysePlaceholder').classList.remove('analyse-logs-list');
+  $('analyseReliabilityBadge').style.display = 'none';
+  analyseCurrentProfile = null;
+  teardownAnalyseChartDrag();
   if (analyseRouteLayer){ analyseMapInstance.removeLayer(analyseRouteLayer); analyseRouteLayer = null; }
 
   if (tabName === 'elevation'){
@@ -10583,6 +11097,8 @@ async function loadAnalyseTab(tabName){
     analyseMapInstance.invalidateSize();
     analyseMapInstance.fitBounds(L.latLngBounds(profile.lat.map((la,i) => [la, profile.lon[i]])), { padding:[20,20] });
     setTimeout(() => renderElevationChart(profile, 'analyseSvg', 'analyseChartWrap'), 60);
+    analyseCurrentProfile = profile;
+    setupAnalyseChartDrag();
     return;
   }
 
@@ -10594,12 +11110,28 @@ async function loadAnalyseTab(tabName){
       $('analysePlaceholder').innerHTML = `<div>${tr('analyseNoRoute')}</div>`;
       return;
     }
+    const key = routeSignature();
     let result;
-    try{ result = await fetchSurfaceDataWithFallback(pts.map(p => ({lat:p.lat, lon:p.lon})), pts.map(p => [p.lat, p.lon])); }
-    catch(e){ $('analysePlaceholder').innerHTML = `<div>${tr('analyseSurfaceFail')}</div>`; return; }
+    if (analyseSurfaceCache && analyseSurfaceCacheKey === key){
+      result = analyseSurfaceCache; // zelfde route als de vorige keer — hergebruik i.p.v. opnieuw (en mogelijk anders) op te halen
+    } else {
+      try{ result = await fetchSurfaceDataWithFallback(pts.map(p => ({lat:p.lat, lon:p.lon})), pts.map(p => [p.lat, p.lon]), 20000); }
+      catch(e){ $('analysePlaceholder').innerHTML = `<div>${tr('analyseSurfaceFail')}</div>`; return; }
+      analyseSurfaceCache = result;
+      analyseSurfaceCacheKey = key;
+    }
     $('analysePlaceholder').style.display = 'none';
     $('analyseMapWrap').style.display = 'block';
     $('analyseChartWrap').style.display = 'block';
+    const badge = $('analyseReliabilityBadge');
+    badge.style.display = 'block';
+    if (result.crossChecked){
+      badge.className = 'ok';
+      badge.textContent = tr('analyseCrossCheckOk');
+    } else {
+      badge.className = 'warn';
+      badge.textContent = tr('analyseCrossCheckFailed');
+    }
     analyseRouteLayer = L.layerGroup().addTo(analyseMapInstance);
     result.surfaceValues.forEach(([startIdx, endIdx, bucket]) => {
       const segPts = result.coordsLatLng.slice(startIdx, endIdx + 1);
@@ -10608,6 +11140,142 @@ async function loadAnalyseTab(tabName){
     analyseMapInstance.invalidateSize();
     analyseMapInstance.fitBounds(L.latLngBounds(result.coordsLatLng), { padding:[20,20] });
     renderSegmentBarChart(result.coordsLatLng, result.surfaceValues, SURFACE_COLORS, 'analyseSvg');
+    return;
+  }
+
+  if (tabName === 'wind'){
+    $('analysePlaceholder').innerHTML = `<div>${tr('analyseLoading')}</div>`;
+    $('analysePlaceholder').style.display = 'flex';
+    const latlngs = routeLine.getLatLngs();
+    if (latlngs.length < 2){
+      $('analysePlaceholder').innerHTML = `<div>${tr('analyseNoRoute')}</div>`;
+      return;
+    }
+    let windDir = weatherSunCache && weatherSunCache.windDir;
+    if (windDir == null){
+      try{
+        const mid = latlngs[Math.floor(latlngs.length / 2)];
+        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${mid.lat}&longitude=${mid.lng}&current=wind_direction_10m&models=knmi_seamless&timezone=auto`);
+        const d = await res.json();
+        windDir = d.current && d.current.wind_direction_10m;
+      }catch(e){ /* geen wind gekend */ }
+    }
+    if (windDir == null){
+      $('analysePlaceholder').innerHTML = `<div>${tr('analyseWindFail')}</div>`;
+      return;
+    }
+    $('analysePlaceholder').style.display = 'none';
+    $('analyseMapWrap').style.display = 'block';
+    $('analyseChartWrap').style.display = 'block';
+    const coordsLatLng = latlngs.map(p => [p.lat, p.lng]);
+    const windToward = (windDir + 180) % 360;
+    const segments = [];
+    let segStart = 0, prevCls = null;
+    for (let i = 1; i < latlngs.length; i++){
+      const segBearing = bearing(latlngs[i-1].lat, latlngs[i-1].lng, latlngs[i].lat, latlngs[i].lng);
+      let diff = Math.abs(segBearing - windToward);
+      if (diff > 180) diff = 360 - diff;
+      const cls = diff < 55 ? 'tail' : diff > 125 ? 'head' : 'cross';
+      if (cls !== prevCls){ if (prevCls != null) segments.push([segStart, i-1, prevCls]); segStart = i-1; prevCls = cls; }
+    }
+    if (prevCls != null) segments.push([segStart, latlngs.length - 1, prevCls]);
+    analyseRouteLayer = L.layerGroup().addTo(analyseMapInstance);
+    segments.forEach(([startIdx, endIdx, cls]) => {
+      L.polyline(coordsLatLng.slice(startIdx, endIdx + 1), { color:WIND_COLORS[cls], weight:5, opacity:0.95 }).addTo(analyseRouteLayer);
+    });
+    analyseMapInstance.invalidateSize();
+    analyseMapInstance.fitBounds(L.latLngBounds(coordsLatLng), { padding:[20,20] });
+    renderSegmentBarChart(coordsLatLng, segments, WIND_COLORS, 'analyseSvg');
+    return;
+  }
+
+  if (tabName === 'slope'){
+    $('analysePlaceholder').innerHTML = `<div>${tr('analyseLoading')}</div>`;
+    $('analysePlaceholder').style.display = 'flex';
+    let profile;
+    try{ profile = await ensureElevationProfile(); }
+    catch(e){ $('analysePlaceholder').innerHTML = `<div>${tr('analyseElevationFail')}</div>`; return; }
+    if (!profile || !profile.lat || profile.lat.length < 2){
+      $('analysePlaceholder').innerHTML = `<div>${tr('analyseNoRoute')}</div>`;
+      return;
+    }
+    $('analysePlaceholder').style.display = 'none';
+    $('analyseMapWrap').style.display = 'block';
+    $('analyseChartWrap').style.display = 'block';
+    const grads = [];
+    for (let i = 1; i < profile.ele.length; i++){
+      const distM = (profile.distKm[i] - profile.distKm[i-1]) * 1000;
+      grads.push(distM > 2 ? ((profile.ele[i] - profile.ele[i-1]) / distM) * 100 : 0); // te korte stukjes geven onbetrouwbare, uitschietende percentages
+    }
+    analyseRouteLayer = L.layerGroup().addTo(analyseMapInstance);
+    for (let i = 1; i < profile.lat.length; i++){
+      L.polyline([[profile.lat[i-1], profile.lon[i-1]], [profile.lat[i], profile.lon[i]]], { color:gradientColor(grads[i-1]), weight:5, opacity:0.95 }).addTo(analyseRouteLayer);
+    }
+    analyseMapInstance.invalidateSize();
+    analyseMapInstance.fitBounds(L.latLngBounds(profile.lat.map((la,i) => [la, profile.lon[i]])), { padding:[20,20] });
+    renderSlopeChart(profile, grads, 'analyseSvg');
+    analyseCurrentProfile = profile;
+    setupAnalyseChartDrag();
+    return;
+  }
+
+  if (tabName === 'logs'){
+    $('analysePlaceholder').innerHTML = `<div>${tr('analyseLoading')}</div>`;
+    $('analysePlaceholder').style.display = 'flex';
+    const pts = getElevationSourcePoints();
+    if (pts.length < 2){
+      $('analysePlaceholder').innerHTML = `<div>${tr('analyseNoRoute')}</div>`;
+      return;
+    }
+    let ways;
+    try{
+      const built = await buildOverpassBucketFn(pts.map(p => [p.lat, p.lon]));
+      ways = built.ways;
+    }catch(e){
+      $('analysePlaceholder').innerHTML = `<div>${tr('analyseLogsFail')}</div>`;
+      return;
+    }
+    $('analysePlaceholder').innerHTML = ways.map(w => {
+      const name = w.tags.name || (curLang()==='en' ? '(unnamed way)' : '(naamloze weg)');
+      const relevantKeys = ['highway','surface','tracktype','smoothness','sidewalk','maxspeed','cycleway','designation','vehicle','bicycle','oneway:bicycle'];
+      const tagLines = relevantKeys.filter(k => w.tags[k]).map(k => `${k}=${w.tags[k]}`).join(' · ');
+      return `<div style="text-align:left; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.08);">
+        <div style="color:var(--cream); font-weight:700; font-size:12.5px;">${name}</div>
+        <div style="color:rgba(246,244,238,0.65); font-size:11px; margin-top:2px;">${tagLines || (curLang()==='en' ? 'no relevant tags' : 'geen relevante tags')}</div>
+      </div>`;
+    }).join('') || `<div>${tr('analyseLogsFail')}</div>`;
+    $('analysePlaceholder').classList.add('analyse-logs-list');
+    $('analysePlaceholder').style.display = 'block';
+    return;
+  }
+
+  if (tabName === 'speed'){
+    if (!analyseRideEntry || !analyseRideEntry.geometry || analyseRideEntry.geometry.length < 2){
+      $('analysePlaceholder').innerHTML = `<div>${tr('analyseNoRoute')}</div>`;
+      $('analysePlaceholder').style.display = 'flex';
+      return;
+    }
+    $('analyseMapWrap').style.display = 'block';
+    $('analyseChartWrap').style.display = 'block';
+    const coordsLatLng = analyseRideEntry.geometry;
+    const speeds = analyseRideEntry.speeds || [];
+    const avgSpeed = analyseRideEntry.avgKmh || (speeds.reduce((a,b) => a+b, 0) / Math.max(1, speeds.length));
+    const SPEED_COLORS = { slow:'#d5443a', normal:'#e2a13c', fast:'#2e9e4f' };
+    const bucketOf = s => s < avgSpeed * 0.7 ? 'slow' : s > avgSpeed * 1.3 ? 'fast' : 'normal';
+    const segments = [];
+    let segStart = 0, prevCls = null;
+    for (let i = 0; i < speeds.length; i++){
+      const cls = bucketOf(speeds[i]);
+      if (cls !== prevCls){ if (prevCls != null) segments.push([segStart, i, prevCls]); segStart = i; prevCls = cls; }
+    }
+    if (prevCls != null) segments.push([segStart, speeds.length, prevCls]);
+    analyseRouteLayer = L.layerGroup().addTo(analyseMapInstance);
+    segments.forEach(([startIdx, endIdx, cls]) => {
+      L.polyline(coordsLatLng.slice(startIdx, endIdx + 1), { color:SPEED_COLORS[cls], weight:5, opacity:0.95 }).addTo(analyseRouteLayer);
+    });
+    analyseMapInstance.invalidateSize();
+    analyseMapInstance.fitBounds(L.latLngBounds(coordsLatLng), { padding:[20,20] });
+    renderSegmentBarChart(coordsLatLng, segments, SPEED_COLORS, 'analyseSvg');
     return;
   }
 
