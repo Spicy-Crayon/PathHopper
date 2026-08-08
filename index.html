@@ -933,6 +933,11 @@
   #analyseMapWrap{ flex:1.15; min-height:0; border-radius:18px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,0.35); }
   #analyseMap{ width:100%; height:100%; }
   #analyseChartWrap{ flex:0.65; min-height:0; background:linear-gradient(160deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02)); border-radius:18px; padding:10px; border:1px solid rgba(255,255,255,0.06); }
+  #analyseChartInner{ position:relative; width:100%; height:100%; }
+  #analyseChartDot{
+    position:absolute; width:14px; height:14px; border-radius:50%; background:#e0392e; border:2px solid white;
+    box-shadow:0 2px 6px rgba(0,0,0,0.4); transform:translate(-50%,-50%); pointer-events:none; z-index:5;
+  }
   #analyseSvg{ width:100%; height:100%; }
   #analysePlaceholder{
     flex:1; display:flex; align-items:center; justify-content:center; text-align:center;
@@ -1080,7 +1085,7 @@
     </div>
   </div>
   <div id="modeSelectHint" data-i18n="modeSelectHint">Knooppunten, navigatie, GPX, offline-gebruik — alles werkt voor beide.</div>
-  <div id="appVersionStart">v2.227 · 7 aug</div>
+  <div id="appVersionStart">v2.228 · 7 aug</div>
 </div>
 
 <div id="bikeSetupScreen" class="hidden">
@@ -1165,7 +1170,7 @@
   <button class="menu-item" id="menuHelpBtn"><span class="mi-icon">❓</span><span class="mi-text"><b data-i18n="menuHelp">Hulp</b><small data-i18n="menuHelpSub">uitleg over alle functies</small></span></button>
   <button class="menu-item" id="menuDevNotesBtn"><span class="mi-icon">🛠️</span><span class="mi-text"><b data-i18n="menuDevNotes">Technische werking</b><small data-i18n="menuDevNotesSub">hoe wegdektype, routering en fallbacks precies werken</small></span></button>
   <button class="menu-item" id="menuLogbookBtn"><span class="mi-icon">📋</span><span class="mi-text"><b data-i18n="menuLogbook">Logboek</b><small data-i18n="menuLogbookSub">overzicht van alle meldingen, ook stille</small></span></button>
-  <div id="menuVersion">v2.227 · 7 aug</div>
+  <div id="menuVersion">v2.228 · 7 aug</div>
 </div>
 
 <div id="hint" data-i18n="hintInitial">Zoom of pan naar je gebied, tik dan op "Laad knooppunten"</div>
@@ -1760,7 +1765,10 @@
     <div id="analyseMapWrap"><div id="analyseMap"></div></div>
     <div id="analyseLegend" style="display:none;"></div>
     <div id="analyseChartWrap">
-      <svg id="analyseSvg" viewBox="0 0 100 40" preserveAspectRatio="none"></svg>
+      <div id="analyseChartInner">
+        <svg id="analyseSvg" viewBox="0 0 100 40" preserveAspectRatio="none"></svg>
+        <div id="analyseChartDot" style="display:none;"></div>
+      </div>
     </div>
     <div id="analysePlaceholder" style="display:none;"></div>
   </div>
@@ -10999,6 +11007,7 @@ let analyseMapInstance = null;
 let analyseSurfaceCache = null, analyseSurfaceCacheKey = null;
 let analyseCurrentProfile = null;
 let analyseChartValueFn = null; // per tab ingesteld: welke waarde (hoogte, stijgingspercentage, ...) hoort bij een bepaald punt
+let analyseChartMinVal = null, analyseChartMaxVal = null; // idem, voor de percentage-berekening van de bol
 let lastCompletedRide = null; // gegevens van de rit die je net voltooide, voor de post-rit-analyse
 let rideSavedThisSession = false; // voorkomt dat een rit dubbel bewaard wordt (bv. aankomst + daarna toch nog Stop drukken)
 let navBreadcrumbs = []; // {lat, lon, t} — voor de snelheid-per-stuk in de post-rit-analyse
@@ -11022,41 +11031,64 @@ function setupAnalyseChartDrag(){
       const d = Math.abs(profile.distKm[i] - targetKm);
       if (d < bestD){ bestD = d; idx = i; }
     }
-    const val = analyseChartValueFn ? analyseChartValueFn(idx) : (profile.ele ? profile.ele[idx] : null);
-    showAnalyseChartDot(frac, profile.lat[idx], profile.lon[idx], targetKm, val);
+    updateAnalyseDotByIndex(idx, frac);
   };
   svg.addEventListener('pointerdown', e => { handler(e); svg.setPointerCapture(e.pointerId); });
   svg.addEventListener('pointermove', e => { if (e.pressure > 0 || e.buttons > 0) handler(e); });
   analyseChartDragHandler = handler;
+  // Bol meteen aanmaken (aan het beginpunt), zodat je meteen ziet dat je 'm kan slepen — zowel op de
+  // kaart als op de grafiek, altijd gesynchroniseerd via updateAnalyseDotByIndex.
+  if (analyseCurrentProfile && analyseCurrentProfile.lat.length){
+    updateAnalyseDotByIndex(0, 0);
+    analyseMapDot.on('drag', (e) => {
+      if (!analyseCurrentProfile) return;
+      const ll = e.target.getLatLng();
+      const profile = analyseCurrentProfile;
+      let idx = 0, bestD = Infinity;
+      for (let i = 0; i < profile.lat.length; i++){
+        const d = haversine(ll.lat, ll.lng, profile.lat[i], profile.lon[i]);
+        if (d < bestD){ bestD = d; idx = i; }
+      }
+      const frac = profile.distKm[idx] / (profile.distKm[profile.distKm.length - 1] || 1);
+      updateAnalyseDotByIndex(idx, frac, true); // true = kaart-bol zelf niet opnieuw verplaatsen, die sleep je al zelf
+    });
+  }
 }
 function teardownAnalyseChartDrag(){
   analyseChartDragHandler = null;
   analyseChartValueFn = null;
+  analyseChartMinVal = null; analyseChartMaxVal = null;
   if (analyseMapDot){ analyseMapInstance.removeLayer(analyseMapDot); analyseMapDot = null; }
-  const svg = $('analyseSvg');
-  const dot = svg.querySelector('.analyse-chart-drag-dot');
-  if (dot) dot.remove();
+  $('analyseChartDot').style.display = 'none';
 }
-function showAnalyseChartDot(frac, lat, lon, km, ele){
-  const svg = $('analyseSvg');
-  const vb = svg.viewBox.baseVal;
-  let dot = svg.querySelector('.analyse-chart-drag-dot');
-  if (!dot){
-    dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    dot.setAttribute('class', 'analyse-chart-drag-dot');
-    dot.setAttribute('r', '6');
-    dot.setAttribute('fill', '#e0392e');
-    dot.setAttribute('stroke', 'white');
-    dot.setAttribute('stroke-width', '2');
-    svg.appendChild(dot);
+// Centrale functie: gegeven een index in het profiel, werkt zowel de kaart-bol als de grafiek-bol bij —
+// zorgt dat beide richtingen (slepen op kaart, slepen op grafiek) altijd gesynchroniseerd blijven.
+function updateAnalyseDotByIndex(idx, frac, skipMapMove){
+  const profile = analyseCurrentProfile;
+  if (!profile) return;
+  const lat = profile.lat[idx], lon = profile.lon[idx];
+  const val = analyseChartValueFn ? analyseChartValueFn(idx) : (profile.ele ? profile.ele[idx] : null);
+  // Grafiek-bol: percentage-gebaseerd, geen pixel-/viewBox-berekening meer nodig — dat bleek op sommige
+  // toestellen net dat kleine stukje anders te meten dan het slepen zelf, met een verkeerd gepositioneerde
+  // bol tot gevolg.
+  const dot = $('analyseChartDot');
+  dot.style.display = 'block';
+  dot.style.left = (frac * 100).toFixed(2) + '%';
+  let yPercent = 50;
+  if (val != null && analyseChartMinVal != null && analyseChartMaxVal != null){
+    const range = (analyseChartMaxVal - analyseChartMinVal) || 1;
+    const topPad = 14, bottomPad = 14; // ruwe marge boven/onder, komt overeen met de rand die de grafieken zelf ook aanhouden
+    const rawPercent = ((val - analyseChartMinVal) / range) * 100;
+    yPercent = (100 - bottomPad) - (rawPercent / 100) * (100 - topPad - bottomPad);
   }
-  const proj = chartProjections['analyseSvg'];
-  const cy = (proj && ele != null) ? proj.y(ele) : vb.height / 2; // op de Hoogte-grafiek: precies op de lijn zelf i.p.v. los in het midden
-  dot.setAttribute('cx', (frac * vb.width).toFixed(1));
-  dot.setAttribute('cy', cy.toFixed(1));
+  dot.style.top = Math.max(2, Math.min(98, yPercent)).toFixed(2) + '%';
+  // Kaart-bol
   if (!analyseMapDot){
-    analyseMapDot = L.circleMarker([lat, lon], { radius:8, color:'white', weight:2, fillColor:'#e0392e', fillOpacity:1 }).addTo(analyseMapInstance);
-  } else {
+    analyseMapDot = L.marker([lat, lon], {
+      icon: L.divIcon({ className:'', html:'<div style="width:16px;height:16px;border-radius:50%;background:#e0392e;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.4);"></div>', iconSize:[16,16], iconAnchor:[8,8] }),
+      draggable:true
+    }).addTo(analyseMapInstance);
+  } else if (!skipMapMove){
     analyseMapDot.setLatLng([lat, lon]);
   }
 }
@@ -11216,6 +11248,8 @@ async function loadAnalyseTab(tabName){
     analyseMapInstance.fitBounds(L.latLngBounds(profile.lat.map((la,i) => [la, profile.lon[i]])), { padding:[20,20] });
     analyseCurrentProfile = profile;
     analyseChartValueFn = idx => profile.ele[idx];
+    analyseChartMinVal = Math.min(...profile.ele);
+    analyseChartMaxVal = Math.max(...profile.ele);
     setTimeout(() => { renderElevationChart(profile, 'analyseSvg', 'analyseChartWrap'); setupAnalyseChartDrag(); }, 60);
     showAnalyseLegend([[ELEV_COLORS.up, curLang()==='en'?'Ascent':'Stijging'], [ELEV_COLORS.down, curLang()==='en'?'Descent':'Daling'], [ELEV_COLORS.flat, curLang()==='en'?'Flat':'Vlak']]);
     return;
@@ -11336,6 +11370,9 @@ async function loadAnalyseTab(tabName){
     analyseMapInstance.fitBounds(L.latLngBounds(profile.lat.map((la,i) => [la, profile.lon[i]])), { padding:[20,20] });
     renderSlopeChart(profile, grads, 'analyseSvg');
     analyseChartValueFn = idx => grads[Math.min(idx, grads.length - 1)];
+    const maxAbsGrad = Math.max(4, ...grads.map(g => Math.abs(g)));
+    analyseChartMinVal = -maxAbsGrad;
+    analyseChartMaxVal = maxAbsGrad;
     analyseCurrentProfile = profile;
     setupAnalyseChartDrag();
     showAnalyseLegend([[gradientColor(-8), '-8%'], [gradientColor(-3), '-3%'], [gradientColor(0), '0%'], [gradientColor(3), '+3%'], [gradientColor(8), '+8%']]);
