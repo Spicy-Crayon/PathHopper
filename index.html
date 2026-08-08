@@ -1144,7 +1144,7 @@
     </div>
   </div>
   <div id="modeSelectHint" data-i18n="modeSelectHint">Knooppunten, navigatie, GPX, offline-gebruik — alles werkt voor beide.</div>
-  <div id="appVersionStart">v2.235 · 8 aug</div>
+  <div id="appVersionStart">v2.237 · 8 aug</div>
 </div>
 
 <div id="bikeSetupScreen" class="hidden">
@@ -1232,7 +1232,7 @@
   <button class="menu-item" id="menuHelpBtn"><span class="mi-icon">❓</span><span class="mi-text"><b data-i18n="menuHelp">Hulp</b><small data-i18n="menuHelpSub">uitleg over alle functies</small></span></button>
   <button class="menu-item" id="menuDevNotesBtn"><span class="mi-icon">🛠️</span><span class="mi-text"><b data-i18n="menuDevNotes">Technische werking</b><small data-i18n="menuDevNotesSub">hoe wegdektype, routering en fallbacks precies werken</small></span></button>
   <button class="menu-item" id="menuLogbookBtn"><span class="mi-icon">📋</span><span class="mi-text"><b data-i18n="menuLogbook">Logboek</b><small data-i18n="menuLogbookSub">overzicht van alle meldingen, ook stille</small></span></button>
-  <div id="menuVersion">v2.235 · 8 aug</div>
+  <div id="menuVersion">v2.237 · 8 aug</div>
 </div>
 
 <div id="hint" data-i18n="hintInitial">Zoom of pan naar je gebied, tik dan op "Laad knooppunten"</div>
@@ -3712,6 +3712,7 @@ document.querySelectorAll('.simple-modal').forEach(modal => {
   modal.addEventListener('click', (e) => {
     if (e.target !== modal) return;
     if (modal.id === 'pinActionSheet' && pinMarker){ map.removeLayer(pinMarker); pinMarker = null; }
+    if (modal.id === 'detourKmModal' && wasMapRotationEnabledBeforePin){ enableMapRotation(); wasMapRotationEnabledBeforePin = false; }
     closeModal(modal.id);
   });
 });
@@ -4574,7 +4575,7 @@ const TRANSLATIONS = {
   detourKmNote: { nl:'Hoeveel km mag de omweg ongeveer zijn? Je route sluit daarna vanzelf weer aan op je oorspronkelijke pad.', en:'Roughly how many km should the detour be? Your route automatically rejoins your original path afterwards.' },
   detourKmConfirmBtn: { nl:'🚧 Automatisch zoeken', en:'🚧 Find automatically' },
   detourKmManualBtn: { nl:'📍 Zelf een punt kiezen', en:'📍 Choose a point myself' },
-  toastManualDetourHint: { nl:'📍 Tik ergens op de kaart om je omweg-punt te plaatsen. De blauwe cirkel toont ongeveer de gevraagde afstand — mag ook erbuiten.', en:'📍 Tap anywhere on the map to place your detour point. The blue circle shows roughly the requested distance — you can also tap outside it.' },
+  toastManualDetourHint: { nl:'📍 Tik ergens op de kaart om je omweg-punt te plaatsen. De blauwe cirkel toont ongeveer de gevraagde afstand — mag ook erbuiten. Niet gewenst? Gewoon niets doen, dit verdwijnt na 30s vanzelf.', en:'📍 Tap anywhere on the map to place your detour point. The blue circle shows roughly the requested distance — you can also tap outside it. Changed your mind? Just do nothing, this disappears on its own after 30s.' },
   toastNoNewNodes: { nl:'Geen nieuwe knooppunten in dit gebied', en:'No new nodes in this area' },
   toastNoWalkNodes: { nl:'Geen wandelknooppunten hier — die bestaan in OSM enkel binnen specifieke wandelnetwerken (natuurgebieden, provinciedomeinen), niet overal zoals fietsknooppunten. Probeer een bekend wandelgebied, of importeer een GPX/dataset.', en:'No walking nodes here — in OSM these only exist within specific walking networks (nature reserves, provincial estates), not everywhere like cycling nodes. Try a known hiking area, or import a GPX/dataset.' },
   toastGraphhopperDown: { nl:'GraphHopper niet bereikbaar, val terug op standaard routering.', en:'GraphHopper unavailable, falling back to standard routing.' },
@@ -6350,7 +6351,7 @@ function setupRouteListDrag(){
 setupRouteListDrag();
 
 $('clearBtn').addEventListener('click', () => {
-  if (manualDetourCircle){ map.removeLayer(manualDetourCircle); manualDetourCircle = null; }
+  cancelManualDetourPinMode();
   const ids = [...new Set(route.map(r => r.id))];
   route.length = 0;
   arrivalActual = [];
@@ -7385,13 +7386,13 @@ $('roadClosedBtn').addEventListener('click', () => {
   openModal('detourKmModal');
 });
 $('detourKmModal').querySelector('.simple-modal-close').addEventListener('click', () => {
-  if (wasMapRotationEnabledBeforePin) enableMapRotation(); // je annuleerde het venster zelf, rotatie terug aanzetten
+  if (wasMapRotationEnabledBeforePin){ enableMapRotation(); wasMapRotationEnabledBeforePin = false; } // je annuleerde het venster zelf, rotatie terug aanzetten
 });
 $('detourKmConfirmBtn').addEventListener('click', () => {
   const km = parseFloat(String($('detourKmInput').value).replace(',', '.'));
   if (!km || km <= 0){ toast(tr('toastDetourInvalidKm'), 3500); return; }
   closeModal('detourKmModal');
-  detourAroundClosedRoad(km).finally(() => { if (wasMapRotationEnabledBeforePin) enableMapRotation(); });
+  detourAroundClosedRoad(km).finally(() => { if (wasMapRotationEnabledBeforePin){ enableMapRotation(); wasMapRotationEnabledBeforePin = false; } });
 });
 $('detourKmManualBtn').addEventListener('click', () => {
   const km = parseFloat(String($('detourKmInput').value).replace(',', '.'));
@@ -7401,25 +7402,37 @@ $('detourKmManualBtn').addEventListener('click', () => {
 });
 let manualDetourCircle = null;
 let wasMapRotationEnabledBeforePin = false;
+let manualDetourPinClickHandler = null;
+function cancelPendingDetourClick(){
+  if (manualDetourCircle){ map.removeLayer(manualDetourCircle); manualDetourCircle = null; }
+  if (manualDetourPinClickHandler){ map.off('click', manualDetourPinClickHandler); manualDetourPinClickHandler = null; }
+}
 function startManualDetourPinMode(km){
   if (!navActive || !lastPosition){ toast(tr('toastNavOnly')); return; }
+  cancelPendingDetourClick(); // enkel rommel van een écht afgebroken vorige poging wegnemen — NIET de rotatie-status aanraken, die staat nu net correct (uitgeschakeld) door de knop die je hierheen bracht
   const myPos = { lat: lastPosition.coords.latitude, lon: lastPosition.coords.longitude };
-  if (manualDetourCircle) map.removeLayer(manualDetourCircle);
   manualDetourCircle = L.circle([myPos.lat, myPos.lon], {
     radius: km * 1000, color:'#4a9fd8', weight:2, fillColor:'#4a9fd8', fillOpacity:0.12, dashArray:'6,6'
   }).addTo(map);
-  // Geen fitBounds hier — dat gaf een storende, onverwachte sprong in het beeld net op het moment dat je
-  // je vinger op de kaart zet om de speld te plaatsen. Je kijkt tijdens navigatie toch al naar je eigen
-  // positie; de cirkel verschijnt gewoon als overlay zonder de weergave zelf te wijzigen.
   toast(tr('toastManualDetourHint'), 5000);
-  // Kaart-rotatie tijdelijk stilzetten zolang je aan het plaatsen bent — anders draait de kaart soms
-  // onder je vinger vandaan tijdens het tikken/verslepen (dezelfde bug die we al eerder hadden).
   wasMapRotationEnabledBeforePin = !appSettings.disableMapRotation;
   if (wasMapRotationEnabledBeforePin) disableMapRotation();
-  map.once('click', (e) => {
+  manualDetourPinClickHandler = (e) => {
+    manualDetourPinClickHandler = null; // deze klik zelf verwerken we hieronder, geen map.off nodig — was toch maar voor 1 klik bedoeld
     if (manualDetourCircle){ map.removeLayer(manualDetourCircle); manualDetourCircle = null; }
     insertManualDetourPin(e.latlng.lat, e.latlng.lng);
-  });
+  };
+  map.once('click', manualDetourPinClickHandler);
+  setTimeout(() => {
+    if (manualDetourPinClickHandler) cancelManualDetourPinMode(); // 30s niet getikt = automatisch opgeruimd, ongeacht hoe je 'weg' ging
+  }, 30000);
+}
+// Ruimt alles op van een niet-afgeronde speld-plaatsing-poging: de cirkel, de wachtende klik-handler (die
+// anders bij een willekeurige latere, normale tik op de kaart alsnog een omweg-punt zou toevoegen — dát
+// was de kern van 'vanaf dan is alles om zeep'), en de rotatie-status.
+function cancelManualDetourPinMode(){
+  cancelPendingDetourClick();
+  if (wasMapRotationEnabledBeforePin){ enableMapRotation(); wasMapRotationEnabledBeforePin = false; }
 }
 async function insertManualDetourPin(lat, lon){
   if (!canEditRouteNow()) return;
@@ -7438,7 +7451,7 @@ async function insertManualDetourPin(lat, lon){
   toast(curLang()==='en' ? '🔄 Recalculating via your new point…' : '🔄 Herberekenen via je nieuwe punt…', 2500);
   await drawRoutePath(true); // altijd meteen vanaf je huidige, live positie — je bent tenslotte aan het navigeren, met dezelfde parameters (fietstype, weging, ...) als je oorspronkelijke route
   applyRouteColoring();
-  if (wasMapRotationEnabledBeforePin) enableMapRotation();
+  if (wasMapRotationEnabledBeforePin){ enableMapRotation(); wasMapRotationEnabledBeforePin = false; }
 }
 
 // ---------- Turn-by-turn: verwerkt de OSRM-'steps' tot een platte lijst met cumulatieve afstand ----------
@@ -9258,6 +9271,7 @@ function stopVoiceOnlyDim(){
 document.addEventListener('click', () => { if (navActive && appSettings.voiceOnlyMode) resetVoiceOnlyDimTimer(); }, { passive:true });
 
 function stopNav(){
+  cancelManualDetourPinMode();
   if (navStartTime && !rideSavedThisSession){
     const km = actualRouteKm != null ? actualRouteKm : straightLineKm();
     // Enkel bewaren als er ook echt iets gebeurd is — een paar seconden per ongeluk op Start drukken en
