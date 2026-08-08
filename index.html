@@ -1144,7 +1144,7 @@
     </div>
   </div>
   <div id="modeSelectHint" data-i18n="modeSelectHint">Knooppunten, navigatie, GPX, offline-gebruik — alles werkt voor beide.</div>
-  <div id="appVersionStart">v2.237 · 8 aug</div>
+  <div id="appVersionStart">v2.238 · 8 aug</div>
 </div>
 
 <div id="bikeSetupScreen" class="hidden">
@@ -1232,7 +1232,7 @@
   <button class="menu-item" id="menuHelpBtn"><span class="mi-icon">❓</span><span class="mi-text"><b data-i18n="menuHelp">Hulp</b><small data-i18n="menuHelpSub">uitleg over alle functies</small></span></button>
   <button class="menu-item" id="menuDevNotesBtn"><span class="mi-icon">🛠️</span><span class="mi-text"><b data-i18n="menuDevNotes">Technische werking</b><small data-i18n="menuDevNotesSub">hoe wegdektype, routering en fallbacks precies werken</small></span></button>
   <button class="menu-item" id="menuLogbookBtn"><span class="mi-icon">📋</span><span class="mi-text"><b data-i18n="menuLogbook">Logboek</b><small data-i18n="menuLogbookSub">overzicht van alle meldingen, ook stille</small></span></button>
-  <div id="menuVersion">v2.237 · 8 aug</div>
+  <div id="menuVersion">v2.238 · 8 aug</div>
 </div>
 
 <div id="hint" data-i18n="hintInitial">Zoom of pan naar je gebied, tik dan op "Laad knooppunten"</div>
@@ -9100,7 +9100,7 @@ function renderLoopGenResults(){
 function addDraggableRoutePointMarker(p){
   const marker = L.marker([p.lat, p.lon], {
     icon: L.divIcon({ className:'', html:`<div class="drop-pin">${p.isVia ? '↔' : '📍'}</div>`, iconSize:[34,34], iconAnchor:[17,32] }),
-    draggable:true, autoPan:false
+    draggable:!navActive, autoPan:false
   }).addTo(map);
   marker.on('dragstart', () => { teardownRotationAwareDragging(); map.dragging.disable(); });
   marker.on('dragend', async (e) => {
