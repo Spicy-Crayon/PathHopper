@@ -1085,7 +1085,7 @@
     </div>
   </div>
   <div id="modeSelectHint" data-i18n="modeSelectHint">Knooppunten, navigatie, GPX, offline-gebruik — alles werkt voor beide.</div>
-  <div id="appVersionStart">v2.228 · 7 aug</div>
+  <div id="appVersionStart">v2.230 · 7 aug</div>
 </div>
 
 <div id="bikeSetupScreen" class="hidden">
@@ -1100,8 +1100,11 @@
       </div>
     </div>
 
-    <div class="bike-setup-title" style="margin-top:26px;" data-i18n="bikeSetupNavTypeTitle">Welk type navigatie kies je?</div>
-    <div class="nav-type-choice">
+    <div id="bikeRoutingProBadge" style="margin-top:22px; background:rgba(226,161,60,0.14); border:1.5px solid var(--amber); border-radius:16px; padding:14px 16px; display:flex; align-items:center; gap:12px;">
+      <span style="font-size:26px;">🚴‍♂️</span>
+      <span style="text-align:left;"><b style="color:var(--cream); font-size:14.5px;" data-i18n="bikeRoutingProTitle">Bike Routing Pro</b><br><small style="color:rgba(246,244,238,0.65); font-size:11.5px; line-height:1.4;" data-i18n="bikeRoutingProSub">Live routelijn, dezelfde 3 routerings-opties, én vooraf/achteraf-analyse — alles in 1.</small></span>
+    </div>
+    <div class="nav-type-choice" style="display:none;">
       <button class="nav-type-card" data-navtype="active">
         <span class="nav-type-icon">🟢</span>
         <span class="nav-type-text"><b data-i18n="navTypeActiveTitle">Actief Live</b><small data-i18n="navTypeActiveSub">Live routelijn, spelden verslepen, meteen herberekenen — zoals nu</small></span>
@@ -1170,7 +1173,7 @@
   <button class="menu-item" id="menuHelpBtn"><span class="mi-icon">❓</span><span class="mi-text"><b data-i18n="menuHelp">Hulp</b><small data-i18n="menuHelpSub">uitleg over alle functies</small></span></button>
   <button class="menu-item" id="menuDevNotesBtn"><span class="mi-icon">🛠️</span><span class="mi-text"><b data-i18n="menuDevNotes">Technische werking</b><small data-i18n="menuDevNotesSub">hoe wegdektype, routering en fallbacks precies werken</small></span></button>
   <button class="menu-item" id="menuLogbookBtn"><span class="mi-icon">📋</span><span class="mi-text"><b data-i18n="menuLogbook">Logboek</b><small data-i18n="menuLogbookSub">overzicht van alle meldingen, ook stille</small></span></button>
-  <div id="menuVersion">v2.228 · 7 aug</div>
+  <div id="menuVersion">v2.230 · 7 aug</div>
 </div>
 
 <div id="hint" data-i18n="hintInitial">Zoom of pan naar je gebied, tik dan op "Laad knooppunten"</div>
@@ -1665,6 +1668,9 @@
       <label class="settings-check-label" style="margin-top:14px;"><span data-i18n="settingsPosUpdateIntervalLabel">🔋 Positie verversen om de … seconden</span></label>
       <input type="number" id="settingPosUpdateInterval" value="1" min="1" max="10" step="1" class="settings-text-input" style="max-width:110px;">
       <div class="settings-subnote" data-i18n="settingsPosUpdateIntervalSub">Hoger = minder vaak de pijl/snelheid/afwijkingscheck bijwerken tussen 2 GPS-signalen door, bespaart wat rekenwerk. Standaard 1 seconde; op de meeste toestellen amper merkbaar verschil tot ~3 seconden.</div>
+      <label class="settings-check-label" style="margin-top:14px;"><span data-i18n="settingsMapRecenterLabel">🗺️ Kaart terug centreren op je positie na … seconden (na zelf verslepen tijdens navigatie)</span></label>
+      <input type="number" id="settingMapRecenterDelay" value="6" min="3" max="30" step="1" class="settings-text-input" style="max-width:110px;">
+      <div class="settings-subnote" data-i18n="settingsMapRecenterSub">Sleep je de kaart zelf weg tijdens navigatie (bv. om je speld-plaatsing preciezer te doen), dan wacht de app dit aantal seconden voor ze automatisch terugspringt naar je positie. Standaard 6s.</div>
     </div>
 
     </details>
@@ -2106,6 +2112,7 @@
     <button id="passiveReadyBtn" data-i18n="passiveReadyBtn">✅ Klaar</button>
     <button id="passiveAnalyseBtn" data-i18n="passiveAnalyseBtn">📊 Analyse</button>
   </div>
+  <button id="bikeRoutingProAnalyseBtn" style="width:100%; margin-top:6px; border:none; border-radius:14px; padding:11px; background:#2d5240; color:var(--cream); font-weight:800; display:none;" data-i18n="passiveAnalyseBtn">📊 Analyse</button>
   <div id="actions">
     <button id="clearBtn" class="small"><span class="ic">🗑️</span><span data-i18n="actionWis">Wis</span></button>
     <button id="toStartBtn" class="small" title="Aan: route vertrekt vanaf je huidige locatie. Uit: route vertrekt vanaf je eerste geselecteerde punt." data-i18n-title="titleVertrekToggle"><span class="ic">🚴</span><span data-i18n="actionVertrek">Vertrek</span></button>
@@ -2608,7 +2615,7 @@ function markNavMapUserPan(){
   if (!navActive) return;
   navMapUserPanning = true;
   clearTimeout(navMapUserPanTimer);
-  navMapUserPanTimer = setTimeout(() => { navMapUserPanning = false; }, 6000);
+  navMapUserPanTimer = setTimeout(() => { navMapUserPanning = false; }, (appSettings.mapRecenterDelaySec || 6) * 1000);
 }
 map.on('dragstart', markNavMapUserPan);
 
@@ -4022,7 +4029,7 @@ let appSettings = {
   dashTextSize:'normal', dashBold:true, garminStyleNav:false, largeNodesAccessibility:false, offRouteDist:35, autoReroute:false, silentReroute:false,
   overlays:{ cycling:false, hiking:false, mtb:false },
   poiLayers:{ cafe:false, restaurant:false, bakery:false, supermarket:false, pharmacy:false, bike:false, water:false, toilet:false, money:false, camping:false, charging:false, playground:false, parking:false, hotel:false }, showPoiDetails:false,
-  showWindDirection:true, autoPause:false, redNavDot:false, topOffsetPx:0, tabGapPx:0, bodyWeightKg:null, voiceOnlyMode:false, routeColorMode:'off', showWindInNav:false, eatReminderOn:false, eatIntervalMin:45, drinkReminderOn:false, drinkIntervalMin:20, segmentPrOn:true, darkArrivalWarning:true, quietRoutingMode:false, historyAudioOn:false, shakeToSurpriseOn:false, shakeKm:30, vertrekFromGps:false, avoidBufferM:18, maxOverlapPct:8, lowerGpsAccuracy:false, disableMapRotation:false, posUpdateIntervalSec:1, overpassSurfaceTimeoutSec:15, routingWeighting:'off', navType:'active', fallDetectionOn:false, sosContactNumber:'', sosContactName:'', routePreference:'balanced', routeLineColor:'#e2a13c', language:'en',
+  showWindDirection:true, autoPause:false, redNavDot:false, topOffsetPx:0, tabGapPx:0, bodyWeightKg:null, voiceOnlyMode:false, routeColorMode:'off', showWindInNav:false, eatReminderOn:false, eatIntervalMin:45, drinkReminderOn:false, drinkIntervalMin:20, segmentPrOn:true, darkArrivalWarning:true, quietRoutingMode:false, historyAudioOn:false, shakeToSurpriseOn:false, shakeKm:30, vertrekFromGps:false, avoidBufferM:18, maxOverlapPct:8, lowerGpsAccuracy:false, disableMapRotation:false, posUpdateIntervalSec:1, mapRecenterDelaySec:6, overpassSurfaceTimeoutSec:15, routingWeighting:'off', navType:'active', fallDetectionOn:false, sosContactNumber:'', sosContactName:'', routePreference:'balanced', routeLineColor:'#e2a13c', language:'en',
   bundledCountries:{ be:true, nl:false }, routingEngine:'brouter'
 };
 
@@ -4117,6 +4124,8 @@ const TRANSLATIONS = {
   settingsDisableMapRotationSub: { nl:'Kaart blijft vast noorden-boven i.p.v. continu mee te draaien met je rijrichting — bespaart de voortdurende herberekening daarvan. Je route en pijl blijven gewoon werken.', en:'Map stays fixed north-up instead of continuously rotating with your direction of travel — saves the constant recalculation involved. Your route and arrow keep working as normal.' },
   settingsPosUpdateIntervalLabel: { nl:'🔋 Positie verversen om de … seconden', en:'🔋 Refresh position every … seconds' },
   settingsPosUpdateIntervalSub: { nl:'Hoger = minder vaak de pijl/snelheid/afwijkingscheck bijwerken tussen 2 GPS-signalen door, bespaart wat rekenwerk. Standaard 1 seconde; op de meeste toestellen amper merkbaar verschil tot ~3 seconden.', en:'Higher = updates the arrow/speed/deviation check less often between 2 GPS fixes, saving some processing. Default 1 second; barely noticeable on most devices up to ~3 seconds.' },
+  settingsMapRecenterLabel: { nl:'🗺️ Kaart terug centreren op je positie na … seconden (na zelf verslepen tijdens navigatie)', en:'🗺️ Re-centre map on your position after … seconds (after manually panning during navigation)' },
+  settingsMapRecenterSub: { nl:'Sleep je de kaart zelf weg tijdens navigatie (bv. om je speld-plaatsing preciezer te doen), dan wacht de app dit aantal seconden voor ze automatisch terugspringt naar je positie. Standaard 6s.', en:'If you pan the map yourself during navigation (e.g. to place a pin more precisely), the app waits this many seconds before automatically snapping back to your position. Default 6s.' },
   settingsWeightLabel: { nl:'⚖️ Lichaamsgewicht (voor calorie-schatting, optioneel)', en:'⚖️ Body weight (for calorie estimate, optional)' },
   statsTitle: { nl:'Mijn statistieken', en:'My statistics' },
   statsWeek: { nl:'Week', en:'Week' },
@@ -5076,6 +5085,7 @@ async function loadSettings(){
   $('settingLowerGpsAccuracy').checked = !!appSettings.lowerGpsAccuracy;
   $('settingDisableMapRotation').checked = !!appSettings.disableMapRotation;
   $('settingPosUpdateInterval').value = appSettings.posUpdateIntervalSec || 1;
+  $('settingMapRecenterDelay').value = appSettings.mapRecenterDelaySec || 6;
   $('settingOverpassSurfaceTimeout').value = appSettings.overpassSurfaceTimeoutSec || 15;
   selectRadio('routingWeighting', appSettings.routingWeighting || 'off', 'off');
   $('settingShowWindInNav').checked = !!appSettings.showWindInNav;
@@ -5220,6 +5230,10 @@ $('settingPosUpdateInterval').addEventListener('change', (e) => {
     clearInterval(renderLoopId);
     renderLoopId = setInterval(renderPosition, appSettings.posUpdateIntervalSec * 1000);
   }
+});
+$('settingMapRecenterDelay').addEventListener('change', (e) => {
+  appSettings.mapRecenterDelaySec = Math.max(3, Math.min(30, parseInt(e.target.value) || 6));
+  saveSettings();
 });
 $('settingShowWindInNav').addEventListener('change', (e) => {
   appSettings.showWindInNav = e.target.checked;
@@ -5448,7 +5462,7 @@ $('settingsResetBtn').addEventListener('click', () => {
     dashTextSize:'normal', dashBold:true, garminStyleNav:false, largeNodesAccessibility:false, offRouteDist:35, autoReroute:false, silentReroute:false,
     overlays:{ cycling:false, hiking:false, mtb:false },
     poiLayers:{ cafe:false, restaurant:false, bakery:false, supermarket:false, pharmacy:false, bike:false, water:false, toilet:false, money:false, camping:false, charging:false, playground:false, parking:false, hotel:false }, showPoiDetails:false,
-    showWindDirection:true, autoPause:false, redNavDot:false, topOffsetPx:0, tabGapPx:0, bodyWeightKg:null, voiceOnlyMode:false, routeColorMode:'off', showWindInNav:false, eatReminderOn:false, eatIntervalMin:45, drinkReminderOn:false, drinkIntervalMin:20, segmentPrOn:true, darkArrivalWarning:true, quietRoutingMode:false, historyAudioOn:false, shakeToSurpriseOn:false, shakeKm:30, vertrekFromGps:false, avoidBufferM:18, maxOverlapPct:8, lowerGpsAccuracy:false, disableMapRotation:false, posUpdateIntervalSec:1, overpassSurfaceTimeoutSec:15, routingWeighting:'off', navType:'active', fallDetectionOn:false, sosContactNumber:'', sosContactName:'', routePreference:'balanced', routeLineColor:'#e2a13c', language:'en',
+    showWindDirection:true, autoPause:false, redNavDot:false, topOffsetPx:0, tabGapPx:0, bodyWeightKg:null, voiceOnlyMode:false, routeColorMode:'off', showWindInNav:false, eatReminderOn:false, eatIntervalMin:45, drinkReminderOn:false, drinkIntervalMin:20, segmentPrOn:true, darkArrivalWarning:true, quietRoutingMode:false, historyAudioOn:false, shakeToSurpriseOn:false, shakeKm:30, vertrekFromGps:false, avoidBufferM:18, maxOverlapPct:8, lowerGpsAccuracy:false, disableMapRotation:false, posUpdateIntervalSec:1, mapRecenterDelaySec:6, overpassSurfaceTimeoutSec:15, routingWeighting:'off', navType:'active', fallDetectionOn:false, sosContactNumber:'', sosContactName:'', routePreference:'balanced', routeLineColor:'#e2a13c', language:'en',
     bundledCountries:{ be:true, nl:false }, routingEngine:'brouter'
   };
   saveSettings();
@@ -5479,6 +5493,7 @@ $('settingsResetBtn').addEventListener('click', () => {
   $('settingLowerGpsAccuracy').checked = false;
   $('settingDisableMapRotation').checked = false;
   $('settingPosUpdateInterval').value = 1;
+  $('settingMapRecenterDelay').value = 6;
   $('settingOverpassSurfaceTimeout').value = 15;
   const routingWeightingOffRadio = document.querySelector('input[name="routingWeighting"][value="off"]');
   if (routingWeightingOffRadio) routingWeightingOffRadio.checked = true;
@@ -6264,6 +6279,7 @@ function setupRouteListDrag(){
 setupRouteListDrag();
 
 $('clearBtn').addEventListener('click', () => {
+  if (manualDetourCircle){ map.removeLayer(manualDetourCircle); manualDetourCircle = null; }
   const ids = [...new Set(route.map(r => r.id))];
   route.length = 0;
   arrivalActual = [];
@@ -7306,6 +7322,7 @@ $('detourKmManualBtn').addEventListener('click', () => {
   startManualDetourPinMode(km);
 });
 let manualDetourCircle = null;
+let wasMapRotationEnabledBeforePin = false;
 function startManualDetourPinMode(km){
   if (!navActive || !lastPosition){ toast(tr('toastNavOnly')); return; }
   const myPos = { lat: lastPosition.coords.latitude, lon: lastPosition.coords.longitude };
@@ -7315,6 +7332,10 @@ function startManualDetourPinMode(km){
   }).addTo(map);
   map.fitBounds(manualDetourCircle.getBounds(), { padding:[40,40] });
   toast(tr('toastManualDetourHint'), 5000);
+  // Kaart-rotatie tijdelijk stilzetten zolang je aan het plaatsen bent — anders draait de kaart soms
+  // onder je vinger vandaan tijdens het tikken/verslepen (dezelfde bug die we al eerder hadden).
+  wasMapRotationEnabledBeforePin = !appSettings.disableMapRotation;
+  if (wasMapRotationEnabledBeforePin) disableMapRotation();
   map.once('click', (e) => {
     if (manualDetourCircle){ map.removeLayer(manualDetourCircle); manualDetourCircle = null; }
     insertManualDetourPin(e.latlng.lat, e.latlng.lng);
@@ -7333,9 +7354,11 @@ async function insertManualDetourPin(lat, lon){
   route.splice(insertAt, 0, stopPoint);
   addDraggableRoutePointMarker(stopPoint);
   renderRoute();
+  updateProgressUI(); // dashboard-lijst meteen laten meeveranderen, niet wachten op de volgende periodieke update
   toast(curLang()==='en' ? '🔄 Recalculating via your new point…' : '🔄 Herberekenen via je nieuwe punt…', 2500);
   await drawRoutePath(true); // altijd meteen vanaf je huidige, live positie — je bent tenslotte aan het navigeren, met dezelfde parameters (fietstype, weging, ...) als je oorspronkelijke route
   applyRouteColoring();
+  if (wasMapRotationEnabledBeforePin) enableMapRotation();
 }
 
 // ---------- Turn-by-turn: verwerkt de OSRM-'steps' tot een platte lijst met cumulatieve afstand ----------
@@ -9430,7 +9453,7 @@ function highlightTarget(){
 }
 
 function wpWord(){ return routeIsFromGpx ? modeGpxLabel() : modeLabel(); }
-function pointLabel(r){ if (r.poiName) return r.poiName; if (r.ref === '•') return curLang()==='en' ? 'Edited point' : 'Bewerkt punt'; if (r.ref === '📍') return curLang()==='en' ? 'Tapped point' : 'Aangeklikt punt'; if (r.isVia) return curLang()==='en' ? 'Via point (dragged)' : 'Tussenpunt (versleept)'; return `${wpWord()} ${r.ref}`; }
+function pointLabel(r){ if (r.poiName) return r.poiName; if (typeof r.id === 'string' && r.id.startsWith('manualdetour-')) return curLang()==='en' ? 'Detour point (chosen by you)' : 'Omweg-punt (zelf gekozen)'; if (r.ref === '•') return curLang()==='en' ? 'Edited point' : 'Bewerkt punt'; if (r.ref === '📍') return curLang()==='en' ? 'Tapped point' : 'Aangeklikt punt'; if (r.isVia) return curLang()==='en' ? 'Via point (dragged)' : 'Tussenpunt (versleept)'; return `${wpWord()} ${r.ref}`; }
 
 function updateGarminSpeedGauge(speedKmh){
   const el = $('garminSpeedGaugeFill');
@@ -10882,12 +10905,10 @@ async function initModeData(){
 
 function selectMode(mode){
   appMode = mode;
-  navType = appSettings.navType || 'active'; // Passief Pro geldt nu voor zowel fiets als wandelen
+  navType = 'active'; // Bike Routing Pro: 1 modus, altijd live — geen Klaar/Edit-vergrendeling meer
   passiveEditingDone = false;
-  $('passiveActionsRow').style.display = navType === 'passive' ? 'flex' : 'none';
-  $('passiveReadyBtn').classList.remove('editing');
-  $('passiveReadyBtn').textContent = curLang()==='en' ? '✅ Ready' : '✅ Klaar';
-  $('passiveAnalyseBtn').disabled = true;
+  $('passiveActionsRow').style.display = 'none'; // Klaar/Edit-rij niet meer nodig, de Analyse-knop staat nu apart hieronder
+  $('bikeRoutingProAnalyseBtn').style.display = 'block'; // altijd beschikbaar, zowel bij fiets als wandelen
   $('toStartBtn').disabled = false;
   document.body.classList.toggle('mode-wandel', mode === 'wandel');
   $('modeSelectScreen').classList.add('hidden');
@@ -11001,6 +11022,10 @@ $('passiveReadyBtn').addEventListener('click', async () => {
   }
 });
 $('passiveAnalyseBtn').addEventListener('click', () => {
+  openAnalyseScreen();
+});
+$('bikeRoutingProAnalyseBtn').addEventListener('click', () => {
+  if (route.length < 2){ toast(tr('toastEditNeedsTwoPoints'), 4000); return; }
   openAnalyseScreen();
 });
 let analyseMapInstance = null;
