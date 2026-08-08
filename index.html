@@ -13,6 +13,8 @@
 <meta name="apple-mobile-web-app-title" content="Knooppunten">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
   :root{
     --extra-top-inset:0px; /* extra ruimte bovenaan voor APK-wrappers die env(safe-area-inset-top) niet ondersteunen — zie de instelling "Extra ruimte bovenaan" */
@@ -711,6 +713,26 @@
   .mode-tile:active .mode-hex{ transform:scale(0.96); }
   #modeSelectHint{ color:rgba(246,244,238,0.6); font-size:12.5px; max-width:280px; flex-shrink:0; }
 
+  /* Garmin-thema: zeshoeken worden afgeronde, glazige kaarten (Gemini-stijl) i.p.v. de standaard zeshoekvorm */
+  body.theme-garmin .mode-tiles-2x2{ flex-direction:column; gap:12px; width:100%; max-width:340px; }
+  body.theme-garmin .hc-col{ flex-direction:row; gap:12px; width:100%; }
+  body.theme-garmin .hc-col-offset{ margin:0; }
+  body.theme-garmin .mode-tile{ width:100%; flex:1; }
+  body.theme-garmin .mode-tile + .mode-tile{ margin-top:0; }
+  body.theme-garmin .hc-col:first-child{ margin-right:0; }
+  body.theme-garmin .mode-hex{
+    width:100%; height:96px; clip-path:none; border-radius:22px;
+    background:linear-gradient(135deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02)) !important;
+    border:1px solid rgba(255,255,255,0.08); box-shadow:0 8px 24px rgba(0,0,0,0.4);
+  }
+  body.theme-garmin .mode-icon{ font-size:34px; }
+  body.theme-garmin .mode-icon-svg{ width:44px; height:44px; }
+  body.theme-garmin .mode-label{
+    position:absolute; bottom:10px; left:14px; font-size:11px; text-transform:uppercase; letter-spacing:0.6px;
+    font-weight:800; color:rgba(241,245,249,0.55);
+  }
+  body.theme-garmin .mode-tile{ position:relative; }
+
   #bikeSetupScreen{
     position:fixed; top:0;left:0;right:0;bottom:0; z-index:3000; background:var(--green-900);
     display:flex; align-items:center; justify-content:center; overflow-y:auto;
@@ -866,12 +888,18 @@
   .reverse-trip-yes{ border:none; background:var(--amber); color:var(--green-900); font-size:14px; font-weight:800; padding:13px; border-radius:12px; }
   .reverse-trip-no{ border:none; background:#eee; color:#555; font-size:13px; font-weight:700; padding:11px; border-radius:12px; }
 
-  /* Garmin-stijl: zwart met felrode/oranje accenten, hoekiger */
+  /* Garmin-stijl v2: donker "slate", amber-accenten, Inter-lettertype, glazige kaarten — op basis van je eigen mockups */
   body.theme-garmin{
-    --green-900:#050505; --green-700:#161616; --green-600:#232323; --green-500:#2e2e2e;
-    --amber:#ff4b1f; --amber-dark:#cc3814; --line:rgba(255,255,255,0.14);
+    --green-900:#020617; --green-700:#0f172a; --green-600:#1e293b; --green-500:#334155;
+    --amber:#f59e0b; --amber-dark:#d97706; --line:rgba(255,255,255,0.08); --cream:#f1f5f9;
+    font-family:'Inter', -apple-system, sans-serif;
   }
-  body.theme-garmin #sheet, body.theme-garmin .simple-modal-card{ background:#e8e8e8; }
+  body.theme-garmin #sheet, body.theme-garmin .simple-modal-card{ background:#0f172a; color:#f1f5f9; }
+  body.theme-garmin .glass-card{
+    background:linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+    backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+    border:1px solid rgba(255,255,255,0.08); border-radius:20px;
+  }
 
   #helpContent section{ margin-bottom:18px; padding-bottom:16px; border-bottom:1px solid var(--line); }
   #helpContent section:last-child{ border-bottom:none; margin-bottom:4px; padding-bottom:0; }
@@ -1085,7 +1113,7 @@
     </div>
   </div>
   <div id="modeSelectHint" data-i18n="modeSelectHint">Knooppunten, navigatie, GPX, offline-gebruik — alles werkt voor beide.</div>
-  <div id="appVersionStart">v2.230 · 7 aug</div>
+  <div id="appVersionStart">v2.231 · 8 aug</div>
 </div>
 
 <div id="bikeSetupScreen" class="hidden">
@@ -1173,7 +1201,7 @@
   <button class="menu-item" id="menuHelpBtn"><span class="mi-icon">❓</span><span class="mi-text"><b data-i18n="menuHelp">Hulp</b><small data-i18n="menuHelpSub">uitleg over alle functies</small></span></button>
   <button class="menu-item" id="menuDevNotesBtn"><span class="mi-icon">🛠️</span><span class="mi-text"><b data-i18n="menuDevNotes">Technische werking</b><small data-i18n="menuDevNotesSub">hoe wegdektype, routering en fallbacks precies werken</small></span></button>
   <button class="menu-item" id="menuLogbookBtn"><span class="mi-icon">📋</span><span class="mi-text"><b data-i18n="menuLogbook">Logboek</b><small data-i18n="menuLogbookSub">overzicht van alle meldingen, ook stille</small></span></button>
-  <div id="menuVersion">v2.230 · 7 aug</div>
+  <div id="menuVersion">v2.231 · 8 aug</div>
 </div>
 
 <div id="hint" data-i18n="hintInitial">Zoom of pan naar je gebied, tik dan op "Laad knooppunten"</div>
