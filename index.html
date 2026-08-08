@@ -47,7 +47,7 @@
     display:flex; align-items:center; justify-content:center;
     box-shadow:0 3px 8px rgba(0,0,0,0.35);
   }
-  .num-marker.picked{ background:var(--amber); border-color:var(--green-900); color:#ffffff; }
+  .num-marker.picked{ background:var(--amber); border-color:#b8860b; color:#ffffff; }
   .num-marker.next{ background:var(--amber-dark); border-color:var(--cream); color:#ffffff; animation:pulse 1.4s infinite; }
   .num-marker-large{ font-size:18px; border-width:3.5px; }
   body.mode-wandel .num-marker{ background:#2a5f8f; }
@@ -444,24 +444,24 @@
 
   /* ---------- Garmin-stijl navigatiescherm (optioneel, via Instellingen) ---------- */
   #garminSpeedGauge{ display:none; }
-  body.garmin-nav-style #dashboardPanel{ background:#0a1410; }
-  body.garmin-nav-style #dashSummary,
-  body.garmin-nav-style #dashSummary2,
-  body.garmin-nav-style #dashSummary3{
+  body.theme-garmin #dashboardPanel{ background:#0a1410; }
+  body.theme-garmin #dashSummary,
+  body.theme-garmin #dashSummary2,
+  body.theme-garmin #dashSummary3{
     display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px;
   }
-  body.garmin-nav-style .dash-stat{
+  body.theme-garmin .dash-stat{
     background:linear-gradient(160deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02));
     border:1px solid rgba(255,255,255,0.08); border-radius:18px; padding:14px 8px;
     position:relative; overflow:hidden;
   }
-  body.garmin-nav-style .dash-stat span{ font-size:26px; font-weight:900; letter-spacing:-0.5px; color:#f0f5ee; }
-  body.garmin-nav-style .dash-stat small{ color:rgba(230,240,225,0.5); font-weight:700; }
-  body.garmin-nav-style #dashSpeedTile{ display:flex; flex-direction:column; align-items:center; justify-content:center; }
-  body.garmin-nav-style #garminSpeedGauge{ display:block; width:64px; height:64px; margin-bottom:2px; }
-  body.garmin-nav-style #dashSpeedTile span{ font-size:22px; }
-  body.garmin-nav-style #dashElevSection,
-  body.garmin-nav-style #dashChartSection{
+  body.theme-garmin .dash-stat span{ font-size:26px; font-weight:900; letter-spacing:-0.5px; color:#f0f5ee; }
+  body.theme-garmin .dash-stat small{ color:rgba(230,240,225,0.5); font-weight:700; }
+  body.theme-garmin #dashSpeedTile{ display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  body.theme-garmin #garminSpeedGauge{ display:block; width:64px; height:64px; margin-bottom:2px; }
+  body.theme-garmin #dashSpeedTile span{ font-size:22px; }
+  body.theme-garmin #dashElevSection,
+  body.theme-garmin #dashChartSection{
     background:linear-gradient(160deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02));
     border:1px solid rgba(255,255,255,0.08); border-radius:18px; padding:10px;
   }
@@ -1144,7 +1144,7 @@
     </div>
   </div>
   <div id="modeSelectHint" data-i18n="modeSelectHint">Knooppunten, navigatie, GPX, offline-gebruik — alles werkt voor beide.</div>
-  <div id="appVersionStart">v2.232 · 8 aug</div>
+  <div id="appVersionStart">v2.233 · 8 aug</div>
 </div>
 
 <div id="bikeSetupScreen" class="hidden">
@@ -1232,7 +1232,7 @@
   <button class="menu-item" id="menuHelpBtn"><span class="mi-icon">❓</span><span class="mi-text"><b data-i18n="menuHelp">Hulp</b><small data-i18n="menuHelpSub">uitleg over alle functies</small></span></button>
   <button class="menu-item" id="menuDevNotesBtn"><span class="mi-icon">🛠️</span><span class="mi-text"><b data-i18n="menuDevNotes">Technische werking</b><small data-i18n="menuDevNotesSub">hoe wegdektype, routering en fallbacks precies werken</small></span></button>
   <button class="menu-item" id="menuLogbookBtn"><span class="mi-icon">📋</span><span class="mi-text"><b data-i18n="menuLogbook">Logboek</b><small data-i18n="menuLogbookSub">overzicht van alle meldingen, ook stille</small></span></button>
-  <div id="menuVersion">v2.232 · 8 aug</div>
+  <div id="menuVersion">v2.233 · 8 aug</div>
 </div>
 
 <div id="hint" data-i18n="hintInitial">Zoom of pan naar je gebied, tik dan op "Laad knooppunten"</div>
@@ -1676,7 +1676,6 @@
       <label class="settings-radio"><input type="radio" name="dashTextSize" value="normal" checked> <span><span data-i18n="settingsTextNormal">🔤 Normaal</span></span></label>
       <label class="settings-radio"><input type="radio" name="dashTextSize" value="small"> <span><span data-i18n="settingsTextSmaller">🔎 Kleiner (handig op kleinere schermen)</span></span></label>
       <label class="settings-check" style="margin-top:6px;"><input type="checkbox" id="settingDashBold" checked> <span><span data-i18n="settingsBold">🅱️ Vetgedrukt</span></span></label>
-      <label class="settings-check" style="margin-top:10px;"><input type="checkbox" id="settingGarminStyle"> <span data-i18n="settingsGarminStyle">⌚ Garmin-stijl (donkerder, grotere tegels, ronde snelheidsmeter)</span></label>
       <label class="settings-check" style="margin-top:10px;"><input type="checkbox" id="settingLargeNodes"> <span data-i18n="settingsLargeNodes">🔍 Grotere knopen en cijfers op de kaart (slechtziend-vriendelijk)</span></label>
     </div>
 
@@ -2821,7 +2820,14 @@ let pinMarkers = {};        // id -> Leaflet marker, voor spelden die wél aan d
 let longPressTimer = null;
 let longPressStart = null;
 
+function isMapCurrentlyRotated(){
+  return Math.abs(((lastMapRotation % 360) + 360) % 360) > 3; // kleine marge, exact 0° telt niet als 'gedraaid'
+}
 function showPinPopup(lat, lon){
+  if (navActive && isMapCurrentlyRotated()){
+    toast(tr('toastPinBlockedRotation'), 5000);
+    return;
+  }
   if (loopGenPicking){
     loopGenStartPoint = { lat, lon };
     loopGenPicking = false;
@@ -4091,7 +4097,7 @@ async function runOfflineDiagnostics(){
 const SETTINGS_KEY = 'app_settings_v1';
 let appSettings = {
   theme:'default', showCompassBtn:true, orsKey:'', graphhopperKey:'', geoapifyKey:'', bikeType:'regular', mapStyle:'standard', thunderforestKey:'',
-  dashTextSize:'normal', dashBold:true, garminStyleNav:false, largeNodesAccessibility:false, offRouteDist:35, autoReroute:false, silentReroute:false,
+  dashTextSize:'normal', dashBold:true, largeNodesAccessibility:false, offRouteDist:35, autoReroute:false, silentReroute:false,
   overlays:{ cycling:false, hiking:false, mtb:false },
   poiLayers:{ cafe:false, restaurant:false, bakery:false, supermarket:false, pharmacy:false, bike:false, water:false, toilet:false, money:false, camping:false, charging:false, playground:false, parking:false, hotel:false }, showPoiDetails:false,
   showWindDirection:true, autoPause:false, redNavDot:false, topOffsetPx:0, tabGapPx:0, bodyWeightKg:null, voiceOnlyMode:false, routeColorMode:'off', showWindInNav:false, eatReminderOn:false, eatIntervalMin:45, drinkReminderOn:false, drinkIntervalMin:20, segmentPrOn:true, darkArrivalWarning:true, quietRoutingMode:false, historyAudioOn:false, shakeToSurpriseOn:false, shakeKm:30, vertrekFromGps:false, avoidBufferM:18, maxOverlapPct:8, lowerGpsAccuracy:false, disableMapRotation:false, posUpdateIntervalSec:1, mapRecenterDelaySec:6, overpassSurfaceTimeoutSec:15, routingWeighting:'off', navType:'active', fallDetectionOn:false, sosContactNumber:'', sosContactName:'', routePreference:'balanced', routeLineColor:'#e2a13c', language:'en',
@@ -4481,6 +4487,9 @@ const TRANSLATIONS = {
   bikeSetupBikeTypeTitle: { nl:'🚲 Kies je fietstype', en:'🚲 Choose your bike type' },
   bikeSetupTitleFiets: { nl:'🚲 Kies je fietstype', en:'🚲 Choose your bike type' },
   bikeSetupTitleWandel: { nl:'🥾 Wandelen', en:'🥾 Walking' },
+  bikeRoutingProTitle: { nl:'Bike Routing Pro', en:'Bike Routing Pro' },
+  walkRoutingProTitle: { nl:'Walk Routing Pro', en:'Walk Routing Pro' },
+  bikeRoutingProSub: { nl:'Live routelijn, dezelfde 3 routerings-opties, én vooraf/achteraf-analyse — alles in 1.', en:'Live route line, the same 3 routing options, and before/after analysis — all in one.' },
   bikeSetupNavTypeTitle: { nl:'Welk type navigatie kies je?', en:'Which navigation type do you choose?' },
   navTypeActiveTitle: { nl:'Actief Live', en:'Active Live' },
   navTypeActiveSub: { nl:'Live routelijn, spelden verslepen, meteen herberekenen — zoals nu', en:'Live route line, drag pins, instant recalculation — like now' },
@@ -4615,6 +4624,8 @@ const TRANSLATIONS = {
   toastArrivedAt: { nl:'🎉 Je bent aangekomen op ', en:'🎉 You have arrived at ' },
   toastRerouteUpdated: { nl:'🔄 Route bijgewerkt met de nieuwe routerings-instelling.', en:'🔄 Route updated with the new routing setting.' },
   toastPressEditFirst: { nl:'✏️ Druk eerst op "Edit" om je route te kunnen wijzigen.', en:'✏️ Press "Edit" first to be able to change your route.' },
+  toastPinBlockedRotation: { nl:'🧭 De kaart draait momenteel mee met je richting — even normaal doorrijden, dan verschijnt de spelden-optie weer betrouwbaar. (Of schakel kaart-rotatie uit in Instellingen.)', en:'🧭 The map is currently rotating with your direction — keep riding normally for a moment and pin placement will be reliable again. (Or turn off map rotation in Settings.)' },
+  toastDragBlockedDuringNav: { nl:'📍 Punten verslepen kan niet tijdens navigatie (kan verkeerd uitpakken door de kaart-rotatie) — stop de navigatie eerst, of gebruik "Weg afgesloten" voor een omweg onderweg.', en:'📍 Dragging points isn\u2019t possible during navigation (can go wrong due to map rotation) — stop navigation first, or use "Road closed" for a detour on the go.' },
   toastBrouterNoShortestDiff: { nl:'ℹ️ Bij BRouter geven "Kortste" en "Evenwichtig" hetzelfde resultaat (geen apart kortste-profiel beschikbaar op hun gratis server). Wil je een écht ander resultaat, schakel dan over naar Valhalla, OpenRouteService of GraphHopper.', en:'ℹ️ With BRouter, "Shortest" and "Balanced" give the same result (no separate shortest profile available on their free server). For a genuinely different result, switch to Valhalla, OpenRouteService or GraphHopper.' },
   toastZoomForPoi: { nl:'🔍 Zoom verder in om interessante plekken te zien (werkt vanaf straatniveau).', en:'🔍 Zoom in further to see points of interest (works from street level).' },
 
@@ -5094,8 +5105,6 @@ function applySettings(){
   setMapStyle(appSettings.mapStyle, appSettings.thunderforestKey);
   applyOverlaySettings();
   document.body.classList.toggle('dash-text-small', appSettings.dashTextSize === 'small');
-  document.body.classList.toggle('garmin-nav-style', !!appSettings.garminStyleNav);
-  $('settingGarminStyle').checked = !!appSettings.garminStyleNav;
   $('settingLargeNodes').checked = !!appSettings.largeNodesAccessibility;
   document.body.classList.toggle('dash-not-bold', !appSettings.dashBold);
   // De handmatige instelling wint altijd van de vroege automatische gok bovenaan het bestand —
@@ -5264,11 +5273,6 @@ document.querySelectorAll('input[name="offRouteDist"]').forEach(radio => {
 });
 $('settingShowCompassBtn').addEventListener('change', (e) => { appSettings.showCompassBtn = e.target.checked; saveSettings(); });
 $('settingDashBold').addEventListener('change', (e) => { appSettings.dashBold = e.target.checked; saveSettings(); });
-$('settingGarminStyle').addEventListener('change', (e) => {
-  appSettings.garminStyleNav = e.target.checked;
-  document.body.classList.toggle('garmin-nav-style', e.target.checked);
-  saveSettings();
-});
 $('settingLargeNodes').addEventListener('change', (e) => {
   appSettings.largeNodesAccessibility = e.target.checked;
   saveSettings();
@@ -5528,7 +5532,7 @@ $('overlayMtb').addEventListener('change', (e) => { appSettings.overlays.mtb = e
 $('settingsResetBtn').addEventListener('click', () => {
   appSettings = {
     theme:'default', showCompassBtn:true, orsKey:'', graphhopperKey:'', geoapifyKey:'', bikeType:'regular', mapStyle:'standard', thunderforestKey:'',
-    dashTextSize:'normal', dashBold:true, garminStyleNav:false, largeNodesAccessibility:false, offRouteDist:35, autoReroute:false, silentReroute:false,
+    dashTextSize:'normal', dashBold:true, largeNodesAccessibility:false, offRouteDist:35, autoReroute:false, silentReroute:false,
     overlays:{ cycling:false, hiking:false, mtb:false },
     poiLayers:{ cafe:false, restaurant:false, bakery:false, supermarket:false, pharmacy:false, bike:false, water:false, toilet:false, money:false, camping:false, charging:false, playground:false, parking:false, hotel:false }, showPoiDetails:false,
     showWindDirection:true, autoPause:false, redNavDot:false, topOffsetPx:0, tabGapPx:0, bodyWeightKg:null, voiceOnlyMode:false, routeColorMode:'off', showWindInNav:false, eatReminderOn:false, eatIntervalMin:45, drinkReminderOn:false, drinkIntervalMin:20, segmentPrOn:true, darkArrivalWarning:true, quietRoutingMode:false, historyAudioOn:false, shakeToSurpriseOn:false, shakeKm:30, vertrekFromGps:false, avoidBufferM:18, maxOverlapPct:8, lowerGpsAccuracy:false, disableMapRotation:false, posUpdateIntervalSec:1, mapRecenterDelaySec:6, overpassSurfaceTimeoutSec:15, routingWeighting:'off', navType:'active', fallDetectionOn:false, sosContactNumber:'', sosContactName:'', routePreference:'balanced', routeLineColor:'#e2a13c', language:'en',
@@ -5548,8 +5552,6 @@ $('settingsResetBtn').addEventListener('click', () => {
   document.querySelector('input[name="offRouteDist"][value="35"]').checked = true;
   $('settingShowCompassBtn').checked = true;
   $('settingDashBold').checked = true;
-  $('settingGarminStyle').checked = false;
-  document.body.classList.remove('garmin-nav-style');
   $('settingLargeNodes').checked = false;
   $('settingAutoReroute').checked = false;
   $('settingSilentReroute').checked = false;
@@ -6294,7 +6296,7 @@ function renderRoute(){
   });
   updateSheetMetaText();
   $('emptyMsg').textContent = tr('emptyMsgWithLoop');
-  $('navBtn').disabled = route.length < 1;
+  $('navBtn').disabled = route.length < 1 || routeLine.getLatLngs().length === 0;
 }
 
 // ---------- Routepunten herschikken via het ⠿ sleep-handvat ----------
@@ -7171,6 +7173,7 @@ async function drawRoutePath(fromCurrentLocation){
     return;
   }
   const myToken = ++drawRoutePathToken;
+  $('navBtn').disabled = true; // pas terug aanzetten zodra de nieuwe berekening écht klaar is, verderop in deze functie
   const profile = cfg().routeProfile; // 'bike' of 'foot'
   if (routeIsFromGpx){
     if (!fromCurrentLocation || !lastPosition){
@@ -7243,6 +7246,7 @@ async function drawRoutePath(fromCurrentLocation){
   }
   if (myToken !== drawRoutePathToken) return;
   applyRouteColoring();
+  $('navBtn').disabled = route.length < 1 || routeLine.getLatLngs().length === 0;
 }
 
 // ---------- "Weg hier afgesloten" (idee van een gebruiker): zoekt een alternatieve route ----------
@@ -9080,8 +9084,15 @@ function addDraggableRoutePointMarker(p){
   }).addTo(map);
   marker.on('dragstart', () => { teardownRotationAwareDragging(); map.dragging.disable(); });
   marker.on('dragend', async (e) => {
-    map.dragging.enable();
-    if (!canEditRouteNow()){ marker.setLatLng([p.lat, p.lon]); return; } // niet toegelaten nu — speld terug op de oorspronkelijke plek
+    const shouldRestoreRotationDrag = navActive && !appSettings.disableMapRotation;
+    if (shouldRestoreRotationDrag) setupRotationAwareDragging(); else map.dragging.enable();
+    // Verslepen van een bestaand punt tijdens actieve navigatie leidde tot een waaier aan problemen
+    // (kaart-rotatie die de sleeprichting/positie in de war stuurt) — daarom nu bewust altijd geblokkeerd
+    // zolang je navigeert. Vóór je op 'Start' drukt, of ná 'Stop', werkt verslepen gewoon normaal.
+    if (!canEditRouteNow() || navActive){
+      if (navActive) toast(tr('toastDragBlockedDuringNav'), 5000);
+      marker.setLatLng([p.lat, p.lon]); return; // niet toegelaten nu — speld terug op de oorspronkelijke plek
+    }
     const ll = e.target.getLatLng();
     const idx = route.findIndex(r => r.id === p.id);
     if (idx === -1) return;
@@ -11063,6 +11074,8 @@ function openBikeSetupScreen(mode){
   document.querySelectorAll('.nav-type-card').forEach(c => c.classList.toggle('active', c.dataset.navtype === (appSettings.navType || 'active')));
   $('bikeTypeSection').style.display = mode === 'fiets' ? 'block' : 'none';
   $('bikeSetupTitle').textContent = mode === 'fiets' ? tr('bikeSetupTitleFiets') : tr('bikeSetupTitleWandel');
+  document.querySelector('#bikeRoutingProBadge b').textContent = mode === 'fiets' ? tr('bikeRoutingProTitle') : tr('walkRoutingProTitle');
+  document.querySelector('#bikeRoutingProBadge span:first-child').textContent = mode === 'fiets' ? '🚴\u200d♂️' : '🥾';
   $('modeSelectScreen').classList.add('hidden');
   $('bikeSetupScreen').classList.remove('hidden');
 }
@@ -11284,7 +11297,7 @@ function openAnalyseScreen(rideEntry){
   $('analyseScreen').classList.remove('hidden');
   if (!analyseMapInstance){
     analyseMapInstance = L.map('analyseMap', { zoomControl:false, attributionControl:false });
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { subdomains:'abcd', maxZoom:19 }).addTo(analyseMapInstance);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { subdomains:'abcd', maxZoom:19 }).addTo(analyseMapInstance);
   }
   setTimeout(() => analyseMapInstance.invalidateSize(), 50);
   analyseRideEntry = rideEntry || null;
