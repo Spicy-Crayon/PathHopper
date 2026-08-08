@@ -38,15 +38,15 @@
     background:var(--green-600);
     border:2.5px solid var(--cream);
     border-radius:50%;
-    color:var(--cream);
+    color:#ffffff;
     font-weight:800;
     font-size:13px;
     letter-spacing:-0.3px;
     display:flex; align-items:center; justify-content:center;
     box-shadow:0 3px 8px rgba(0,0,0,0.35);
   }
-  .num-marker.picked{ background:var(--amber); border-color:var(--green-900); color:var(--green-900); }
-  .num-marker.next{ background:var(--amber-dark); border-color:var(--cream); color:var(--cream); animation:pulse 1.4s infinite; }
+  .num-marker.picked{ background:var(--amber); border-color:var(--green-900); color:#ffffff; }
+  .num-marker.next{ background:var(--amber-dark); border-color:var(--cream); color:#ffffff; animation:pulse 1.4s infinite; }
   .num-marker-large{ font-size:18px; border-width:3.5px; }
   body.mode-wandel .num-marker{ background:#2a5f8f; }
   .poi-toggle-marker{
@@ -798,6 +798,7 @@
   #helpCard{ max-width:440px; max-height:85vh; }
   #devNotesCard{ max-width:440px; max-height:85vh; }
   #logbookCard{ max-width:440px; max-height:85vh; }
+  #loopGenModal .simple-modal-card{ max-height:calc(80vh + 20px); }
   .logbook-item{ display:flex; gap:10px; padding:7px 0; border-bottom:1px solid rgba(0,0,0,0.08); font-size:12.5px; }
   .logbook-item:last-child{ border-bottom:none; }
   .logbook-time{ flex-shrink:0; color:#8a8a8a; font-variant-numeric:tabular-nums; }
@@ -1079,7 +1080,7 @@
     </div>
   </div>
   <div id="modeSelectHint" data-i18n="modeSelectHint">Knooppunten, navigatie, GPX, offline-gebruik — alles werkt voor beide.</div>
-  <div id="appVersionStart">v2.221 · 7 aug</div>
+  <div id="appVersionStart">v2.225 · 7 aug</div>
 </div>
 
 <div id="bikeSetupScreen" class="hidden">
@@ -1164,7 +1165,7 @@
   <button class="menu-item" id="menuHelpBtn"><span class="mi-icon">❓</span><span class="mi-text"><b data-i18n="menuHelp">Hulp</b><small data-i18n="menuHelpSub">uitleg over alle functies</small></span></button>
   <button class="menu-item" id="menuDevNotesBtn"><span class="mi-icon">🛠️</span><span class="mi-text"><b data-i18n="menuDevNotes">Technische werking</b><small data-i18n="menuDevNotesSub">hoe wegdektype, routering en fallbacks precies werken</small></span></button>
   <button class="menu-item" id="menuLogbookBtn"><span class="mi-icon">📋</span><span class="mi-text"><b data-i18n="menuLogbook">Logboek</b><small data-i18n="menuLogbookSub">overzicht van alle meldingen, ook stille</small></span></button>
-  <div id="menuVersion">v2.221 · 7 aug</div>
+  <div id="menuVersion">v2.225 · 7 aug</div>
 </div>
 
 <div id="hint" data-i18n="hintInitial">Zoom of pan naar je gebied, tik dan op "Laad knooppunten"</div>
@@ -2823,7 +2824,16 @@ async function addPinToRoute(viaKnooppunt){
 
   await loadBundledPois(); // zorgt dat de POI-naamcheck hieronder ook werkt als je nog nooit een POI-laag aanvinkte
   const nearbyPoi = findNearestNamedPoi(pin.lat, pin.lon, 20);
-  route.push({ id: pinId, ref: '📍', lat: pin.lat, lon: pin.lon, poiName: nearbyPoi ? nearbyPoi.name : null });
+  const newPinPoint = { id: pinId, ref: '📍', lat: pin.lat, lon: pin.lon, poiName: nearbyPoi ? nearbyPoi.name : null };
+  // Invoegen op de plek waar dit punt geografisch het best past — net na het bestaande routepunt waar het
+  // het dichtst bij ligt — i.p.v. altijd blindweg achteraan te plakken. Zonder dit kon een tussenpunt
+  // ver vóór je eindpunt toch pas na alles staan, met een onnodig kronkelende route tot gevolg.
+  let insertAfterIdx = route.length - 1, bestPinD = Infinity;
+  route.forEach((r, i) => {
+    const d = haversine(pin.lat, pin.lon, r.lat, r.lon);
+    if (d < bestPinD){ bestPinD = d; insertAfterIdx = i; }
+  });
+  route.splice(insertAfterIdx + 1, 0, newPinPoint);
   pinMarkers[pinId] = pinMarker; // blijft nu permanent op de kaart staan, zolang hij in de route zit
   // Sleepgedrag "omschakelen": vóór het toevoegen stuurde slepen de tijdelijke pinLatLng bij, maar eenmaal
   // dit punt écht in je route zit, moet slepen datzelfde route-punt bijwerken én de route herberekenen
@@ -5898,7 +5908,7 @@ function refreshAllNodeIcons(){
 }
 
 function canEditRouteNow(){
-  if (navType === 'passive' && navActive && passiveEditingDone){
+  if (navType === 'passive' && passiveEditingDone){
     toast(tr('toastPressEditFirst'), 3500);
     return false;
   }
@@ -6259,6 +6269,7 @@ $('clearBtn').addEventListener('click', () => {
     $('passiveReadyBtn').classList.remove('editing');
     $('passiveReadyBtn').textContent = tr('passiveReadyBtn');
     $('passiveAnalyseBtn').disabled = true;
+    $('toStartBtn').disabled = false;
   }
   renderRoute();
   drawRoutePath();
@@ -10867,6 +10878,7 @@ function selectMode(mode){
   $('passiveReadyBtn').classList.remove('editing');
   $('passiveReadyBtn').textContent = curLang()==='en' ? '✅ Ready' : '✅ Klaar';
   $('passiveAnalyseBtn').disabled = true;
+  $('toStartBtn').disabled = false;
   document.body.classList.toggle('mode-wandel', mode === 'wandel');
   $('modeSelectScreen').classList.add('hidden');
   const lang = appSettings.language === 'en' ? 'en' : 'nl';
@@ -10962,6 +10974,7 @@ $('passiveReadyBtn').addEventListener('click', async () => {
     $('passiveReadyBtn').classList.add('editing');
     $('passiveReadyBtn').textContent = curLang()==='en' ? '✏️ Edit' : '✏️ Edit';
     $('passiveAnalyseBtn').disabled = false;
+    $('toStartBtn').disabled = true;
     toast(curLang()==='en' ? '🔄 Calculating your route…' : '🔄 Je route wordt berekend…', 2500);
     await drawRoutePath(routeStartsFromGps);
   } else {
@@ -10970,6 +10983,7 @@ $('passiveReadyBtn').addEventListener('click', async () => {
     $('passiveReadyBtn').classList.remove('editing');
     $('passiveReadyBtn').textContent = curLang()==='en' ? '✅ Ready' : '✅ Klaar';
     $('passiveAnalyseBtn').disabled = true;
+    $('toStartBtn').disabled = false;
     routeLine.setLatLngs([]);
     routeSteps = [];
     actualRouteKm = null;
@@ -10982,6 +10996,7 @@ $('passiveAnalyseBtn').addEventListener('click', () => {
 let analyseMapInstance = null;
 let analyseSurfaceCache = null, analyseSurfaceCacheKey = null;
 let analyseCurrentProfile = null;
+let analyseChartValueFn = null; // per tab ingesteld: welke waarde (hoogte, stijgingspercentage, ...) hoort bij een bepaald punt
 let lastCompletedRide = null; // gegevens van de rit die je net voltooide, voor de post-rit-analyse
 let rideSavedThisSession = false; // voorkomt dat een rit dubbel bewaard wordt (bv. aankomst + daarna toch nog Stop drukken)
 let navBreadcrumbs = []; // {lat, lon, t} — voor de snelheid-per-stuk in de post-rit-analyse
@@ -11005,7 +11020,8 @@ function setupAnalyseChartDrag(){
       const d = Math.abs(profile.distKm[i] - targetKm);
       if (d < bestD){ bestD = d; idx = i; }
     }
-    showAnalyseChartDot(frac, profile.lat[idx], profile.lon[idx], targetKm, profile.ele ? profile.ele[idx] : null);
+    const val = analyseChartValueFn ? analyseChartValueFn(idx) : (profile.ele ? profile.ele[idx] : null);
+    showAnalyseChartDot(frac, profile.lat[idx], profile.lon[idx], targetKm, val);
   };
   svg.addEventListener('pointerdown', e => { handler(e); svg.setPointerCapture(e.pointerId); });
   svg.addEventListener('pointermove', e => { if (e.pressure > 0 || e.buttons > 0) handler(e); });
@@ -11013,6 +11029,7 @@ function setupAnalyseChartDrag(){
 }
 function teardownAnalyseChartDrag(){
   analyseChartDragHandler = null;
+  analyseChartValueFn = null;
   if (analyseMapDot){ analyseMapInstance.removeLayer(analyseMapDot); analyseMapDot = null; }
   const svg = $('analyseSvg');
   const dot = svg.querySelector('.analyse-chart-drag-dot');
@@ -11054,6 +11071,11 @@ function renderSlopeChart(profile, grads, svgId){
   const zeroY = h / 2;
   const pad = { l:2, r:2 };
   const barW = Math.max(1, (w - pad.l - pad.r) / grads.length);
+  // Eigen projectiefunctie voor deze grafiek — anders hergebruikt de sleepbol stiekem de schaal van de
+  // laatst bezochte Hoogte-tab, wat de bol de hoogte i.p.v. het stijgingspercentage liet volgen.
+  const xFor = km => pad.l + (km / totalKm) * (w - pad.l - pad.r);
+  const yFor = g => zeroY - (Math.max(-maxAbsGrad, Math.min(maxAbsGrad, g)) / maxAbsGrad) * (h/2 - 10);
+  chartProjections[svgId] = { x: xFor, y: yFor, maxDist: totalKm };
   let bars = '';
   grads.forEach((g, i) => {
     const x = pad.l + (profile.distKm[i] / totalKm) * (w - pad.l - pad.r);
@@ -11188,9 +11210,9 @@ async function loadAnalyseTab(tabName){
     }
     analyseMapInstance.invalidateSize();
     analyseMapInstance.fitBounds(L.latLngBounds(profile.lat.map((la,i) => [la, profile.lon[i]])), { padding:[20,20] });
-    setTimeout(() => renderElevationChart(profile, 'analyseSvg', 'analyseChartWrap'), 60);
     analyseCurrentProfile = profile;
-    setupAnalyseChartDrag();
+    analyseChartValueFn = idx => profile.ele[idx];
+    setTimeout(() => { renderElevationChart(profile, 'analyseSvg', 'analyseChartWrap'); setupAnalyseChartDrag(); }, 60);
     showAnalyseLegend([[ELEV_COLORS.up, curLang()==='en'?'Ascent':'Stijging'], [ELEV_COLORS.down, curLang()==='en'?'Descent':'Daling'], [ELEV_COLORS.flat, curLang()==='en'?'Flat':'Vlak']]);
     return;
   }
@@ -11309,6 +11331,7 @@ async function loadAnalyseTab(tabName){
     analyseMapInstance.invalidateSize();
     analyseMapInstance.fitBounds(L.latLngBounds(profile.lat.map((la,i) => [la, profile.lon[i]])), { padding:[20,20] });
     renderSlopeChart(profile, grads, 'analyseSvg');
+    analyseChartValueFn = idx => grads[Math.min(idx, grads.length - 1)];
     analyseCurrentProfile = profile;
     setupAnalyseChartDrag();
     showAnalyseLegend([[gradientColor(-8), '-8%'], [gradientColor(-3), '-3%'], [gradientColor(0), '0%'], [gradientColor(3), '+3%'], [gradientColor(8), '+8%']]);
