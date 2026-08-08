@@ -240,6 +240,14 @@
     pointer-events:none;
   }
   #compassHeadingReadout{ font-size:15px; font-weight:800; color:var(--cream); font-variant-numeric:tabular-nums; margin-bottom:2px; }
+  body.theme-garmin #sunDialWrap::before{
+    content:''; position:absolute; inset:6%; border-radius:50%; border:3px dashed rgba(255,255,255,0.18); pointer-events:none;
+  }
+  body.theme-garmin #compassHeadingReadout{ font-size:40px; font-weight:900; letter-spacing:-1px; color:#f1f5f9; }
+  body.theme-garmin #compassCardinal{ font-size:16px; font-weight:700; color:var(--amber); }
+  body.theme-garmin #sunTodayLabel{ display:none; } /* de grote graden-uitlezing spreekt al voor zich, geen dubbele titel nodig */
+  body.theme-garmin #compassNeedleFixed polygon:first-child{ fill:var(--amber) !important; }
+  body.theme-garmin #compassNeedleFixed polygon:last-child{ fill:rgba(255,255,255,0.25) !important; }
   #compassHeadingReadout span:last-child{ color:var(--amber); font-size:12px; margin-left:4px; }
   #sunTodayLabel{ font-size:12px; font-weight:800; color:rgba(246,244,238,0.85); margin-bottom:2px; }
   #sunRow1, #sunRow2{ display:flex; align-items:center; gap:8px; }
@@ -289,6 +297,12 @@
     flex:1; display:flex; overflow-x:auto; scroll-snap-type:x mandatory;
     -webkit-overflow-scrolling:touch;
   }
+  #weatherGarminTabBar{
+    display:none; gap:3px; background:rgba(255,255,255,0.05); border-radius:14px; padding:4px; margin:0 16px 10px;
+  }
+  body.theme-garmin #weatherGarminTabBar{ display:flex; }
+  .wgtab{ flex:1; border:none; background:transparent; color:rgba(241,245,249,0.55); padding:8px 4px; border-radius:11px; font-size:11.5px; font-weight:700; }
+  .wgtab.active{ background:var(--amber); color:#1e293b; }
   .weather-screen{
     flex:0 0 100%; scroll-snap-align:start; display:flex; flex-direction:column;
     align-items:center; justify-content:center; padding:20px; gap:8px; box-sizing:border-box;
@@ -335,6 +349,12 @@
 
   .wpollutant-grid{ width:100%; max-width:280px; display:grid; grid-template-columns:1fr 1fr; gap:8px; }
   .wpollutant{ background:rgba(255,255,255,0.05); border-radius:10px; padding:8px 10px; }
+  body.theme-garmin .wpollutant{ display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.07); border-radius:14px; padding:11px 14px; }
+  body.theme-garmin .wpollutant small{ color:#cbd5e1; font-size:12.5px; font-weight:600; }
+  body.theme-garmin .pollen-badge{
+    font-size:11px !important; font-weight:800; padding:4px 12px; border-radius:20px;
+    background:color-mix(in srgb, currentColor 16%, transparent); border:1px solid color-mix(in srgb, currentColor 40%, transparent);
+  }
   .wpollutant small{ font-size:10px; color:rgba(246,244,238,0.55); text-transform:uppercase; }
   .wpollutant b{ display:block; font-size:16px; color:var(--cream); margin-top:2px; }
 
@@ -900,6 +920,17 @@
     backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
     border:1px solid rgba(255,255,255,0.08); border-radius:20px;
   }
+  /* Het subtiele lichte-naar-donkere verloop bovenaan elk hoofdscherm — exact het effect uit je screenshots */
+  body.theme-garmin #modeSelectScreen::before,
+  body.theme-garmin #weatherPanel::before,
+  body.theme-garmin #sunPanel::before{
+    content:''; position:absolute; top:0; left:0; right:0; height:180px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.10), transparent);
+    pointer-events:none; z-index:0;
+  }
+  body.theme-garmin #modeSelectScreen,
+  body.theme-garmin #weatherPanel,
+  body.theme-garmin #sunPanel{ position:relative; overflow:hidden; }
 
   #helpContent section{ margin-bottom:18px; padding-bottom:16px; border-bottom:1px solid var(--line); }
   #helpContent section:last-child{ border-bottom:none; margin-bottom:4px; padding-bottom:0; }
@@ -1113,7 +1144,7 @@
     </div>
   </div>
   <div id="modeSelectHint" data-i18n="modeSelectHint">Knooppunten, navigatie, GPX, offline-gebruik — alles werkt voor beide.</div>
-  <div id="appVersionStart">v2.231 · 8 aug</div>
+  <div id="appVersionStart">v2.232 · 8 aug</div>
 </div>
 
 <div id="bikeSetupScreen" class="hidden">
@@ -1201,7 +1232,7 @@
   <button class="menu-item" id="menuHelpBtn"><span class="mi-icon">❓</span><span class="mi-text"><b data-i18n="menuHelp">Hulp</b><small data-i18n="menuHelpSub">uitleg over alle functies</small></span></button>
   <button class="menu-item" id="menuDevNotesBtn"><span class="mi-icon">🛠️</span><span class="mi-text"><b data-i18n="menuDevNotes">Technische werking</b><small data-i18n="menuDevNotesSub">hoe wegdektype, routering en fallbacks precies werken</small></span></button>
   <button class="menu-item" id="menuLogbookBtn"><span class="mi-icon">📋</span><span class="mi-text"><b data-i18n="menuLogbook">Logboek</b><small data-i18n="menuLogbookSub">overzicht van alle meldingen, ook stille</small></span></button>
-  <div id="menuVersion">v2.231 · 8 aug</div>
+  <div id="menuVersion">v2.232 · 8 aug</div>
 </div>
 
 <div id="hint" data-i18n="hintInitial">Zoom of pan naar je gebied, tik dan op "Laad knooppunten"</div>
@@ -1962,6 +1993,12 @@
     <span id="weatherPlaceName">–</span>
     <button id="weatherLocateBtn" title="Mijn locatie" data-i18n-title="titleMyLocation">🎯</button>
   </div>
+  <div id="weatherGarminTabBar" style="display:none;">
+    <button class="wgtab active" data-screen="1" data-i18n="wTabNow">Nu</button>
+    <button class="wgtab" data-screen="2" data-i18n="wTabAir">Lucht</button>
+    <button class="wgtab" data-screen="3" data-i18n="wTabRadar">Radar</button>
+    <button class="wgtab" data-screen="4" data-i18n="wTabDetails">Details</button>
+  </div>
   <div id="weatherScroller">
     <div class="weather-screen" id="weatherScreen1">
       <div id="wIcon">☀️</div>
@@ -2071,12 +2108,12 @@
 
       <button id="pollenToggle" class="settings-btn" style="max-width:280px; margin:8px 0;" data-i18n="wPollenToggle">🌼 Pollen tonen</button>
       <div id="pollenPanel" class="wpollutant-grid" style="display:none;">
-        <div class="wpollutant"><small data-i18n="wPollenBirch">Berk</small><b id="wPollenBirch">–</b></div>
-        <div class="wpollutant"><small data-i18n="wPollenGrass">Gras</small><b id="wPollenGrass">–</b></div>
-        <div class="wpollutant"><small data-i18n="wPollenAlder">Els</small><b id="wPollenAlder">–</b></div>
-        <div class="wpollutant"><small data-i18n="wPollenMugwort">Bijvoet</small><b id="wPollenMugwort">–</b></div>
-        <div class="wpollutant"><small data-i18n="wPollenOlive">Olijf</small><b id="wPollenOlive">–</b></div>
-        <div class="wpollutant"><small data-i18n="wPollenRagweed">Ambrosia</small><b id="wPollenRagweed">–</b></div>
+        <div class="wpollutant"><small data-i18n="wPollenBirch">Berk</small><b id="wPollenBirch" class="pollen-badge">–</b></div>
+        <div class="wpollutant"><small data-i18n="wPollenGrass">Gras</small><b id="wPollenGrass" class="pollen-badge">–</b></div>
+        <div class="wpollutant"><small data-i18n="wPollenAlder">Els</small><b id="wPollenAlder" class="pollen-badge">–</b></div>
+        <div class="wpollutant"><small data-i18n="wPollenMugwort">Bijvoet</small><b id="wPollenMugwort" class="pollen-badge">–</b></div>
+        <div class="wpollutant"><small data-i18n="wPollenOlive">Olijf</small><b id="wPollenOlive" class="pollen-badge">–</b></div>
+        <div class="wpollutant"><small data-i18n="wPollenRagweed">Ambrosia</small><b id="wPollenRagweed" class="pollen-badge">–</b></div>
       </div>
       <div id="pollenUnavailable" style="display:none; font-size:11px; color:rgba(246,244,238,0.5); text-align:center; max-width:280px;" data-i18n="wPollenUnavailable">Geen pollendata beschikbaar voor deze locatie.</div>
 
@@ -4171,6 +4208,10 @@ const TRANSLATIONS = {
   statsRecordCalories: { nl:'Geschatte calorieën (deze periode)', en:'Estimated calories (this period)' },
   statsNoData: { nl:'Nog geen ritten in deze periode', en:'No rides in this period yet' },
   wPollenToggle: { nl:'🌼 Pollen tonen', en:'🌼 Show pollen' },
+  wTabNow: { nl:'Nu', en:'Now' },
+  wTabAir: { nl:'Lucht', en:'Air' },
+  wTabRadar: { nl:'Radar', en:'Radar' },
+  wTabDetails: { nl:'Details', en:'Details' },
   wPollenToggleHide: { nl:'🌼 Pollen verbergen', en:'🌼 Hide pollen' },
   wPollenBirch: { nl:'Berk', en:'Birch' },
   wPollenGrass: { nl:'Gras', en:'Grass' },
@@ -9849,6 +9890,18 @@ async function updateWeatherPlaceLabel(){
   $('weatherPlaceName').textContent = name || tr('weatherLocationUnknown');
 }
 
+document.querySelectorAll('.wgtab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const idx = +btn.dataset.screen - 1;
+    const scroller = $('weatherScroller');
+    scroller.scrollTo({ left: idx * scroller.clientWidth, behavior:'smooth' });
+  });
+});
+$('weatherScroller').addEventListener('scroll', () => {
+  const scroller = $('weatherScroller');
+  const idx = Math.round(scroller.scrollLeft / (scroller.clientWidth || 1));
+  document.querySelectorAll('.wgtab').forEach((btn, i) => btn.classList.toggle('active', i === idx));
+});
 $('weatherLocateBtn').addEventListener('click', async () => {
   const btn = $('weatherLocateBtn');
   btn.classList.add('locating');
@@ -9998,6 +10051,15 @@ function renderWeatherDetailsScreen(data){
 
 const POLLEN_LEVELS_NL = ['Geen','Laag','Matig','Hoog','Zeer hoog'];
 const POLLEN_LEVELS_EN = ['None','Low','Moderate','High','Very high'];
+function pollenLevelIndex(v){
+  if (v == null) return -1;
+  if (v < 1) return 0;
+  if (v < 20) return 1;
+  if (v < 50) return 2;
+  if (v < 300) return 3;
+  return 4;
+}
+const POLLEN_LEVEL_COLORS = ['#8a8a8a', '#2e9e4f', '#e2a13c', '#e8503f', '#c22a2a'];
 function pollenLevelLabel(v){
   // Ruwe schaal in korrels/m³, gebaseerd op algemeen gehanteerde grenzen (verschilt licht per pollensoort,
   // dit is een vereenvoudigde, bruikbare benadering).
@@ -10019,12 +10081,18 @@ function renderPollen(data){
   }
   toggle.style.display = 'block';
   unavailable.style.display = 'none';
-  $('wPollenBirch').textContent = pollenLevelLabel(data.pollen.birch);
-  $('wPollenGrass').textContent = pollenLevelLabel(data.pollen.grass);
-  $('wPollenAlder').textContent = pollenLevelLabel(data.pollen.alder);
-  $('wPollenMugwort').textContent = pollenLevelLabel(data.pollen.mugwort);
-  $('wPollenOlive').textContent = pollenLevelLabel(data.pollen.olive);
-  $('wPollenRagweed').textContent = pollenLevelLabel(data.pollen.ragweed);
+  const setPollen = (id, val) => {
+    const el = $(id);
+    el.textContent = pollenLevelLabel(val);
+    const idx = pollenLevelIndex(val);
+    el.style.color = idx >= 0 ? POLLEN_LEVEL_COLORS[idx] : '';
+  };
+  setPollen('wPollenBirch', data.pollen.birch);
+  setPollen('wPollenGrass', data.pollen.grass);
+  setPollen('wPollenAlder', data.pollen.alder);
+  setPollen('wPollenMugwort', data.pollen.mugwort);
+  setPollen('wPollenOlive', data.pollen.olive);
+  setPollen('wPollenRagweed', data.pollen.ragweed);
 }
 const pollenToggleBtn = document.getElementById('pollenToggle');
 if (pollenToggleBtn) pollenToggleBtn.addEventListener('click', () => {
