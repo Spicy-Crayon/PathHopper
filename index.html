@@ -921,12 +921,12 @@
     font-size:16px; font-weight:900; flex-shrink:0; box-shadow:0 3px 10px rgba(0,0,0,0.35);
   }
   #analyseTabBar{
-    display:flex; gap:3px; overflow-x:auto; flex:1; background:rgba(15,20,15,0.55); backdrop-filter:blur(6px);
+    display:flex; flex-wrap:wrap; gap:3px; flex:1; background:rgba(15,20,15,0.55); backdrop-filter:blur(6px);
     border-radius:16px; padding:4px; box-shadow:0 3px 10px rgba(0,0,0,0.3);
   }
   .analyse-tab{
-    flex-shrink:0; border:none; background:transparent; color:rgba(246,244,238,0.65);
-    padding:8px 12px; border-radius:13px; font-size:11px; font-weight:700; white-space:nowrap; transition:background .15s;
+    flex:1 1 auto; min-width:0; border:none; background:transparent; color:rgba(246,244,238,0.65);
+    padding:7px 8px; border-radius:13px; font-size:10.5px; font-weight:700; white-space:nowrap; transition:background .15s;
   }
   .analyse-tab.active{ background:var(--amber); color:var(--green-900); box-shadow:0 2px 6px rgba(0,0,0,0.25); }
   #analyseBody{ flex:1; display:flex; flex-direction:column; min-height:0; padding:8px 12px 16px; gap:8px; }
@@ -1080,7 +1080,7 @@
     </div>
   </div>
   <div id="modeSelectHint" data-i18n="modeSelectHint">Knooppunten, navigatie, GPX, offline-gebruik — alles werkt voor beide.</div>
-  <div id="appVersionStart">v2.225 · 7 aug</div>
+  <div id="appVersionStart">v2.226 · 7 aug</div>
 </div>
 
 <div id="bikeSetupScreen" class="hidden">
@@ -1165,7 +1165,7 @@
   <button class="menu-item" id="menuHelpBtn"><span class="mi-icon">❓</span><span class="mi-text"><b data-i18n="menuHelp">Hulp</b><small data-i18n="menuHelpSub">uitleg over alle functies</small></span></button>
   <button class="menu-item" id="menuDevNotesBtn"><span class="mi-icon">🛠️</span><span class="mi-text"><b data-i18n="menuDevNotes">Technische werking</b><small data-i18n="menuDevNotesSub">hoe wegdektype, routering en fallbacks precies werken</small></span></button>
   <button class="menu-item" id="menuLogbookBtn"><span class="mi-icon">📋</span><span class="mi-text"><b data-i18n="menuLogbook">Logboek</b><small data-i18n="menuLogbookSub">overzicht van alle meldingen, ook stille</small></span></button>
-  <div id="menuVersion">v2.225 · 7 aug</div>
+  <div id="menuVersion">v2.226 · 7 aug</div>
 </div>
 
 <div id="hint" data-i18n="hintInitial">Zoom of pan naar je gebied, tik dan op "Laad knooppunten"</div>
@@ -5742,7 +5742,7 @@ function renderClimbMiniChart(profile, climb, doneKm){
 function renderElevationChart(profile, svgId='elevationSvg', wrapId='elevationChartWrap', opts={}){
   const svg = $(svgId);
   const wrap = $(wrapId);
-  const w = wrap.clientWidth || window.innerWidth, h = wrap.clientHeight || 300;
+  const w = svg.clientWidth || wrap.clientWidth || window.innerWidth, h = svg.clientHeight || wrap.clientHeight || 300;
   svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
   const compact = h < 100;
   const pad = compact ? { l:32, r:6, t:16, b:6 } : { l:46, r:14, t:26, b:26 };
@@ -11064,7 +11064,7 @@ function showAnalyseChartDot(frac, lat, lon, km, ele){
 function renderSlopeChart(profile, grads, svgId){
   const svg = $(svgId);
   const wrap = svg.parentElement;
-  const w = wrap.clientWidth || window.innerWidth, h = wrap.clientHeight || 120;
+  const w = svg.clientWidth || wrap.clientWidth || window.innerWidth, h = svg.clientHeight || wrap.clientHeight || 120;
   svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
   const totalKm = profile.distKm[profile.distKm.length - 1] || 1;
   const maxAbsGrad = Math.max(4, ...grads.map(g => Math.abs(g))); // minstens een lichte schaal, ook op een quasi-vlakke route
@@ -11092,7 +11092,7 @@ function renderSlopeChart(profile, grads, svgId){
 function renderSegmentBarChart(coordsLatLng, segments, colorMap, svgId){
   const svg = $(svgId);
   const wrap = svg.parentElement;
-  const w = wrap.clientWidth || window.innerWidth, h = wrap.clientHeight || 120;
+  const w = svg.clientWidth || wrap.clientWidth || window.innerWidth, h = svg.clientHeight || wrap.clientHeight || 120;
   svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
   // Cumulatieve afstand per coördinaat, zodat we elk segment naar een precieze breedte kunnen omzetten.
   const cum = [0];
@@ -11354,17 +11354,28 @@ async function loadAnalyseTab(tabName){
       $('analysePlaceholder').innerHTML = `<div>${tr('analyseLogsFail')}</div>`;
       return;
     }
-    $('analysePlaceholder').innerHTML = ways.map(w => {
+    $('analysePlaceholder').innerHTML = ways.map((w, i) => {
       const name = w.tags.name || (curLang()==='en' ? '(unnamed way)' : '(naamloze weg)');
       const relevantKeys = ['highway','surface','tracktype','smoothness','sidewalk','maxspeed','cycleway','designation','vehicle','bicycle','oneway:bicycle'];
       const tagLines = relevantKeys.filter(k => w.tags[k]).map(k => `${k}=${w.tags[k]}`).join(' · ');
-      return `<div style="text-align:left; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.08);">
-        <div style="color:var(--cream); font-weight:700; font-size:12.5px;">${name}</div>
+      return `<div class="analyse-log-item" data-way-idx="${i}" style="text-align:left; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.08); cursor:pointer;">
+        <div style="color:var(--amber); font-weight:700; font-size:12.5px; text-decoration:underline;">📍 ${name}</div>
         <div style="color:rgba(246,244,238,0.65); font-size:11px; margin-top:2px;">${tagLines || (curLang()==='en' ? 'no relevant tags' : 'geen relevante tags')}</div>
       </div>`;
     }).join('') || `<div>${tr('analyseLogsFail')}</div>`;
     $('analysePlaceholder').classList.add('analyse-logs-list');
     $('analysePlaceholder').style.display = 'block';
+    $('analysePlaceholder').querySelectorAll('.analyse-log-item').forEach(el => {
+      el.addEventListener('click', () => {
+        const w = ways[+el.dataset.wayIdx];
+        if (!w || !w.geometry || !w.geometry.length) return;
+        const mid = w.geometry[Math.floor(w.geometry.length / 2)];
+        document.querySelectorAll('.analyse-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === 'surface'));
+        loadAnalyseTab('surface').then(() => {
+          analyseMapInstance.setView([mid.lat, mid.lon], 17);
+        });
+      });
+    });
     return;
   }
 
