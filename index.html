@@ -1146,7 +1146,7 @@
     </div>
   </div>
   <div id="modeSelectHint" data-i18n="modeSelectHint">Knooppunten, navigatie, GPX, offline-gebruik — alles werkt voor beide.</div>
-  <div id="appVersionStart">v2.243 · 9 aug</div>
+  <div id="appVersionStart">v2.242 · 8 aug</div>
 </div>
 
 <div id="bikeSetupScreen" class="hidden">
@@ -1234,7 +1234,7 @@
   <button class="menu-item" id="menuHelpBtn"><span class="mi-icon">❓</span><span class="mi-text"><b data-i18n="menuHelp">Hulp</b><small data-i18n="menuHelpSub">uitleg over alle functies</small></span></button>
   <button class="menu-item" id="menuDevNotesBtn"><span class="mi-icon">🛠️</span><span class="mi-text"><b data-i18n="menuDevNotes">Technische werking</b><small data-i18n="menuDevNotesSub">hoe wegdektype, routering en fallbacks precies werken</small></span></button>
   <button class="menu-item" id="menuLogbookBtn"><span class="mi-icon">📋</span><span class="mi-text"><b data-i18n="menuLogbook">Logboek</b><small data-i18n="menuLogbookSub">overzicht van alle meldingen, ook stille</small></span></button>
-  <div id="menuVersion">v2.243 · 9 aug</div>
+  <div id="menuVersion">v2.242 · 8 aug</div>
 </div>
 
 <div id="hint" data-i18n="hintInitial">Zoom of pan naar je gebied, tik dan op "Laad knooppunten"</div>
@@ -2644,7 +2644,6 @@ let arrivalActual = [];     // index in route -> Date.now() op moment van aankom
 let lastSpeedKmh = null;    // meest recent gemeten fietssnelheid, voor tijdsinschattingen
 let lastMapRotation = 0;    // huidige rotatiehoek van de kaart zelf (koers-boven tijdens navigeren)
 let lastElevationProfile = null; // laatst berekende hoogteprofiel-data, voor herrenderen bij schermdraai
-let rotatorInvalidateTimer = null; // zie enableMapRotation/disableMapRotation hieronder
 
 // ---------- Modus: fiets of wandel ----------
 const MODE_CONFIG = {
@@ -2686,38 +2685,16 @@ function markNavMapUserPan(){
 }
 map.on('dragstart', markNavMapUserPan);
 
-// #mapRotator groeit/krimpt via een CSS-transition (.3s) tussen 100% en 230% breedte/hoogte, zodat draaien
-// geen lege hoeken toont. We mogen Leaflet pas invalidateSize() laten aanroepen NADAT die transition echt
-// afgerond is — te vroeg aanroepen (bv. op de eerstvolgende animatieframe, of één directe aanroep vóór de
-// transition start) laat Leaflet een tussentijdse, verkeerde containergrootte meten. Bij het groeien gaf dat
-// een grijze diagonale rand (te weinig tegels geladen voor het uiteindelijke, grotere gebied); bij het krimpen
-// gaf een te vroege aanroep net het omgekeerde: tegels werden al verwijderd terwijl de kaart visueel nog groot
-// stond, met een groen randje (de achtergrondkleur van #mapViewport) tot gevolg. Daarom wachten we nu écht op
-// het einde van de transition (met een korte fallback-timer voor het geval transitionend niet vuurt).
-function invalidateAfterRotatorTransition(){
-  const el = document.getElementById('mapRotator');
-  clearTimeout(rotatorInvalidateTimer);
-  let done = false;
-  const finish = () => {
-    if (done) return;
-    done = true;
-    el.removeEventListener('transitionend', onEnd);
-    map.invalidateSize();
-  };
-  const onEnd = (e) => { if (e.target === el && (e.propertyName === 'width' || e.propertyName === 'height')) finish(); };
-  el.addEventListener('transitionend', onEnd);
-  rotatorInvalidateTimer = setTimeout(finish, 400); // vangnet
-}
 function enableMapRotation(){
   document.getElementById('mapRotator').classList.add('rotating');
-  invalidateAfterRotatorTransition();
+  requestAnimationFrame(() => map.invalidateSize());
   setupRotationAwareDragging();
 }
 function disableMapRotation(){
   lastMapRotation = 0;
   setMapRotation(0);
   document.getElementById('mapRotator').classList.remove('rotating');
-  invalidateAfterRotatorTransition();
+  requestAnimationFrame(() => map.invalidateSize());
   teardownRotationAwareDragging();
 }
 
@@ -2738,108 +2715,30 @@ function rotDragMove(x, y){
   map.panBy([-rx, -ry], { animate:false });
 }
 function rotDragEnd(){ rotDragActive = false; }
-
-// ---------- Zoomen corrigeren voor de gedraaide kaart ----------
-// Zelfde probleem als bij slepen, maar dan voor dubbeltik- en knijpzoom: Leaflet vertaalt een schermpunt
-// naar een containerpunt zonder rekening te houden met de CSS-rotatie van #mapRotator. Bij 0° (pijl naar
-// boven) klopt dat toevallig nog, maar bij elke andere hoek zoomt de kaart dan "schuin" in op een punt dat
-// niet overeenkomt met waar je tikte/kneep. Rotatie van een element rond z'n eigen middelpunt verandert het
-// middelpunt van de bounding box niet — dus dat middelpunt (via getBoundingClientRect) is wél betrouwbaar,
-// ongeacht de hoek. Van daaruit draaien we het schermpunt terug naar Leaflet's ongedraaide coördinatenstelsel.
-function rotContainerPointFromClient(clientX, clientY){
-  const c = map.getContainer();
-  const rect = c.getBoundingClientRect();
-  const cx = rect.left + rect.width / 2, cy = rect.top + rect.height / 2;
-  const dx = clientX - cx, dy = clientY - cy;
-  const rad = -lastMapRotation * Math.PI / 180;
-  const rx = dx * Math.cos(rad) - dy * Math.sin(rad);
-  const ry = dx * Math.sin(rad) + dy * Math.cos(rad);
-  const size = map.getSize();
-  return L.point(size.x / 2 + rx, size.y / 2 + ry);
-}
-function rotZoomAroundClientPoint(clientX, clientY, newZoom){
-  const latlng = map.containerPointToLatLng(rotContainerPointFromClient(clientX, clientY));
-  map.setZoomAround(latlng, newZoom, { animate:false });
-}
-// Dubbeltik (en dubbelklik met de muis) — handmatig gedetecteerd i.p.v. Leaflet's eigen doubleClickZoom,
-// want die staat uit zolang de kaart draait (zie setupRotationAwareDragging).
-let lastTapTime = 0, lastTapX = 0, lastTapY = 0;
-function maybeHandleDoubleTap(clientX, clientY){
-  const now = Date.now();
-  const closeEnough = Math.hypot(clientX - lastTapX, clientY - lastTapY) < 40;
-  if (now - lastTapTime < 350 && closeEnough){
-    rotZoomAroundClientPoint(clientX, clientY, map.getZoom() + 1);
-    lastTapTime = 0; // voorkom een 'triple tap' die meteen weer als dubbeltik telt
-  } else {
-    lastTapTime = now; lastTapX = clientX; lastTapY = clientY;
-  }
-}
-// Knijpzoom (2 vingers) — anker blijft het middelpunt van waar de knijpbeweging begon, net als bij normale
-// pinch-zoom, maar dan met de rotatiecorrectie hierboven.
-let rotPinchActive = false, rotPinchStartDist = 0, rotPinchStartZoom = 0, rotPinchAnchorLatLng = null;
-function rotPinchDist(t0, t1){ return Math.hypot(t1.clientX - t0.clientX, t1.clientY - t0.clientY); }
-function rotPinchStart(t0, t1){
-  rotDragActive = false;
-  rotPinchActive = true;
-  rotPinchStartDist = rotPinchDist(t0, t1);
-  rotPinchStartZoom = map.getZoom();
-  const midX = (t0.clientX + t1.clientX) / 2, midY = (t0.clientY + t1.clientY) / 2;
-  rotPinchAnchorLatLng = map.containerPointToLatLng(rotContainerPointFromClient(midX, midY));
-  map.stop(); markNavMapUserPan();
-}
-function rotPinchMove(t0, t1){
-  if (!rotPinchActive) return;
-  const dist = rotPinchDist(t0, t1);
-  if (dist < 1 || rotPinchStartDist < 1) return;
-  const newZoom = rotPinchStartZoom + Math.log2(dist / rotPinchStartDist);
-  map.setZoomAround(rotPinchAnchorLatLng, newZoom, { animate:false });
-}
-function rotPinchEnd(){ rotPinchActive = false; }
-function rotTouchStartHandler(e){
-  if (e.touches.length === 1) rotDragStart(e.touches[0].clientX, e.touches[0].clientY);
-  else if (e.touches.length === 2) rotPinchStart(e.touches[0], e.touches[1]);
-}
-function rotTouchMoveHandler(e){
-  if (e.touches.length === 2){ rotPinchMove(e.touches[0], e.touches[1]); e.preventDefault(); }
-  else if (e.touches.length === 1 && rotDragActive){ rotDragMove(e.touches[0].clientX, e.touches[0].clientY); e.preventDefault(); }
-}
-function rotTouchEndHandler(e){
-  if (rotPinchActive && e.touches.length < 2) rotPinchEnd();
-  if (rotDragActive && e.touches.length === 0){
-    rotDragEnd();
-    if (e.changedTouches && e.changedTouches.length) maybeHandleDoubleTap(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
-  }
-}
+function rotTouchStartHandler(e){ if (e.touches.length === 1) rotDragStart(e.touches[0].clientX, e.touches[0].clientY); }
+function rotTouchMoveHandler(e){ if (e.touches.length === 1){ rotDragMove(e.touches[0].clientX, e.touches[0].clientY); e.preventDefault(); } }
 function rotMouseDownHandler(e){ rotDragStart(e.clientX, e.clientY); }
 function rotMouseMoveHandler(e){ rotDragMove(e.clientX, e.clientY); }
-function rotDblClickHandler(e){ rotZoomAroundClientPoint(e.clientX, e.clientY, map.getZoom() + 1); }
 function setupRotationAwareDragging(){
   map.dragging.disable();
-  map.doubleClickZoom.disable();
-  map.touchZoom.disable();
   const c = map.getContainer();
   c.addEventListener('touchstart', rotTouchStartHandler, { passive:true });
   c.addEventListener('touchmove', rotTouchMoveHandler, { passive:false });
-  c.addEventListener('touchend', rotTouchEndHandler);
+  c.addEventListener('touchend', rotDragEnd);
   c.addEventListener('mousedown', rotMouseDownHandler);
-  c.addEventListener('dblclick', rotDblClickHandler);
   window.addEventListener('mousemove', rotMouseMoveHandler);
   window.addEventListener('mouseup', rotDragEnd);
 }
 function teardownRotationAwareDragging(){
   map.dragging.enable();
-  map.doubleClickZoom.enable();
-  map.touchZoom.enable();
   const c = map.getContainer();
   c.removeEventListener('touchstart', rotTouchStartHandler);
   c.removeEventListener('touchmove', rotTouchMoveHandler);
-  c.removeEventListener('touchend', rotTouchEndHandler);
+  c.removeEventListener('touchend', rotDragEnd);
   c.removeEventListener('mousedown', rotMouseDownHandler);
-  c.removeEventListener('dblclick', rotDblClickHandler);
   window.removeEventListener('mousemove', rotMouseMoveHandler);
   window.removeEventListener('mouseup', rotDragEnd);
   rotDragActive = false;
-  rotPinchActive = false;
 }
 
 const $ = (id) => document.getElementById(id);
@@ -7384,14 +7283,6 @@ async function detourAroundClosedRoad(kmWanted){
   // zodat de motor verplicht is een écht ander tracé te zoeken, niet gewoon dezelfde weg terug te geven.
   // De breedte van die zone kan hieronder groeien als een eerste poging toch op zijn eigen stappen terugkeert.
   const directSegment = linePts.slice(myIdx, rejoinIdx + 1).map(p => [p.lat, p.lng]);
-  // Je huidige positie en het aansluitpunt liggen zelf ook op deze weg. Als de verboden zone tot precies
-  // daar reikt, moet de gevonden omweg er toch nog een klein stukje langs diezelfde weg naderen om exact op
-  // die coördinaat te geraken — dat zag er dan uit als "gaat naar een punt en keert weer terug", ongeacht
-  // hoe breed je de zone zelf instelde. Door een kleine marge aan begin en eind vrij te laten, blijft de
-  // rest van de weg wél verboden maar kan de omweg netjes aansluiten zonder die laatste meters te moeten
-  // forceren.
-  const avoidTrim = Math.min(2, Math.floor((directSegment.length - 2) / 2));
-  const segmentToAvoid = avoidTrim > 0 ? directSegment.slice(avoidTrim, directSegment.length - avoidTrim) : directSegment;
   const baseProfile = cfg().routeProfile;
 
   toast(curLang()==='en' ? `Finding a detour of about ${kmWanted} km…` : `Omweg van ongeveer ${kmWanted} km zoeken…`, 3000);
@@ -7400,7 +7291,7 @@ async function detourAroundClosedRoad(kmWanted){
     const overlapLimit = (appSettings.maxOverlapPct || 8) / 100; // zelfde 'nooit terugkeren'-strengheid als de generator
     let cleanFound = false;
     for (let attempt = 0; attempt < 5; attempt++){
-      const polygon = bufferPolylineToPolygon(downsampleCoords(segmentToAvoid, 40), bufferM);
+      const polygon = bufferPolylineToPolygon(downsampleCoords(directSegment, 40), bufferM);
       detour = await fetchOrsRouteWithAvoidPolygon([myPos, rejoinPt], polygon, baseProfile, {});
       // Keert de gevonden omweg toch op zijn eigen stappen terug (bv. naar een knooppunt en weer terug)?
       // Dan is de vermijdzone blijkbaar nog te smal — verbreden en opnieuw proberen, i.p.v. dat te
@@ -7503,9 +7394,8 @@ async function rerouteFromCurrentPosition(isAutomatic){
   }
 }
 $('roadClosedBtn').addEventListener('click', () => {
-  // Rotatie hier NIET uitschakelen: dat is enkel nuttig zodra je echt een pin gaat verslepen
-  // (zie startManualDetourPinMode hieronder), niet voor dit simpele km-invoerveld — anders klapt de
-  // kaart telkens even naar noorden-boven en weer terug zodra je op deze knop drukt, zonder nut.
+  wasMapRotationEnabledBeforePin = !appSettings.disableMapRotation;
+  if (wasMapRotationEnabledBeforePin) disableMapRotation();
   $('detourKmInput').value = 2;
   openModal('detourKmModal');
 });
