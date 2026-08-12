@@ -1146,7 +1146,7 @@
     </div>
   </div>
   <div id="modeSelectHint" data-i18n="modeSelectHint">Knooppunten, navigatie, GPX, offline-gebruik — alles werkt voor beide.</div>
-  <div id="appVersionStart">v2.254 · 12 aug</div>
+  <div id="appVersionStart">v2.255 · 12 aug</div>
 </div>
 
 <div id="bikeSetupScreen" class="hidden">
@@ -1234,7 +1234,7 @@
   <button class="menu-item" id="menuHelpBtn"><span class="mi-icon">❓</span><span class="mi-text"><b data-i18n="menuHelp">Hulp</b><small data-i18n="menuHelpSub">uitleg over alle functies</small></span></button>
   <button class="menu-item" id="menuDevNotesBtn"><span class="mi-icon">🛠️</span><span class="mi-text"><b data-i18n="menuDevNotes">Technische werking</b><small data-i18n="menuDevNotesSub">hoe wegdektype, routering en fallbacks precies werken</small></span></button>
   <button class="menu-item" id="menuLogbookBtn"><span class="mi-icon">📋</span><span class="mi-text"><b data-i18n="menuLogbook">Logboek</b><small data-i18n="menuLogbookSub">overzicht van alle meldingen, ook stille</small></span></button>
-  <div id="menuVersion">v2.254 · 12 aug</div>
+  <div id="menuVersion">v2.255 · 12 aug</div>
 </div>
 
 <div id="hint" data-i18n="hintInitial">Zoom of pan naar je gebied, tik dan op "Laad knooppunten"</div>
@@ -2708,6 +2708,7 @@ function pauseNavForDetour(){
   $('tabDashBtn').classList.add('nav-hide'); // dashboard heeft tijdens dit korte omweg-moment geen zin
   wasMapRotationEnabledBeforePin = !appSettings.disableMapRotation;
   if (wasMapRotationEnabledBeforePin) lockMapNorthForPause();
+  updateRoutePointMarkersDraggable();
 }
 function resumeNavFromDetourPause(){
   if (!navPausedForDetour) return;
@@ -2715,6 +2716,7 @@ function resumeNavFromDetourPause(){
   cancelManualDetourPinMode(); // ruimt eventuele nog openstaande handmatige-pin-poging netjes op
   $('resumeNavBtn').style.display = 'none';
   $('tabDashBtn').classList.remove('nav-hide');
+  updateRoutePointMarkersDraggable();
   $('navPanel').classList.add('show');
   $('navHexButtons').classList.add('show');
   $('sheet').classList.add('collapsed');
@@ -2753,6 +2755,21 @@ function invalidateAfterRotatorTransition(){
 function enableMapRotation(){
   document.getElementById('mapRotator').classList.add('rotating');
   invalidateAfterRotatorTransition();
+  setupRotationAwareDragging();
+}
+// Instant-variant, enkel voor het STARTEN van navigatie: normaal groeit #mapRotator vloeiend (.3s) naar
+// 230%, maar zolang die overgang bezig is, heeft Leaflet nog geen tegels voor het grotere gebied — precies
+// dezelfde reden als de vorige tegel-gaatjes. Bij het begin van een rit springen we sowieso al instant
+// (zonder animatie) naar je startpositie, dus een vloeiende groei-animatie erbovenop heeft toch geen zin —
+// we schakelen 'm hier daarom kortstondig uit, forceren een reflow zodat de 230% meteen toegepast is, en
+// zetten de overgang daarna weer aan zodat latere draai-updates (tijdens het rijden) wél vloeiend blijven.
+function enableMapRotationInstant(){
+  const el = document.getElementById('mapRotator');
+  el.style.transition = 'none';
+  el.classList.add('rotating');
+  void el.offsetHeight; // reflow forceren
+  el.style.transition = '';
+  map.invalidateSize();
   setupRotationAwareDragging();
 }
 function disableMapRotation(){
@@ -9302,6 +9319,16 @@ function renderLoopGenResults(){
 // Een écht knooppunt is een vaste, genummerde plek — die blijft bewust niet versleepbaar. Maar punten die
 // de rondrit-generator, "harde vermijding", of het slepen van de route zelf toevoegen (geen echt
 // knooppunt, gewoon een coördinaat) mogen net als een handmatige speld wél bijgestuurd worden.
+// Bestaande spelden (van vóór je op Start drukte, of van vóór je pauzeerde) kregen hun sleepbaarheid maar
+// één keer mee, op het moment dat ze aangemaakt werden (Leaflet's `draggable`-optie is niet "reactief").
+// Zonder dit bleven ze dus gewoon versleepbaar nadat je begon te navigeren — je vinger zag de speld netjes
+// meebewegen, tot dragend hem terug op zijn plek zette (en de bekende melding toonde). Functioneel klopte
+// dat al (de route veranderde niet), maar visueel was het verwarrend. Dit zet alle bestaande spelden in één
+// keer expliciet aan/uit, bij elke overgang tussen rijden/pauzeren/plannen.
+function updateRoutePointMarkersDraggable(){
+  const allowed = !navActive || navPausedForDetour;
+  Object.values(pinMarkers).forEach(m => { if (m && m.dragging){ if (allowed) m.dragging.enable(); else m.dragging.disable(); } });
+}
 function addDraggableRoutePointMarker(p){
   const isVia = !!p.isVia;
   const marker = L.marker([p.lat, p.lon], {
@@ -9410,6 +9437,7 @@ function startNav(){
   // afslag) effectief geluid geven. Zonder dit faalt spraak soms compleet stil, zonder foutmelding.
   speak(curLang()==='en' ? 'Navigation started.' : 'Navigatie gestart.');
   navActive = true;
+  updateRoutePointMarkersDraggable();
   navTargetIndex = 0;
   lastPosForSpeed = null;
   lastArrowRotation = 0;
@@ -9451,10 +9479,10 @@ function startNav(){
     // rare dubbele sprong (eerst wat opschuiven, dan met een schok verder inzoomen).
     map.setView([pos.coords.latitude, pos.coords.longitude], 18, { animate:false });
     suppressNextPanAnimation = true; // de eerstvolgende automatische centrering niet nog eens laten meeanimeren, bovenop de rotatie die zo meteen ook al start
-    if (!appSettings.disableMapRotation) enableMapRotation();
+    if (!appSettings.disableMapRotation) enableMapRotationInstant();
     drawRoutePath(true).then(renderRoute);
   }, () => {
-    if (!appSettings.disableMapRotation) enableMapRotation();
+    if (!appSettings.disableMapRotation) enableMapRotationInstant();
     drawRoutePath(true).then(renderRoute); // geen verse fix beschikbaar, val terug op wat we al hadden
   }, { enableHighAccuracy: !appSettings.lowerGpsAccuracy, timeout:5000, maximumAge:2000 });
 
@@ -9520,6 +9548,7 @@ function stopNav(){
   clearFuelReminders();
   stopHistoryAudio();
   navActive = false;
+  updateRoutePointMarkersDraggable();
   $('navBtn').innerHTML = '<span class="ic">▶</span><span data-i18n="actionStart">Start</span>';
   translatePage();
   $('navBtn').classList.remove('active');
