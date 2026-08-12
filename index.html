@@ -609,7 +609,7 @@
   }
   #actions button .ic{ font-size:14px; }
   #clearBtn{ background:#e8e3d6; color:var(--green-900); }
-  #toStartBtn{ background:#2d5240; color:var(--cream); border:2px solid transparent; display:none; } /* vervangen door tik-op-positie-bolletje; DOM/JS-referenties blijven intact, enkel niet meer getoond */
+  #toStartBtn{ background:#2d5240; color:var(--cream); border:2px solid transparent; display:none !important; } /* vervangen door tik-op-positie-bolletje; DOM/JS-referenties blijven intact, enkel niet meer getoond — !important nodig, anders wint de specifiekere #actions button{display:flex} regel hierboven */
   #toStartBtn:disabled{ opacity:.5; }
   #toStartBtn.toggle-on{ border:3px solid #e64c3c; box-shadow:0 0 0 1px rgba(0,0,0,0.4) inset; }
   #elevationBtn{ background:#7a5a1e; color:var(--cream); }
@@ -677,7 +677,7 @@
   }
   #navHexButtons.show{ display:flex; }
   #navHexButtons .tab-hex{ font-size:20px; }
-  #tabDashBtn.nav-hide{ display:none; } /* geen dashboard/analyse tijdens actief navigeren, zie startNav()/stopNav() */
+  #tabDashBtn.nav-hide{ display:none; } /* enkel tijdens de omweg-pauze (pauseNavForDetour) — tijdens het rijden zelf blijft dashboard bruikbaar */
 
   #turnBanner{
     display:none; align-items:center; gap:8px; background:rgba(255,255,255,0.08);
@@ -1146,7 +1146,7 @@
     </div>
   </div>
   <div id="modeSelectHint" data-i18n="modeSelectHint">Knooppunten, navigatie, GPX, offline-gebruik — alles werkt voor beide.</div>
-  <div id="appVersionStart">v2.249 · 12 aug</div>
+  <div id="appVersionStart">v2.250 · 12 aug</div>
 </div>
 
 <div id="bikeSetupScreen" class="hidden">
@@ -1234,7 +1234,7 @@
   <button class="menu-item" id="menuHelpBtn"><span class="mi-icon">❓</span><span class="mi-text"><b data-i18n="menuHelp">Hulp</b><small data-i18n="menuHelpSub">uitleg over alle functies</small></span></button>
   <button class="menu-item" id="menuDevNotesBtn"><span class="mi-icon">🛠️</span><span class="mi-text"><b data-i18n="menuDevNotes">Technische werking</b><small data-i18n="menuDevNotesSub">hoe wegdektype, routering en fallbacks precies werken</small></span></button>
   <button class="menu-item" id="menuLogbookBtn"><span class="mi-icon">📋</span><span class="mi-text"><b data-i18n="menuLogbook">Logboek</b><small data-i18n="menuLogbookSub">overzicht van alle meldingen, ook stille</small></span></button>
-  <div id="menuVersion">v2.249 · 12 aug</div>
+  <div id="menuVersion">v2.250 · 12 aug</div>
 </div>
 
 <div id="hint" data-i18n="hintInitial">Zoom of pan naar je gebied, tik dan op "Laad knooppunten"</div>
@@ -2700,6 +2700,7 @@ function pauseNavForDetour(){
   $('navHexButtons').classList.remove('show');
   $('sheet').classList.remove('collapsed');
   $('resumeNavBtn').style.display = '';
+  $('tabDashBtn').classList.add('nav-hide'); // dashboard heeft tijdens dit korte omweg-moment geen zin
   wasMapRotationEnabledBeforePin = !appSettings.disableMapRotation;
   if (wasMapRotationEnabledBeforePin) disableMapRotation();
 }
@@ -2708,6 +2709,7 @@ function resumeNavFromDetourPause(){
   navPausedForDetour = false;
   cancelManualDetourPinMode(); // ruimt eventuele nog openstaande handmatige-pin-poging netjes op
   $('resumeNavBtn').style.display = 'none';
+  $('tabDashBtn').classList.remove('nav-hide');
   $('navPanel').classList.add('show');
   $('navHexButtons').classList.add('show');
   $('sheet').classList.add('collapsed');
@@ -2804,17 +2806,18 @@ function maybeHandleDoubleTap(clientX, clientY){
     lastTapTime = now; lastTapX = clientX; lastTapY = clientY;
   }
 }
-// Knijpzoom (2 vingers) — anker blijft het middelpunt van waar de knijpbeweging begon, net als bij normale
-// pinch-zoom, maar dan met de rotatiecorrectie hierboven.
-let rotPinchActive = false, rotPinchStartDist = 0, rotPinchStartZoom = 0, rotPinchAnchorLatLng = null;
+// Knijpzoom (2 vingers) — het ankerpunt wordt bij elke beweging opnieuw berekend op het HUIDIGE middelpunt
+// van je vingers (i.p.v. één keer vastgelegd bij het begin van de knijpbeweging). Anders bleef het scherm
+// "achter" op de oude vingerpositie zodra je hand tijdens het knijpen ook maar een beetje verschoof, wat
+// aanvoelde alsof de kaart tegelijk verschoof én zoomde — met een vast startanker gebeurt dat juist wél,
+// met een steeds ververst anker (zoals gewone pinch-zoom) blijft het punt onder je vingers precies staan.
+let rotPinchActive = false, rotPinchStartDist = 0, rotPinchStartZoom = 0;
 function rotPinchDist(t0, t1){ return Math.hypot(t1.clientX - t0.clientX, t1.clientY - t0.clientY); }
 function rotPinchStart(t0, t1){
   rotDragActive = false;
   rotPinchActive = true;
   rotPinchStartDist = rotPinchDist(t0, t1);
   rotPinchStartZoom = map.getZoom();
-  const midX = (t0.clientX + t1.clientX) / 2, midY = (t0.clientY + t1.clientY) / 2;
-  rotPinchAnchorLatLng = map.containerPointToLatLng(rotContainerPointFromClient(midX, midY));
   map.stop(); markNavMapUserPan();
 }
 function rotPinchMove(t0, t1){
@@ -2822,7 +2825,8 @@ function rotPinchMove(t0, t1){
   const dist = rotPinchDist(t0, t1);
   if (dist < 1 || rotPinchStartDist < 1) return;
   const newZoom = rotPinchStartZoom + Math.log2(dist / rotPinchStartDist);
-  map.setZoomAround(rotPinchAnchorLatLng, newZoom, { animate:false });
+  const midX = (t0.clientX + t1.clientX) / 2, midY = (t0.clientY + t1.clientY) / 2;
+  map.setZoomAround(rotContainerPointFromClient(midX, midY), newZoom, { animate:false });
 }
 function rotPinchEnd(){ rotPinchActive = false; }
 function rotTouchStartHandler(e){
@@ -6213,7 +6217,7 @@ function toggleNode(id){
 }
 
 function removeFromRoute(index){
-  if (navActive){ toast(tr('toastPinBlockedNav'), 5000); return; } // ook tijdens de omweg-pauze blijft dit de enige toegelaten manier om de route te wijzigen
+  if (navActive && !navPausedForDetour){ toast(tr('toastPinBlockedNav'), 5000); return; } // tijdens de omweg-pauze mag je de zonet aangemaakte omwegpunten wél verwijderen
   const removedId = route[index].id;
   route.splice(index, 1);
   if (pinMarkers[removedId]){ map.removeLayer(pinMarkers[removedId]); delete pinMarkers[removedId]; }
@@ -9296,7 +9300,7 @@ function addDraggableRoutePointMarker(p){
       iconSize:[34,34],
       iconAnchor: isVia ? [17,17] : [17,32]
     }),
-    draggable:!navActive, autoPan:false
+    draggable: !navActive || navPausedForDetour, autoPan:false
   }).addTo(map);
   marker.on('click', () => {
     const idx = route.findIndex(r => r.id === p.id);
@@ -9310,13 +9314,16 @@ function addDraggableRoutePointMarker(p){
   });
   marker.on('dragstart', () => { teardownRotationAwareDragging(); map.dragging.disable(); });
   marker.on('dragend', async (e) => {
-    const shouldRestoreRotationDrag = navActive && !appSettings.disableMapRotation;
+    const shouldRestoreRotationDrag = navActive && !navPausedForDetour && !appSettings.disableMapRotation;
     if (shouldRestoreRotationDrag) setupRotationAwareDragging(); else map.dragging.enable();
     // Verslepen van een bestaand punt tijdens actieve navigatie leidde tot een waaier aan problemen
-    // (kaart-rotatie die de sleeprichting/positie in de war stuurt) — daarom nu bewust altijd geblokkeerd
-    // zolang je navigeert. Vóór je op 'Start' drukt, of ná 'Stop', werkt verslepen gewoon normaal.
-    if (!canEditRouteNow() || navActive){
-      if (navActive) toast(tr('toastDragBlockedDuringNav'), 5000);
+    // (kaart-rotatie die de sleeprichting/positie in de war stuurt) — daarom geblokkeerd zolang je écht
+    // aan het rijden bent. Tijdens de omweg-pauze (kaart staat dan toch al stil, niet gedraaid) mag het wél
+    // — net daar heb je het nodig om een automatisch gevonden omwegpunt nog even bij te sturen. Vóór 'Start'
+    // of ná 'Stop' werkt verslepen sowieso gewoon normaal.
+    const blocked = navActive && !navPausedForDetour;
+    if (!canEditRouteNow() || blocked){
+      if (blocked) toast(tr('toastDragBlockedDuringNav'), 5000);
       marker.setLatLng([p.lat, p.lon]); return; // niet toegelaten nu — speld terug op de oorspronkelijke plek
     }
     const ll = e.target.getLatLng();
@@ -9411,8 +9418,6 @@ function startNav(){
   $('navBtn').classList.add('active');
   $('navPanel').classList.add('show');
   $('navHexButtons').classList.add('show');
-  $('tabDashBtn').classList.add('nav-hide');
-  if (document.body.classList.contains('dash-active')) setActiveTab('map'); // geen analyse tijdens navigeren
   $('sheet').classList.add('collapsed');
   updateProgressUI();
   $('navWindLine').style.display = appSettings.showWindInNav ? 'block' : 'none';
