@@ -1146,7 +1146,7 @@
     </div>
   </div>
   <div id="modeSelectHint" data-i18n="modeSelectHint">Knooppunten, navigatie, GPX, offline-gebruik — alles werkt voor beide.</div>
-  <div id="appVersionStart">v2.256 · 12 aug</div>
+  <div id="appVersionStart">v2.258 · 12 aug</div>
 </div>
 
 <div id="bikeSetupScreen" class="hidden">
@@ -1234,7 +1234,7 @@
   <button class="menu-item" id="menuHelpBtn"><span class="mi-icon">❓</span><span class="mi-text"><b data-i18n="menuHelp">Hulp</b><small data-i18n="menuHelpSub">uitleg over alle functies</small></span></button>
   <button class="menu-item" id="menuDevNotesBtn"><span class="mi-icon">🛠️</span><span class="mi-text"><b data-i18n="menuDevNotes">Technische werking</b><small data-i18n="menuDevNotesSub">hoe wegdektype, routering en fallbacks precies werken</small></span></button>
   <button class="menu-item" id="menuLogbookBtn"><span class="mi-icon">📋</span><span class="mi-text"><b data-i18n="menuLogbook">Logboek</b><small data-i18n="menuLogbookSub">overzicht van alle meldingen, ook stille</small></span></button>
-  <div id="menuVersion">v2.256 · 12 aug</div>
+  <div id="menuVersion">v2.258 · 12 aug</div>
 </div>
 
 <div id="hint" data-i18n="hintInitial">Zoom of pan naar je gebied, tik dan op "Laad knooppunten"</div>
@@ -2237,7 +2237,13 @@ let tileWatchdog = null;
 function useTileProvider(index){
   if (currentTileLayer) map.removeLayer(currentTileLayer);
   const p = activeTileProviders[index];
-  currentTileLayer = L.tileLayer(p.url, p.options).addTo(map);
+  // keepBuffer hoger dan Leaflet's standaard (2) laten staan: de kaart houdt dan een bredere ring tegels
+  // rond het zichtbare gebied al gecached/geladen, ook tijdens gewoon plannen (100%, niet gedraaid). Dat
+  // is precies het gebied dat bij het STARTEN van navigatie plots zichtbaar wordt (container groeit dan
+  // naar 230%) — met een bredere buffer staan die tegels dan al vaker klaar i.p.v. pas op dat moment vanaf
+  // nul opgehaald te moeten worden, wat de (enkel bij een koude cache merkbare) groene rand bij de allereerste
+  // navigatiestart van een sessie zou moeten verminderen.
+  currentTileLayer = L.tileLayer(p.url, { ...p.options, keepBuffer: 6 }).addTo(map);
   document.getElementById('mapAttribution').textContent = p.options.attribution;
 
   let anyTileLoaded = false;
@@ -6801,9 +6807,20 @@ async function buildOverpassBucketFn(coordsLatLngIn){
   const bucketFor = (lat, lon) => {
     let best = null, bestConfident = false, bestDist = 55; // ruimer dan de 50m van de query zelf, anders missen we net-nog-geldige wegen
     ways.forEach(w => {
+      // Bug gevonden: bij een gewone weg mét een parallel liggend paadje/trekkerspoor/oprit ernaast (heel
+      // gewoon langs een "Grote Baan" of "Koolmijnlaan"), kon dat aparte, onverharde weggetje toevallig een
+      // dichterbij liggend geometriepunt hebben dan de eigenlijke (verharde) weg waar je op fietst — OSM-
+      // wegpunten liggen immers niet gelijkmatig verdeeld, een lang recht wegstuk kan best 50-100m tussen
+      // punten hebben. Zo werd een terecht "verhard" (bv. van de routeringsbron zelf, zichtbaar in de Logs)
+      // stilzwijgend overschreven met de kleur van dat compleet andere, toevallig dichterbijzijnde paadje.
+      // Kleine "straf"-afstand op track/path-achtige wegen lost dit op: een échte weg wint dan net op de
+      // meeste van dit soort net-naast-elkaar-situaties, terwijl een écht pad nog altijd wint zodra je er
+      // duidelijk op zit (dichterbij dan de straf goedmaakt).
+      const isTrackish = (w.tags.highway === 'track' || w.tags.highway === 'path') && !looksLikeUrbanStreet(w.tags);
+      const penalty = isTrackish ? 12 : 0;
       for (let j = 0; j < w.geometry.length; j++){ // elk punt controleren — een steekproef kon een nabije weg net missen bij een bocht
         const g = w.geometry[j];
-        const d = haversine(lat, lon, g.lat, g.lon);
+        const d = haversine(lat, lon, g.lat, g.lon) + penalty;
         if (d < bestDist){
           bestDist = d;
           let bucket = w.tags.surface ? classifySurfaceText(w.tags.surface) : (w.tags.track_type ? classifyTrackType(w.tags.track_type) : (w.tags.highway === 'track' || w.tags.highway === 'path' ? 'unknown' : 'paved'));
@@ -11464,7 +11481,10 @@ function setupAnalyseChartDrag(){
         if (d < bestD){ bestD = d; idx = i; }
       }
       const frac = profile.distKm[idx] / (profile.distKm[profile.distKm.length - 1] || 1);
-      updateAnalyseDotByIndex(idx, frac, true); // true = kaart-bol zelf niet opnieuw verplaatsen, die sleep je al zelf
+      // De bol moet op de route BLIJVEN, niet los meebewegen met je vinger — daarom hier NIET meer
+      // skipMapMove gebruiken: elke sleepbeweging zet 'm meteen terug exact op het dichtstbijzijnde
+      // routepunt, wat het gevoel geeft dat de bol "vastzit" aan de lijn en er enkel langs schuift.
+      updateAnalyseDotByIndex(idx, frac);
     });
   }
 }
@@ -11481,22 +11501,29 @@ function updateAnalyseDotByIndex(idx, frac, skipMapMove){
   const profile = analyseCurrentProfile;
   if (!profile) return;
   const lat = profile.lat[idx], lon = profile.lon[idx];
-  const val = analyseChartValueFn ? analyseChartValueFn(idx) : (profile.ele ? profile.ele[idx] : null);
-  // Grafiek-bol: percentage-gebaseerd, geen pixel-/viewBox-berekening meer nodig — dat bleek op sommige
-  // toestellen net dat kleine stukje anders te meten dan het slepen zelf, met een verkeerd gepositioneerde
-  // bol tot gevolg.
   const dot = $('analyseChartDot');
   dot.style.display = 'block';
-  dot.style.left = (frac * 100).toFixed(2) + '%';
+  // Exact dezelfde projectie gebruiken als de grafiek zelf (chartProjections, opgeslagen door
+  // renderElevationChart/renderSlopeChart) i.p.v. een eigen, benaderende opvulling/marge-berekening — die
+  // bleek op sommige combinaties van kaartlijn-marges niet exact overeen te komen, met een bolletje dat
+  // net niet op de lijn zelf stond. Zo volgt de bol nu pixel-voor-pixel dezelfde lijn als de grafiek.
+  const svg = $('analyseSvg');
+  const proj = chartProjections['analyseSvg'];
+  const rect = svg.getBoundingClientRect();
+  const w = rect.width || svg.clientWidth || 1, h = rect.height || svg.clientHeight || 1;
   let yPercent = 50;
-  if (val != null && analyseChartMinVal != null && analyseChartMaxVal != null){
-    const range = (analyseChartMaxVal - analyseChartMinVal) || 1;
-    const topPad = 14, bottomPad = 14; // ruwe marge boven/onder, komt overeen met de rand die de grafieken zelf ook aanhouden
-    const rawPercent = ((val - analyseChartMinVal) / range) * 100;
-    yPercent = (100 - bottomPad) - (rawPercent / 100) * (100 - topPad - bottomPad);
+  if (analyseChartValueFn && proj){
+    const val = analyseChartValueFn(idx);
+    dot.style.left = ((proj.x(profile.distKm[idx]) / w) * 100).toFixed(2) + '%';
+    if (val != null) yPercent = (proj.y(val) / h) * 100;
+  } else {
+    dot.style.left = (frac * 100).toFixed(2) + '%'; // staafdiagrammen (wegtype/wind) hebben geen zinvolle hoogte-waarde
   }
   dot.style.top = Math.max(2, Math.min(98, yPercent)).toFixed(2) + '%';
-  // Kaart-bol
+  // Kaart-bol: altijd exact op het dichtstbijzijnde routepunt zetten (nooit los op de kaart laten hangen
+  // waar je vinger toevallig staat) — anders kon je 'm van de route af slepen. `skipMapMove` bestaat enkel
+  // om te vermijden dat we tijdens het slepen zelf de bol tegen je vinger in terugzetten; hij landt sowieso
+  // altijd op het (dichtstbijzijnde) routepunt zodra Leaflet's drag-event de nieuwe positie doorgeeft.
   if (!analyseMapDot){
     analyseMapDot = L.marker([lat, lon], {
       icon: L.divIcon({ className:'', html:'<div style="width:16px;height:16px;border-radius:50%;background:#e0392e;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.4);"></div>', iconSize:[16,16], iconAnchor:[8,8] }),
