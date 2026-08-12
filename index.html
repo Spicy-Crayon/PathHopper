@@ -814,11 +814,11 @@
   }
   #zoomBtns{
     position:absolute; right:12px; bottom:calc(env(safe-area-inset-bottom,0px) + var(--extra-bottom-inset) + 64px); z-index:999;
-    display:flex; flex-direction:column; border-radius:10px; overflow:hidden; box-shadow:var(--shadow);
+    display:flex; flex-direction:column; border-radius:12px; overflow:hidden; box-shadow:var(--shadow);
   }
   #zoomBtns button{
-    width:32px; height:32px; border:none; background:var(--cream); color:var(--green-900);
-    font-size:17px; font-weight:700; border-bottom:1px solid var(--line);
+    width:48px; height:48px; border:none; background:var(--cream); color:var(--green-900);
+    font-size:24px; font-weight:700; border-bottom:1px solid var(--line);
   }
   #zoomBtns button:last-child{ border-bottom:none; }
 
@@ -1146,7 +1146,7 @@
     </div>
   </div>
   <div id="modeSelectHint" data-i18n="modeSelectHint">Knooppunten, navigatie, GPX, offline-gebruik — alles werkt voor beide.</div>
-  <div id="appVersionStart">v2.250 · 12 aug</div>
+  <div id="appVersionStart">v2.251 · 12 aug</div>
 </div>
 
 <div id="bikeSetupScreen" class="hidden">
@@ -1234,7 +1234,7 @@
   <button class="menu-item" id="menuHelpBtn"><span class="mi-icon">❓</span><span class="mi-text"><b data-i18n="menuHelp">Hulp</b><small data-i18n="menuHelpSub">uitleg over alle functies</small></span></button>
   <button class="menu-item" id="menuDevNotesBtn"><span class="mi-icon">🛠️</span><span class="mi-text"><b data-i18n="menuDevNotes">Technische werking</b><small data-i18n="menuDevNotesSub">hoe wegdektype, routering en fallbacks precies werken</small></span></button>
   <button class="menu-item" id="menuLogbookBtn"><span class="mi-icon">📋</span><span class="mi-text"><b data-i18n="menuLogbook">Logboek</b><small data-i18n="menuLogbookSub">overzicht van alle meldingen, ook stille</small></span></button>
-  <div id="menuVersion">v2.250 · 12 aug</div>
+  <div id="menuVersion">v2.251 · 12 aug</div>
 </div>
 
 <div id="hint" data-i18n="hintInitial">Zoom of pan naar je gebied, tik dan op "Laad knooppunten"</div>
@@ -2806,39 +2806,19 @@ function maybeHandleDoubleTap(clientX, clientY){
     lastTapTime = now; lastTapX = clientX; lastTapY = clientY;
   }
 }
-// Knijpzoom (2 vingers) — het ankerpunt wordt bij elke beweging opnieuw berekend op het HUIDIGE middelpunt
-// van je vingers (i.p.v. één keer vastgelegd bij het begin van de knijpbeweging). Anders bleef het scherm
-// "achter" op de oude vingerpositie zodra je hand tijdens het knijpen ook maar een beetje verschoof, wat
-// aanvoelde alsof de kaart tegelijk verschoof én zoomde — met een vast startanker gebeurt dat juist wél,
-// met een steeds ververst anker (zoals gewone pinch-zoom) blijft het punt onder je vingers precies staan.
-let rotPinchActive = false, rotPinchStartDist = 0, rotPinchStartZoom = 0;
-function rotPinchDist(t0, t1){ return Math.hypot(t1.clientX - t0.clientX, t1.clientY - t0.clientY); }
-function rotPinchStart(t0, t1){
-  rotDragActive = false;
-  rotPinchActive = true;
-  rotPinchStartDist = rotPinchDist(t0, t1);
-  rotPinchStartZoom = map.getZoom();
-  map.stop(); markNavMapUserPan();
-}
-function rotPinchMove(t0, t1){
-  if (!rotPinchActive) return;
-  const dist = rotPinchDist(t0, t1);
-  if (dist < 1 || rotPinchStartDist < 1) return;
-  const newZoom = rotPinchStartZoom + Math.log2(dist / rotPinchStartDist);
-  const midX = (t0.clientX + t1.clientX) / 2, midY = (t0.clientY + t1.clientY) / 2;
-  map.setZoomAround(rotContainerPointFromClient(midX, midY), newZoom, { animate:false });
-}
-function rotPinchEnd(){ rotPinchActive = false; }
+// Knijpzoom staat tijdens navigeren (en de omweg-pauze) bewust volledig UIT — zowel Leaflet's eigen
+// pinch-zoom (touchZoom.disable() hieronder) als een eigen, rotatiegecorrigeerde variant zorgden telkens
+// voor een wisselwerking met de kaartrotatie die voelde als "de kaart springt/schuift terwijl ze zoomt".
+// In plaats daarvan gebruik je de +/- knoppen (nu ook groter gemaakt) om in/uit te zoomen — geen enkele
+// van die knijp-problemen kan zich daar voordoen, en het is op de fiets sowieso makkelijker te raken.
 function rotTouchStartHandler(e){
   if (e.touches.length === 1) rotDragStart(e.touches[0].clientX, e.touches[0].clientY);
-  else if (e.touches.length === 2) rotPinchStart(e.touches[0], e.touches[1]);
+  else rotDragEnd(); // 2+ vingers: gewoon negeren, geen zoom en geen rotatie
 }
 function rotTouchMoveHandler(e){
-  if (e.touches.length === 2){ rotPinchMove(e.touches[0], e.touches[1]); e.preventDefault(); }
-  else if (e.touches.length === 1 && rotDragActive){ rotDragMove(e.touches[0].clientX, e.touches[0].clientY); e.preventDefault(); }
+  if (e.touches.length === 1 && rotDragActive){ rotDragMove(e.touches[0].clientX, e.touches[0].clientY); e.preventDefault(); }
 }
 function rotTouchEndHandler(e){
-  if (rotPinchActive && e.touches.length < 2) rotPinchEnd();
   if (rotDragActive && e.touches.length === 0){
     rotDragEnd();
     if (e.changedTouches && e.changedTouches.length) maybeHandleDoubleTap(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
@@ -2850,7 +2830,7 @@ function rotDblClickHandler(e){ rotZoomAroundClientPoint(e.clientX, e.clientY, m
 function setupRotationAwareDragging(){
   map.dragging.disable();
   map.doubleClickZoom.disable();
-  map.touchZoom.disable();
+  map.touchZoom.disable(); // knijpzoom staat tijdens navigeren/pauze volledig uit, zie hierboven — enkel de +/- knoppen
   const c = map.getContainer();
   c.addEventListener('touchstart', rotTouchStartHandler, { passive:true });
   c.addEventListener('touchmove', rotTouchMoveHandler, { passive:false });
@@ -2873,7 +2853,6 @@ function teardownRotationAwareDragging(){
   window.removeEventListener('mousemove', rotMouseMoveHandler);
   window.removeEventListener('mouseup', rotDragEnd);
   rotDragActive = false;
-  rotPinchActive = false;
 }
 
 const $ = (id) => document.getElementById(id);
@@ -9412,7 +9391,7 @@ function startNav(){
   announcedStepStart = null;
   announcedStepNear = null;
   lastMapRotation = 0;
-  if (!appSettings.disableMapRotation) enableMapRotation();
+  setMapRotation(0); // kaart al onveranderd/niet-gedraaid laten staan vóór we zo meteen inzoomen op je startpositie
   $('navBtn').innerHTML = '<span class="ic">■</span><span data-i18n="actionStop">Stop</span>';
   translatePage();
   $('navBtn').classList.add('active');
@@ -9433,9 +9412,14 @@ function startNav(){
   navigator.geolocation.getCurrentPosition(pos => {
     lastPosition = pos;
     renderPosition();
-    map.setView([pos.coords.latitude, pos.coords.longitude], 18); // stevig inzoomen op je startpositie bij het begin van de navigatie
+    // Meteen (zonder eigen animatie) naar je startpositie springen, en pas DAARNA de kaart laten
+    // groeien/draaien inschakelen — anders overlappen die twee overgangen elkaar en oogt het als een
+    // rare dubbele sprong (eerst wat opschuiven, dan met een schok verder inzoomen).
+    map.setView([pos.coords.latitude, pos.coords.longitude], 18, { animate:false });
+    if (!appSettings.disableMapRotation) enableMapRotation();
     drawRoutePath(true).then(renderRoute);
   }, () => {
+    if (!appSettings.disableMapRotation) enableMapRotation();
     drawRoutePath(true).then(renderRoute); // geen verse fix beschikbaar, val terug op wat we al hadden
   }, { enableHighAccuracy: !appSettings.lowerGpsAccuracy, timeout:5000, maximumAge:2000 });
 
@@ -11064,33 +11048,15 @@ $('northBtn').addEventListener('click', () => {
   if (!navActive) disableMapRotation();
 });
 
-// ---------- Manueel de kaart draaien met twee vingers ----------
-let rotateGesture = null;
-function touchAngle(touches){
-  return Math.atan2(touches[1].clientY - touches[0].clientY, touches[1].clientX - touches[0].clientX) * 180 / Math.PI;
-}
-const mapTouchEl = document.getElementById('map');
-mapTouchEl.addEventListener('touchstart', (e) => {
-  if (!navActive) return; // buiten navigatie: gewoon Leaflet's eigen pinch-zoom laten werken, niet de kaart laten 'springen'
-  if (e.touches.length === 2){
-    if (!document.getElementById('mapRotator').classList.contains('rotating')) enableMapRotation();
-    rotateGesture = { startAngle: touchAngle(e.touches), startRotation: lastMapRotation };
-  }
-}, { passive:true });
-mapTouchEl.addEventListener('touchmove', (e) => {
-  if (!navActive) return;
-  if (e.touches.length === 2 && rotateGesture){
-    const delta = touchAngle(e.touches) - rotateGesture.startAngle;
-    // Hoek altijd binnen -180..180 houden — anders "onthoudt" de kaart hoe vaak je in totaal draaide
-    // (bv. 3 volle toeren), en zou het terugzetten naar noorden nadien evenveel keer visueel terugdraaien.
-    lastMapRotation = ((rotateGesture.startRotation + delta + 180) % 360 + 360) % 360 - 180;
-    setMapRotation(lastMapRotation);
-  }
-}, { passive:true });
-mapTouchEl.addEventListener('touchend', (e) => {
-  if (e.touches.length < 2) rotateGesture = null;
-}, { passive:true });
-mapTouchEl.addEventListener('touchcancel', () => { rotateGesture = null; }, { passive:true });
+// ---------- Manueel de kaart draaien met twee vingers: VERWIJDERD in v2.251 ----------
+// Deze functie luisterde op DEZELFDE 2-vinger-touchstart/touchmove-events op #map als de
+// rotatiegecorrigeerde knijp-zoom (setupRotationAwareDragging, zie hierboven) — de twee botsten
+// voortdurend (kaart draaide EN zoomde tegelijk door elkaar), en deze riep bovendien op eigen houtje
+// enableMapRotation() op zodra je met 2 vingers de kaart aanraakte — zelfs tijdens de omweg-pauze, wat
+// verklaarde waarom de kaart daar soms toch weer ging draaien ondanks disableMapRotation(). Nu knijp-zoom
+// tijdens navigeren volledig uitstaat (zie touchZoom.disable() in setupRotationAwareDragging, en de
+// vereenvoudigde rotTouchMoveHandler die 2-vinger-gebaren nu gewoon negeert), is er ook geen reden meer
+// om een apart 2-vinger-draaigebaar te ondersteunen.
 
 function currentSpeedKmh(pos, lat, lon){
   // Geef voorkeur aan GPS-snelheid van het toestel zelf (m/s)
