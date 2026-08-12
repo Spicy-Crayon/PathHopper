@@ -713,6 +713,10 @@
     text-align:center; overflow-y:auto;
   }
   #modeSelectScreen.hidden{ display:none; }
+  #modeSelectScreenGarmin{
+    position:fixed; top:0;left:0;right:0;bottom:0; z-index:3000; background:#020617;
+  }
+  #modeSelectScreenGarmin.hidden{ display:none; }
   #modeSelectTitle{ color:var(--cream); font-size:19px; font-weight:800; flex-shrink:0; }
   .mode-tiles-2x2{ display:flex; justify-content:center; }
   .hc-col{ display:flex; flex-direction:column; align-items:center; }
@@ -1147,6 +1151,13 @@
   </div>
   <div id="modeSelectHint" data-i18n="modeSelectHint">Knooppunten, navigatie, GPX, offline-gebruik — alles werkt voor beide.</div>
   <div id="appVersionStart">v2.261 · 12 aug</div>
+</div>
+
+<!-- Garmin-stijl hub: letterlijk Gemini's keuzescherm.html-ontwerp, geïsoleerd in een iframe zodat
+     Tailwind's CSS-reset de rest van de app (Standaard-thema) niet kan beïnvloeden. De iframe praat
+     via postMessage met de echte app-functies (openBikeSetupScreen, selectMode, setActiveTab). -->
+<div id="modeSelectScreenGarmin" class="hidden">
+  <iframe id="garminHubFrame" title="Garmin-stijl keuzescherm" style="border:0;width:100%;height:100%;display:block;"></iframe>
 </div>
 
 <div id="bikeSetupScreen" class="hidden">
@@ -3885,7 +3896,7 @@ document.querySelectorAll('.menu-item[data-target]').forEach(btn => {
 function openModal(id){ $(id).classList.add('show'); }
 function closeModal(id){
   $(id).classList.remove('show');
-  if (appMode === null && id !== 'modeSelectScreen') $('modeSelectScreen').classList.remove('hidden');
+  if (appMode === null && id !== 'modeSelectScreen') showHubScreen();
 }
 document.querySelectorAll('[data-close]').forEach(btn => {
   btn.addEventListener('click', () => closeModal(btn.dataset.close));
@@ -5286,7 +5297,217 @@ function tr(key){
 function applyTheme(theme){
   document.body.classList.remove('theme-garmin');
   if (theme === 'garmin') document.body.classList.add('theme-garmin');
+  // Als de hub op dit moment zichtbaar is (gebruiker heeft nog geen modus gekozen), meteen live omschakelen
+  // tussen het Standaard-hub en de Garmin-hub-iframe, zonder dat de gebruiker opnieuw hoeft te navigeren.
+  const onHub = !$('modeSelectScreen').classList.contains('hidden') || !$('modeSelectScreenGarmin').classList.contains('hidden');
+  if (onHub && appMode === null) showHubScreen();
 }
+
+// ---------- Garmin-hub (letterlijk Gemini's keuzescherm.html, in een iframe) ----------
+let garminHubFrameLoaded = false;
+let hubWeatherCache = null; // { t, temp, windLabel }
+function showHubScreen(){
+  const garmin = (appSettings.theme === 'garmin');
+  $('modeSelectScreen').classList.toggle('hidden', garmin);
+  $('modeSelectScreenGarmin').classList.toggle('hidden', !garmin);
+  if (garmin){
+    if (!garminHubFrameLoaded){
+      const frame = $('garminHubFrame');
+      frame.addEventListener('load', () => sendHubWeatherToFrame(), { once:true });
+      frame.srcdoc = buildGarminHubHtml();
+      garminHubFrameLoaded = true;
+    } else {
+      sendHubWeatherToFrame();
+    }
+    fetchHubWeather();
+  }
+}
+function sendHubWeatherToFrame(){
+  const frame = $('garminHubFrame');
+  if (!frame || !frame.contentWindow) return;
+  if (hubWeatherCache){
+    frame.contentWindow.postMessage({ source:'garminHubWeather', temp:hubWeatherCache.temp, windLabel:hubWeatherCache.windLabel, updatedLabel:hubWeatherCache.updatedLabel }, '*');
+  }
+}
+async function fetchHubWeather(){
+  // Cache 15 minuten geldig — geen zin om bij elk bezoek aan de hub opnieuw GPS + API aan te spreken.
+  if (hubWeatherCache && (Date.now() - hubWeatherCache.t < 15*60000)){
+    sendHubWeatherToFrame();
+    return;
+  }
+  if (!navigator.geolocation){
+    postHubWeatherError(curLang()==='en' ? 'No GPS available' : 'Geen GPS beschikbaar');
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(async (pos) => {
+    try{
+      const { latitude:lat, longitude:lon } = pos.coords;
+      const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,wind_speed_10m,wind_direction_10m&timezone=auto`);
+      if (!res.ok) throw new Error('http ' + res.status);
+      const data = await res.json();
+      if (!data.current) throw new Error('geen data');
+      const temp = Math.round(data.current.temperature_2m);
+      const windSpeed = Math.round(data.current.wind_speed_10m);
+      const cardinals = cardinalsForLang();
+      const windDirLabel = cardinals[Math.round(data.current.wind_direction_10m / 22.5) % 16];
+      const windLabel = `${windDirLabel} ${windSpeed}`;
+      const now = new Date();
+      const updatedLabel = (curLang()==='en' ? 'Updated ' : 'Bijgewerkt ') + now.toLocaleTimeString(curLang()==='en'?'en-GB':'nl-BE', { hour:'2-digit', minute:'2-digit' });
+      hubWeatherCache = { t: Date.now(), temp, windLabel, updatedLabel };
+      sendHubWeatherToFrame();
+    } catch(e){
+      postHubWeatherError(curLang()==='en' ? 'Weather unavailable' : 'Weer niet beschikbaar');
+    }
+  }, () => {
+    postHubWeatherError(curLang()==='en' ? 'No location access' : 'Geen locatietoegang');
+  }, { timeout:10000 });
+}
+function postHubWeatherError(msg){
+  const frame = $('garminHubFrame');
+  if (!frame || !frame.contentWindow) return;
+  frame.contentWindow.postMessage({ source:'garminHubWeather', error: msg }, '*');
+}
+function hideHubScreen(){
+  $('modeSelectScreen').classList.add('hidden');
+  $('modeSelectScreenGarmin').classList.add('hidden');
+}
+
+const APP_VERSION_TEXT = 'v2.261 · 12 aug';
+function buildGarminHubHtml(){
+  // Dit is Gemini's keuzescherm.html, ongewijzigd qua opbouw/stijl — enkel: (1) een derde grote tegel
+  // "Hardlopen" toegevoegd, (2) de <a href> vervangen door postMessage-oproepen naar de echte app.
+  return `<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>KnooppuntenRoute - Keuze</title>
+<script src="https://cdn.tailwindcss.com"><\/script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap');
+  body { font-family: 'Inter', sans-serif; }
+  .glass-ribbon {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border-left: 1px solid rgba(255, 255, 255, 0.12);
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    transform: rotate(-15deg) scale(1.4);
+  }
+</style>
+</head>
+<body class="bg-slate-950 min-h-screen flex items-center justify-center p-0 overflow-x-hidden">
+  <div class="w-full bg-slate-950 text-slate-100 min-h-screen p-6 flex flex-col justify-between overflow-hidden relative">
+    <div class="absolute inset-0 w-full h-full pointer-events-none z-0 overflow-hidden">
+      <div class="glass-ribbon absolute top-[-20%] left-[-10%] w-[120%] h-[140%]"></div>
+    </div>
+    <div class="absolute top-10 right-10 w-40 h-40 bg-amber-500/10 rounded-full blur-3xl pointer-events-none z-0"></div>
+    <div class="absolute bottom-20 left-10 w-40 h-40 bg-sky-500/10 rounded-full blur-3xl pointer-events-none z-0"></div>
+
+    <div class="relative z-10 w-full flex-1 flex flex-col justify-between">
+      <div class="text-center pt-8">
+        <span class="text-[11px] text-amber-500 font-black uppercase tracking-widest bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20 inline-block mb-3">${APP_VERSION_TEXT}</span>
+        <h1 class="text-3xl font-black tracking-tight text-white">KnooppuntenRoute</h1>
+        <p class="text-xs text-slate-400 mt-2 font-medium">Kies je activiteit en bekijk de omgevingsstatus</p>
+      </div>
+
+      <div class="my-auto space-y-4 py-8">
+        <button data-action="fiets" class="hub-tile block w-full text-left bg-slate-900/60 backdrop-blur-md border border-slate-800/80 hover:border-amber-500/40 rounded-3xl p-6 transition-all duration-300 transform active:scale-[0.98] group relative overflow-hidden shadow-lg shadow-black/40">
+          <div class="absolute -right-4 -bottom-4 text-slate-800/20 text-8xl font-black group-hover:scale-110 transition duration-300">🚴</div>
+          <div class="flex items-center space-x-5">
+            <div class="w-14 h-14 bg-gradient-to-br from-amber-400 to-orange-500 text-slate-950 font-bold rounded-2xl flex items-center justify-center text-3xl shadow-lg shadow-orange-500/20">🚴</div>
+            <div class="text-left">
+              <h2 class="text-xl font-black tracking-tight text-white group-hover:text-amber-400 transition">Ik ga Fietsen</h2>
+              <p class="text-xs text-slate-400 mt-0.5 leading-tight">Knooppunten, navigatie, GPX en offline kaarten</p>
+            </div>
+          </div>
+        </button>
+
+        <button data-action="wandel" class="hub-tile block w-full text-left bg-slate-900/60 backdrop-blur-md border border-slate-800/80 hover:border-emerald-500/40 rounded-3xl p-6 transition-all duration-300 transform active:scale-[0.98] group relative overflow-hidden shadow-lg shadow-black/40">
+          <div class="absolute -right-4 -bottom-4 text-slate-800/20 text-8xl font-black group-hover:scale-110 transition duration-300">🥾</div>
+          <div class="flex items-center space-x-5">
+            <div class="w-14 h-14 bg-gradient-to-br from-emerald-400 to-teal-500 text-slate-950 font-bold rounded-2xl flex items-center justify-center text-3xl shadow-lg shadow-emerald-500/20">🥾</div>
+            <div class="text-left">
+              <h2 class="text-xl font-black tracking-tight text-white group-hover:text-emerald-400 transition">Ik ga Wandelen</h2>
+              <p class="text-xs text-slate-400 mt-0.5 leading-tight">Wandelnetwerken, rustige paden en natuurroutes</p>
+            </div>
+          </div>
+        </button>
+
+        <button data-action="hardloop" class="hub-tile block w-full text-left bg-slate-900/60 backdrop-blur-md border border-slate-800/80 hover:border-rose-500/40 rounded-3xl p-6 transition-all duration-300 transform active:scale-[0.98] group relative overflow-hidden shadow-lg shadow-black/40">
+          <div class="absolute -right-4 -bottom-4 text-slate-800/20 text-8xl font-black group-hover:scale-110 transition duration-300">🏃</div>
+          <div class="flex items-center space-x-5">
+            <div class="w-14 h-14 bg-gradient-to-br from-rose-400 to-red-500 text-slate-950 font-bold rounded-2xl flex items-center justify-center text-3xl shadow-lg shadow-red-500/20">🏃</div>
+            <div class="text-left">
+              <h2 class="text-xl font-black tracking-tight text-white group-hover:text-rose-400 transition">Ik ga Hardlopen</h2>
+              <p class="text-xs text-slate-400 mt-0.5 leading-tight">AI-coach, opbouwschema's en audio-begeleiding</p>
+            </div>
+          </div>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4 pb-4">
+        <button data-action="kompas" class="bg-slate-900/50 backdrop-blur-md border border-slate-800/60 hover:border-slate-700 p-4 rounded-2xl flex flex-col justify-between transition transform active:scale-95 group text-left">
+          <div class="flex justify-between items-start w-full">
+            <span class="text-slate-400 text-[10px] font-bold uppercase tracking-wider">Kompas &amp; Sensoren</span>
+            <span class="text-slate-500 group-hover:text-white transition">🧭</span>
+          </div>
+          <div class="mt-4">
+            <div class="text-lg font-black text-white group-hover:text-amber-400 transition flex items-center gap-1.5">Tik voor live kompas</div>
+            <span class="text-[10px] text-slate-500 mt-0.5 block">Sensor start pas na tikken</span>
+          </div>
+        </button>
+
+        <button data-action="weer" class="bg-slate-900/50 backdrop-blur-md border border-slate-800/60 hover:border-slate-700 p-4 rounded-2xl flex flex-col justify-between transition transform active:scale-95 group text-left">
+          <div class="flex justify-between items-start w-full">
+            <span class="text-slate-400 text-[10px] font-bold uppercase tracking-wider">Het Weer</span>
+            <span class="text-slate-500 group-hover:text-white transition">☀️</span>
+          </div>
+          <div class="mt-4">
+            <div id="hubWeatherValue" class="text-lg font-black text-white group-hover:text-sky-400 transition">–</div>
+            <span id="hubWeatherSub" class="text-[10px] text-slate-500 mt-0.5 block">Locatie ophalen…</span>
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+  <script>
+    document.querySelectorAll('.hub-tile, [data-action]').forEach(el => {
+      el.addEventListener('click', () => {
+        parent.postMessage({ source: 'garminHub', action: el.dataset.action }, '*');
+      });
+    });
+    window.addEventListener('message', (ev) => {
+      const data = ev.data;
+      if (!data || data.source !== 'garminHubWeather') return;
+      const valEl = document.getElementById('hubWeatherValue');
+      const subEl = document.getElementById('hubWeatherSub');
+      if (data.error){
+        subEl.textContent = data.error;
+        return;
+      }
+      valEl.innerHTML = data.temp + '°C <span class="text-xs font-normal text-slate-400">' + data.windLabel + '</span>';
+      subEl.textContent = data.updatedLabel;
+    });
+  <\/script>
+</body>
+</html>`;
+}
+
+window.addEventListener('message', (ev) => {
+  const data = ev.data;
+  if (!data || data.source !== 'garminHub') return;
+  switch (data.action){
+    case 'fiets':   openBikeSetupScreen('fiets'); break;
+    case 'wandel':  openBikeSetupScreen('wandel'); break;
+    case 'kompas':  selectMode(appMode || 'fiets'); setTimeout(() => setActiveTab('sun'), 50); break;
+    case 'weer':    selectMode(appMode || 'fiets'); setTimeout(() => setActiveTab('weather'), 50); break;
+    case 'hardloop':
+      toast(curLang()==='en' ? 'Running mode is coming soon.' : 'Hardlopen komt binnenkort — nog in opbouw.', 3000);
+      break;
+  }
+});
 let poiSettingsDebounceTimer = null;
 function applySettings(){
   applyTheme(appSettings.theme);
@@ -5805,7 +6026,7 @@ $('menuSwitchModeBtn').addEventListener('click', () => {
   poiLayer.clearLayers();
   routeLine.setLatLngs([]);
   renderRoute();
-  $('modeSelectScreen').classList.remove('hidden');
+  showHubScreen();
 });
 
 // ---------- Hoogteprofiel ----------
@@ -11319,7 +11540,7 @@ function selectMode(mode){
   $('bikeRoutingProAnalyseBtn').style.display = 'block'; // altijd beschikbaar, zowel bij fiets als wandelen
   $('toStartBtn').disabled = false;
   document.body.classList.toggle('mode-wandel', mode === 'wandel');
-  $('modeSelectScreen').classList.add('hidden');
+  hideHubScreen();
   const lang = appSettings.language === 'en' ? 'en' : 'nl';
   const placeholders = {
     nl: { fiets:'Plaats, knooppunt, of café/bakker/…', wandel:'Plaats, wandelknooppunt, of café/bakker/…' },
@@ -11377,7 +11598,7 @@ function openBikeSetupScreen(mode){
   $('bikeSetupTitle').textContent = mode === 'fiets' ? tr('bikeSetupTitleFiets') : tr('bikeSetupTitleWandel');
   document.querySelector('#bikeRoutingProBadge b').textContent = mode === 'fiets' ? tr('bikeRoutingProTitle') : tr('walkRoutingProTitle');
   document.querySelector('#bikeRoutingProBadge span:first-child').textContent = mode === 'fiets' ? '🚴\u200d♂️' : '🥾';
-  $('modeSelectScreen').classList.add('hidden');
+  hideHubScreen();
   $('bikeSetupScreen').classList.remove('hidden');
 }
 document.querySelectorAll('.bike-type-tile').forEach(tile => {
@@ -11406,7 +11627,7 @@ $('bikeSetupContinueBtn').addEventListener('click', () => {
 });
 $('bikeSetupBackBtn').addEventListener('click', () => {
   $('bikeSetupScreen').classList.add('hidden');
-  $('modeSelectScreen').classList.remove('hidden');
+  showHubScreen();
 });
 $('passiveReadyBtn').addEventListener('click', async () => {
   if (!passiveEditingDone){
