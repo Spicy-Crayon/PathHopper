@@ -1146,7 +1146,7 @@
     </div>
   </div>
   <div id="modeSelectHint" data-i18n="modeSelectHint">Knooppunten, navigatie, GPX, offline-gebruik — alles werkt voor beide.</div>
-  <div id="appVersionStart">v2.252 · 12 aug</div>
+  <div id="appVersionStart">v2.253 · 12 aug</div>
 </div>
 
 <div id="bikeSetupScreen" class="hidden">
@@ -1234,7 +1234,7 @@
   <button class="menu-item" id="menuHelpBtn"><span class="mi-icon">❓</span><span class="mi-text"><b data-i18n="menuHelp">Hulp</b><small data-i18n="menuHelpSub">uitleg over alle functies</small></span></button>
   <button class="menu-item" id="menuDevNotesBtn"><span class="mi-icon">🛠️</span><span class="mi-text"><b data-i18n="menuDevNotes">Technische werking</b><small data-i18n="menuDevNotesSub">hoe wegdektype, routering en fallbacks precies werken</small></span></button>
   <button class="menu-item" id="menuLogbookBtn"><span class="mi-icon">📋</span><span class="mi-text"><b data-i18n="menuLogbook">Logboek</b><small data-i18n="menuLogbookSub">overzicht van alle meldingen, ook stille</small></span></button>
-  <div id="menuVersion">v2.252 · 12 aug</div>
+  <div id="menuVersion">v2.253 · 12 aug</div>
 </div>
 
 <div id="hint" data-i18n="hintInitial">Zoom of pan naar je gebied, tik dan op "Laad knooppunten"</div>
@@ -2678,6 +2678,11 @@ function setMapRotation(deg){
 // een eigen sleepgebaar, want binnen de seconde sprong de kaart gewoon terug. Nu pauzeert het automatisch
 // centreren enkele seconden zodra je zelf sleept, en hervat het vanzelf nadien.
 let navMapUserPanning = false;
+// Onderdrukt, één enkele keer, de vloeiende animatie van het automatische centreren op je positie — gebruikt
+// net na het starten of hervatten van navigatie, waar de kaart toch al aan het bewegen/groeien is (rotatie
+// inschakelen, of terug centreren na de pauze). Zonder dit gebeurden die twee bewegingen na elkaar, wat
+// aanvoelde als een lange "rollende" veeg over het scherm i.p.v. één rustige overgang.
+let suppressNextPanAnimation = false;
 let navMapUserPanTimer = null;
 function markNavMapUserPan(){
   if (!navActive) return;
@@ -2713,6 +2718,11 @@ function resumeNavFromDetourPause(){
   $('navPanel').classList.add('show');
   $('navHexButtons').classList.add('show');
   $('sheet').classList.add('collapsed');
+  // Tijdens de pauze kon je vrij rondkijken op de kaart — meteen (zonder animatie) terug naar je huidige
+  // positie springen vóór rotatie weer aangaat, anders volgde er een lange, vloeiend "rollende" veeg over
+  // het scherm zodra de eerstvolgende automatische centrering dat alsnog moest inhalen.
+  if (lastPosition) map.setView([lastPosition.coords.latitude, lastPosition.coords.longitude], map.getZoom(), { animate:false });
+  suppressNextPanAnimation = true;
   if (wasMapRotationEnabledBeforePin){ enableMapRotation(); wasMapRotationEnabledBeforePin = false; }
   toast(curLang()==='en' ? 'Navigation resumed' : 'Navigatie hervat', 2500);
 }
@@ -9416,6 +9426,7 @@ function startNav(){
     // groeien/draaien inschakelen — anders overlappen die twee overgangen elkaar en oogt het als een
     // rare dubbele sprong (eerst wat opschuiven, dan met een schok verder inzoomen).
     map.setView([pos.coords.latitude, pos.coords.longitude], 18, { animate:false });
+    suppressNextPanAnimation = true; // de eerstvolgende automatische centrering niet nog eens laten meeanimeren, bovenop de rotatie die zo meteen ook al start
     if (!appSettings.disableMapRotation) enableMapRotation();
     drawRoutePath(true).then(renderRoute);
   }, () => {
@@ -9678,7 +9689,8 @@ function renderPosition(){
   const dist = haversine(lat, lon, target.lat, target.lon);
   const brg = bearing(lat, lon, target.lat, target.lon);
 
-  if (!navMapUserPanning) map.panTo([lat,lon], { animate:true });
+  if (!navMapUserPanning) map.panTo([lat,lon], { animate: !suppressNextPanAnimation });
+  suppressNextPanAnimation = false;
 
   // Vloeiende rotatie van de HUD-pijl: kortste weg naar de nieuwe hoek, geen sprong bij 359°→0°.
   // Gebruikt dezelfde (GPS-koers-bij-voorkeur) richting als de kaart zelf, niet het rauwe kompas —
