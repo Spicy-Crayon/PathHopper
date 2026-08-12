@@ -1146,7 +1146,7 @@
     </div>
   </div>
   <div id="modeSelectHint" data-i18n="modeSelectHint">Knooppunten, navigatie, GPX, offline-gebruik — alles werkt voor beide.</div>
-  <div id="appVersionStart">v2.258 · 12 aug</div>
+  <div id="appVersionStart">v2.261 · 12 aug</div>
 </div>
 
 <div id="bikeSetupScreen" class="hidden">
@@ -1234,7 +1234,7 @@
   <button class="menu-item" id="menuHelpBtn"><span class="mi-icon">❓</span><span class="mi-text"><b data-i18n="menuHelp">Hulp</b><small data-i18n="menuHelpSub">uitleg over alle functies</small></span></button>
   <button class="menu-item" id="menuDevNotesBtn"><span class="mi-icon">🛠️</span><span class="mi-text"><b data-i18n="menuDevNotes">Technische werking</b><small data-i18n="menuDevNotesSub">hoe wegdektype, routering en fallbacks precies werken</small></span></button>
   <button class="menu-item" id="menuLogbookBtn"><span class="mi-icon">📋</span><span class="mi-text"><b data-i18n="menuLogbook">Logboek</b><small data-i18n="menuLogbookSub">overzicht van alle meldingen, ook stille</small></span></button>
-  <div id="menuVersion">v2.258 · 12 aug</div>
+  <div id="menuVersion">v2.261 · 12 aug</div>
 </div>
 
 <div id="hint" data-i18n="hintInitial">Zoom of pan naar je gebied, tik dan op "Laad knooppunten"</div>
@@ -2242,8 +2242,12 @@ function useTileProvider(index){
   // is precies het gebied dat bij het STARTEN van navigatie plots zichtbaar wordt (container groeit dan
   // naar 230%) — met een bredere buffer staan die tegels dan al vaker klaar i.p.v. pas op dat moment vanaf
   // nul opgehaald te moeten worden, wat de (enkel bij een koude cache merkbare) groene rand bij de allereerste
-  // navigatiestart van een sessie zou moeten verminderen.
-  currentTileLayer = L.tileLayer(p.url, { ...p.options, keepBuffer: 6 }).addTo(map);
+  // navigatiestart van een sessie zou moeten verminderen. Een vaste waarde volstond op een telefoonscherm,
+  // maar op een groot pc-scherm past er verhoudingsgewijs veel meer in het zichtbare gebied — dus schalen
+  // we de buffer mee met de schermgrootte (in tegel-eenheden van 256px) i.p.v. een vast getal te gebruiken.
+  const viewportPx = Math.max(window.innerWidth, window.innerHeight);
+  const dynamicKeepBuffer = Math.min(8, Math.max(6, Math.ceil((viewportPx / 256) * 0.7))); // voorzichtiger: kleinere factor én een plafond, zodat het op een groot pc-scherm niet buitensporig veel extra data/geheugen kost
+  currentTileLayer = L.tileLayer(p.url, { ...p.options, keepBuffer: dynamicKeepBuffer }).addTo(map);
   document.getElementById('mapAttribution').textContent = p.options.attribution;
 
   let anyTileLoaded = false;
@@ -6054,7 +6058,7 @@ function renderElevationChart(profile, svgId='elevationSvg', wrapId='elevationCh
 
   const x = km => pad.l + (km / maxDist) * (w - pad.l - pad.r);
   const y = ele => (h - pad.b) - ((ele - minEle) / eleRange) * (h - pad.b - pad.t);
-  chartProjections[svgId] = { x, y, maxDist };
+  chartProjections[svgId] = { x, y, maxDist, w, h };
 
   let segs = '';
   for (let i = 1; i < profile.ele.length; i++){
@@ -11506,11 +11510,12 @@ function updateAnalyseDotByIndex(idx, frac, skipMapMove){
   // Exact dezelfde projectie gebruiken als de grafiek zelf (chartProjections, opgeslagen door
   // renderElevationChart/renderSlopeChart) i.p.v. een eigen, benaderende opvulling/marge-berekening — die
   // bleek op sommige combinaties van kaartlijn-marges niet exact overeen te komen, met een bolletje dat
-  // net niet op de lijn zelf stond. Zo volgt de bol nu pixel-voor-pixel dezelfde lijn als de grafiek.
-  const svg = $('analyseSvg');
+  // net niet op de lijn zelf stond. Zo volgt de bol nu pixel-voor-pixel dezelfde lijn als de grafiek. En:
+  // de breedte/hoogte NIET hier opnieuw opmeten (svg.getBoundingClientRect() kan op het moment van slepen
+  // net iets anders teruggeven dan toen de lijn zelf getekend werd, bv. door lay-out-timing) — we gebruiken
+  // in plaats daarvan exact dezelfde w/h die chartProjections zelf al heeft opgeslagen bij het tekenen.
   const proj = chartProjections['analyseSvg'];
-  const rect = svg.getBoundingClientRect();
-  const w = rect.width || svg.clientWidth || 1, h = rect.height || svg.clientHeight || 1;
+  const w = (proj && proj.w) || 1, h = (proj && proj.h) || 1;
   let yPercent = 50;
   if (analyseChartValueFn && proj){
     const val = analyseChartValueFn(idx);
@@ -11551,7 +11556,7 @@ function renderSlopeChart(profile, grads, svgId){
   // laatst bezochte Hoogte-tab, wat de bol de hoogte i.p.v. het stijgingspercentage liet volgen.
   const xFor = km => pad.l + (km / totalKm) * (w - pad.l - pad.r);
   const yFor = g => zeroY - (Math.max(-maxAbsGrad, Math.min(maxAbsGrad, g)) / maxAbsGrad) * (h/2 - 10);
-  chartProjections[svgId] = { x: xFor, y: yFor, maxDist: totalKm };
+  chartProjections[svgId] = { x: xFor, y: yFor, maxDist: totalKm, w, h };
   let bars = '';
   grads.forEach((g, i) => {
     const x = pad.l + (profile.distKm[i] / totalKm) * (w - pad.l - pad.r);
