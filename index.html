@@ -101,6 +101,12 @@
   .me-dot{ width:16px; height:16px; border-radius:50%; background:#2b7fff; border:3px solid white; box-shadow:0 0 0 3px rgba(43,127,255,0.35);}
   .me-dot-red{ width:16px; height:16px; border-radius:50%; background:#e8352b; border:3px solid white; box-shadow:0 0 0 3px rgba(232,53,43,0.4); }
   .me-dot-red.moving{ animation:red-dot-pulse 1.1s ease-in-out infinite; }
+  /* Groter, onzichtbaar tik-gebied rond het (kleine) positie-bolletje — enkel relevant vóór je op Start
+     drukt, want dan bepaalt een tik erop of de route vanaf je huidige locatie vertrekt. De amber ring
+     toont of dat op dit moment AAN staat (vervangt de vroegere aparte "Vertrek"-knop volledig). */
+  .me-dot-taptarget{ width:40px; height:40px; display:flex; align-items:center; justify-content:center; }
+  .me-dot-vertrek-on.me-dot{ box-shadow:0 0 0 3px rgba(43,127,255,0.35), 0 0 0 6px rgba(226,161,60,0.9); }
+  .me-dot-vertrek-on.me-dot-red{ box-shadow:0 0 0 3px rgba(232,53,43,0.4), 0 0 0 6px rgba(226,161,60,0.9); }
   @keyframes red-dot-pulse{
     0%{ box-shadow:0 0 0 3px rgba(232,53,43,0.4), 0 0 6px 2px rgba(232,53,43,0.5); opacity:1; }
     50%{ box-shadow:0 0 0 10px rgba(232,53,43,0), 0 0 14px 6px rgba(232,53,43,0.85); opacity:0.55; }
@@ -546,6 +552,7 @@
   body.dash-active #locateBtn,
   body.dash-active #zoomBtns,
   body.dash-active #navPanel,
+  body.dash-active #navHexButtons,
   body.dash-active #offRouteBanner{ display:none !important; }
 
   /* Bottom sheet */
@@ -602,7 +609,7 @@
   }
   #actions button .ic{ font-size:14px; }
   #clearBtn{ background:#e8e3d6; color:var(--green-900); }
-  #toStartBtn{ background:#2d5240; color:var(--cream); border:2px solid transparent; }
+  #toStartBtn{ background:#2d5240; color:var(--cream); border:2px solid transparent; display:none; } /* vervangen door tik-op-positie-bolletje; DOM/JS-referenties blijven intact, enkel niet meer getoond */
   #toStartBtn:disabled{ opacity:.5; }
   #toStartBtn.toggle-on{ border:3px solid #e64c3c; box-shadow:0 0 0 1px rgba(0,0,0,0.4) inset; }
   #elevationBtn{ background:#7a5a1e; color:var(--cream); }
@@ -653,31 +660,24 @@
   .navDist{ text-align:right; min-width:68px; }
   .navDist span{ font-size:17px; font-weight:800; line-height:1; }
   .navDist small{ display:block; font-size:10px; opacity:.7; }
-  .navBottom{ display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:11.5px; opacity:.9; }
-  #navExpandToggle{
-    width:100%; border:none; background:rgba(255,255,255,0.08); color:var(--cream);
-    font-size:11px; font-weight:700; padding:5px; border-radius:8px; margin-top:6px;
-  }
-  #navExtra{ display:none; margin-top:8px; }
-  #navExtra.show{ display:block; }
-  #roadClosedBtn{
-    width:100%; margin-top:8px; border:none; border-radius:10px; padding:8px;
-    background:rgba(224,90,78,0.18); color:#f0a89c; font-size:11.5px; font-weight:700;
-  }
-  #roadClosedBtn:active{ background:rgba(224,90,78,0.3); }
-  #foodBreakBtn{
-    display:block; margin:10px auto 0; border:none; border-radius:16px; padding:8px 22px;
-    background:rgba(255,255,255,0.08); color:var(--cream); font-size:11.5px; font-weight:700;
-  }
-  #foodBreakBtn:active{ background:rgba(255,255,255,0.16); }
-  #navWindLine{ text-align:center; font-size:11.5px; color:rgba(246,244,238,0.75); margin-top:8px; }
-  #backToStartBtn{
-    width:100%; margin-top:8px; border:none; border-radius:10px; padding:8px;
-    background:rgba(255,255,255,0.08); color:var(--cream); font-size:11.5px; font-weight:700;
-  }
-  #backToStartBtn:active{ background:rgba(255,255,255,0.16); }
+  .navBottom{ display:flex; align-items:center; justify-content:space-between; gap:10px; font-size:11.5px; opacity:.9; margin-top:6px; }
+  #roadClosedBtn{ color:#f0a89c; }
+  #roadClosedBtn:active{ background:rgba(224,90,78,0.3) !important; }
+  #navWindLine{ text-align:center; font-size:11.5px; color:rgba(246,244,238,0.75); margin-top:6px; }
   #navProgressBar{ flex:1; height:5px; background:rgba(255,255,255,0.15); border-radius:3px; overflow:hidden; }
   #navProgressFill{ height:100%; background:var(--amber); border-radius:3px; transition:width .3s; }
+
+  /* De 3 acties die vroeger in het uitklapbare "Meer details"-paneel zaten (afsluiting/pauze/terug naar
+     start) staan nu als losse honingraat-knopjes links op het scherm tijdens navigeren — zelfde .tab-hex-
+     stijl en grootte als de tabbalk bovenaan, 5px tussenruimte, boven het onderste sheet-handvat. */
+  #navHexButtons{
+    position:absolute; left:12px;
+    bottom:calc(env(safe-area-inset-bottom,0px) + var(--extra-bottom-inset) + 70px);
+    z-index:900; display:none; flex-direction:column; gap:5px;
+  }
+  #navHexButtons.show{ display:flex; }
+  #navHexButtons .tab-hex{ font-size:20px; }
+  #tabDashBtn.nav-hide{ display:none; } /* geen dashboard/analyse tijdens actief navigeren, zie startNav()/stopNav() */
 
   #turnBanner{
     display:none; align-items:center; gap:8px; background:rgba(255,255,255,0.08);
@@ -1146,7 +1146,7 @@
     </div>
   </div>
   <div id="modeSelectHint" data-i18n="modeSelectHint">Knooppunten, navigatie, GPX, offline-gebruik — alles werkt voor beide.</div>
-  <div id="appVersionStart">v2.242 · 8 aug</div>
+  <div id="appVersionStart">v2.249 · 12 aug</div>
 </div>
 
 <div id="bikeSetupScreen" class="hidden">
@@ -1234,7 +1234,7 @@
   <button class="menu-item" id="menuHelpBtn"><span class="mi-icon">❓</span><span class="mi-text"><b data-i18n="menuHelp">Hulp</b><small data-i18n="menuHelpSub">uitleg over alle functies</small></span></button>
   <button class="menu-item" id="menuDevNotesBtn"><span class="mi-icon">🛠️</span><span class="mi-text"><b data-i18n="menuDevNotes">Technische werking</b><small data-i18n="menuDevNotesSub">hoe wegdektype, routering en fallbacks precies werken</small></span></button>
   <button class="menu-item" id="menuLogbookBtn"><span class="mi-icon">📋</span><span class="mi-text"><b data-i18n="menuLogbook">Logboek</b><small data-i18n="menuLogbookSub">overzicht van alle meldingen, ook stille</small></span></button>
-  <div id="menuVersion">v2.242 · 8 aug</div>
+  <div id="menuVersion">v2.249 · 12 aug</div>
 </div>
 
 <div id="hint" data-i18n="hintInitial">Zoom of pan naar je gebied, tik dan op "Laad knooppunten"</div>
@@ -1877,18 +1877,18 @@
     <span id="turnText">–</span>
     <button class="voice-toggle" title="Gesproken navigatie aan/uit" data-i18n-title="titleVoiceToggle">🔊</button>
   </div>
-  <button id="navExpandToggle" data-i18n="navMoreDetails">⌄ Meer details</button>
-  <div id="navExtra">
-    <div class="navBottom">
-      <span id="navNextLabel" data-i18n="navStartLabel">Start navigatie</span>
-      <div id="navProgressBar"><div id="navProgressFill" style="width:0%"></div></div>
-      <span id="navProgressLabel">0/0</span>
-    </div>
-    <button id="roadClosedBtn" data-i18n="roadClosedBtn">🚧 Weg hier afgesloten — herbereken</button>
-    <button id="foodBreakBtn" data-i18n="foodBreakBtn">☕ Pauze zoeken</button>
-    <div id="navWindLine" style="display:none;">–</div>
-    <button id="backToStartBtn" data-i18n="backToStartBtn">↩️ Terug naar startpunt</button>
+  <div class="navBottom">
+    <span id="navNextLabel" data-i18n="navStartLabel">Start navigatie</span>
+    <div id="navProgressBar"><div id="navProgressFill" style="width:0%"></div></div>
+    <span id="navProgressLabel">0/0</span>
   </div>
+  <div id="navWindLine" style="display:none;">–</div>
+</div>
+
+<div id="navHexButtons">
+  <button id="roadClosedBtn" class="tab-hex" title="Afsluiting — omweg zoeken" data-i18n-title="titleRoadClosed">🚧</button>
+  <button id="foodBreakBtn" class="tab-hex" title="Pauze zoeken" data-i18n-title="titleFoodBreak">☕</button>
+  <button id="backToStartBtn" class="tab-hex" title="Terug naar startpunt" data-i18n-title="titleBackToStart">↩️</button>
 </div>
 
 <div id="offRouteBanner" data-i18n="toastOffRoute">⚠️ Je wijkt af van de route</div>
@@ -2184,6 +2184,7 @@
     <button id="toStartBtn" class="small" title="Aan: route vertrekt vanaf je huidige locatie. Uit: route vertrekt vanaf je eerste geselecteerde punt." data-i18n-title="titleVertrekToggle"><span class="ic">🚴</span><span data-i18n="actionVertrek">Vertrek</span></button>
     <button id="elevationBtn" class="small"><span class="ic">📈</span><span data-i18n="actionHoogte">Hoogte</span></button>
     <button id="detourBtn" class="small" style="display:none;"><span class="ic">🔀</span><span data-i18n="actionOmweg">Omweg</span></button>
+    <button id="resumeNavBtn" class="small" style="display:none; background:var(--amber); color:var(--green-900);"><span class="ic">▶</span><span data-i18n="actionResumeNav">Hervat</span></button>
     <button id="navBtn" class="small" disabled><span class="ic">▶</span><span data-i18n="actionStart">Start</span></button>
   </div>
 </div>
@@ -2644,6 +2645,7 @@ let arrivalActual = [];     // index in route -> Date.now() op moment van aankom
 let lastSpeedKmh = null;    // meest recent gemeten fietssnelheid, voor tijdsinschattingen
 let lastMapRotation = 0;    // huidige rotatiehoek van de kaart zelf (koers-boven tijdens navigeren)
 let lastElevationProfile = null; // laatst berekende hoogteprofiel-data, voor herrenderen bij schermdraai
+let rotatorInvalidateTimer = null; // zie enableMapRotation/disableMapRotation hieronder
 
 // ---------- Modus: fiets of wandel ----------
 const MODE_CONFIG = {
@@ -2685,16 +2687,67 @@ function markNavMapUserPan(){
 }
 map.on('dragstart', markNavMapUserPan);
 
+// ---------- Punt 5: "Afsluiting" pauzeert de navigatie-UI zonder de navigatie zelf te stoppen ----------
+// navActive, GPS-tracking, kruimelspoor, rit-timer, ... blijven allemaal gewoon doorlopen — enkel het
+// turn-by-turn-scherm maakt plaats voor de vertrouwde kaart/planningsweergave (net als na Stop), zodat je
+// rustig een omweg kan kiezen zonder draaiende kaart of kompas in de weg. Pas bij "Hervat" schakelt de
+// echte turn-by-turn-weergave terug aan. De rit zelf wordt dus nooit afgesloten/opgeslagen door dit pauzeren.
+let navPausedForDetour = false;
+function pauseNavForDetour(){
+  if (!navActive || navPausedForDetour) return;
+  navPausedForDetour = true;
+  $('navPanel').classList.remove('show');
+  $('navHexButtons').classList.remove('show');
+  $('sheet').classList.remove('collapsed');
+  $('resumeNavBtn').style.display = '';
+  wasMapRotationEnabledBeforePin = !appSettings.disableMapRotation;
+  if (wasMapRotationEnabledBeforePin) disableMapRotation();
+}
+function resumeNavFromDetourPause(){
+  if (!navPausedForDetour) return;
+  navPausedForDetour = false;
+  cancelManualDetourPinMode(); // ruimt eventuele nog openstaande handmatige-pin-poging netjes op
+  $('resumeNavBtn').style.display = 'none';
+  $('navPanel').classList.add('show');
+  $('navHexButtons').classList.add('show');
+  $('sheet').classList.add('collapsed');
+  if (wasMapRotationEnabledBeforePin){ enableMapRotation(); wasMapRotationEnabledBeforePin = false; }
+  toast(curLang()==='en' ? 'Navigation resumed' : 'Navigatie hervat', 2500);
+}
+
+
+// #mapRotator groeit/krimpt via een CSS-transition (.3s) tussen 100% en 230% breedte/hoogte, zodat draaien
+// geen lege hoeken toont. We mogen Leaflet pas invalidateSize() laten aanroepen NADAT die transition echt
+// afgerond is — te vroeg aanroepen (bv. op de eerstvolgende animatieframe, of één directe aanroep vóór de
+// transition start) laat Leaflet een tussentijdse, verkeerde containergrootte meten. Bij het groeien gaf dat
+// een grijze diagonale rand (te weinig tegels geladen voor het uiteindelijke, grotere gebied); bij het krimpen
+// gaf een te vroege aanroep net het omgekeerde: tegels werden al verwijderd terwijl de kaart visueel nog groot
+// stond, met een groen randje (de achtergrondkleur van #mapViewport) tot gevolg. Daarom wachten we nu écht op
+// het einde van de transition (met een korte fallback-timer voor het geval transitionend niet vuurt).
+function invalidateAfterRotatorTransition(){
+  const el = document.getElementById('mapRotator');
+  clearTimeout(rotatorInvalidateTimer);
+  let done = false;
+  const finish = () => {
+    if (done) return;
+    done = true;
+    el.removeEventListener('transitionend', onEnd);
+    map.invalidateSize();
+  };
+  const onEnd = (e) => { if (e.target === el && (e.propertyName === 'width' || e.propertyName === 'height')) finish(); };
+  el.addEventListener('transitionend', onEnd);
+  rotatorInvalidateTimer = setTimeout(finish, 400); // vangnet
+}
 function enableMapRotation(){
   document.getElementById('mapRotator').classList.add('rotating');
-  requestAnimationFrame(() => map.invalidateSize());
+  invalidateAfterRotatorTransition();
   setupRotationAwareDragging();
 }
 function disableMapRotation(){
   lastMapRotation = 0;
   setMapRotation(0);
   document.getElementById('mapRotator').classList.remove('rotating');
-  requestAnimationFrame(() => map.invalidateSize());
+  invalidateAfterRotatorTransition();
   teardownRotationAwareDragging();
 }
 
@@ -2715,30 +2768,108 @@ function rotDragMove(x, y){
   map.panBy([-rx, -ry], { animate:false });
 }
 function rotDragEnd(){ rotDragActive = false; }
-function rotTouchStartHandler(e){ if (e.touches.length === 1) rotDragStart(e.touches[0].clientX, e.touches[0].clientY); }
-function rotTouchMoveHandler(e){ if (e.touches.length === 1){ rotDragMove(e.touches[0].clientX, e.touches[0].clientY); e.preventDefault(); } }
+
+// ---------- Zoomen corrigeren voor de gedraaide kaart ----------
+// Zelfde probleem als bij slepen, maar dan voor dubbeltik- en knijpzoom: Leaflet vertaalt een schermpunt
+// naar een containerpunt zonder rekening te houden met de CSS-rotatie van #mapRotator. Bij 0° (pijl naar
+// boven) klopt dat toevallig nog, maar bij elke andere hoek zoomt de kaart dan "schuin" in op een punt dat
+// niet overeenkomt met waar je tikte/kneep. Rotatie van een element rond z'n eigen middelpunt verandert het
+// middelpunt van de bounding box niet — dus dat middelpunt (via getBoundingClientRect) is wél betrouwbaar,
+// ongeacht de hoek. Van daaruit draaien we het schermpunt terug naar Leaflet's ongedraaide coördinatenstelsel.
+function rotContainerPointFromClient(clientX, clientY){
+  const c = map.getContainer();
+  const rect = c.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2, cy = rect.top + rect.height / 2;
+  const dx = clientX - cx, dy = clientY - cy;
+  const rad = -lastMapRotation * Math.PI / 180;
+  const rx = dx * Math.cos(rad) - dy * Math.sin(rad);
+  const ry = dx * Math.sin(rad) + dy * Math.cos(rad);
+  const size = map.getSize();
+  return L.point(size.x / 2 + rx, size.y / 2 + ry);
+}
+function rotZoomAroundClientPoint(clientX, clientY, newZoom){
+  const latlng = map.containerPointToLatLng(rotContainerPointFromClient(clientX, clientY));
+  map.setZoomAround(latlng, newZoom, { animate:false });
+}
+// Dubbeltik (en dubbelklik met de muis) — handmatig gedetecteerd i.p.v. Leaflet's eigen doubleClickZoom,
+// want die staat uit zolang de kaart draait (zie setupRotationAwareDragging).
+let lastTapTime = 0, lastTapX = 0, lastTapY = 0;
+function maybeHandleDoubleTap(clientX, clientY){
+  const now = Date.now();
+  const closeEnough = Math.hypot(clientX - lastTapX, clientY - lastTapY) < 40;
+  if (now - lastTapTime < 350 && closeEnough){
+    rotZoomAroundClientPoint(clientX, clientY, map.getZoom() + 1);
+    lastTapTime = 0; // voorkom een 'triple tap' die meteen weer als dubbeltik telt
+  } else {
+    lastTapTime = now; lastTapX = clientX; lastTapY = clientY;
+  }
+}
+// Knijpzoom (2 vingers) — anker blijft het middelpunt van waar de knijpbeweging begon, net als bij normale
+// pinch-zoom, maar dan met de rotatiecorrectie hierboven.
+let rotPinchActive = false, rotPinchStartDist = 0, rotPinchStartZoom = 0, rotPinchAnchorLatLng = null;
+function rotPinchDist(t0, t1){ return Math.hypot(t1.clientX - t0.clientX, t1.clientY - t0.clientY); }
+function rotPinchStart(t0, t1){
+  rotDragActive = false;
+  rotPinchActive = true;
+  rotPinchStartDist = rotPinchDist(t0, t1);
+  rotPinchStartZoom = map.getZoom();
+  const midX = (t0.clientX + t1.clientX) / 2, midY = (t0.clientY + t1.clientY) / 2;
+  rotPinchAnchorLatLng = map.containerPointToLatLng(rotContainerPointFromClient(midX, midY));
+  map.stop(); markNavMapUserPan();
+}
+function rotPinchMove(t0, t1){
+  if (!rotPinchActive) return;
+  const dist = rotPinchDist(t0, t1);
+  if (dist < 1 || rotPinchStartDist < 1) return;
+  const newZoom = rotPinchStartZoom + Math.log2(dist / rotPinchStartDist);
+  map.setZoomAround(rotPinchAnchorLatLng, newZoom, { animate:false });
+}
+function rotPinchEnd(){ rotPinchActive = false; }
+function rotTouchStartHandler(e){
+  if (e.touches.length === 1) rotDragStart(e.touches[0].clientX, e.touches[0].clientY);
+  else if (e.touches.length === 2) rotPinchStart(e.touches[0], e.touches[1]);
+}
+function rotTouchMoveHandler(e){
+  if (e.touches.length === 2){ rotPinchMove(e.touches[0], e.touches[1]); e.preventDefault(); }
+  else if (e.touches.length === 1 && rotDragActive){ rotDragMove(e.touches[0].clientX, e.touches[0].clientY); e.preventDefault(); }
+}
+function rotTouchEndHandler(e){
+  if (rotPinchActive && e.touches.length < 2) rotPinchEnd();
+  if (rotDragActive && e.touches.length === 0){
+    rotDragEnd();
+    if (e.changedTouches && e.changedTouches.length) maybeHandleDoubleTap(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+  }
+}
 function rotMouseDownHandler(e){ rotDragStart(e.clientX, e.clientY); }
 function rotMouseMoveHandler(e){ rotDragMove(e.clientX, e.clientY); }
+function rotDblClickHandler(e){ rotZoomAroundClientPoint(e.clientX, e.clientY, map.getZoom() + 1); }
 function setupRotationAwareDragging(){
   map.dragging.disable();
+  map.doubleClickZoom.disable();
+  map.touchZoom.disable();
   const c = map.getContainer();
   c.addEventListener('touchstart', rotTouchStartHandler, { passive:true });
   c.addEventListener('touchmove', rotTouchMoveHandler, { passive:false });
-  c.addEventListener('touchend', rotDragEnd);
+  c.addEventListener('touchend', rotTouchEndHandler);
   c.addEventListener('mousedown', rotMouseDownHandler);
+  c.addEventListener('dblclick', rotDblClickHandler);
   window.addEventListener('mousemove', rotMouseMoveHandler);
   window.addEventListener('mouseup', rotDragEnd);
 }
 function teardownRotationAwareDragging(){
   map.dragging.enable();
+  map.doubleClickZoom.enable();
+  map.touchZoom.enable();
   const c = map.getContainer();
   c.removeEventListener('touchstart', rotTouchStartHandler);
   c.removeEventListener('touchmove', rotTouchMoveHandler);
-  c.removeEventListener('touchend', rotDragEnd);
+  c.removeEventListener('touchend', rotTouchEndHandler);
   c.removeEventListener('mousedown', rotMouseDownHandler);
+  c.removeEventListener('dblclick', rotDblClickHandler);
   window.removeEventListener('mousemove', rotMouseMoveHandler);
   window.removeEventListener('mouseup', rotDragEnd);
   rotDragActive = false;
+  rotPinchActive = false;
 }
 
 const $ = (id) => document.getElementById(id);
@@ -2826,8 +2957,11 @@ function isMapCurrentlyRotated(){
   return Math.abs(((lastMapRotation % 360) + 360) % 360) > 3; // kleine marge, exact 0° telt niet als 'gedraaid'
 }
 function showPinPopup(lat, lon){
-  if (navActive && isMapCurrentlyRotated()){
-    toast(tr('toastPinBlockedRotation'), 5000);
+  // Een nieuw punt plaatsen betekent je route herberekenen — dat laten we tijdens actief navigeren nu bewust
+  // niet meer toe (zie ook het verslepen van bestaande punten hierboven): gebruik "Weg afgesloten" voor een
+  // omweg onderweg, dat blijft wél gewoon werken tijdens navigeren.
+  if (navActive){
+    toast(tr('toastPinBlockedNav'), 5000);
     return;
   }
   if (loopGenPicking){
@@ -2996,6 +3130,7 @@ function touchToLatLng(e){
 }
 map.on('mousedown', (e) => {
   if (editMode) return; // tijdens het bewerken van de route mag de speld-functie niet in de weg zitten
+  if (navActive) return; // geen nieuwe punten tijdens actief navigeren — zie showPinPopup
   longPressStart = e.latlng;
   clearTimeout(longPressTimer);
   longPressTimer = setTimeout(() => { if (longPressStart) showPinPopup(longPressStart.lat, longPressStart.lng); }, 550);
@@ -3010,6 +3145,7 @@ let longPressStartPoint = null;
 const mapTouchTarget = map.getContainer();
 mapTouchTarget.addEventListener('touchstart', (e) => {
   if (editMode) return; // tijdens het bewerken van de route mag de speld-functie niet in de weg zitten
+  if (navActive) return; // geen nieuwe punten tijdens actief navigeren — zie showPinPopup
   if (e.touches.length > 1){ cancelLongPress(); return; } // niet tijdens 2-vinger-draaien
   const t = e.touches[0];
   longPressStartPoint = { x: t.clientX, y: t.clientY };
@@ -3714,7 +3850,8 @@ document.querySelectorAll('.simple-modal').forEach(modal => {
   modal.addEventListener('click', (e) => {
     if (e.target !== modal) return;
     if (modal.id === 'pinActionSheet' && pinMarker){ map.removeLayer(pinMarker); pinMarker = null; }
-    if (modal.id === 'detourKmModal' && wasMapRotationEnabledBeforePin){ enableMapRotation(); wasMapRotationEnabledBeforePin = false; }
+    // detourKmModal via de achtergrond sluiten laat je bewust in de gepauzeerde kaartweergave staan —
+    // rotatie schakelt voortaan uitsluitend via "Hervat" terug aan, zie resumeNavFromDetourPause().
     closeModal(modal.id);
   });
 });
@@ -4120,6 +4257,7 @@ const TRANSLATIONS = {
   actionVertrek: { nl:'Vertrek', en:'Depart' },
   actionHoogte: { nl:'Hoogte', en:'Elevation' },
   actionOmweg: { nl:'Omweg', en:'Detour' },
+  actionResumeNav: { nl:'Hervat', en:'Resume' },
   actionStart: { nl:'Start', en:'Start' },
   actionStop: { nl:'Stop', en:'Stop' },
   sheetEmptyTitle: { nl:'Jouw route', en:'Your route' },
@@ -4627,7 +4765,8 @@ const TRANSLATIONS = {
   toastArrivedAt: { nl:'🎉 Je bent aangekomen op ', en:'🎉 You have arrived at ' },
   toastRerouteUpdated: { nl:'🔄 Route bijgewerkt met de nieuwe routerings-instelling.', en:'🔄 Route updated with the new routing setting.' },
   toastPressEditFirst: { nl:'✏️ Druk eerst op "Edit" om je route te kunnen wijzigen.', en:'✏️ Press "Edit" first to be able to change your route.' },
-  toastPinBlockedRotation: { nl:'🧭 De kaart draait momenteel mee met je richting — even normaal doorrijden, dan verschijnt de spelden-optie weer betrouwbaar. (Of schakel kaart-rotatie uit in Instellingen.)', en:'🧭 The map is currently rotating with your direction — keep riding normally for a moment and pin placement will be reliable again. (Or turn off map rotation in Settings.)' },
+  toastPinBlockedNav: { nl:'📍 Nieuwe punten zetten kan niet tijdens navigatie — gebruik "Weg afgesloten" voor een omweg onderweg.', en:'📍 Placing new points isn\u2019t possible during navigation — use "Road closed" for a detour on the go.' },
+  toastVertrekBlockedNav: { nl:'🚴 Vertrekpunt wisselen kan niet tijdens navigatie.', en:'🚴 Changing the starting point isn\u2019t possible during navigation.' },
   toastDragBlockedDuringNav: { nl:'📍 Punten verslepen kan niet tijdens navigatie (kan verkeerd uitpakken door de kaart-rotatie) — stop de navigatie eerst, of gebruik "Weg afgesloten" voor een omweg onderweg.', en:'📍 Dragging points isn\u2019t possible during navigation (can go wrong due to map rotation) — stop navigation first, or use "Road closed" for a detour on the go.' },
   toastBrouterNoShortestDiff: { nl:'ℹ️ Bij BRouter geven "Kortste" en "Evenwichtig" hetzelfde resultaat (geen apart kortste-profiel beschikbaar op hun gratis server). Wil je een écht ander resultaat, schakel dan over naar Valhalla, OpenRouteService of GraphHopper.', en:'ℹ️ With BRouter, "Shortest" and "Balanced" give the same result (no separate shortest profile available on their free server). For a genuinely different result, switch to Valhalla, OpenRouteService or GraphHopper.' },
   toastZoomForPoi: { nl:'🔍 Zoom verder in om interessante plekken te zien (werkt vanaf straatniveau).', en:'🔍 Zoom in further to see points of interest (works from street level).' },
@@ -4648,6 +4787,9 @@ const TRANSLATIONS = {
   titleMyLocation: { nl:'Mijn locatie', en:'My location' },
   titleTabMap: { nl:'Kaart', en:'Map' },
   titleTabDash: { nl:'Dashboard', en:'Dashboard' },
+  titleRoadClosed: { nl:'Afsluiting — omweg zoeken', en:'Closure — find a detour' },
+  titleFoodBreak: { nl:'Pauze zoeken', en:'Find a break' },
+  titleBackToStart: { nl:'Terug naar startpunt', en:'Back to starting point' },
   titleTabCompass: { nl:'Kompas', en:'Compass' },
   titleTabWeather: { nl:'Weer', en:'Weather' },
   titleWindDir: { nl:'Windrichting', en:'Wind direction' },
@@ -5642,23 +5784,45 @@ function sampleEvenly(points, maxCount){
   return out;
 }
 
-// Haalt hoogtes op voor punten zonder ele — eerst Open-Elevation, met Open-Topo-Data als terugval
+// Haalt hoogtes op voor punten zonder ele — probeert na elkaar Open-Elevation, Open-Topo-Data en Open-Meteo.
+// Alle drie zijn gratis, sleutelloze diensten en dus af en toe eens onbereikbaar/overbelast; met drie na
+// elkaar geprobeerd wordt de kans dat ze *alle drie* tegelijk plat liggen heel klein. Enkel als ook de derde
+// faalt, geven we de effectieve foutmelding door.
+async function fetchElevationsFromOpenElevation(points){
+  const res = await fetch('https://api.open-elevation.com/api/v1/lookup', {
+    method:'POST', headers:{ 'Content-Type':'application/json' },
+    body: JSON.stringify({ locations: points.map(p => ({ latitude:p.lat, longitude:p.lon })) })
+  });
+  if (!res.ok) throw new Error('status ' + res.status);
+  const data = await res.json();
+  return data.results.map(r => r.elevation);
+}
+async function fetchElevationsFromOpenTopoData(points){
+  const locStr = points.map(p => `${p.lat},${p.lon}`).join('|');
+  const res = await fetch(`https://api.opentopodata.org/v1/srtm90m?locations=${encodeURIComponent(locStr)}`);
+  if (!res.ok) throw new Error('status ' + res.status);
+  const data = await res.json();
+  return data.results.map(r => r.elevation);
+}
+async function fetchElevationsFromOpenMeteo(points){
+  const latStr = points.map(p => p.lat).join(',');
+  const lonStr = points.map(p => p.lon).join(',');
+  const res = await fetch(`https://api.open-meteo.com/v1/elevation?latitude=${encodeURIComponent(latStr)}&longitude=${encodeURIComponent(lonStr)}`);
+  if (!res.ok) throw new Error('status ' + res.status);
+  const data = await res.json();
+  return data.elevation;
+}
 async function fetchElevations(points){
-  try{
-    const res = await fetch('https://api.open-elevation.com/api/v1/lookup', {
-      method:'POST', headers:{ 'Content-Type':'application/json' },
-      body: JSON.stringify({ locations: points.map(p => ({ latitude:p.lat, longitude:p.lon })) })
-    });
-    if (!res.ok) throw new Error('status ' + res.status);
-    const data = await res.json();
-    return data.results.map(r => r.elevation);
-  }catch(e){
-    const locStr = points.map(p => `${p.lat},${p.lon}`).join('|');
-    const res2 = await fetch(`https://api.opentopodata.org/v1/srtm90m?locations=${encodeURIComponent(locStr)}`);
-    if (!res2.ok) throw new Error(curLang()==='en' ? 'elevation services currently unavailable' : 'hoogte-diensten momenteel niet bereikbaar');
-    const data2 = await res2.json();
-    return data2.results.map(r => r.elevation);
+  const providers = [fetchElevationsFromOpenElevation, fetchElevationsFromOpenTopoData, fetchElevationsFromOpenMeteo];
+  let lastErr = null;
+  for (const provider of providers){
+    try{
+      const result = await provider(points);
+      if (Array.isArray(result) && result.length === points.length && result.every(v => typeof v === 'number')) return result;
+      throw new Error('onverwacht antwoord');
+    }catch(e){ lastErr = e; }
   }
+  throw new Error(curLang()==='en' ? 'elevation services currently unavailable' : 'hoogte-diensten momenteel niet bereikbaar');
 }
 
 async function buildElevationProfile(){
@@ -6014,6 +6178,7 @@ function canEditRouteNow(){
 }
 function toggleNode(id){
   if (!canEditRouteNow()) return;
+  if (navActive){ toast(tr('toastPinBlockedNav'), 5000); return; } // zie showPinPopup — geen herroutering tijdens navigeren
   if (routeIsFromGpx){ route.length = 0; routeIsFromGpx = false; importedTrack = []; arrivalActual = []; actualRouteKm = null; }
   const wasEmpty = route.length === 0;
   const n = loadedNodes.get(id);
@@ -6048,6 +6213,7 @@ function toggleNode(id){
 }
 
 function removeFromRoute(index){
+  if (navActive){ toast(tr('toastPinBlockedNav'), 5000); return; } // ook tijdens de omweg-pauze blijft dit de enige toegelaten manier om de route te wijzigen
   const removedId = route[index].id;
   route.splice(index, 1);
   if (pinMarkers[removedId]){ map.removeLayer(pinMarkers[removedId]); delete pinMarkers[removedId]; }
@@ -7283,6 +7449,14 @@ async function detourAroundClosedRoad(kmWanted){
   // zodat de motor verplicht is een écht ander tracé te zoeken, niet gewoon dezelfde weg terug te geven.
   // De breedte van die zone kan hieronder groeien als een eerste poging toch op zijn eigen stappen terugkeert.
   const directSegment = linePts.slice(myIdx, rejoinIdx + 1).map(p => [p.lat, p.lng]);
+  // Je huidige positie en het aansluitpunt liggen zelf ook op deze weg. Als de verboden zone tot precies
+  // daar reikt, moet de gevonden omweg er toch nog een klein stukje langs diezelfde weg naderen om exact op
+  // die coördinaat te geraken — dat zag er dan uit als "gaat naar een punt en keert weer terug", ongeacht
+  // hoe breed je de zone zelf instelde. Door een kleine marge aan begin en eind vrij te laten, blijft de
+  // rest van de weg wél verboden maar kan de omweg netjes aansluiten zonder die laatste meters te moeten
+  // forceren.
+  const avoidTrim = Math.min(2, Math.floor((directSegment.length - 2) / 2));
+  const segmentToAvoid = avoidTrim > 0 ? directSegment.slice(avoidTrim, directSegment.length - avoidTrim) : directSegment;
   const baseProfile = cfg().routeProfile;
 
   toast(curLang()==='en' ? `Finding a detour of about ${kmWanted} km…` : `Omweg van ongeveer ${kmWanted} km zoeken…`, 3000);
@@ -7291,7 +7465,7 @@ async function detourAroundClosedRoad(kmWanted){
     const overlapLimit = (appSettings.maxOverlapPct || 8) / 100; // zelfde 'nooit terugkeren'-strengheid als de generator
     let cleanFound = false;
     for (let attempt = 0; attempt < 5; attempt++){
-      const polygon = bufferPolylineToPolygon(downsampleCoords(directSegment, 40), bufferM);
+      const polygon = bufferPolylineToPolygon(downsampleCoords(segmentToAvoid, 40), bufferM);
       detour = await fetchOrsRouteWithAvoidPolygon([myPos, rejoinPt], polygon, baseProfile, {});
       // Keert de gevonden omweg toch op zijn eigen stappen terug (bv. naar een knooppunt en weer terug)?
       // Dan is de vermijdzone blijkbaar nog te smal — verbreden en opnieuw proberen, i.p.v. dat te
@@ -7394,19 +7568,19 @@ async function rerouteFromCurrentPosition(isAutomatic){
   }
 }
 $('roadClosedBtn').addEventListener('click', () => {
-  wasMapRotationEnabledBeforePin = !appSettings.disableMapRotation;
-  if (wasMapRotationEnabledBeforePin) disableMapRotation();
+  pauseNavForDetour();
   $('detourKmInput').value = 2;
   openModal('detourKmModal');
 });
 $('detourKmModal').querySelector('.simple-modal-close').addEventListener('click', () => {
-  if (wasMapRotationEnabledBeforePin){ enableMapRotation(); wasMapRotationEnabledBeforePin = false; } // je annuleerde het venster zelf, rotatie terug aanzetten
+  // Venster zelf gesloten (niet Hervat) — je blijft in de gepauzeerde kaartweergave staan, zodat je nog een
+  // handmatig punt kan kiezen of gewoon zelf op "Hervat" drukt wanneer je klaar bent.
 });
 $('detourKmConfirmBtn').addEventListener('click', () => {
   const km = parseFloat(String($('detourKmInput').value).replace(',', '.'));
   if (!km || km <= 0){ toast(tr('toastDetourInvalidKm'), 3500); return; }
   closeModal('detourKmModal');
-  detourAroundClosedRoad(km).finally(() => { if (wasMapRotationEnabledBeforePin){ enableMapRotation(); wasMapRotationEnabledBeforePin = false; } });
+  detourAroundClosedRoad(km); // blijft na afloop in de gepauzeerde weergave — pas "Hervat" schakelt terug naar turn-by-turn
 });
 $('detourKmManualBtn').addEventListener('click', () => {
   const km = parseFloat(String($('detourKmInput').value).replace(',', '.'));
@@ -7414,6 +7588,7 @@ $('detourKmManualBtn').addEventListener('click', () => {
   closeModal('detourKmModal');
   startManualDetourPinMode(km);
 });
+$('resumeNavBtn').addEventListener('click', resumeNavFromDetourPause);
 let manualDetourCircle = null;
 let wasMapRotationEnabledBeforePin = false;
 let manualDetourPinClickHandler = null;
@@ -7423,14 +7598,12 @@ function cancelPendingDetourClick(){
 }
 function startManualDetourPinMode(km){
   if (!navActive || !lastPosition){ toast(tr('toastNavOnly')); return; }
-  cancelPendingDetourClick(); // enkel rommel van een écht afgebroken vorige poging wegnemen — NIET de rotatie-status aanraken, die staat nu net correct (uitgeschakeld) door de knop die je hierheen bracht
+  cancelPendingDetourClick(); // enkel rommel van een écht afgebroken vorige poging wegnemen — NIET de rotatie-status aanraken, die staat nu net correct (uitgeschakeld) door pauseNavForDetour()
   const myPos = { lat: lastPosition.coords.latitude, lon: lastPosition.coords.longitude };
   manualDetourCircle = L.circle([myPos.lat, myPos.lon], {
     radius: km * 1000, color:'#4a9fd8', weight:2, fillColor:'#4a9fd8', fillOpacity:0.12, dashArray:'6,6'
   }).addTo(map);
   toast(tr('toastManualDetourHint'), 5000);
-  wasMapRotationEnabledBeforePin = !appSettings.disableMapRotation;
-  if (wasMapRotationEnabledBeforePin) disableMapRotation();
   manualDetourPinClickHandler = (e) => {
     manualDetourPinClickHandler = null; // deze klik zelf verwerken we hieronder, geen map.off nodig — was toch maar voor 1 klik bedoeld
     if (manualDetourCircle){ map.removeLayer(manualDetourCircle); manualDetourCircle = null; }
@@ -7438,15 +7611,15 @@ function startManualDetourPinMode(km){
   };
   map.once('click', manualDetourPinClickHandler);
   setTimeout(() => {
-    if (manualDetourPinClickHandler) cancelManualDetourPinMode(); // 30s niet getikt = automatisch opgeruimd, ongeacht hoe je 'weg' ging
+    if (manualDetourPinClickHandler) cancelManualDetourPinMode(); // 30s niet getikt = automatisch opgeruimd, blijft wel gewoon gepauzeerd staan
   }, 30000);
 }
-// Ruimt alles op van een niet-afgeronde speld-plaatsing-poging: de cirkel, de wachtende klik-handler (die
-// anders bij een willekeurige latere, normale tik op de kaart alsnog een omweg-punt zou toevoegen — dát
-// was de kern van 'vanaf dan is alles om zeep'), en de rotatie-status.
+// Ruimt alles op van een niet-afgeronde speld-plaatsing-poging: de cirkel en de wachtende klik-handler (die
+// anders bij een willekeurige latere, normale tik op de kaart alsnog een omweg-punt zou toevoegen — dát was
+// de kern van 'vanaf dan is alles om zeep'). De rotatie-status raken we hier bewust niet meer aan — dat
+// gebeurt voortaan uitsluitend nog via "Hervat" (resumeNavFromDetourPause), niet automatisch tussendoor.
 function cancelManualDetourPinMode(){
   cancelPendingDetourClick();
-  if (wasMapRotationEnabledBeforePin){ enableMapRotation(); wasMapRotationEnabledBeforePin = false; }
 }
 async function insertManualDetourPin(lat, lon){
   if (!canEditRouteNow()) return;
@@ -7465,7 +7638,7 @@ async function insertManualDetourPin(lat, lon){
   toast(curLang()==='en' ? '🔄 Recalculating via your new point…' : '🔄 Herberekenen via je nieuwe punt…', 2500);
   await drawRoutePath(true); // altijd meteen vanaf je huidige, live positie — je bent tenslotte aan het navigeren, met dezelfde parameters (fietstype, weging, ...) als je oorspronkelijke route
   applyRouteColoring();
-  if (wasMapRotationEnabledBeforePin){ enableMapRotation(); wasMapRotationEnabledBeforePin = false; }
+  toast(curLang()==='en' ? '✅ Detour point added — tap "Resume" when ready.' : '✅ Omwegpunt toegevoegd — tik op "Hervat" wanneer je klaar bent.', 4000);
 }
 
 // ---------- Turn-by-turn: verwerkt de OSRM-'steps' tot een platte lijst met cumulatieve afstand ----------
@@ -7598,13 +7771,6 @@ document.querySelectorAll('.voice-toggle').forEach(btn => {
   btn.addEventListener('click', (e) => { e.stopPropagation(); setVoiceEnabled(!voiceEnabled); });
 });
 
-$('navExpandToggle').addEventListener('click', () => {
-  const extra = $('navExtra');
-  const nowShown = extra.classList.toggle('show');
-  $('navExpandToggle').setAttribute('data-i18n', nowShown ? 'navLessDetails' : 'navMoreDetails');
-  translatePage();
-});
-
 // Zoekt de eerstvolgende afslag t.o.v. de afgelegde afstand (in meter langs de route)
 function nextManeuver(traveledM){
   for (const step of routeSteps){
@@ -7630,19 +7796,25 @@ $('locateBtn').addEventListener('click', () => {
   }, { enableHighAccuracy:true, timeout:8000 });
 });
 
-// ---------- 🚴 Vertrek: aan/uit-toggle die bepaalt of de route start vanaf je huidige locatie ----------
+// ---------- 🚴 Vertrek: tik op je blauwe positie-bolletje bepaalt of de route start vanaf je huidige locatie ----------
 // Staat standaard AAN: elk nieuw punt/speld/knooppunt routeert dan automatisch vanaf je live GPS-positie.
-// Zet je 'm UIT (bv. je plant een route ver weg terwijl je met de auto onderweg bent), dan start de route
-// gewoon vanaf je eerste geselecteerde punt — en blijft dat zo bij elk volgend punt dat je toevoegt.
-// Op "Start" drukken vertrekt sowieso altijd vanaf je échte huidige locatie, ongeacht deze instelling.
-function updateVertrekBtnStyle(){
-  $('toStartBtn').classList.toggle('toggle-on', !!appSettings.vertrekFromGps);
-}
-$('toStartBtn').addEventListener('click', () => {
+// Tik je nogmaals, dan start de route gewoon vanaf je eerste geselecteerde punt — en blijft dat zo bij elk
+// volgend punt dat je toevoegt. Op "Start" drukken vertrekt sowieso altijd vanaf je échte huidige locatie,
+// ongeacht deze instelling. Vervangt de vroegere aparte "Vertrek"-knop volledig (die knop bestaat nog wel
+// verborgen in de HTML/CSS, om de her en der verspreide $('toStartBtn')-referenties niet stuk te maken,
+// maar wordt nergens meer getoond of aangestuurd).
+function toggleVertrekFromGps(){
+  if (navActive){ toast(tr('toastVertrekBlockedNav'), 4000); return; } // zie point 3 — geen herroutering tijdens navigeren
   appSettings.vertrekFromGps = !appSettings.vertrekFromGps;
   saveSettings();
   updateVertrekBtnStyle();
-  if (!route.length) return; // niets te hertekenen zolang de route nog leeg is
+  renderPosition(); // ververst meteen de amber ring rond het bolletje
+  if (!route.length){
+    toast(appSettings.vertrekFromGps
+      ? (curLang()==='en' ? 'New routes will now start from your current location' : 'Nieuwe routes vertrekken nu vanaf je huidige locatie')
+      : (curLang()==='en' ? 'New routes will now start from your first point' : 'Nieuwe routes vertrekken nu vanaf je eerste punt'), 3000);
+    return; // niets te hertekenen zolang de route nog leeg is
+  }
   if (appSettings.vertrekFromGps){
     if (!navigator.geolocation){ toast(tr('toastNoGps')); return; }
     const recentEnough = lastPosition && lastPosition.timestamp && (Date.now() - lastPosition.timestamp < 20000);
@@ -7652,22 +7824,23 @@ $('toStartBtn').addEventListener('click', () => {
       toast(curLang()==='en' ? 'Route now starts from your current location' : 'Route vertrekt nu vanaf je huidige locatie', 3000);
       return;
     }
-    $('toStartBtn').querySelector('.ic').textContent = '⏳';
+    toast(curLang()==='en' ? 'Locating…' : 'Locatie bepalen…', 2000);
     navigator.geolocation.getCurrentPosition(async pos => {
       lastPosition = pos;
       renderPosition();
       await drawRoutePath(true);
-      $('toStartBtn').querySelector('.ic').textContent = '🚴';
       toast(curLang()==='en' ? 'Route now starts from your current location' : 'Route vertrekt nu vanaf je huidige locatie', 3000);
     }, err => {
       toast(explainGeoError(err), 7000);
-      $('toStartBtn').querySelector('.ic').textContent = '🚴';
     }, { enableHighAccuracy:true, timeout:8000, maximumAge:15000 });
   } else {
     drawRoutePath(false);
     toast(curLang()==='en' ? 'Route now starts from your first point' : 'Route vertrekt nu vanaf je eerste punt', 3000);
   }
-});
+}
+function updateVertrekBtnStyle(){
+  $('toStartBtn').classList.toggle('toggle-on', !!appSettings.vertrekFromGps);
+}
 
 // ---------- Search (Nominatim + POI-categorieën) ----------
 // Let op: een Vlaams "café" (drinkgelegenheid) wordt in OSM meestal als amenity=pub getagd,
@@ -7827,6 +8000,7 @@ $('searchForm').addEventListener('submit', async (e) => {
       }
       map.setView([node.lat, node.lon], 15);
       renderVisible();
+      if (navActive){ toast(tr('toastPinBlockedNav'), 5000); return; } // zie showPinPopup — wel tonen, niet toevoegen tijdens navigeren
       if (routeIsFromGpx){ route.length = 0; routeIsFromGpx = false; importedTrack = []; arrivalActual = []; actualRouteKm = null; }
       route.push({ id:node.id, ref:node.ref, lat:node.lat, lon:node.lon }); // toevoegen aan route; opnieuw zoeken = opnieuw toevoegen (lus mogelijk)
       refreshNodeIcon(node.id);
@@ -9236,6 +9410,9 @@ function startNav(){
   translatePage();
   $('navBtn').classList.add('active');
   $('navPanel').classList.add('show');
+  $('navHexButtons').classList.add('show');
+  $('tabDashBtn').classList.add('nav-hide');
+  if (document.body.classList.contains('dash-active')) setActiveTab('map'); // geen analyse tijdens navigeren
   $('sheet').classList.add('collapsed');
   updateProgressUI();
   $('navWindLine').style.display = appSettings.showWindInNav ? 'block' : 'none';
@@ -9304,6 +9481,8 @@ document.addEventListener('click', () => { if (navActive && appSettings.voiceOnl
 
 function stopNav(){
   cancelManualDetourPinMode();
+  navPausedForDetour = false;
+  $('resumeNavBtn').style.display = 'none';
   if (navStartTime && !rideSavedThisSession){
     const km = actualRouteKm != null ? actualRouteKm : straightLineKm();
     // Enkel bewaren als er ook echt iets gebeurd is — een paar seconden per ongeluk op Start drukken en
@@ -9321,6 +9500,8 @@ function stopNav(){
   translatePage();
   $('navBtn').classList.remove('active');
   $('navPanel').classList.remove('show');
+  $('navHexButtons').classList.remove('show');
+  $('tabDashBtn').classList.remove('nav-hide');
   $('sheet').classList.remove('collapsed');
   $('speedVal').textContent = '0';
   $('distVal').textContent = '–';
@@ -9384,7 +9565,8 @@ function meIcon(headingDeg, moving){
   const useRed = !!appSettings.redNavDot;
   if (headingDeg == null){
     const cls = useRed ? `me-dot-red${moving ? ' moving' : ''}` : 'me-dot';
-    return L.divIcon({ className:'', html:`<div class="${cls}"></div>`, iconSize:[16,16], iconAnchor:[8,8] });
+    const vertrekCls = appSettings.vertrekFromGps ? ' me-dot-vertrek-on' : '';
+    return L.divIcon({ className:'', html:`<div class="me-dot-taptarget"><div class="${cls}${vertrekCls}"></div></div>`, iconSize:[40,40], iconAnchor:[20,20] });
   }
   const arrowColor = useRed ? '#e8352b' : '#2b7fff';
   const glowClass = useRed && moving ? 'me-arrow-glow' : '';
@@ -9451,6 +9633,9 @@ function renderPosition(){
 
   if (!meMarker){
     meMarker = L.marker([lat,lon], { icon: meIcon(navActive ? 0 : null, isMoving), zIndexOffset:1000 }).addTo(map);
+    // Tikken op je eigen positie-bolletje bepaalt of nieuwe routes vanaf hier vertrekken (vervangt de
+    // vroegere "Vertrek"-knop) — enkel bij het (kleine) bolletje van vóór je navigeert, zie meIcon().
+    meMarker.on('click', toggleVertrekFromGps);
   } else {
     meMarker.setLatLng([lat,lon]);
     meMarker.setIcon(meIcon(navActive ? 0 : null, isMoving));
