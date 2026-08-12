@@ -1146,7 +1146,7 @@
     </div>
   </div>
   <div id="modeSelectHint" data-i18n="modeSelectHint">Knooppunten, navigatie, GPX, offline-gebruik — alles werkt voor beide.</div>
-  <div id="appVersionStart">v2.253 · 12 aug</div>
+  <div id="appVersionStart">v2.254 · 12 aug</div>
 </div>
 
 <div id="bikeSetupScreen" class="hidden">
@@ -1234,7 +1234,7 @@
   <button class="menu-item" id="menuHelpBtn"><span class="mi-icon">❓</span><span class="mi-text"><b data-i18n="menuHelp">Hulp</b><small data-i18n="menuHelpSub">uitleg over alle functies</small></span></button>
   <button class="menu-item" id="menuDevNotesBtn"><span class="mi-icon">🛠️</span><span class="mi-text"><b data-i18n="menuDevNotes">Technische werking</b><small data-i18n="menuDevNotesSub">hoe wegdektype, routering en fallbacks precies werken</small></span></button>
   <button class="menu-item" id="menuLogbookBtn"><span class="mi-icon">📋</span><span class="mi-text"><b data-i18n="menuLogbook">Logboek</b><small data-i18n="menuLogbookSub">overzicht van alle meldingen, ook stille</small></span></button>
-  <div id="menuVersion">v2.253 · 12 aug</div>
+  <div id="menuVersion">v2.254 · 12 aug</div>
 </div>
 
 <div id="hint" data-i18n="hintInitial">Zoom of pan naar je gebied, tik dan op "Laad knooppunten"</div>
@@ -2707,7 +2707,7 @@ function pauseNavForDetour(){
   $('resumeNavBtn').style.display = '';
   $('tabDashBtn').classList.add('nav-hide'); // dashboard heeft tijdens dit korte omweg-moment geen zin
   wasMapRotationEnabledBeforePin = !appSettings.disableMapRotation;
-  if (wasMapRotationEnabledBeforePin) disableMapRotation();
+  if (wasMapRotationEnabledBeforePin) lockMapNorthForPause();
 }
 function resumeNavFromDetourPause(){
   if (!navPausedForDetour) return;
@@ -2761,6 +2761,30 @@ function disableMapRotation(){
   document.getElementById('mapRotator').classList.remove('rotating');
   invalidateAfterRotatorTransition();
   teardownRotationAwareDragging();
+}
+// Lichte variant voor de omweg-pauze: enkel de hoek terugzetten naar 0/noorden, ZONDER de container te
+// laten krimpen (de 'rotating'-klasse/230%-vergroting blijft gewoon aan staan). De volledige
+// groei/krimp-overgang van enable/disableMapRotation bleek, precies op dit soort snelle aan/uit-momenten,
+// af en toe nog een kortstondig tegel-gaatje te geven — door de container hier gewoon vergroot te láten
+// staan (onzichtbaar voor de gebruiker, hooguit een handvol extra geladen tegels) vermijden we die
+// krimp-overgang, en dus die hele risicoklasse van bugs, tijdens de pauze volledig. Bij hoek 0 heeft
+// Leaflet's eigen (niet-gecorrigeerde) sleepgebaar geen correctie meer nodig, dus die zetten we hier terug
+// aan — maar knijpzoom (touchZoom) blijft wél bewust UIT, net als de rest van de navigatiesessie: enkel de
+// +/- knoppen zijn tijdens de hele navigatie (rijden én pauze) bedoeld om te zoomen.
+function lockMapNorthForPause(){
+  lastMapRotation = 0;
+  setMapRotation(0);
+  map.dragging.enable();
+  map.doubleClickZoom.enable();
+  const c = map.getContainer();
+  c.removeEventListener('touchstart', rotTouchStartHandler);
+  c.removeEventListener('touchmove', rotTouchMoveHandler);
+  c.removeEventListener('touchend', rotTouchEndHandler);
+  c.removeEventListener('mousedown', rotMouseDownHandler);
+  c.removeEventListener('dblclick', rotDblClickHandler);
+  window.removeEventListener('mousemove', rotMouseMoveHandler);
+  window.removeEventListener('mouseup', rotDragEnd);
+  rotDragActive = false;
 }
 
 // ---------- Sleepgebaar corrigeren voor de gedraaide kaart ----------
