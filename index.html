@@ -1146,7 +1146,7 @@
     </div>
   </div>
   <div id="modeSelectHint" data-i18n="modeSelectHint">Knooppunten, navigatie, GPX, offline-gebruik — alles werkt voor beide.</div>
-  <div id="appVersionStart">v2.255 · 12 aug</div>
+  <div id="appVersionStart">v2.256 · 12 aug</div>
 </div>
 
 <div id="bikeSetupScreen" class="hidden">
@@ -1234,7 +1234,7 @@
   <button class="menu-item" id="menuHelpBtn"><span class="mi-icon">❓</span><span class="mi-text"><b data-i18n="menuHelp">Hulp</b><small data-i18n="menuHelpSub">uitleg over alle functies</small></span></button>
   <button class="menu-item" id="menuDevNotesBtn"><span class="mi-icon">🛠️</span><span class="mi-text"><b data-i18n="menuDevNotes">Technische werking</b><small data-i18n="menuDevNotesSub">hoe wegdektype, routering en fallbacks precies werken</small></span></button>
   <button class="menu-item" id="menuLogbookBtn"><span class="mi-icon">📋</span><span class="mi-text"><b data-i18n="menuLogbook">Logboek</b><small data-i18n="menuLogbookSub">overzicht van alle meldingen, ook stille</small></span></button>
-  <div id="menuVersion">v2.255 · 12 aug</div>
+  <div id="menuVersion">v2.256 · 12 aug</div>
 </div>
 
 <div id="hint" data-i18n="hintInitial">Zoom of pan naar je gebied, tik dan op "Laad knooppunten"</div>
@@ -2991,10 +2991,10 @@ function isMapCurrentlyRotated(){
   return Math.abs(((lastMapRotation % 360) + 360) % 360) > 3; // kleine marge, exact 0° telt niet als 'gedraaid'
 }
 function showPinPopup(lat, lon){
-  // Een nieuw punt plaatsen betekent je route herberekenen — dat laten we tijdens actief navigeren nu bewust
-  // niet meer toe (zie ook het verslepen van bestaande punten hierboven): gebruik "Weg afgesloten" voor een
-  // omweg onderweg, dat blijft wél gewoon werken tijdens navigeren.
-  if (navActive){
+  // Een nieuw punt plaatsen betekent je route herberekenen — dat laten we tijdens het écht rijden bewust niet
+  // toe (kaart-rotatie + dit tegelijk is de bron van veel problemen geweest). Tijdens de omweg-pauze staat de
+  // kaart-rotatie sowieso al helemaal stil (net als tijdens plannen), dus daar kan het gewoon wél.
+  if (navActive && !navPausedForDetour){
     toast(tr('toastPinBlockedNav'), 5000);
     return;
   }
@@ -3164,7 +3164,7 @@ function touchToLatLng(e){
 }
 map.on('mousedown', (e) => {
   if (editMode) return; // tijdens het bewerken van de route mag de speld-functie niet in de weg zitten
-  if (navActive) return; // geen nieuwe punten tijdens actief navigeren — zie showPinPopup
+  if (navActive && !navPausedForDetour) return; // geen nieuwe punten tijdens het rijden zelf — tijdens de omweg-pauze mag het wél, zie showPinPopup
   longPressStart = e.latlng;
   clearTimeout(longPressTimer);
   longPressTimer = setTimeout(() => { if (longPressStart) showPinPopup(longPressStart.lat, longPressStart.lng); }, 550);
@@ -3179,7 +3179,7 @@ let longPressStartPoint = null;
 const mapTouchTarget = map.getContainer();
 mapTouchTarget.addEventListener('touchstart', (e) => {
   if (editMode) return; // tijdens het bewerken van de route mag de speld-functie niet in de weg zitten
-  if (navActive) return; // geen nieuwe punten tijdens actief navigeren — zie showPinPopup
+  if (navActive && !navPausedForDetour) return; // geen nieuwe punten tijdens het rijden zelf — tijdens de omweg-pauze mag het wél, zie showPinPopup
   if (e.touches.length > 1){ cancelLongPress(); return; } // niet tijdens 2-vinger-draaien
   const t = e.touches[0];
   longPressStartPoint = { x: t.clientX, y: t.clientY };
@@ -6212,7 +6212,7 @@ function canEditRouteNow(){
 }
 function toggleNode(id){
   if (!canEditRouteNow()) return;
-  if (navActive){ toast(tr('toastPinBlockedNav'), 5000); return; } // zie showPinPopup — geen herroutering tijdens navigeren
+  if (navActive && !navPausedForDetour){ toast(tr('toastPinBlockedNav'), 5000); return; } // zie showPinPopup — tijdens de omweg-pauze mag dit wél
   if (routeIsFromGpx){ route.length = 0; routeIsFromGpx = false; importedTrack = []; arrivalActual = []; actualRouteKm = null; }
   const wasEmpty = route.length === 0;
   const n = loadedNodes.get(id);
@@ -8034,7 +8034,7 @@ $('searchForm').addEventListener('submit', async (e) => {
       }
       map.setView([node.lat, node.lon], 15);
       renderVisible();
-      if (navActive){ toast(tr('toastPinBlockedNav'), 5000); return; } // zie showPinPopup — wel tonen, niet toevoegen tijdens navigeren
+      if (navActive && !navPausedForDetour){ toast(tr('toastPinBlockedNav'), 5000); return; } // zie showPinPopup — wel tonen, tijdens de omweg-pauze ook toevoegen mag
       if (routeIsFromGpx){ route.length = 0; routeIsFromGpx = false; importedTrack = []; arrivalActual = []; actualRouteKm = null; }
       route.push({ id:node.id, ref:node.ref, lat:node.lat, lon:node.lon }); // toevoegen aan route; opnieuw zoeken = opnieuw toevoegen (lus mogelijk)
       refreshNodeIcon(node.id);
