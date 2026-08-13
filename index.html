@@ -730,46 +730,28 @@
   }
   #garminSetupScreen.hidden{ display:none; }
   #modeSelectTitle{ color:var(--cream); font-size:19px; font-weight:800; flex-shrink:0; }
-  .mode-tiles-2x2{ display:flex; justify-content:center; }
-  .hc-col{ display:flex; flex-direction:column; align-items:center; }
-  .hc-col-offset{ margin-top:0px; margin-left:8px; }
+  .mode-tiles-main{ display:flex; flex-direction:column; align-items:center; gap:12px; }
+  .mode-tiles-small{ display:flex; flex-direction:row; gap:10px; margin-top:14px; }
   .mode-tile{
     border:none; background:none; padding:0; display:flex; flex-direction:column; align-items:center; gap:4px;
     width:150px;
   }
-  .mode-tile + .mode-tile{ margin-top:12px; }
-  .hc-col:first-child{ margin-right:8px; }
+  .mode-tile-small{ width:104px; }
   .mode-hex{
     width:150px; height:173px;
     clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
     display:flex; align-items:center; justify-content:center;
     box-shadow:0 8px 20px rgba(0,0,0,0.35);
   }
+  .mode-tile-small .mode-hex{ width:104px; height:120px; }
   .mode-icon{ font-size:56px; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+  .mode-tile-small .mode-icon{ font-size:38px; }
   .mode-icon-svg{ width:76px; height:76px; filter:drop-shadow(0 3px 6px rgba(0,0,0,0.35)); }
+  .mode-tile-small .mode-icon-svg{ width:52px; height:52px; }
   .mode-label{ color:var(--cream); font-weight:800; font-size:15px; }
+  .mode-tile-small .mode-label{ font-size:12px; }
   .mode-tile:active .mode-hex{ transform:scale(0.96); }
   #modeSelectHint{ color:rgba(246,244,238,0.6); font-size:12.5px; max-width:280px; flex-shrink:0; }
-
-  /* Garmin-thema: zeshoeken worden afgeronde, glazige kaarten (Gemini-stijl) i.p.v. de standaard zeshoekvorm */
-  body.theme-garmin .mode-tiles-2x2{ flex-direction:column; gap:12px; width:100%; max-width:340px; }
-  body.theme-garmin .hc-col{ flex-direction:row; gap:12px; width:100%; }
-  body.theme-garmin .hc-col-offset{ margin:0; }
-  body.theme-garmin .mode-tile{ width:100%; flex:1; }
-  body.theme-garmin .mode-tile + .mode-tile{ margin-top:0; }
-  body.theme-garmin .hc-col:first-child{ margin-right:0; }
-  body.theme-garmin .mode-hex{
-    width:100%; height:96px; clip-path:none; border-radius:22px;
-    background:linear-gradient(135deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02)) !important;
-    border:1px solid rgba(255,255,255,0.08); box-shadow:0 8px 24px rgba(0,0,0,0.4);
-  }
-  body.theme-garmin .mode-icon{ font-size:34px; }
-  body.theme-garmin .mode-icon-svg{ width:44px; height:44px; }
-  body.theme-garmin .mode-label{
-    position:absolute; bottom:10px; left:14px; font-size:11px; text-transform:uppercase; letter-spacing:0.6px;
-    font-weight:800; color:rgba(241,245,249,0.55);
-  }
-  body.theme-garmin .mode-tile{ position:relative; }
 
   #bikeSetupScreen{
     position:fixed; top:0;left:0;right:0;bottom:0; z-index:3000; background:var(--green-900);
@@ -1116,62 +1098,64 @@
 
 <div id="modeSelectScreen">
   <div id="modeSelectTitle" data-i18n="modeSelectTitle">Waar ga je vandaag voor?</div>
-  <div class="mode-tiles-2x2">
-    <div class="hc-col">
-      <button class="mode-tile" id="modeFietsBtn">
-        <span class="mode-label" data-i18n="modeFiets">Fiets</span>
-        <span class="mode-hex" style="background:#15603f;"><span class="mode-icon">🚴</span></span>
-      </button>
-      <button class="mode-tile" id="modeWandelBtn">
-        <span class="mode-label" data-i18n="modeWandel">Wandel</span>
-        <span class="mode-hex" style="background:#2a5f8f;"><span class="mode-icon">🥾</span></span>
-      </button>
-    </div>
-    <div class="hc-col hc-col-offset">
-      <button class="mode-tile" id="modeWeatherBtn">
-        <span class="mode-label" data-i18n="modeWeer">Weer</span>
-        <span class="mode-hex" style="background:linear-gradient(160deg,#2a5a8f,#173a5c);">
-          <svg class="mode-icon-svg" viewBox="0 0 100 100">
-            <circle cx="62" cy="34" r="17" fill="#ffcf4d"/>
-            <g stroke="#ffcf4d" stroke-width="3" stroke-linecap="round">
-              <line x1="62" y1="6" x2="62" y2="13"/><line x1="62" y1="55" x2="62" y2="62" opacity="0"/>
-              <line x1="34" y1="34" x2="41" y2="34"/><line x1="83" y1="34" x2="90" y2="34"/>
-              <line x1="42" y1="14" x2="47" y2="19"/><line x1="82" y1="14" x2="77" y2="19"/>
-              <line x1="42" y1="54" x2="47" y2="49"/>
-            </g>
-            <path d="M20,72 a16,16 0 0 1 3,-31.8 a20,20 0 0 1 39,-4 a15,15 0 0 1 2,35.8 z" fill="#f6f4ee"/>
-            <path d="M20,72 a16,16 0 0 1 3,-31.8" fill="none" stroke="#dfe4ea" stroke-width="0"/>
-            <g stroke="#8fc4ec" stroke-width="3" stroke-linecap="round">
-              <line x1="30" y1="80" x2="27" y2="88"/><line x1="42" y1="80" x2="39" y2="88"/><line x1="54" y1="80" x2="51" y2="88"/>
-            </g>
-          </svg>
-        </span>
-      </button>
-      <button class="mode-tile" id="modeCompassBtn">
-        <span class="mode-label" data-i18n="modeKompas">Kompas</span>
-        <span class="mode-hex" style="background:radial-gradient(circle at 50% 40%,#7a52c9,#4a2f85);">
-          <svg class="mode-icon-svg" viewBox="0 0 100 100">
-            <circle cx="50" cy="50" r="40" fill="none" stroke="#e2c98a" stroke-width="2.5"/>
-            <circle cx="50" cy="50" r="33" fill="#1c1030" stroke="#e2c98a" stroke-width="1.5"/>
-            <g fill="#e2c98a">
-              <polygon points="50,12 55,45 50,50 45,45"/>
-              <polygon points="50,88 55,55 50,50 45,55"/>
-              <polygon points="12,50 45,45 50,50 45,55"/>
-              <polygon points="88,50 55,45 50,50 55,55"/>
-            </g>
-            <g fill="#8a6ad8" opacity="0.85">
-              <polygon points="24,24 42,42 40,44 22,26"/>
-              <polygon points="76,24 58,42 60,44 78,26"/>
-              <polygon points="24,76 42,58 40,56 22,74"/>
-              <polygon points="76,76 58,58 60,56 78,74"/>
-            </g>
-            <polygon points="50,25 57,50 50,75 43,50" fill="#e0392e"/>
-            <circle cx="50" cy="50" r="5" fill="#e2c98a" stroke="#1c1030" stroke-width="1.5"/>
-            <text x="50" y="10" text-anchor="middle" font-size="9" font-weight="800" fill="#e2c98a">N</text>
-          </svg>
-        </span>
-      </button>
-    </div>
+  <div class="mode-tiles-main">
+    <button class="mode-tile" id="modeFietsBtn">
+      <span class="mode-label" data-i18n="modeFiets">Fiets</span>
+      <span class="mode-hex" style="background:#15603f;"><span class="mode-icon">🚴</span></span>
+    </button>
+    <button class="mode-tile" id="modeWandelBtn">
+      <span class="mode-label" data-i18n="modeWandel">Wandel</span>
+      <span class="mode-hex" style="background:#2a5f8f;"><span class="mode-icon">🥾</span></span>
+    </button>
+    <button class="mode-tile" id="modeHardloopBtn">
+      <span class="mode-label" data-i18n="modeHardloop">Hardlopen</span>
+      <span class="mode-hex" style="background:linear-gradient(160deg,#c23b3b,#7a1f1f);"><span class="mode-icon">🏃</span></span>
+    </button>
+  </div>
+  <div class="mode-tiles-small">
+    <button class="mode-tile mode-tile-small" id="modeCompassBtn">
+      <span class="mode-label" data-i18n="modeKompas">Kompas</span>
+      <span class="mode-hex" style="background:radial-gradient(circle at 50% 40%,#7a52c9,#4a2f85);">
+        <svg class="mode-icon-svg" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" r="40" fill="none" stroke="#e2c98a" stroke-width="2.5"/>
+          <circle cx="50" cy="50" r="33" fill="#1c1030" stroke="#e2c98a" stroke-width="1.5"/>
+          <g fill="#e2c98a">
+            <polygon points="50,12 55,45 50,50 45,45"/>
+            <polygon points="50,88 55,55 50,50 45,55"/>
+            <polygon points="12,50 45,45 50,50 45,55"/>
+            <polygon points="88,50 55,45 50,50 55,55"/>
+          </g>
+          <g fill="#8a6ad8" opacity="0.85">
+            <polygon points="24,24 42,42 40,44 22,26"/>
+            <polygon points="76,24 58,42 60,44 78,26"/>
+            <polygon points="24,76 42,58 40,56 22,74"/>
+            <polygon points="76,76 58,58 60,56 78,74"/>
+          </g>
+          <polygon points="50,25 57,50 50,75 43,50" fill="#e0392e"/>
+          <circle cx="50" cy="50" r="5" fill="#e2c98a" stroke="#1c1030" stroke-width="1.5"/>
+          <text x="50" y="10" text-anchor="middle" font-size="9" font-weight="800" fill="#e2c98a">N</text>
+        </svg>
+      </span>
+    </button>
+    <button class="mode-tile mode-tile-small" id="modeWeatherBtn">
+      <span class="mode-label" data-i18n="modeWeer">Weer</span>
+      <span class="mode-hex" style="background:linear-gradient(160deg,#2a5a8f,#173a5c);">
+        <svg class="mode-icon-svg" viewBox="0 0 100 100">
+          <circle cx="62" cy="34" r="17" fill="#ffcf4d"/>
+          <g stroke="#ffcf4d" stroke-width="3" stroke-linecap="round">
+            <line x1="62" y1="6" x2="62" y2="13"/><line x1="62" y1="55" x2="62" y2="62" opacity="0"/>
+            <line x1="34" y1="34" x2="41" y2="34"/><line x1="83" y1="34" x2="90" y2="34"/>
+            <line x1="42" y1="14" x2="47" y2="19"/><line x1="82" y1="14" x2="77" y2="19"/>
+            <line x1="42" y1="54" x2="47" y2="49"/>
+          </g>
+          <path d="M20,72 a16,16 0 0 1 3,-31.8 a20,20 0 0 1 39,-4 a15,15 0 0 1 2,35.8 z" fill="#f6f4ee"/>
+          <path d="M20,72 a16,16 0 0 1 3,-31.8" fill="none" stroke="#dfe4ea" stroke-width="0"/>
+          <g stroke="#8fc4ec" stroke-width="3" stroke-linecap="round">
+            <line x1="30" y1="80" x2="27" y2="88"/><line x1="42" y1="80" x2="39" y2="88"/><line x1="54" y1="80" x2="51" y2="88"/>
+          </g>
+        </svg>
+      </span>
+    </button>
   </div>
   <div id="modeSelectHint" data-i18n="modeSelectHint">Knooppunten, navigatie, GPX, offline-gebruik — alles werkt voor beide.</div>
   <div id="appVersionStart">v2.261 · 12 aug</div>
@@ -4384,6 +4368,7 @@ const TRANSLATIONS = {
   modeSelectTitle: { nl:'Waar ga je vandaag voor?', en:'What are you up for today?' },
   modeFiets: { nl:'Fiets', en:'Bike' },
   modeWandel: { nl:'Wandel', en:'Walk' },
+  modeHardloop: { nl:'Hardlopen', en:'Run' },
   modeWeer: { nl:'Weer', en:'Weather' },
   modeKompas: { nl:'Kompas', en:'Compass' },
   modeSelectHint: { nl:'Knooppunten, navigatie, GPX, offline-gebruik — alles werkt voor beide.', en:'Nodes, navigation, GPX, offline use — everything works for both.' },
@@ -5612,10 +5597,10 @@ window.addEventListener('message', (ev) => {
 });
 // Kleine herbruikbare snippet (dot-driehoekje + wiring) die in elk Garmin-iframe-template wordt geplakt.
 const GARMIN_MENU_BTN_HTML = `
-  <button id="garminMenuBtn" title="Instellingen" class="w-9 h-9 flex flex-col items-center justify-center gap-[3px] bg-slate-900/70 border border-slate-800 rounded-xl hover:border-amber-500/60 transition active:scale-95 flex-shrink-0">
-    <div class="flex gap-[3px]"><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span></div>
-    <div class="flex gap-[3px]"><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span></div>
-    <div class="flex gap-[3px]"><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span></div>
+  <button id="garminMenuBtn" title="Instellingen" class="w-8 h-8 flex flex-col items-center justify-center gap-[2.5px] bg-black/60 border border-amber-500/40 rounded-lg hover:border-amber-400 hover:bg-black/80 transition active:scale-95 flex-shrink-0 shadow-lg">
+    <div class="flex gap-[2.5px]"><span class="w-[5px] h-[5px] rounded-full bg-amber-400"></span><span class="w-[5px] h-[5px] rounded-full bg-amber-400"></span><span class="w-[5px] h-[5px] rounded-full bg-amber-400"></span></div>
+    <div class="flex gap-[2.5px]"><span class="w-[5px] h-[5px] rounded-full bg-amber-400"></span><span class="w-[5px] h-[5px] rounded-full bg-amber-400"></span></div>
+    <div class="flex gap-[2.5px]"><span class="w-[5px] h-[5px] rounded-full bg-amber-400"></span></div>
   </button>`;
 const GARMIN_MENU_BTN_JS = `
     const garminMenuBtn = document.getElementById('garminMenuBtn');
@@ -5640,7 +5625,6 @@ function buildGarminSetupHtml(mode){
     <div class="flex justify-between items-center mb-5">
       <div class="flex items-center gap-3">
         <button id="backBtn" class="w-9 h-9 bg-slate-900 border border-slate-800 text-slate-400 hover:text-white rounded-xl flex items-center justify-center">←</button>
-        ${GARMIN_MENU_BTN_HTML}
         <div>
           <span class="text-[10px] text-slate-400 block uppercase tracking-widest font-black">${isFiets ? 'Knooppuntenroute' : 'Wandelknooppunten'}</span>
           <h1 class="text-lg font-black tracking-tight text-white flex items-center gap-1.5 mt-0.5">
@@ -5648,6 +5632,7 @@ function buildGarminSetupHtml(mode){
           </h1>
         </div>
       </div>
+      ${GARMIN_MENU_BTN_HTML}
     </div>
 
     ${isFiets ? `
@@ -5991,14 +5976,16 @@ function buildGarminKompasHtml(){
         <button id="backBtn" class="w-9 h-9 bg-[#17242d] hover:bg-slate-700 rounded-xl text-slate-300 border border-slate-700/50 transition-all flex items-center justify-center text-lg">
           ‹
         </button>
-        ${GARMIN_MENU_BTN_HTML}
         <div>
           <span class="text-[10px] font-bold tracking-widest text-slate-400 uppercase">Navigatie</span>
           <h1 class="text-lg font-bold text-white leading-none">Kompas</h1>
         </div>
       </div>
-      <div class="w-9 h-9 bg-[#17242d] rounded-xl flex items-center justify-center text-amber-400 border border-slate-700/50">
-        🧭
+      <div class="flex items-center gap-2">
+        ${GARMIN_MENU_BTN_HTML}
+        <div class="w-9 h-9 bg-[#17242d] rounded-xl flex items-center justify-center text-amber-400 border border-slate-700/50">
+          🧭
+        </div>
       </div>
     </div>
 
@@ -6235,15 +6222,17 @@ function buildGarminWeerHtml(){
     <div class="flex items-center justify-between">
       <div class="flex items-center gap-3">
         <button id="backBtn" class="w-9 h-9 bg-[#17242d] hover:bg-slate-700 rounded-xl text-slate-300 border border-slate-700/50 transition-all flex items-center justify-center text-lg">‹</button>
-        ${GARMIN_MENU_BTN_HTML}
         <div>
           <span class="text-[10px] font-bold tracking-widest text-slate-400 uppercase">Meteo</span>
           <h1 class="text-lg font-bold text-white leading-none">Weer Dashboard</h1>
         </div>
       </div>
-      <button id="refreshBtn" class="px-3 py-1.5 bg-slate-800/80 hover:bg-slate-700 text-xs font-semibold rounded-xl text-slate-300 border border-slate-700/50 transition-all flex items-center gap-1">
-        <span>📍</span> GPS
-      </button>
+      <div class="flex items-center gap-2">
+        ${GARMIN_MENU_BTN_HTML}
+        <button id="refreshBtn" class="px-3 py-1.5 bg-slate-800/80 hover:bg-slate-700 text-xs font-semibold rounded-xl text-slate-300 border border-slate-700/50 transition-all flex items-center gap-1">
+          <span>📍</span> GPS
+        </button>
+      </div>
     </div>
 
     <div class="bg-gradient-to-br from-[#0a1324] via-[#0d182e] to-[#080d1a] rounded-2xl p-4 border border-slate-800/80 relative overflow-hidden flex items-center justify-between min-h-[105px]">
@@ -6584,7 +6573,7 @@ function buildGarminHubHtml(){
     </div>
     <div class="absolute top-10 right-10 w-40 h-40 bg-amber-500/10 rounded-full blur-3xl pointer-events-none z-0"></div>
     <div class="absolute bottom-20 left-10 w-40 h-40 bg-sky-500/10 rounded-full blur-3xl pointer-events-none z-0"></div>
-    <div class="absolute top-6 left-6 z-20">${GARMIN_MENU_BTN_HTML}</div>
+    <div class="absolute top-6 right-6 z-20">${GARMIN_MENU_BTN_HTML}</div>
 
     <div class="relative z-10 w-full flex-1 flex flex-col justify-between">
       <div class="text-center pt-8">
@@ -13448,6 +13437,7 @@ async function loadAnalyseTab(tabName){
   $('analysePlaceholder').style.display = 'flex';
 }
 $('modeWandelBtn').addEventListener('click', () => openBikeSetupScreen('wandel'));
+$('modeHardloopBtn').addEventListener('click', () => toast(curLang()==='en' ? 'Running mode is coming soon.' : 'Hardlopen komt binnenkort — nog in opbouw.', 3000));
 $('modeWeatherBtn').addEventListener('click', () => {
   selectMode(appMode || 'fiets');
   setTimeout(() => setActiveTab('weather'), 50);
