@@ -717,6 +717,18 @@
     position:fixed; top:0;left:0;right:0;bottom:0; z-index:3000; background:#020617;
   }
   #modeSelectScreenGarmin.hidden{ display:none; }
+  #garminKompasScreen{
+    position:fixed; top:0;left:0;right:0;bottom:0; z-index:3000; background:#050914;
+  }
+  #garminKompasScreen.hidden{ display:none; }
+  #garminWeerScreen{
+    position:fixed; top:0;left:0;right:0;bottom:0; z-index:3000; background:#050914;
+  }
+  #garminWeerScreen.hidden{ display:none; }
+  #garminSetupScreen{
+    position:fixed; top:0;left:0;right:0;bottom:0; z-index:3001; background:#020617;
+  }
+  #garminSetupScreen.hidden{ display:none; }
   #modeSelectTitle{ color:var(--cream); font-size:19px; font-weight:800; flex-shrink:0; }
   .mode-tiles-2x2{ display:flex; justify-content:center; }
   .hc-col{ display:flex; flex-direction:column; align-items:center; }
@@ -773,23 +785,31 @@
   }
   #bikeSetupBackBtn:active{ background:rgba(226,161,60,0.3); }
   .bike-setup-inner{ width:100%; max-width:380px; text-align:center; margin-top:-25px; }
-  .bike-setup-title{ color:var(--cream); font-size:16px; font-weight:800; margin-bottom:12px; }
-  .bike-type-grid{ display:grid; grid-template-columns:repeat(4, 1fr); gap:8px; }
+  .bike-setup-title{ color:var(--cream); font-size:16px; font-weight:800; margin-bottom:16px; }
+
+  .bike-type-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; }
   .bike-type-tile{
-    border:2px solid transparent; background:rgba(255,255,255,0.06); border-radius:14px;
-    padding:12px 4px; display:flex; flex-direction:column; align-items:center; gap:5px; cursor:pointer;
+    border:2px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.06); border-radius:16px;
+    padding:14px 6px; display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer;
+    transition:transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease, border-color 0.12s ease;
   }
-  .bike-type-tile.active{ background:var(--amber); border-color:var(--cream); }
-  .bike-type-icon{ font-size:28px; }
+  .bike-type-tile:active{ transform:scale(0.96); }
+  .bike-type-tile.active{
+    background:var(--amber); border-color:var(--cream);
+    box-shadow:0 4px 14px rgba(226,161,60,0.35);
+  }
+  .bike-type-icon{ font-size:30px; line-height:1; }
   .bike-type-label{ color:var(--cream); font-size:10.5px; font-weight:700; line-height:1.2; }
   .bike-type-tile.active .bike-type-label{ color:var(--green-900); }
 
   .nav-type-choice{ display:flex; flex-direction:column; gap:10px; }
   .nav-type-card{
     display:flex; align-items:center; gap:12px; text-align:left;
-    border:2px solid transparent; background:rgba(255,255,255,0.06); border-radius:16px; padding:14px 16px; cursor:pointer;
+    border:2px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.06); border-radius:16px; padding:14px 16px; cursor:pointer;
+    transition:transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease, border-color 0.12s ease;
   }
-  .nav-type-card.active{ background:rgba(226,161,60,0.16); border-color:var(--amber); }
+  .nav-type-card:active{ transform:scale(0.98); }
+  .nav-type-card.active{ background:rgba(226,161,60,0.16); border-color:var(--amber); box-shadow:0 4px 14px rgba(226,161,60,0.2); }
   .nav-type-card:disabled{ opacity:0.45; cursor:default; }
   .nav-type-icon{ font-size:26px; flex-shrink:0; }
   .nav-type-text{ display:flex; flex-direction:column; gap:2px; }
@@ -797,10 +817,11 @@
   .nav-type-text small{ color:rgba(246,244,238,0.65); font-size:11.5px; line-height:1.4; }
 
   #bikeSetupContinueBtn{
-    width:100%; margin-top:26px; border:none; border-radius:16px; padding:14px;
+    width:100%; margin-top:26px; border:none; border-radius:16px; padding:15px;
     background:var(--amber); color:var(--green-900); font-size:15px; font-weight:800;
+    box-shadow:0 6px 18px rgba(226,161,60,0.3); transition:transform 0.12s ease, filter 0.12s ease;
   }
-  #bikeSetupContinueBtn:active{ filter:brightness(0.92); }
+  #bikeSetupContinueBtn:active{ filter:brightness(0.92); transform:scale(0.98); }
   #appVersionStart{ margin-top:10px; color:rgba(246,244,238,0.35); font-size:11px; letter-spacing:.5px; flex-shrink:0; align-self:flex-end; }
 
   #mapViewport{ position:absolute; top:0;left:0;right:0;bottom:0; overflow:hidden; background:var(--green-900); }
@@ -833,6 +854,9 @@
     display:none; align-items:center; justify-content:center; padding:20px;
   }
   .simple-modal.show{ display:flex; }
+  /* Instellingen-modal moet boven de Garmin-stijl overlay-schermen (z-index 3000/3001) kunnen tonen,
+     zonder de z-index van andere modals overal aan te raken. */
+  #settingsModal.show{ z-index:3500; }
   .simple-modal-card{
     background:var(--cream); border-radius:18px; padding:18px; width:100%; max-width:380px;
     max-height:80vh; overflow-y:auto; box-shadow:var(--shadow);
@@ -1160,6 +1184,23 @@
   <iframe id="garminHubFrame" title="Garmin-stijl keuzescherm" style="border:0;width:100%;height:100%;display:block;"></iframe>
 </div>
 
+<!-- Garmin-stijl Kompas: letterlijk Gemini's Compas.html (incl. drijf-animatie), met platform-slimme
+     sensor-start: automatisch op Android, tik-knop enkel op iOS (Apple staat geen omweg toe). -->
+<div id="garminKompasScreen" class="hidden">
+  <iframe id="garminKompasFrame" title="Garmin-stijl kompas" style="border:0;width:100%;height:100%;display:block;"></iframe>
+</div>
+
+<!-- Garmin-stijl Weer: letterlijk Gemini's weer.html, gevoed met echte data uit loadWeatherAndSun(). -->
+<div id="garminWeerScreen" class="hidden">
+  <iframe id="garminWeerFrame" title="Garmin-stijl weer" style="border:0;width:100%;height:100%;display:block;"></iframe>
+</div>
+
+<!-- Garmin-stijl Fietsen/Wandelen-opzetscherm: bike-type/navtype-keuze en de CTA-knop besturen de
+     ECHTE, bestaande #bikeTypeSection / #bikeSetupContinueBtn-elementen (geen dubbele logica). -->
+<div id="garminSetupScreen" class="hidden">
+  <iframe id="garminSetupFrame" title="Garmin-stijl opzetscherm" style="border:0;width:100%;height:100%;display:block;"></iframe>
+</div>
+
 <div id="bikeSetupScreen" class="hidden">
   <button id="bikeSetupBackBtn" aria-label="Terug">←</button>
   <div class="bike-setup-inner">
@@ -1185,6 +1226,31 @@
         <span class="nav-type-icon">🧭</span>
         <span class="nav-type-text"><b data-i18n="navTypePassiveTitle">Passief Pro</b><small data-i18n="navTypePassiveSub">Punten zetten zonder live herberekening — druk op "Klaar" om te berekenen</small></span>
       </button>
+    </div>
+
+    <div id="natureIdSection" style="display:none; margin-top:22px; text-align:left;">
+      <div class="bike-setup-title" style="text-align:left; margin-bottom:10px;" data-i18n="natureIdTitle">🌿 Plant herkennen</div>
+      <label id="natureIdTile" for="natureIdCameraInput" style="display:flex; align-items:center; gap:12px; background:rgba(255,255,255,0.06); border:2px solid rgba(255,255,255,0.08); border-radius:16px; padding:14px 16px; cursor:pointer;">
+        <span style="font-size:26px; flex-shrink:0;">📸</span>
+        <span style="text-align:left; flex:1;">
+          <b style="color:var(--cream); font-size:14.5px; display:block;" data-i18n="natureIdTileTitle">Neem een foto van een plant</b>
+          <small style="color:rgba(246,244,238,0.65); font-size:11.5px; line-height:1.4;" id="natureIdTileSub" data-i18n="natureIdTileSub">Herkenning via Pl@ntNet — werkt het best met een duidelijke blad- of bloemfoto.</small>
+        </span>
+        <input type="file" id="natureIdCameraInput" accept="image/*" capture="environment" class="hidden" style="display:none;">
+      </label>
+      <div id="natureIdResult" style="display:none; margin-top:12px; background:rgba(255,255,255,0.06); border:2px solid var(--amber); border-radius:16px; padding:14px 16px;"></div>
+    </div>
+
+    <div id="restPointsSection" style="display:none; margin-top:18px; text-align:left;">
+      <div class="bike-setup-title" style="text-align:left; margin-bottom:10px;" data-i18n="restPointsTitle">🪑 Rustpunten in de buurt</div>
+      <button id="restPointsBtn" type="button" style="display:flex; align-items:center; gap:12px; width:100%; background:rgba(255,255,255,0.06); border:2px solid rgba(255,255,255,0.08); border-radius:16px; padding:14px 16px; cursor:pointer; text-align:left;">
+        <span style="font-size:26px; flex-shrink:0;">🔎</span>
+        <span style="text-align:left; flex:1;">
+          <b style="color:var(--cream); font-size:14.5px; display:block;" data-i18n="restPointsBtnTitle">Zoek bankjes, terrassen & picknicktafels</b>
+          <small style="color:rgba(246,244,238,0.65); font-size:11.5px; line-height:1.4;" data-i18n="restPointsBtnSub">Binnen ~900 m, via OpenStreetMap — geen account nodig.</small>
+        </span>
+      </button>
+      <div id="restPointsResult" style="display:none; margin-top:12px; background:rgba(255,255,255,0.06); border:2px solid var(--amber); border-radius:16px; padding:8px 16px;"></div>
     </div>
 
     <button id="bikeSetupContinueBtn" data-i18n="bikeSetupContinueBtn">Doorgaan →</button>
@@ -1652,6 +1718,9 @@
 
       <div class="settings-subnote" style="margin-top:14px;"><span data-i18n="settingsGeoapifySub">Geoapify — extra vangnet voor wegdektype-kleuring, wordt automatisch gebruikt als OpenRouteService/GraphHopper falen. Gratis account op geoapify.com (3000 aanvragen/dag inbegrepen, geen creditcard nodig).</span></div>
       <input type="text" id="geoapifyKeyInput" placeholder="Jouw gratis Geoapify API-sleutel…" data-i18n-placeholder="phGeoapifyKey" class="settings-text-input">
+
+      <div class="settings-subnote" style="margin-top:14px;"><span data-i18n="settingsPlantnetSub">Pl@ntNet — voor plantherkenning via foto op het Wandelen-opzetscherm. Gratis account op my.plantnet.org (500 identificaties/dag inbegrepen).</span></div>
+      <input type="text" id="plantnetKeyInput" placeholder="Jouw gratis Pl@ntNet API-sleutel…" data-i18n-placeholder="phPlantnetKey" class="settings-text-input">
     </div>
 
     <div class="settings-section">
@@ -3921,6 +3990,16 @@ async function getRideHistory(){
   const val = await storageGet(RIDE_HISTORY_KEY());
   try{ return val ? JSON.parse(val) : []; }catch(e){ return []; }
 }
+// Echte week-kilometerstat (niet gebonden aan de huidige appMode) — voor gebruik op de hub/opzetschermen,
+// waar appMode nog null is omdat de gebruiker nog geen modus koos.
+async function computeWeeklyKm(mode){
+  try{
+    const val = await storageGet('ride_history_' + mode);
+    const history = val ? JSON.parse(val) : [];
+    const weekAgo = Date.now() - 7*24*60*60*1000;
+    return history.filter(r => r.date && new Date(r.date).getTime() >= weekAgo).reduce((s,r) => s + (r.km||0), 0);
+  }catch(e){ return 0; }
+}
 async function saveRideToHistory(){
   const km = actualRouteKm != null ? actualRouteKm : straightLineKm();
   const durationMin = navStartTime ? Math.round((Date.now() - navStartTime)/60000) : null;
@@ -4291,7 +4370,7 @@ async function runOfflineDiagnostics(){
 // ---------- Instellingen: thema, kompasknop, wegtype-voorkeuren ----------
 const SETTINGS_KEY = 'app_settings_v1';
 let appSettings = {
-  theme:'default', showCompassBtn:true, orsKey:'', graphhopperKey:'', geoapifyKey:'', bikeType:'regular', mapStyle:'standard', thunderforestKey:'',
+  theme:'default', showCompassBtn:true, orsKey:'', graphhopperKey:'', geoapifyKey:'', plantnetKey:'', bikeType:'regular', mapStyle:'standard', thunderforestKey:'',
   dashTextSize:'normal', dashBold:true, largeNodesAccessibility:false, offRouteDist:35, autoReroute:false, silentReroute:false,
   overlays:{ cycling:false, hiking:false, mtb:false },
   poiLayers:{ cafe:false, restaurant:false, bakery:false, supermarket:false, pharmacy:false, bike:false, water:false, toilet:false, money:false, camping:false, charging:false, playground:false, parking:false, hotel:false }, showPoiDetails:false,
@@ -4638,6 +4717,14 @@ const TRANSLATIONS = {
   settingsApiKeysHeading: { nl:'🔑 API-sleutels', en:'🔑 API keys' },
   settingsGeoapifySub: { nl:'Geoapify — extra vangnet voor wegdektype-kleuring, wordt automatisch gebruikt als OpenRouteService/GraphHopper falen. Gratis account op geoapify.com (3000 aanvragen/dag inbegrepen, geen creditcard nodig).', en:'Geoapify — extra fallback for surface-type colouring, used automatically if OpenRouteService/GraphHopper fail. Free account at geoapify.com (3000 requests/day included, no credit card needed).' },
   phGeoapifyKey: { nl:'Jouw gratis Geoapify API-sleutel…', en:'Your free Geoapify API key…' },
+  settingsPlantnetSub: { nl:'Pl@ntNet — voor plantherkenning via foto op het Wandelen-opzetscherm. Gratis account op my.plantnet.org (500 identificaties/dag inbegrepen).', en:'Pl@ntNet — for photo-based plant identification on the Walking setup screen. Free account at my.plantnet.org (500 identifications/day included).' },
+  phPlantnetKey: { nl:'Jouw gratis Pl@ntNet API-sleutel…', en:'Your free Pl@ntNet API key…' },
+  natureIdTitle: { nl:'🌿 Plant herkennen', en:'🌿 Identify plant' },
+  natureIdTileTitle: { nl:'Neem een foto van een plant', en:'Take a photo of a plant' },
+  natureIdTileSub: { nl:'Herkenning via Pl@ntNet — werkt het best met een duidelijke blad- of bloemfoto.', en:'Identification via Pl@ntNet — works best with a clear leaf or flower photo.' },
+  restPointsTitle: { nl:'🪑 Rustpunten in de buurt', en:'🪑 Rest points nearby' },
+  restPointsBtnTitle: { nl:'Zoek bankjes, terrassen & picknicktafels', en:'Find benches, terraces & picnic tables' },
+  restPointsBtnSub: { nl:'Binnen ~900 m, via OpenStreetMap — geen account nodig.', en:'Within ~900 m, via OpenStreetMap — no account needed.' },
   settingsApiKeysNote: { nl:'Alle optionele gratis sleutels op 1 plek. Elke sleutel schakelt een specifiek extraatje elders in de app vrij — zie de verwijzing bij elk veld.', en:'All optional free keys in one place. Each key unlocks a specific extra elsewhere in the app — see the note next to each field.' },
   settingsAutoPauseSub: { nl:'Rijtijd/gemiddelde snelheid tellen niet mee zolang je stilstaat (bv. koffiepauze) — hervat vanzelf zodra je weer beweegt.', en:'Ride time/average speed don\'t count while you\'re stationary (e.g. a coffee stop) — resumes automatically once you move again.' },
   settingsRoutingSub: { nl:'Alle behalve GraphHopper zijn gratis publieke servers zonder account. Je OpenRouteService-sleutel (bij 🔑 API-sleutels hierboven) blijft apart werken indien ingesteld.', en:'All except GraphHopper are free public servers without an account. Your OpenRouteService key (under 🔑 API keys above) keeps working separately if set.' },
@@ -5372,6 +5459,1099 @@ function hideHubScreen(){
   $('modeSelectScreenGarmin').classList.add('hidden');
 }
 
+// ---------- Garmin-stijl Kompas (letterlijk Gemini's Compas.html) ----------
+let garminKompasFrameLoaded = false;
+function openGarminKompasScreen(){
+  hideHubScreen();
+  $('garminKompasScreen').classList.remove('hidden');
+  if (!garminKompasFrameLoaded){
+    $('garminKompasFrame').srcdoc = buildGarminKompasHtml();
+    garminKompasFrameLoaded = true;
+  }
+}
+function closeGarminKompasScreen(){
+  $('garminKompasScreen').classList.add('hidden');
+  showHubScreen();
+}
+window.addEventListener('message', (ev) => {
+  const data = ev.data;
+  if (!data || data.source !== 'garminKompas') return;
+  if (data.action === 'back') closeGarminKompasScreen();
+});
+
+// ---------- Garmin-stijl Weer (letterlijk Gemini's weer.html, met echte data) ----------
+let garminWeerFrameLoaded = false;
+function openGarminWeerScreen(){
+  hideHubScreen();
+  $('garminWeerScreen').classList.remove('hidden');
+  if (!garminWeerFrameLoaded){
+    $('garminWeerFrame').srcdoc = buildGarminWeerHtml();
+    garminWeerFrameLoaded = true;
+  } else {
+    fetchGarminWeerData();
+  }
+}
+function closeGarminWeerScreen(){
+  $('garminWeerScreen').classList.add('hidden');
+  showHubScreen();
+}
+window.addEventListener('message', (ev) => {
+  const data = ev.data;
+  if (!data || data.source !== 'garminWeer') return;
+  if (data.action === 'back') closeGarminWeerScreen();
+  if (data.action === 'refresh') fetchGarminWeerData(true);
+});
+
+// ---------- Garmin-stijl Fietsen/Wandelen-opzetscherm ----------
+// Bouwt géén eigen route-logica na: dit scherm ligt als overlay bovenop het echte #bikeSetupScreen
+// (dat we via de echte openBikeSetupScreen(mode) al voorbereiden) en stuurt de echte knoppen aan.
+let garminSetupMode = null;
+function openGarminSetupScreen(mode){
+  garminSetupMode = mode;
+  hideHubScreen();
+  openBikeSetupScreen(mode); // bereidt het echte scherm/state voor (blijft onder de overlay verborgen zicht)
+  $('garminSetupScreen').classList.remove('hidden');
+  const frame = $('garminSetupFrame');
+  frame.addEventListener('load', () => fetchGarminSetupData(mode), { once:true });
+  frame.srcdoc = buildGarminSetupHtml(mode);
+}
+function closeGarminSetupScreen(){
+  $('garminSetupScreen').classList.add('hidden');
+  $('bikeSetupScreen').classList.add('hidden');
+  showHubScreen();
+}
+function garminSetupSelectBikeType(type){
+  const tile = document.querySelector('.bike-type-tile[data-biketype="' + type + '"]');
+  if (tile) tile.click(); // hergebruikt de echte, bestaande handler (zet appSettings.bikeType e.d.)
+}
+function garminSetupContinue(){
+  $('garminSetupScreen').classList.add('hidden');
+  $('bikeSetupContinueBtn').click(); // echte doorgaan-knop: opent de kaart zoals in Standaard-stijl
+}
+function garminSetupOpenLoopGen(){
+  $('garminSetupScreen').classList.add('hidden');
+  $('bikeSetupContinueBtn').click();
+  setTimeout(() => { const b = $('menuLoopGenBtn'); if (b) b.click(); }, 300);
+}
+function garminSetupOpenGpxImport(){
+  $('garminSetupScreen').classList.add('hidden');
+  $('bikeSetupContinueBtn').click();
+  setTimeout(() => { const b = $('importBtn'); if (b) b.click(); }, 300);
+}
+async function fetchGarminSetupData(mode){
+  const frame = $('garminSetupFrame');
+  const post = (payload) => { if (frame && frame.contentWindow) frame.contentWindow.postMessage(Object.assign({ source:'garminSetupData' }, payload), '*'); };
+
+  const weekKm = Math.round((await computeWeeklyKm(mode)) * 10) / 10;
+  post({ weekKm });
+
+  if (hubWeatherCache && (Date.now() - hubWeatherCache.t < 15*60000)){
+    post({ temp: hubWeatherCache.temp, icon: hubWeatherCache.icon, conditionText: hubWeatherCache.conditionText });
+    return;
+  }
+  if (!navigator.geolocation){ post({ weerError: curLang()==='en' ? 'No GPS available' : 'Geen GPS beschikbaar' }); return; }
+  navigator.geolocation.getCurrentPosition(async (pos) => {
+    try{
+      const { latitude:lat, longitude:lon } = pos.coords;
+      const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weather_code&timezone=auto`);
+      if (!res.ok) throw new Error('http ' + res.status);
+      const data = await res.json();
+      if (!data.current) throw new Error('geen data');
+      const temp = Math.round(data.current.temperature_2m);
+      const icon = WEATHER_ICONS[data.current.weather_code] || '🌡️';
+      const conditionText = weatherConditionText()[data.current.weather_code] || '';
+      hubWeatherCache = Object.assign(hubWeatherCache || {}, { t: Date.now(), temp, icon, conditionText });
+      post({ temp, icon, conditionText });
+    } catch(e){
+      post({ weerError: curLang()==='en' ? 'Weather unavailable' : 'Weer niet beschikbaar' });
+    }
+  }, () => {
+    post({ weerError: curLang()==='en' ? 'No location access' : 'Geen locatietoegang' });
+  }, { timeout:10000 });
+}
+window.addEventListener('message', (ev) => {
+  const data = ev.data;
+  if (!data || data.source !== 'garminSetup') return;
+  switch (data.action){
+    case 'back':       closeGarminSetupScreen(); break;
+    case 'biketype':   garminSetupSelectBikeType(data.type); break;
+    case 'continue':   garminSetupContinue(); break;
+    case 'loopgen':    garminSetupOpenLoopGen(); break;
+    case 'gpximport':  garminSetupOpenGpxImport(); break;
+    case 'identifyplant': garminIdentifyPlant(data.file); break;
+    case 'findrestpoints': garminFindRestPoints(); break;
+  }
+});
+async function garminFindRestPoints(){
+  const frame = $('garminSetupFrame');
+  const post = (payload) => { if (frame && frame.contentWindow) frame.contentWindow.postMessage(Object.assign({ source:'garminRestPointsResult' }, payload), '*'); };
+  const r = await findNearbyRestPoints();
+  if (!r.ok){ post({ status:'error', message: restPointErrorMessage(r.reason) }); return; }
+  post({ status:'ok', points: r.points });
+}
+async function garminIdentifyPlant(file){
+  const frame = $('garminSetupFrame');
+  const post = (payload) => { if (frame && frame.contentWindow) frame.contentWindow.postMessage(Object.assign({ source:'garminPlantResult' }, payload), '*'); };
+  post({ status:'loading' });
+  const r = await plantNetIdentifyCore(file);
+  if (!r.ok){ post({ status:'error', message: plantNetErrorMessage(r.reason) }); return; }
+  post({ status:'ok', commonName:r.commonName, sciName:r.sciName, pct:r.pct, matchLabel: curLang()==='en' ? 'match' : 'zekerheid' });
+}
+
+// Instellingen-toegang vanuit eender welk Garmin-stijl scherm (het gele driehoekje linksboven):
+// opent de échte instellingen-modal, exact zoals de bestaande menu-knop dat doet.
+window.addEventListener('message', (ev) => {
+  const data = ev.data;
+  if (!data || data.source !== 'garminMenu') return;
+  if (data.action === 'settings'){
+    closeActionMenu();
+    openModal('settingsModal');
+    runOfflineDiagnostics();
+    checkBatteryLevel();
+  }
+});
+// Kleine herbruikbare snippet (dot-driehoekje + wiring) die in elk Garmin-iframe-template wordt geplakt.
+const GARMIN_MENU_BTN_HTML = `
+  <button id="garminMenuBtn" title="Instellingen" class="w-9 h-9 flex flex-col items-center justify-center gap-[3px] bg-slate-900/70 border border-slate-800 rounded-xl hover:border-amber-500/60 transition active:scale-95 flex-shrink-0">
+    <div class="flex gap-[3px]"><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span></div>
+    <div class="flex gap-[3px]"><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span></div>
+    <div class="flex gap-[3px]"><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span></div>
+  </button>`;
+const GARMIN_MENU_BTN_JS = `
+    const garminMenuBtn = document.getElementById('garminMenuBtn');
+    if (garminMenuBtn) garminMenuBtn.addEventListener('click', () => parent.postMessage({ source:'garminMenu', action:'settings' }, '*'));`;
+
+function buildGarminSetupHtml(mode){
+  const isFiets = mode === 'fiets';
+  return `<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KnooppuntenRoute</title>
+<script src="https://cdn.tailwindcss.com"><\/script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap');
+  body { font-family: 'Inter', sans-serif; }
+</style>
+</head>
+<body class="bg-slate-950 min-h-screen text-slate-100 overflow-x-hidden">
+  <div class="w-full min-h-screen p-5 flex flex-col">
+    <div class="flex justify-between items-center mb-5">
+      <div class="flex items-center gap-3">
+        <button id="backBtn" class="w-9 h-9 bg-slate-900 border border-slate-800 text-slate-400 hover:text-white rounded-xl flex items-center justify-center">←</button>
+        ${GARMIN_MENU_BTN_HTML}
+        <div>
+          <span class="text-[10px] text-slate-400 block uppercase tracking-widest font-black">${isFiets ? 'Knooppuntenroute' : 'Wandelknooppunten'}</span>
+          <h1 class="text-lg font-black tracking-tight text-white flex items-center gap-1.5 mt-0.5">
+            <span>${isFiets ? '🚴' : '🥾'}</span> ${isFiets ? 'Waar ga je vandaag voor?' : 'Waar wandel jij naartoe?'}
+          </h1>
+        </div>
+      </div>
+    </div>
+
+    ${isFiets ? `
+    <div class="mb-6">
+      <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-3">1. Kies je fietstype</span>
+      <div class="grid grid-cols-3 gap-2" id="bikeTypeGrid">
+        <button data-type="road" class="bt-tile bg-slate-900/60 border-2 border-slate-800 rounded-2xl p-3 text-center transition"><span class="text-2xl block mb-1">🚴</span><span class="text-xs font-bold text-white block">Racefiets</span></button>
+        <button data-type="regular" class="bt-tile bg-slate-900/60 border-2 border-slate-800 rounded-2xl p-3 text-center transition"><span class="text-2xl block mb-1">🚲</span><span class="text-xs font-bold text-white block">Stadsfiets</span></button>
+        <button data-type="mountain" class="bt-tile bg-slate-900/60 border-2 border-slate-800 rounded-2xl p-3 text-center transition"><span class="text-2xl block mb-1">🚵</span><span class="text-xs font-bold text-white block">Mountainbike</span></button>
+      </div>
+    </div>
+    <div class="bg-emerald-950/40 border border-emerald-800/40 rounded-2xl p-3.5 mb-6 flex items-center gap-2">
+      <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+      <div>
+        <div class="text-xs font-bold text-emerald-400">ACTIEF LIVE</div>
+        <div class="text-[11px] text-slate-400">Live routelijn & meteen herberekenen onderweg.</div>
+      </div>
+    </div>` : ''}
+
+    <div class="grid grid-cols-2 gap-3 mb-6">
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-3 flex flex-col justify-between">
+        <div class="flex justify-between items-start"><span class="text-slate-400 text-[10px] font-bold uppercase tracking-wider">${isFiets ? 'Het weer nu' : 'Weer & Comfort'}</span><span id="weerIcon" class="text-lg">–</span></div>
+        <div class="mt-2">
+          <div id="weerTemp" class="text-xl font-black text-white tracking-tight">--°C</div>
+          <div id="weerSub" class="text-[10px] text-slate-500 mt-1">Locatie ophalen…</div>
+        </div>
+      </div>
+      <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-3 flex flex-col justify-between">
+        <span class="text-slate-400 text-[10px] font-bold uppercase tracking-wider">Deze week</span>
+        <div class="mt-2">
+          <div id="weekKm" class="text-xl font-black text-amber-400 tracking-tight">-- km</div>
+          <div class="text-[9px] text-slate-500 mt-1">Uit je eigen ritgeschiedenis</div>
+        </div>
+      </div>
+    </div>
+
+    ${isFiets ? `
+    <div class="space-y-3 mb-6">
+      <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Route & Tools</span>
+      <button id="loopGenBtn" class="w-full bg-slate-900/70 border border-slate-800 rounded-2xl p-3 flex justify-between items-center text-left">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 bg-slate-800 rounded-xl flex items-center justify-center">🎲</div>
+          <div><div class="font-bold text-xs text-slate-200">Rondrit-generator</div><div class="text-[10px] text-slate-400">Genereer 3 routevoorstellen rond een punt</div></div>
+        </div>
+        <span class="text-slate-500">→</span>
+      </button>
+      <button id="gpxImportBtn" class="w-full bg-slate-900/70 border border-slate-800 rounded-2xl p-3 flex justify-between items-center text-left">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 bg-slate-800 rounded-xl flex items-center justify-center">📂</div>
+          <div><div class="font-bold text-xs text-slate-200">Importeer GPX-bestand</div><div class="text-[10px] text-slate-400">Laad routes van Komoot, Garmin of Strava</div></div>
+        </div>
+        <span class="text-slate-500">→</span>
+      </button>
+    </div>` : `
+    <div class="mb-6">
+      <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-3">Wandel-extra's</span>
+      <div class="grid grid-cols-2 gap-3">
+        <button id="restPointsTile" class="bg-slate-900/60 border border-sky-500/40 rounded-2xl p-2.5 text-center"><span class="text-xl block mb-0.5">☕</span><span class="text-xs font-bold text-sky-400 block">Rustpunten</span><span class="text-[9px] text-slate-500 block">Echte OSM-data</span></button>
+        <button class="stub-tile bg-slate-900/60 border border-slate-800 rounded-2xl p-2.5 text-center"><span class="text-xl block mb-0.5">🦉</span><span class="text-xs font-bold text-white block">Natuurspotter</span><span class="text-[9px] text-slate-500 block">Binnenkort</span></button>
+        <label for="floraScannerInput" class="bg-slate-900/60 border border-emerald-500/40 rounded-2xl p-2.5 text-center cursor-pointer block relative">
+          <span class="text-xl block mb-0.5">📸</span><span class="text-xs font-bold text-emerald-400 block">Flora Scanner</span><span id="floraScannerSub" class="text-[9px] text-slate-500 block">Echte herkenning</span>
+          <input type="file" id="floraScannerInput" accept="image/*" capture="environment" class="hidden" style="display:none;">
+        </label>
+        <button class="stub-tile bg-slate-900/60 border border-slate-800 rounded-2xl p-2.5 text-center"><span class="text-xl block mb-0.5">🎧</span><span class="text-xs font-bold text-white block">Audio Gids</span><span class="text-[9px] text-slate-500 block">Binnenkort</span></button>
+      </div>
+      <div id="restPointsResultGarmin" style="display:none; margin-top:10px; background:rgba(255,255,255,0.06); border:2px solid #38bdf8; border-radius:16px; padding:10px 14px; max-height:220px; overflow-y:auto;"></div>
+      <div id="floraScannerResult" style="display:none; margin-top:10px; background:rgba(255,255,255,0.06); border:2px solid #f59e0b; border-radius:16px; padding:12px 14px;"></div>
+    </div>`}
+
+    <div class="mt-auto pt-3">
+      <button id="continueBtn" class="w-full bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-black py-3.5 rounded-2xl text-center shadow-xl tracking-wider text-xs uppercase">
+        🗺️ Open kaart & plan route
+      </button>
+    </div>
+  </div>
+
+  <script>
+    let selectedType = ${isFiets ? "'road'" : "null"};
+    const backBtn = document.getElementById('backBtn');
+    backBtn.addEventListener('click', () => parent.postMessage({ source:'garminSetup', action:'back' }, '*'));
+${GARMIN_MENU_BTN_JS}
+
+    document.querySelectorAll('.bt-tile').forEach(tile => {
+      tile.addEventListener('click', () => {
+        selectedType = tile.dataset.type;
+        document.querySelectorAll('.bt-tile').forEach(t => { t.classList.remove('border-amber-500'); t.classList.add('border-slate-800'); });
+        tile.classList.remove('border-slate-800'); tile.classList.add('border-amber-500');
+        parent.postMessage({ source:'garminSetup', action:'biketype', type:selectedType }, '*');
+      });
+    });
+    document.querySelectorAll('.stub-tile').forEach(tile => {
+      tile.addEventListener('click', () => alert('Deze functie is nog in opbouw.'));
+    });
+    const floraScannerInput = document.getElementById('floraScannerInput');
+    if (floraScannerInput){
+      floraScannerInput.addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        parent.postMessage({ source:'garminSetup', action:'identifyplant', file }, '*');
+      });
+    }
+    const restPointsTile = document.getElementById('restPointsTile');
+    if (restPointsTile){
+      restPointsTile.addEventListener('click', () => {
+        const resultEl = document.getElementById('restPointsResultGarmin');
+        resultEl.style.display = 'block';
+        resultEl.innerHTML = '<div class="text-xs text-slate-300 py-1">Bezig met zoeken…</div>';
+        parent.postMessage({ source:'garminSetup', action:'findrestpoints' }, '*');
+      });
+    }
+    window.addEventListener('message', (ev) => {
+      const d = ev.data;
+      if (d && d.source === 'garminRestPointsResult'){
+        const resultEl = document.getElementById('restPointsResultGarmin');
+        if (!resultEl) return;
+        resultEl.style.display = 'block';
+        if (d.status === 'error'){
+          resultEl.innerHTML = '<div class="text-xs text-slate-300 py-1">' + d.message + '</div>';
+        } else if (d.status === 'ok'){
+          resultEl.innerHTML = d.points.map(p =>
+            '<div class="flex items-center gap-2 py-1.5 border-b border-slate-800/60">' +
+            '<span class="text-base">' + p.emoji + '</span>' +
+            '<div class="flex-1 min-w-0"><div class="text-xs font-bold text-white truncate">' + p.name + '</div>' +
+            '<div class="text-[10px] text-slate-500">' + p.typeLabel + '</div></div>' +
+            '<div class="text-[11px] font-bold text-sky-400 flex-shrink-0">' + p.distanceM + ' m</div></div>'
+          ).join('');
+        }
+      }
+    });
+    window.addEventListener('message', (ev) => {
+      const d = ev.data;
+      if (!d || d.source !== 'garminPlantResult') return;
+      const resultEl = document.getElementById('floraScannerResult');
+      if (!resultEl) return;
+      resultEl.style.display = 'block';
+      if (d.status === 'loading'){
+        resultEl.innerHTML = '<div class="text-xs text-slate-300">Bezig met herkennen…</div>';
+      } else if (d.status === 'error'){
+        resultEl.innerHTML = '<div class="text-xs text-slate-300">' + d.message + '</div>';
+      } else if (d.status === 'ok'){
+        resultEl.innerHTML =
+          '<div class="flex items-center gap-2 mb-1"><span class="text-xl">🌿</span><div>' +
+          '<div class="text-sm font-bold text-white">' + (d.commonName || d.sciName) + '</div>' +
+          '<div class="text-[11px] text-slate-400 italic">' + d.sciName + '</div></div></div>' +
+          '<div class="text-[11px] font-bold text-amber-400">' + d.pct + '% ' + d.matchLabel + '</div>';
+      }
+    });
+
+    const loopGenBtn = document.getElementById('loopGenBtn');
+    if (loopGenBtn) loopGenBtn.addEventListener('click', () => parent.postMessage({ source:'garminSetup', action:'loopgen' }, '*'));
+    const gpxImportBtn = document.getElementById('gpxImportBtn');
+    if (gpxImportBtn) gpxImportBtn.addEventListener('click', () => parent.postMessage({ source:'garminSetup', action:'gpximport' }, '*'));
+
+    document.getElementById('continueBtn').addEventListener('click', () => {
+      if (selectedType) parent.postMessage({ source:'garminSetup', action:'biketype', type:selectedType }, '*');
+      parent.postMessage({ source:'garminSetup', action:'continue' }, '*');
+    });
+
+    window.addEventListener('message', (ev) => {
+      const d = ev.data;
+      if (!d || d.source !== 'garminSetupData') return;
+      if (d.weerError){
+        document.getElementById('weerSub').textContent = d.weerError;
+      } else if (d.temp != null){
+        document.getElementById('weerTemp').textContent = d.temp + '°C';
+        document.getElementById('weerIcon').textContent = d.icon || '';
+        document.getElementById('weerSub').textContent = d.conditionText || '';
+      }
+      if (d.weekKm != null){
+        document.getElementById('weekKm').textContent = d.weekKm + ' km';
+      }
+    });
+  <\/script>
+</body>
+</html>`;
+}
+
+async function fetchGarminWeerData(forceLocation){
+  const frame = $('garminWeerFrame');
+  const post = (payload) => { if (frame && frame.contentWindow) frame.contentWindow.postMessage(Object.assign({ source:'garminWeerData' }, payload), '*'); };
+  if (!navigator.geolocation){
+    post({ error: curLang()==='en' ? 'No GPS available' : 'Geen GPS beschikbaar' });
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(async (pos) => {
+    try{
+      weatherLocationOverride = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+      const data = await loadWeatherAndSun();
+      if (!data){ post({ error: curLang()==='en' ? 'Weather unavailable' : 'Weer niet beschikbaar' }); return; }
+      const placeName = await fetchPlaceName(weatherLocationOverride.lat, weatherLocationOverride.lng);
+      const cardinals = cardinalsForLang();
+      const windDirLabel = data.windDir != null ? cardinals[Math.round(data.windDir / 22.5) % 16] : '–';
+      const now = new Date();
+      post({
+        temp:data.temp, tempMax:data.tempMax, tempMin:data.tempMin, feelsLike:data.feelsLike,
+        humidity:data.humidity, windSpeed:data.windSpeed, windDir:data.windDir, windDirLabel,
+        uvIndex:data.uvIndex, pressure:data.pressure, pressureTrend:data.pressureTrend,
+        aqi:data.aqi, pollen:data.pollen,
+        conditionText: weatherConditionText()[data.code] || '–',
+        icon: WEATHER_ICONS[data.code] || '🌡️',
+        sunriseText:data.sunriseText, sunsetText:data.sunsetText, sunriseMin:data.sunriseMin, sunsetMin:data.sunsetMin,
+        hourly: (data.hourly||[]).map(h => ({ hourLabel: h.hour === now.getHours() ? (curLang()==='en'?'Now':'Nu') : (String(h.hour).padStart(2,'0') + (curLang()==='en'?'h':'u')), temp:h.temp, icon: WEATHER_ICONS[h.code] || '🌡️' })),
+        daily: (data.daily||[]).map(d => ({ dayLabel: d.date.toDateString()===now.toDateString() ? (curLang()==='en'?'Today':'Vandaag') : d.date.toLocaleDateString(curLang()==='en'?'en-GB':'nl-BE', { weekday:'short' }), max:d.max, min:d.min, icon: WEATHER_ICONS[d.code] || '🌡️' })),
+        placeName: placeName || (curLang()==='en' ? 'Unknown location' : 'Locatie onbekend'),
+        updatedLabel: (curLang()==='en' ? 'Updated ' : 'Bijgewerkt ') + now.toLocaleTimeString(curLang()==='en'?'en-GB':'nl-BE', { hour:'2-digit', minute:'2-digit' })
+      });
+    } catch(e){
+      post({ error: curLang()==='en' ? 'Weather unavailable' : 'Weer niet beschikbaar' });
+    }
+  }, () => {
+    post({ error: curLang()==='en' ? 'No location access' : 'Geen locatietoegang' });
+  }, { timeout:10000 });
+}
+
+function buildGarminKompasHtml(){
+  // Gemini's Compas.html, ongewijzigd qua opbouw/animatie/stijl. Enige aanpassingen:
+  // (1) "‹ terug" stuurt een postMessage naar de echte app i.p.v. history.back(),
+  // (2) sensor-start: op Android start dit automatisch (geen permissie nodig), op iOS blijft de
+  //     tik-knop nodig omdat Apple DeviceOrientationEvent.requestPermission() enkel na een
+  //     gebruikersactie toestaat — dat is een platformbeperking, geen keuze.
+  return `<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kompas - Fietsapp</title>
+    <script src="https://cdn.tailwindcss.com"><\/script>
+    <style>
+        * {
+            user-select: none;
+        }
+
+        @keyframes floatingCompass {
+            0% { transform: translateY(0px) rotate(0deg); }
+            25% { transform: translateY(-2px) rotate(0.6deg); }
+            50% { transform: translateY(1.5px) rotate(-0.5deg); }
+            75% { transform: translateY(-1px) rotate(-0.3deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        .water-float {
+            animation: floatingCompass 4.5s ease-in-out infinite;
+        }
+
+        .compass-dial {
+            width: 270px;
+            height: 270px;
+            border-radius: 50%;
+            position: absolute;
+            transition: transform 0.05s linear;
+        }
+
+        .deg-marker {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            text-align: center;
+        }
+
+        .deg-marker span {
+            position: absolute;
+            top: 22px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            font-weight: 500;
+            color: #8fa0ad;
+        }
+
+        .deg-marker::before {
+            content: '';
+            position: absolute;
+            top: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 1.5px;
+            height: 14px;
+            background-color: #64748b;
+        }
+
+        .sub-marker {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+        }
+
+        .sub-marker::before {
+            content: '';
+            position: absolute;
+            top: 4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 1px;
+            height: 8px;
+            background-color: #475569;
+        }
+
+        .indicator-dot {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: radial-gradient(circle, #ffaa33 0%, #ff5500 70%, #cc3300 100%);
+            border-radius: 50%;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 10px rgba(255, 119, 0, 0.8), inset 0 1px 2px rgba(255, 255, 255, 0.4);
+            z-index: 4;
+        }
+
+        .inner-core {
+            width: 120px;
+            height: 120px;
+            background:
+                radial-gradient(circle at 50% 25%, rgba(255, 255, 255, 0.12) 0%, transparent 60%),
+                linear-gradient(135deg, #1b2633 0%, #0e1621 100%);
+            border-radius: 50%;
+            box-shadow:
+                0 10px 25px rgba(0,0,0,0.8),
+                inset 0 2px 4px rgba(255,255,255,0.15),
+                inset 0 -4px 8px rgba(0,0,0,0.9),
+                inset 0 0 0 5px rgba(255, 255, 255, 0.12);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body class="bg-[#050914] text-slate-100 min-h-screen flex items-center justify-center p-2 sm:p-4 font-sans">
+
+  <div class="w-full max-w-md bg-[#091122] rounded-[32px] p-5 border border-slate-800 shadow-2xl relative space-y-4 flex flex-col h-[860px]">
+
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <button id="backBtn" class="w-9 h-9 bg-[#17242d] hover:bg-slate-700 rounded-xl text-slate-300 border border-slate-700/50 transition-all flex items-center justify-center text-lg">
+          ‹
+        </button>
+        ${GARMIN_MENU_BTN_HTML}
+        <div>
+          <span class="text-[10px] font-bold tracking-widest text-slate-400 uppercase">Navigatie</span>
+          <h1 class="text-lg font-bold text-white leading-none">Kompas</h1>
+        </div>
+      </div>
+      <div class="w-9 h-9 bg-[#17242d] rounded-xl flex items-center justify-center text-amber-400 border border-slate-700/50">
+        🧭
+      </div>
+    </div>
+
+    <div class="flex-1 flex items-center justify-center relative cursor-grab active:cursor-grabbing" id="compassContainer">
+      <div class="water-float w-[330px] h-[330px] bg-gradient-to-br from-[#0a1324] via-[#0d182e] to-[#080d1a] rounded-full shadow-[0_20px_45px_rgba(0,0,0,0.7)] border border-slate-800/80 flex items-center justify-center relative overflow-hidden">
+
+        <div class="absolute top-2 text-red-500 font-bold text-sm z-20">N</div>
+        <div class="absolute bottom-2 text-slate-500 font-semibold text-sm z-20">S</div>
+        <div class="absolute right-2.5 text-slate-500 font-semibold text-sm z-20">E</div>
+        <div class="absolute left-2.5 text-slate-500 font-semibold text-sm z-20">W</div>
+
+        <div class="compass-dial" id="compassDial">
+          <div class="indicator-dot"></div>
+        </div>
+
+        <div class="inner-core">
+          <div class="text-2xl font-extrabold text-white tracking-tight flex items-start" id="degreeText">
+            –<span class="text-xs font-bold ml-0.5">°</span>
+          </div>
+          <div class="text-xs font-semibold text-slate-400 tracking-widest mt-0.5" id="dirText">–</div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="bg-[#17242d] rounded-2xl p-3 border border-slate-800/80 text-center text-xs text-slate-400 flex flex-col gap-2">
+      <span id="statusText">Bezig met starten…</span>
+      <button id="sensorBtn" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-2 px-4 rounded-xl transition-all shadow-md" style="display:none;">
+        Activeer Kompas Sensoren
+      </button>
+    </div>
+
+  </div>
+
+  <script>
+    const dial = document.getElementById('compassDial');
+    const container = document.getElementById('compassContainer');
+    const degreeText = document.getElementById('degreeText');
+    const dirText = document.getElementById('dirText');
+    const statusText = document.getElementById('statusText');
+    const sensorBtn = document.getElementById('sensorBtn');
+    const backBtn = document.getElementById('backBtn');
+
+    let currentAngle = 0;
+    let useHardwareSensor = false;
+
+    backBtn.addEventListener('click', () => parent.postMessage({ source:'garminKompas', action:'back' }, '*'));
+${GARMIN_MENU_BTN_JS}
+
+    for (let i = 0; i < 360; i += 10) {
+        if (i % 30 === 0) {
+            const marker = document.createElement('div');
+            marker.className = 'deg-marker';
+            marker.style.transform = \`rotate(\${i}deg)\`;
+            marker.innerHTML = \`<span>\${i === 0 ? '0' : i}.</span>\`;
+            dial.appendChild(marker);
+        } else {
+            const subMarker = document.createElement('div');
+            subMarker.className = 'sub-marker';
+            subMarker.style.transform = \`rotate(\${i}deg)\`;
+            dial.appendChild(subMarker);
+        }
+    }
+
+    function updateCompass(angle) {
+        let normalized = Math.round(angle) % 360;
+        if (normalized < 0) normalized += 360;
+
+        dial.style.transform = \`rotate(\${-normalized}deg)\`;
+        degreeText.innerHTML = \`\${normalized}<span class="text-xs font-bold ml-0.5">°</span>\`;
+        dirText.textContent = getCardinalDirection(normalized);
+    }
+
+    function getCardinalDirection(deg) {
+        const directions = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N'];
+        return directions[Math.round(deg / 45)];
+    }
+
+    // --- HARDWARE KOMPAS ACTIVATIE ---
+    // Android/Chrome: geen permissie-stap nodig -> start meteen vanzelf zodra dit scherm opent.
+    // iOS/Safari: DeviceOrientationEvent.requestPermission() bestaat enkel daar en werkt enkel
+    // na een echte tik van de gebruiker -> knop blijft daar nodig, kan niet automatisch.
+    const isIOSPermissionFlow = (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function');
+
+    function requestSensorAccess() {
+        if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+            statusText.textContent = "Fout: Sensoren vereisen een beveiligde HTTPS-verbinding!";
+            statusText.classList.add('text-rose-400');
+            return;
+        }
+        if (isIOSPermissionFlow) {
+            DeviceOrientationEvent.requestPermission()
+                .then(response => {
+                    if (response === 'granted') {
+                        startListening();
+                    } else {
+                        statusText.textContent = "Toegang tot sensoren geweigerd.";
+                    }
+                })
+                .catch(err => {
+                    statusText.textContent = "Fout bij aanvragen permissie: " + err;
+                });
+        } else {
+            startListening();
+        }
+    }
+    sensorBtn.addEventListener('click', requestSensorAccess);
+
+    function startListening() {
+        window.addEventListener('deviceorientation', handleOrientation, true);
+        statusText.textContent = "Kompas zoekt naar magnetisch noorden…";
+        sensorBtn.style.display = 'none';
+    }
+
+    function handleOrientation(event) {
+        let heading = null;
+
+        if (event.webkitCompassHeading !== undefined) {
+            heading = event.webkitCompassHeading;
+        }
+        else if (event.absolute && event.alpha !== null) {
+            heading = 360 - event.alpha;
+        }
+        else if (event.alpha !== null) {
+            heading = 360 - event.alpha;
+        }
+
+        if (heading !== null) {
+            useHardwareSensor = true;
+            currentAngle = heading;
+            updateCompass(currentAngle);
+            statusText.textContent = "Live GPS/Hardware Kompas Actief";
+            statusText.classList.remove('text-rose-400');
+            statusText.classList.add('text-emerald-400');
+        } else {
+            statusText.textContent = "Geen kompasdata beschikbaar op dit apparaat.";
+        }
+    }
+
+    if (!window.DeviceOrientationEvent) {
+        statusText.textContent = "Je browser ondersteunt geen bewegingssensoren.";
+        sensorBtn.style.display = 'none';
+    } else if (isIOSPermissionFlow) {
+        statusText.textContent = "Tik op de knop om het kompas te starten";
+        sensorBtn.style.display = 'inline-block';
+    } else {
+        // Android: geen knop nodig, meteen starten.
+        startListening();
+    }
+
+    // --- PC / MUIS / TOUCH FALLBACK (enkel als hardwaresensor niet actief is) ---
+    let isDragging = false;
+    let startAngle = 0;
+
+    function getAngle(e) {
+        const rect = container.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return Math.atan2(clientY - centerY, clientX - centerX) * (180 / Math.PI);
+    }
+
+    container.addEventListener('mousedown', (e) => {
+        if (useHardwareSensor) return;
+        isDragging = true;
+        startAngle = getAngle(e) - currentAngle;
+    });
+
+    window.addEventListener('mousemove', (e) => {
+        if (!isDragging || useHardwareSensor) return;
+        currentAngle = getAngle(e) - startAngle;
+        updateCompass(currentAngle);
+    });
+
+    window.addEventListener('mouseup', () => { isDragging = false; });
+
+    container.addEventListener('touchstart', (e) => {
+        if (useHardwareSensor) return;
+        isDragging = true;
+        startAngle = getAngle(e) - currentAngle;
+    });
+
+    window.addEventListener('touchmove', (e) => {
+        if (!isDragging || useHardwareSensor) return;
+        currentAngle = getAngle(e) - startAngle;
+        updateCompass(currentAngle);
+    });
+
+    window.addEventListener('touchend', () => { isDragging = false; });
+
+    updateCompass(currentAngle);
+  <\/script>
+</body>
+</html>`;
+}
+
+function buildGarminWeerHtml(){
+  // Gemini's weer.html-lay-out (Radar-tab vervangen door een duidelijke "nog niet gekoppeld"-melding,
+  // in plaats van nagemaakte/fictieve neerslagbalken te tonen — dat zou misleidend zijn tijdens een rit).
+  return `<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Uitgebreid Weerbericht - Meteo</title>
+  <script src="https://cdn.tailwindcss.com"><\/script>
+  <style>
+    .custom-scroll::-webkit-scrollbar { width: 4px; }
+    .custom-scroll::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); border-radius: 8px; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #334155; border-radius: 8px; }
+    .range-bar-container { position: relative; height: 8px; width: 100%; margin: 4px 0; }
+    .range-bar { height: 100%; border-radius: 4px; width: 100%; }
+    .range-indicator {
+      position: absolute; top: 50%; transform: translate(-50%, -50%); width: 14px; height: 14px;
+      background-color: #ffffff; border: 2px solid #000000; border-radius: 50%;
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.4); transition: left 0.3s ease;
+    }
+    .uv-gradient { background: linear-gradient(to right, #4CAF50, #FFEB3B, #FF9800, #F44336, #9C27B0); }
+    .pressure-gradient { background: linear-gradient(to right, #2196F3, #80DEEA, #FFC107, #FF5722); }
+    .aqi-gradient { background: linear-gradient(to right, #4CAF50, #8BC34A, #FFEB3B, #FF9800, #E91E63); }
+    @keyframes floatGentle { 0%, 100% { transform: translateY(0px) rotate(0deg); } 50% { transform: translateY(-4px) rotate(2deg); } }
+    .animate-bear-body { animation: floatGentle 4s ease-in-out infinite; }
+    @keyframes softRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    .animate-soft-spin { animation: softRotate 30s linear infinite; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-[#050914] text-slate-100 min-h-screen flex items-center justify-center p-2 sm:p-4 font-sans">
+
+  <div class="w-full max-w-md bg-[#091122] rounded-[32px] p-5 border border-slate-800 shadow-2xl relative space-y-4 flex flex-col">
+
+    <div class="flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <button id="backBtn" class="w-9 h-9 bg-[#17242d] hover:bg-slate-700 rounded-xl text-slate-300 border border-slate-700/50 transition-all flex items-center justify-center text-lg">‹</button>
+        ${GARMIN_MENU_BTN_HTML}
+        <div>
+          <span class="text-[10px] font-bold tracking-widest text-slate-400 uppercase">Meteo</span>
+          <h1 class="text-lg font-bold text-white leading-none">Weer Dashboard</h1>
+        </div>
+      </div>
+      <button id="refreshBtn" class="px-3 py-1.5 bg-slate-800/80 hover:bg-slate-700 text-xs font-semibold rounded-xl text-slate-300 border border-slate-700/50 transition-all flex items-center gap-1">
+        <span>📍</span> GPS
+      </button>
+    </div>
+
+    <div class="bg-gradient-to-br from-[#0a1324] via-[#0d182e] to-[#080d1a] rounded-2xl p-4 border border-slate-800/80 relative overflow-hidden flex items-center justify-between min-h-[105px]">
+      <div>
+        <div class="text-3xl font-extrabold text-white tracking-tight" id="main-temp-display">--°C</div>
+        <div class="text-xs font-medium text-slate-300 mt-0.5" id="main-weather-desc">Data laden...</div>
+        <div class="text-[10px] font-semibold text-sky-400 mt-1" id="main-temp-range">▲ --° max • ▼ --° min</div>
+      </div>
+      <div class="flex flex-col items-center justify-center min-w-[70px]">
+        <div id="main-weather-icon-container" class="w-14 h-14 flex items-center justify-center text-5xl">🌡️</div>
+        <span id="location-name-display" class="text-[9px] font-extrabold tracking-widest text-slate-300 uppercase mt-1">LADEN...</span>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-5 gap-1 bg-[#050914] p-1 rounded-2xl border border-slate-800/80 text-[11px] text-center font-medium">
+      <button id="tab-radar" class="tab-btn py-2 rounded-xl text-slate-400 hover:text-white transition-all">Radar</button>
+      <button id="tab-trend" class="tab-btn py-2 rounded-xl bg-amber-500 text-slate-950 font-bold shadow-md transition-all">Trend</button>
+      <button id="tab-details" class="tab-btn py-2 rounded-xl text-slate-400 hover:text-white transition-all">Details</button>
+      <button id="tab-pollen" class="tab-btn py-2 rounded-xl text-slate-400 hover:text-white transition-all">Pollen</button>
+      <button id="tab-advies" class="tab-btn py-2 rounded-xl text-slate-400 hover:text-white transition-all">Advies</button>
+    </div>
+
+    <div class="h-[520px] overflow-y-auto custom-scroll pr-1">
+
+      <div id="content-radar" class="tab-content hidden space-y-3">
+        <div class="bg-[#0b1426] rounded-2xl p-6 border border-slate-800 text-center text-sm text-slate-400">
+          🛰️ Neerslagradar is nog niet gekoppeld aan een echte databron.<br>
+          <span class="text-xs">Komt in een latere stap — geen nagemaakte data getoond.</span>
+        </div>
+      </div>
+
+      <div id="content-trend" class="tab-content space-y-4">
+        <div class="space-y-2">
+          <div class="flex justify-between items-center text-xs">
+            <span class="font-bold tracking-wider text-slate-300 uppercase text-[10px]">Verwachting per uur</span>
+            <span class="text-[10px] text-slate-500">Veeg voor meer →</span>
+          </div>
+          <div id="hourly-forecast-container" class="flex gap-2 overflow-x-auto no-scrollbar pb-1"></div>
+        </div>
+        <div class="bg-[#0b1426] rounded-2xl p-4 border border-slate-800/80 space-y-3">
+          <h3 class="text-xs font-bold text-slate-300 flex items-center gap-1.5"><span>📅</span> Verwachting voor de komende dagen</h3>
+          <div id="daily-forecast-container" class="grid grid-cols-5 gap-1.5 text-center"></div>
+        </div>
+        <div class="bg-[#0d1e2b] rounded-2xl p-4 border border-teal-900/40 relative overflow-hidden space-y-3">
+          <div class="flex items-start justify-between gap-2">
+            <div class="space-y-1.5 flex-1">
+              <span id="bear-tag" class="px-3 py-1 bg-teal-800/50 text-teal-300 text-[10px] font-bold rounded-full border border-teal-600/40 inline-block">Laden...</span>
+              <h2 id="bear-title" class="text-lg font-bold text-white leading-tight">Weerbericht geladen</h2>
+              <p id="bear-desc" class="text-xs text-slate-300 leading-relaxed">Even geduld, we halen het actuele weerbericht op.</p>
+            </div>
+            <div class="relative w-32 h-36 flex flex-col items-center justify-end flex-shrink-0">
+              <div id="weather-effect-svg" class="w-14 h-14 mb-1 flex items-center justify-center z-10 text-4xl"></div>
+              <div class="w-24 h-24 relative flex items-center justify-center">
+                <svg class="w-24 h-24 animate-bear-body relative z-0" viewBox="0 0 100 100">
+                  <circle cx="30" cy="35" r="10" fill="#a0683a" /><circle cx="30" cy="35" r="6" fill="#d99b66" />
+                  <circle cx="70" cy="35" r="10" fill="#a0683a" /><circle cx="70" cy="35" r="6" fill="#d99b66" />
+                  <circle cx="50" cy="50" r="26" fill="#b87843" />
+                  <ellipse cx="50" cy="56" rx="12" ry="9" fill="#e6b382" />
+                  <ellipse cx="50" cy="52" rx="4" ry="3" fill="#331a00" />
+                  <circle cx="41" cy="46" r="2.5" fill="#221100" /><circle cx="59" cy="46" r="2.5" fill="#221100" />
+                  <circle cx="36" cy="51" r="3" fill="#f43f5e" opacity="0.4" /><circle cx="64" cy="51" r="3" fill="#f43f5e" opacity="0.4" />
+                  <path d="M 32 68 Q 50 78 68 68 Q 72 78 50 82 Q 28 78 32 68 Z" fill="#ff6b00" />
+                  <ellipse cx="50" cy="85" rx="22" ry="15" fill="#a0683a" /><ellipse cx="50" cy="86" rx="14" ry="10" fill="#d99b66" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="content-details" class="tab-content hidden space-y-3">
+        <div class="bg-[#0b1426] rounded-2xl p-4 border border-slate-800/80 space-y-3">
+          <h3 class="font-bold text-white text-sm">Stand van de zon</h3>
+          <div class="w-full flex justify-between px-4 text-sm font-semibold text-slate-200">
+            <span>🌅 <span id="label-sunrise-time">--:--</span></span>
+            <span>🌇 <span id="label-sunset-time">--:--</span></span>
+          </div>
+          <div class="pt-3 border-t border-slate-800/80 space-y-1.5 text-xs">
+            <div class="flex justify-between items-center"><span class="text-slate-400">Lengte van de dag</span><span class="font-bold text-white" id="val-day-length">--u --m</span></div>
+            <div class="flex justify-between items-center"><span class="text-slate-400">Resterende daglicht</span><span class="font-bold text-amber-400" id="val-remaining-light">--u --m</span></div>
+          </div>
+        </div>
+
+        <div class="bg-[#0b1426] rounded-2xl p-4 border border-slate-800/80 space-y-2">
+          <span class="text-[10px] font-bold tracking-wider text-slate-400 uppercase block">UV-INDEX</span>
+          <div class="range-bar-container"><div class="range-bar uv-gradient"></div><div class="range-indicator" id="uv-indicator" style="left: 0%;"></div></div>
+          <div class="text-3xl font-extrabold text-white leading-none mt-2" id="uv-value">--</div>
+          <div class="text-xs font-medium text-slate-400" id="uv-status">Laden...</div>
+        </div>
+
+        <div class="bg-[#0b1426] rounded-2xl p-4 border border-slate-800/80 space-y-2">
+          <span class="text-[10px] font-bold tracking-wider text-slate-400 uppercase block">LUCHTDRUK</span>
+          <div class="range-bar-container"><div class="range-bar pressure-gradient"></div><div class="range-indicator" id="pressure-indicator" style="left: 0%;"></div></div>
+          <div class="text-3xl font-extrabold text-white leading-none mt-2"><span id="pressure-value">--</span><span class="text-base font-semibold text-slate-300 ml-1">hPa</span></div>
+          <div class="text-xs font-medium text-slate-400" id="pressure-status">Laden...</div>
+        </div>
+
+        <div class="bg-[#0b1426] rounded-2xl p-4 border border-slate-800/80 space-y-2">
+          <span class="text-[10px] font-bold tracking-wider text-slate-400 uppercase block">LUCHTKWALITEIT</span>
+          <div class="range-bar-container"><div class="range-bar aqi-gradient"></div><div class="range-indicator" id="aqi-indicator" style="left: 0%;"></div></div>
+          <div class="text-3xl font-extrabold text-white leading-none mt-2" id="aqi-value">--</div>
+          <div class="text-xs font-medium text-slate-400" id="aqi-status">Laden...</div>
+        </div>
+
+        <div class="bg-[#0b1426] rounded-2xl p-4 border border-slate-800/80 text-xs text-slate-300 space-y-3">
+          <h3 class="font-bold text-white text-sm">Gedetailleerde Parameters</h3>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="bg-[#050914] p-3 rounded-xl border border-slate-800"><span class="text-[10px] text-slate-400">Luchtvochtigheid</span><p class="text-base font-bold text-white mt-0.5" id="humidity-value">--%</p></div>
+            <div class="bg-[#050914] p-3 rounded-xl border border-slate-800"><span class="text-[10px] text-slate-400">Windkracht</span><p class="text-base font-bold text-white mt-0.5" id="wind-value">-- km/u</p></div>
+          </div>
+          <div class="bg-[#050914] p-3 rounded-xl border border-slate-800 flex items-center justify-between">
+            <div>
+              <span class="text-[10px] text-slate-400 block">Windrichting</span>
+              <p class="text-lg font-bold text-white mt-0.5" id="wind-dir-text">--</p>
+              <span class="text-[10px] text-amber-400 font-mono" id="wind-dir-deg">--°</span>
+            </div>
+            <div class="relative w-16 h-16 flex items-center justify-center">
+              <svg class="w-16 h-16" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="42" stroke="#334155" stroke-width="2" fill="none" />
+                <text x="50" y="16" fill="#94a3b8" font-size="11" font-weight="bold" text-anchor="middle">N</text>
+                <text x="86" y="54" fill="#94a3b8" font-size="11" font-weight="bold" text-anchor="middle">O</text>
+                <text x="50" y="92" fill="#94a3b8" font-size="11" font-weight="bold" text-anchor="middle">Z</text>
+                <text x="14" y="54" fill="#94a3b8" font-size="11" font-weight="bold" text-anchor="middle">W</text>
+                <g id="wind-compass-needle" transform="translate(50, 50) rotate(0)">
+                  <polygon points="0,-28 6,10 0,4 -6,10" fill="#f59e0b" /><circle cx="0" cy="0" r="3" fill="#ffffff" />
+                </g>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="content-pollen" class="tab-content hidden space-y-3">
+        <div class="bg-[#0b1426] rounded-2xl p-4 border border-slate-800/80 text-xs text-slate-300 space-y-3">
+          <h3 class="font-bold text-white text-sm">Pollenbericht</h3>
+          <div id="pollen-rows" class="space-y-3"></div>
+          <p id="pollen-empty" class="text-xs text-slate-500 hidden">Geen pollendata beschikbaar voor deze locatie (dit model dekt enkel Europa).</p>
+        </div>
+      </div>
+
+      <div id="content-advies" class="tab-content hidden space-y-3">
+        <div class="grid grid-cols-2 gap-2">
+          <div class="bg-[#0b1426] p-4 rounded-2xl border border-slate-800/80 flex flex-col items-center text-center">
+            <span class="text-2xl mb-1">🚴‍♂️</span><h3 class="font-semibold text-white text-xs">Buitenactiviteiten</h3>
+            <p id="advice-outdoor" class="text-xs text-emerald-400 mt-1 font-medium">Laden...</p>
+          </div>
+          <div class="bg-[#0b1426] p-4 rounded-2xl border border-slate-800/80 flex flex-col items-center text-center">
+            <span class="text-2xl mb-1">🔭</span><h3 class="font-semibold text-white text-xs">Sterrenkijken</h3>
+            <p id="advice-stargazing" class="text-xs text-amber-400 mt-1 font-medium">Laden...</p>
+          </div>
+          <div class="bg-[#0b1426] p-4 rounded-2xl border border-slate-800/80 flex flex-col items-center text-center">
+            <span class="text-2xl mb-1">🥶</span><h3 class="font-semibold text-white text-xs">Koude</h3>
+            <p id="advice-cold" class="text-xs text-blue-400 mt-1 font-medium">Laden...</p>
+          </div>
+          <div class="bg-[#0b1426] p-4 rounded-2xl border border-slate-800/80 flex flex-col items-center text-center">
+            <span class="text-2xl mb-1">🦟</span><h3 class="font-semibold text-white text-xs">Muggenactiviteit</h3>
+            <p id="advice-mosquito" class="text-xs text-rose-400 mt-1 font-medium">Laden...</p>
+          </div>
+        </div>
+        <div class="bg-[#0b1426] rounded-2xl p-4 border border-slate-800/80 space-y-2 mt-3">
+          <h3 class="text-xs font-bold text-white flex items-center gap-1.5"><span>ℹ️</span> Uitgebreid Advies & Toelichting</h3>
+          <p id="detailed-advice-text" class="text-xs text-slate-300 leading-relaxed">Actuele adviezen worden berekend op basis van de weersomstandigheden...</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const backBtn = document.getElementById('backBtn');
+    const refreshBtn = document.getElementById('refreshBtn');
+    backBtn.addEventListener('click', () => parent.postMessage({ source:'garminWeer', action:'back' }, '*'));
+${GARMIN_MENU_BTN_JS}
+    refreshBtn.addEventListener('click', () => parent.postMessage({ source:'garminWeer', action:'refresh' }, '*'));
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tab = btn.id.replace('tab-', '');
+        document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('bg-amber-500','text-slate-950','font-bold','shadow-md'); b.classList.add('text-slate-400'); });
+        btn.classList.add('bg-amber-500','text-slate-950','font-bold','shadow-md'); btn.classList.remove('text-slate-400');
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+        document.getElementById('content-' + tab).classList.remove('hidden');
+      });
+    });
+
+    function clampPct(v, min, max){ return Math.max(0, Math.min(100, ((v - min) / (max - min)) * 100)); }
+    function fmtMin(mins){
+      if (mins == null) return '--u --m';
+      const h = Math.floor(mins/60), m = Math.round(mins%60);
+      return h + 'u ' + m + 'm';
+    }
+
+    window.addEventListener('message', (ev) => {
+      const d = ev.data;
+      if (!d || d.source !== 'garminWeerData') return;
+      if (d.error){
+        document.getElementById('location-name-display').textContent = d.error;
+        document.getElementById('main-weather-desc').textContent = d.error;
+        return;
+      }
+
+      // Hero
+      document.getElementById('main-temp-display').textContent = (d.temp ?? '--') + '°C';
+      document.getElementById('main-weather-desc').textContent = d.conditionText || '--';
+      document.getElementById('main-temp-range').innerHTML = '▲ ' + (d.tempMax ?? '--') + '° max • ▼ ' + (d.tempMin ?? '--') + '° min';
+      document.getElementById('main-weather-icon-container').textContent = d.icon || '🌡️';
+      document.getElementById('location-name-display').textContent = (d.placeName || '').toUpperCase();
+
+      // Uurverwachting
+      const hc = document.getElementById('hourly-forecast-container');
+      hc.innerHTML = (d.hourly||[]).map(h => \`
+        <div class="flex flex-col items-center gap-1 bg-[#0b1426] rounded-xl px-3 py-2 border border-slate-800/80 min-w-[52px]">
+          <span class="text-[10px] text-slate-400 font-semibold">\${h.hourLabel}</span>
+          <span class="text-lg">\${h.icon}</span>
+          <span class="text-xs font-bold text-white">\${h.temp}°</span>
+        </div>\`).join('');
+
+      // Dagverwachting
+      const dc = document.getElementById('daily-forecast-container');
+      dc.innerHTML = (d.daily||[]).slice(0,5).map(day => \`
+        <div class="bg-[#050914] rounded-xl p-1.5 border border-slate-800/60">
+          <div class="text-[9px] text-slate-400 font-semibold">\${day.dayLabel}</div>
+          <div class="text-base my-0.5">\${day.icon}</div>
+          <div class="text-[10px] font-bold text-white">\${day.max}°</div>
+          <div class="text-[9px] text-slate-500">\${day.min}°</div>
+        </div>\`).join('');
+
+      // Weerbericht-kaart
+      document.getElementById('bear-tag').textContent = d.conditionText || '--';
+      document.getElementById('bear-title').textContent = d.conditionText ? (d.conditionText + '!') : '--';
+      document.getElementById('bear-desc').textContent = (d.temp ?? '--') + '°C, gevoelstemperatuur ' + (d.feelsLike ?? '--') + '°C. ' +
+        (d.windSpeed != null ? ('Wind uit het ' + (d.windDirLabel||'') + ' aan ' + d.windSpeed + ' km/u.') : '');
+      document.getElementById('weather-effect-svg').textContent = d.icon || '';
+
+      // Details: zon
+      document.getElementById('label-sunrise-time').textContent = d.sunriseText || '--:--';
+      document.getElementById('label-sunset-time').textContent = d.sunsetText || '--:--';
+      if (d.sunriseMin != null && d.sunsetMin != null){
+        document.getElementById('val-day-length').textContent = fmtMin(d.sunsetMin - d.sunriseMin);
+        const now = new Date(); const nowMin = now.getHours()*60 + now.getMinutes();
+        document.getElementById('val-remaining-light').textContent = fmtMin(Math.max(0, d.sunsetMin - nowMin));
+      }
+
+      // UV
+      if (d.uvIndex != null){
+        document.getElementById('uv-value').textContent = d.uvIndex;
+        document.getElementById('uv-indicator').style.left = clampPct(d.uvIndex, 0, 11) + '%';
+        document.getElementById('uv-status').textContent = d.uvIndex < 3 ? 'Laag' : d.uvIndex < 6 ? 'Matig' : d.uvIndex < 8 ? 'Hoog' : d.uvIndex < 11 ? 'Zeer hoog' : 'Extreem';
+      }
+      // Luchtdruk
+      if (d.pressure != null){
+        document.getElementById('pressure-value').textContent = d.pressure;
+        document.getElementById('pressure-indicator').style.left = clampPct(d.pressure, 970, 1050) + '%';
+        const arrow = d.pressureTrend === 'rising' ? '↗️ Stijgend' : d.pressureTrend === 'falling' ? '↘️ Dalend' : '➡️ Stabiel';
+        document.getElementById('pressure-status').textContent = arrow;
+      }
+      // Luchtkwaliteit
+      if (d.aqi != null){
+        document.getElementById('aqi-value').textContent = d.aqi;
+        document.getElementById('aqi-indicator').style.left = clampPct(d.aqi, 0, 100) + '%';
+        document.getElementById('aqi-status').textContent = d.aqi < 20 ? 'Goed' : d.aqi < 40 ? 'Redelijk' : d.aqi < 60 ? 'Matig' : d.aqi < 80 ? 'Slecht' : 'Zeer slecht';
+      }
+      // Extra parameters
+      if (d.humidity != null) document.getElementById('humidity-value').textContent = d.humidity + '%';
+      if (d.windSpeed != null) document.getElementById('wind-value').textContent = d.windSpeed + ' km/u';
+      if (d.windDirLabel){
+        document.getElementById('wind-dir-text').textContent = d.windDirLabel;
+        document.getElementById('wind-dir-deg').textContent = Math.round(d.windDir) + '°';
+        document.getElementById('wind-compass-needle').setAttribute('transform', 'translate(50, 50) rotate(' + d.windDir + ')');
+      }
+
+      // Pollen
+      const pollenRows = document.getElementById('pollen-rows');
+      const pollenEmpty = document.getElementById('pollen-empty');
+      if (d.pollen){
+        const rows = [
+          { label:'Bomen (berk)', v:d.pollen.birch, color:'amber' },
+          { label:'Gras', v:d.pollen.grass, color:'emerald' },
+          { label:'Kruiden (bijvoet/ambrosia)', v:Math.max(d.pollen.mugwort||0, d.pollen.ragweed||0), color:'emerald' }
+        ];
+        pollenRows.innerHTML = rows.map(r => {
+          const pct = Math.min(100, ((r.v||0)/50)*100);
+          const level = (r.v||0) < 10 ? 'Laag' : (r.v||0) < 30 ? 'Matig' : 'Hoog';
+          return \`<div>
+            <div class="flex justify-between text-[11px] mb-1"><span>\${r.label}</span><span class="text-\${r.color}-400">\${level} (\${r.v ?? 0})</span></div>
+            <div class="w-full bg-slate-800 h-1.5 rounded-full"><div class="bg-\${r.color}-500 h-1.5 rounded-full" style="width: \${pct}%"></div></div>
+          </div>\`;
+        }).join('');
+        pollenRows.classList.remove('hidden'); pollenEmpty.classList.add('hidden');
+      } else {
+        pollenRows.innerHTML = ''; pollenEmpty.classList.remove('hidden');
+      }
+
+      // Advies (eenvoudige vuistregels, geen medisch advies)
+      if (d.temp != null){
+        document.getElementById('advice-outdoor').textContent = (d.windSpeed <= 25 && (d.aqi==null || d.aqi < 60)) ? 'Prima weer om op pad te gaan' : 'Let op wind/luchtkwaliteit';
+        document.getElementById('advice-cold').textContent = d.temp < 5 ? 'Kleed je warm aan' : d.temp < 12 ? 'Fris, jasje aanraden' : 'Geen probleem';
+        document.getElementById('advice-stargazing').textContent = (d.uvIndex != null && d.icon === '☀️') ? 'Heldere hemel verwacht' : 'Wisselend zicht op de sterren';
+        document.getElementById('advice-mosquito').textContent = (d.temp >= 18 && d.humidity >= 60) ? 'Verhoogde kans op muggen' : 'Beperkte muggenactiviteit';
+        document.getElementById('detailed-advice-text').textContent =
+          'Bij ' + d.temp + '°C en ' + (d.conditionText||'').toLowerCase() + ', wind uit het ' + (d.windDirLabel||'') + ' aan ' + (d.windSpeed??'--') + ' km/u' +
+          (d.uvIndex != null ? ', UV-index ' + d.uvIndex : '') + (d.aqi != null ? ', luchtkwaliteit ' + d.aqi : '') + '.';
+      }
+    });
+  <\/script>
+</body>
+</html>`;
+}
 const APP_VERSION_TEXT = 'v2.261 · 12 aug';
 function buildGarminHubHtml(){
   // Dit is Gemini's keuzescherm.html, ongewijzigd qua opbouw/stijl — enkel: (1) een derde grote tegel
@@ -5404,6 +6584,7 @@ function buildGarminHubHtml(){
     </div>
     <div class="absolute top-10 right-10 w-40 h-40 bg-amber-500/10 rounded-full blur-3xl pointer-events-none z-0"></div>
     <div class="absolute bottom-20 left-10 w-40 h-40 bg-sky-500/10 rounded-full blur-3xl pointer-events-none z-0"></div>
+    <div class="absolute top-6 left-6 z-20">${GARMIN_MENU_BTN_HTML}</div>
 
     <div class="relative z-10 w-full flex-1 flex flex-col justify-between">
       <div class="text-center pt-8">
@@ -5478,6 +6659,7 @@ function buildGarminHubHtml(){
         parent.postMessage({ source: 'garminHub', action: el.dataset.action }, '*');
       });
     });
+${GARMIN_MENU_BTN_JS}
     window.addEventListener('message', (ev) => {
       const data = ev.data;
       if (!data || data.source !== 'garminHubWeather') return;
@@ -5499,10 +6681,10 @@ window.addEventListener('message', (ev) => {
   const data = ev.data;
   if (!data || data.source !== 'garminHub') return;
   switch (data.action){
-    case 'fiets':   openBikeSetupScreen('fiets'); break;
-    case 'wandel':  openBikeSetupScreen('wandel'); break;
-    case 'kompas':  selectMode(appMode || 'fiets'); setTimeout(() => setActiveTab('sun'), 50); break;
-    case 'weer':    selectMode(appMode || 'fiets'); setTimeout(() => setActiveTab('weather'), 50); break;
+    case 'fiets':   openGarminSetupScreen('fiets'); break;
+    case 'wandel':  openGarminSetupScreen('wandel'); break;
+    case 'kompas':  openGarminKompasScreen(); break;
+    case 'weer':    openGarminWeerScreen(); break;
     case 'hardloop':
       toast(curLang()==='en' ? 'Running mode is coming soon.' : 'Hardlopen komt binnenkort — nog in opbouw.', 3000);
       break;
@@ -5597,6 +6779,7 @@ async function loadSettings(){
   $('thunderforestKeyInput').value = appSettings.thunderforestKey || '';
   $('orsKeyInput').value = appSettings.orsKey || '';
   $('geoapifyKeyInput').value = appSettings.geoapifyKey || '';
+  $('plantnetKeyInput').value = appSettings.plantnetKey || '';
   $('graphhopperKeyInput').value = appSettings.graphhopperKey || '';
   $('bundledBE').checked = !!appSettings.bundledCountries.be;
   $('bundledNL').checked = !!appSettings.bundledCountries.nl;
@@ -5625,6 +6808,7 @@ function saveSettings(){ storageSet(SETTINGS_KEY, JSON.stringify(appSettings)); 
 $('thunderforestKeyInput').addEventListener('change', (e) => { appSettings.thunderforestKey = e.target.value.trim(); saveSettings(); });
 $('orsKeyInput').addEventListener('change', (e) => { appSettings.orsKey = e.target.value.trim(); saveSettings(); rerouteCurrentRouteIfAny(); });
 $('geoapifyKeyInput').addEventListener('change', (e) => { appSettings.geoapifyKey = e.target.value.trim(); saveSettings(); });
+$('plantnetKeyInput').addEventListener('change', (e) => { appSettings.plantnetKey = e.target.value.trim(); saveSettings(); });
 $('graphhopperKeyInput').addEventListener('change', (e) => { appSettings.graphhopperKey = e.target.value.trim(); saveSettings(); rerouteCurrentRouteIfAny(); });
 document.querySelectorAll('input[name="language"]').forEach(radio => {
   radio.addEventListener('change', () => { appSettings.language = radio.value; saveSettings(); });
@@ -5941,7 +7125,7 @@ $('overlayMtb').addEventListener('change', (e) => { appSettings.overlays.mtb = e
 });
 $('settingsResetBtn').addEventListener('click', () => {
   appSettings = {
-    theme:'default', showCompassBtn:true, orsKey:'', graphhopperKey:'', geoapifyKey:'', bikeType:'regular', mapStyle:'standard', thunderforestKey:'',
+    theme:'default', showCompassBtn:true, orsKey:'', graphhopperKey:'', geoapifyKey:'', plantnetKey:'', bikeType:'regular', mapStyle:'standard', thunderforestKey:'',
     dashTextSize:'normal', dashBold:true, largeNodesAccessibility:false, offRouteDist:35, autoReroute:false, silentReroute:false,
     overlays:{ cycling:false, hiking:false, mtb:false },
     poiLayers:{ cafe:false, restaurant:false, bakery:false, supermarket:false, pharmacy:false, bike:false, water:false, toilet:false, money:false, camping:false, charging:false, playground:false, parking:false, hotel:false }, showPoiDetails:false,
@@ -5999,6 +7183,7 @@ $('settingsResetBtn').addEventListener('click', () => {
   $('thunderforestKeyInput').value = '';
   $('orsKeyInput').value = '';
   $('geoapifyKeyInput').value = '';
+  $('plantnetKeyInput').value = '';
   $('graphhopperKeyInput').value = '';
   $('bundledBE').checked = true;
   $('bundledNL').checked = false;
@@ -11595,11 +12780,151 @@ function openBikeSetupScreen(mode){
   document.querySelectorAll('.bike-type-tile').forEach(t => t.classList.toggle('active', t.dataset.biketype === appSettings.bikeType));
   document.querySelectorAll('.nav-type-card').forEach(c => c.classList.toggle('active', c.dataset.navtype === (appSettings.navType || 'active')));
   $('bikeTypeSection').style.display = mode === 'fiets' ? 'block' : 'none';
+  $('natureIdSection').style.display = mode === 'wandel' ? 'block' : 'none';
+  $('natureIdResult').style.display = 'none';
+  $('natureIdCameraInput').value = '';
+  $('restPointsSection').style.display = mode === 'wandel' ? 'block' : 'none';
+  $('restPointsResult').style.display = 'none';
   $('bikeSetupTitle').textContent = mode === 'fiets' ? tr('bikeSetupTitleFiets') : tr('bikeSetupTitleWandel');
   document.querySelector('#bikeRoutingProBadge b').textContent = mode === 'fiets' ? tr('bikeRoutingProTitle') : tr('walkRoutingProTitle');
   document.querySelector('#bikeRoutingProBadge span:first-child').textContent = mode === 'fiets' ? '🚴\u200d♂️' : '🥾';
   hideHubScreen();
   $('bikeSetupScreen').classList.remove('hidden');
+}
+
+// ---------- Plantherkenning via Pl@ntNet (Wandelen-opzetscherm) ----------
+$('natureIdCameraInput').addEventListener('change', async (e) => {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+  await identifyPlantPhoto(file);
+});
+$('restPointsBtn').addEventListener('click', async () => {
+  const resultEl = $('restPointsResult');
+  resultEl.style.display = 'block';
+  resultEl.innerHTML = `<div style="color:var(--cream); font-size:12.5px; padding:8px 0;">${curLang()==='en' ? 'Searching…' : 'Bezig met zoeken…'}</div>`;
+  const r = await findNearbyRestPoints();
+  if (!r.ok){
+    resultEl.innerHTML = `<div style="color:var(--cream); font-size:12.5px; padding:8px 0;">${restPointErrorMessage(r.reason)}</div>`;
+    return;
+  }
+  resultEl.innerHTML = renderRestPointsHtml(r.points);
+});
+// Kernlogica (geen DOM-afhankelijkheid) — herbruikt door zowel het Standaard- als het Garmin-scherm.
+async function plantNetIdentifyCore(file){
+  const key = (appSettings.plantnetKey || '').trim();
+  if (!key) return { ok:false, reason:'no-key' };
+  try{
+    const form = new FormData();
+    form.append('images', file);
+    form.append('organs', 'auto');
+    const res = await fetch(`https://my-api.plantnet.org/v2/identify/weurope?api-key=${encodeURIComponent(key)}`, { method:'POST', body:form });
+    if (!res.ok){
+      if (res.status === 401 || res.status === 403) return { ok:false, reason:'invalid-key' };
+      if (res.status === 429) return { ok:false, reason:'rate-limit' };
+      return { ok:false, reason:'http-error' };
+    }
+    const data = await res.json();
+    const top = data.results && data.results[0];
+    if (!top) return { ok:false, reason:'no-match' };
+    return {
+      ok:true,
+      commonName: (top.species.commonNames && top.species.commonNames[0]) || null,
+      sciName: top.species.scientificNameWithoutAuthor,
+      pct: Math.round(top.score * 100)
+    };
+  } catch(err){
+    return { ok:false, reason:'network' };
+  }
+}
+function plantNetErrorMessage(reason){
+  const en = curLang()==='en';
+  switch(reason){
+    case 'no-key': return en ? 'No Pl@ntNet API key configured yet. Add a free key in Settings → API keys to enable plant identification.' : 'Nog geen Pl@ntNet API-sleutel ingesteld. Voeg een gratis sleutel toe via Instellingen → API-sleutels om plantherkenning te gebruiken.';
+    case 'invalid-key': return en ? 'Pl@ntNet key rejected — check it in Settings.' : 'Pl@ntNet-sleutel geweigerd — controleer die in Instellingen.';
+    case 'rate-limit': return en ? 'Daily Pl@ntNet limit reached — try again tomorrow.' : 'Dagelijkse Pl@ntNet-limiet bereikt — probeer morgen opnieuw.';
+    case 'no-match': return en ? 'No match found — try a clearer photo of a leaf or flower.' : 'Geen match gevonden — probeer een duidelijkere foto van blad of bloem.';
+    default: return en ? 'Identification failed — check your connection and try again.' : 'Herkenning mislukt — controleer je verbinding en probeer opnieuw.';
+  }
+}
+// ---------- Rustpunten (bankjes, terrassen, picknicktafels) via gratis OSM Overpass API ----------
+const REST_POINT_TYPES = {
+  bench:        { emoji:'🪑', nl:'Bankje', en:'Bench' },
+  cafe:         { emoji:'☕', nl:'Café', en:'Café' },
+  pub:          { emoji:'🍺', nl:'Café/kroeg', en:'Pub' },
+  restaurant:   { emoji:'🍽️', nl:'Restaurant', en:'Restaurant' },
+  picnic_table: { emoji:'🧺', nl:'Picknicktafel', en:'Picnic table' },
+  drinking_water:{ emoji:'🚰', nl:'Drinkwaterpunt', en:'Drinking water' }
+};
+async function findNearbyRestPoints(){
+  if (!navigator.geolocation) return { ok:false, reason:'no-geo' };
+  const pos = await new Promise((resolve) => {
+    navigator.geolocation.getCurrentPosition(p => resolve(p), () => resolve(null), { timeout:10000 });
+  });
+  if (!pos) return { ok:false, reason:'no-location' };
+  const lat = pos.coords.latitude, lon = pos.coords.longitude;
+  const query = `[out:json][timeout:15];(
+    node["amenity"="bench"](around:900,${lat},${lon});
+    node["amenity"="cafe"](around:900,${lat},${lon});
+    node["amenity"="pub"](around:900,${lat},${lon});
+    node["amenity"="restaurant"](around:900,${lat},${lon});
+    node["leisure"="picnic_table"](around:900,${lat},${lon});
+    node["amenity"="drinking_water"](around:900,${lat},${lon});
+  );out body 40;`;
+  try{
+    const res = await fetch('https://overpass-api.de/api/interpreter', { method:'POST', body:'data=' + encodeURIComponent(query) });
+    if (!res.ok) return { ok:false, reason:'http-error' };
+    const data = await res.json();
+    const points = (data.elements || []).map(el => {
+      const type = el.tags.amenity || el.tags.leisure;
+      const meta = REST_POINT_TYPES[type] || { emoji:'📍', nl:type, en:type };
+      const distanceM = Math.round(haversine(lat, lon, el.lat, el.lon));
+      const name = el.tags.name || (curLang()==='en' ? meta.en : meta.nl);
+      return { name, type, emoji:meta.emoji, typeLabel: curLang()==='en' ? meta.en : meta.nl, distanceM };
+    }).sort((a,b) => a.distanceM - b.distanceM).slice(0, 10);
+    if (!points.length) return { ok:false, reason:'no-results' };
+    return { ok:true, points };
+  } catch(err){
+    return { ok:false, reason:'network' };
+  }
+}
+function restPointErrorMessage(reason){
+  const en = curLang()==='en';
+  switch(reason){
+    case 'no-geo': return en ? 'No GPS available on this device.' : 'Geen GPS beschikbaar op dit toestel.';
+    case 'no-location': return en ? 'Location access denied.' : 'Locatietoegang geweigerd.';
+    case 'no-results': return en ? 'Nothing found nearby within ~900 m.' : 'Niets gevonden binnen ~900 m.';
+    default: return en ? 'Could not fetch rest points — check your connection.' : 'Kon rustpunten niet ophalen — controleer je verbinding.';
+  }
+}
+function renderRestPointsHtml(points){
+  return points.map(p => `<div style="display:flex; align-items:center; gap:10px; padding:7px 0; border-bottom:1px solid rgba(255,255,255,0.06);">
+    <span style="font-size:18px; flex-shrink:0;">${p.emoji}</span>
+    <div style="flex:1; min-width:0;">
+      <div style="color:var(--cream); font-size:12.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.name}</div>
+      <div style="color:rgba(246,244,238,0.55); font-size:10.5px;">${p.typeLabel}</div>
+    </div>
+    <div style="color:var(--amber); font-size:11px; font-weight:700; flex-shrink:0;">${p.distanceM} m</div>
+  </div>`).join('');
+}
+async function identifyPlantPhoto(file){
+  const resultEl = $('natureIdResult');
+  resultEl.style.display = 'block';
+  resultEl.innerHTML = `<div style="color:var(--cream); font-size:12.5px;">${curLang()==='en' ? 'Identifying…' : 'Bezig met herkennen…'}</div>`;
+  const r = await plantNetIdentifyCore(file);
+  if (!r.ok){
+    const color = r.reason === 'no-key' || r.reason === 'no-match' ? 'var(--cream)' : '#ff8a8a';
+    resultEl.innerHTML = `<div style="color:${color}; font-size:12.5px; line-height:1.5;">${plantNetErrorMessage(r.reason)}</div>`;
+    return;
+  }
+  resultEl.innerHTML = `
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:4px;">
+      <span style="font-size:22px;">🌿</span>
+      <div>
+        <div style="color:var(--cream); font-weight:800; font-size:14.5px;">${r.commonName || r.sciName}</div>
+        <div style="color:rgba(246,244,238,0.65); font-size:11.5px; font-style:italic;">${r.sciName}</div>
+      </div>
+    </div>
+    <div style="color:var(--amber); font-size:11px; font-weight:700;">${r.pct}% ${curLang()==='en' ? 'match' : 'zekerheid'}</div>`;
 }
 document.querySelectorAll('.bike-type-tile').forEach(tile => {
   tile.addEventListener('click', () => {
