@@ -840,6 +840,29 @@
   #rsPauseBtn{ background:var(--amber); color:var(--green-900); }
   #rsStopBtn{ background:rgba(255,255,255,0.08); color:var(--cream); border:1.5px solid rgba(255,255,255,0.15) !important; }
   #rsGpsWarning{ color:#ff8a8a; font-size:11px; margin-top:10px; display:none; }
+
+  /* Garmin-thema: zelfde scherm/logica, enkel de kleuren/vormen omgezet naar de donkere navy/amber-look. */
+  body.theme-garmin #runSessionScreen{ background:#050914; }
+  body.theme-garmin #rsIntervalLabel.type-run{ color:#4ade80; }
+  body.theme-garmin #rsIntervalLabel.type-walk{ color:#38bdf8; }
+  body.theme-garmin #rsIntervalLabel.type-warmup,
+  body.theme-garmin #rsIntervalLabel.type-cooldown{ color:#e2a13c; }
+  body.theme-garmin #rsCountdown{ color:#f1f5f9; text-shadow:0 0 24px rgba(226,161,60,0.15); }
+  body.theme-garmin .rs-stat b{ color:#f1f5f9; }
+  body.theme-garmin #rsPauseBtn{ background:#e2a13c; color:#0f172a; border-radius:16px; }
+  body.theme-garmin #rsStopBtn{
+    background:rgba(255,255,255,0.06) !important; color:#f1f5f9; border:1.5px solid rgba(255,255,255,0.12) !important;
+    border-radius:16px;
+  }
+  body.theme-garmin #runCoachScreen{ background:#050914; }
+  body.theme-garmin #runCoachScreen .run-week-card{
+    background:linear-gradient(160deg,#7f1d3a,#450a1f); border-radius:20px;
+  }
+  body.theme-garmin #runCoachBackBtn{
+    border-color:#e2a13c; background:rgba(226,161,60,0.14); color:#e2a13c;
+  }
+  body.theme-garmin #runCoachVoiceSelect{ background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.1); }
+  body.theme-garmin #runCoachStartBtn{ background:#e2a13c; color:#0f172a; }
   #bikeSetupBackBtn{
     position:absolute; left:16px; top:calc(16px + env(safe-area-inset-top,0px) + var(--extra-top-inset));
     border:2px solid var(--amber); background:rgba(226,161,60,0.16); color:var(--amber);
@@ -1009,6 +1032,21 @@
     font-family:'Inter', -apple-system, sans-serif;
   }
   body.theme-garmin #sheet, body.theme-garmin .simple-modal-card{ background:#0f172a; color:#f1f5f9; }
+  /* Titel en sluitknop van elke popup gebruikten var(--green-900) — die wordt onder dit thema zelf
+     donker, waardoor tekst bijna onzichtbaar werd op de nu ook donkere kaart. Expliciet lichte tekst. */
+  body.theme-garmin .simple-modal-head b{ color:#f1f5f9; }
+  body.theme-garmin .simple-modal-close{ background:rgba(255,255,255,0.08); color:#f1f5f9; }
+  body.theme-garmin .simple-modal-text{ color:rgba(241,245,249,0.75); }
+  body.theme-garmin .settings-reset{ background:rgba(255,255,255,0.08); color:#f1f5f9; }
+  body.theme-garmin .settings-subnote{ color:rgba(241,245,249,0.55); }
+  body.theme-garmin .settings-section{ border-color:rgba(255,255,255,0.08); }
+  body.theme-garmin .settings-text-input{ background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.1); color:#f1f5f9; }
+  body.theme-garmin .settings-section h4{ color:#f1f5f9; }
+  body.theme-garmin #helpContent h3{ color:#f1f5f9; }
+  body.theme-garmin #helpContent p{ color:rgba(241,245,249,0.75); }
+  body.theme-garmin #helpContent b{ color:#e2a13c; }
+  body.theme-garmin .settings-radio, body.theme-garmin .settings-check{ color:rgba(241,245,249,0.85); }
+  body.theme-garmin .settings-accordion summary::after{ color:rgba(241,245,249,0.5); }
   body.theme-garmin .glass-card{
     background:linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
     backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
@@ -1049,6 +1087,21 @@
   body.theme-garmin #bikeRoutingProAnalyseBtn{ background:#1e293b !important; }
   body.theme-garmin #actionMenu{ background:#0f172a; }
   body.theme-garmin .menu-item .mi-text small{ color:rgba(241,245,249,0.55); }
+
+  /* Navigatiepaneel + actieknoppen tijdens het rijden: zelfde functionaliteit/kleuren, maar met een
+     subtiele glazige rand/schaduw i.p.v. platte vlakken — sluit aan bij de rest van de Garmin-look. */
+  body.theme-garmin #navPanel{
+    border:1px solid rgba(255,255,255,0.08); box-shadow:0 8px 24px rgba(0,0,0,0.4);
+  }
+  body.theme-garmin #actions button{
+    border-radius:14px; border:1px solid rgba(255,255,255,0.08);
+  }
+  body.theme-garmin #dashList li{
+    border:1px solid rgba(255,255,255,0.06);
+  }
+  body.theme-garmin #sheet{
+    border-top:1px solid rgba(255,255,255,0.08);
+  }
 
   #helpContent section{ margin-bottom:18px; padding-bottom:16px; border-bottom:1px solid var(--line); }
   #helpContent section:last-child{ border-bottom:none; margin-bottom:4px; padding-bottom:0; }
@@ -2011,9 +2064,19 @@
       <label>🔊 Stem voor audio-coach</label>
       <select id="runCoachVoiceSelect"><option value="">Standaardstem van je toestel</option></select>
     </div>
+    <div class="run-voice-section">
+      <label>🎵 Eigen muziek tijdens de training</label>
+      <label id="runMusicPickLabel" for="runMusicInput" style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.06); border:2px solid rgba(255,255,255,0.08); border-radius:12px; padding:11px 12px; cursor:pointer;">
+        <span style="font-size:18px;">📂</span>
+        <span style="flex:1; text-align:left; font-size:12.5px; color:var(--cream);">Kies MP3-bestanden van je toestel…</span>
+        <input type="file" id="runMusicInput" accept="audio/*" multiple class="hidden" style="display:none;">
+      </label>
+      <div id="runMusicCount" style="font-size:11px; color:rgba(246,244,238,0.55); margin-top:6px;">Geen eigen muziek geladen — de gesproken coach blijft altijd hoorbaar.</div>
+    </div>
     <button id="runCoachStartBtn">▶ Start training</button>
   </div>
 </div>
+<audio id="runMusicPlayer" preload="auto"></audio>
 
 <div id="runSessionScreen" class="hidden">
   <div>
@@ -5691,6 +5754,25 @@ function populateRunVoiceSelect(){
   if ('speechSynthesis' in window) window.speechSynthesis.addEventListener('voiceschanged', fillList, { once:true });
   sel.onchange = () => localStorage.setItem(RUN_VOICE_KEY, sel.value);
 }
+// Eigen muziek tijdens de training: bestanden blijven enkel in het geheugen van deze sessie
+// (browsers laten geen bestanden automatisch opnieuw laden na herstart, om privacyredenen).
+let runMusicFiles = [];
+let runMusicIdx = 0;
+$('runMusicInput').addEventListener('change', (e) => {
+  runMusicFiles = Array.from(e.target.files || []);
+  runMusicIdx = 0;
+  $('runMusicCount').textContent = runMusicFiles.length
+    ? `${runMusicFiles.length} ${curLang()==='en' ? 'tracks loaded — will play during your session.' : 'nummers geladen — spelen af tijdens je training.'}`
+    : (curLang()==='en' ? 'No music loaded — the spoken coach stays audible either way.' : 'Geen eigen muziek geladen — de gesproken coach blijft altijd hoorbaar.');
+});
+function playNextRunTrack(){
+  if (!runMusicFiles.length) return;
+  const player = $('runMusicPlayer');
+  player.src = URL.createObjectURL(runMusicFiles[runMusicIdx % runMusicFiles.length]);
+  runMusicIdx++;
+  player.volume = 0.55;
+  player.play().catch(() => { /* toestel blokkeert autoplay zonder gebruikersinteractie — muziekknop is zelf al een tik geweest, dit lukt normaal */ });
+}
 $('runCoachBackBtn').addEventListener('click', closeRunCoachScreen);
 $('runCoachStartBtn').addEventListener('click', () => startRunSession());
 
@@ -5720,6 +5802,12 @@ function speakForRun(text){
       const v = window.speechSynthesis.getVoices().find(v => v.voiceURI === uri);
       if (v) u.voice = v;
     }
+    // Muziek-ducking: zachter tijdens de aankondiging, terug normaal zodra uitgesproken.
+    const player = $('runMusicPlayer');
+    if (player && !player.paused){
+      u.onstart = () => { player.volume = 0.12; };
+      u.onend = () => { player.volume = 0.55; };
+    }
     if (window.speechSynthesis.getVoices().length === 0){
       window.speechSynthesis.addEventListener('voiceschanged', () => window.speechSynthesis.speak(u), { once:true });
     }
@@ -5744,6 +5832,8 @@ async function startRunSession(){
   $('rsGpsWarning').style.display = 'none';
   updateRunSessionUI();
   speakForRun(curLang()==='en' ? RUN_START_ANNOUNCE[intervals[0].type].en : RUN_START_ANNOUNCE[intervals[0].type].nl);
+  if (runMusicFiles.length) playNextRunTrack();
+  $('runMusicPlayer').addEventListener('ended', playNextRunTrack);
   rsState.tickId = setInterval(tickRunSession, 1000);
   if (navigator.geolocation){
     rsState.watchId = navigator.geolocation.watchPosition(handleRunGpsUpdate, () => {
@@ -5801,14 +5891,17 @@ function updateRunSessionUI(){
 $('rsPauseBtn').addEventListener('click', () => {
   if (!rsState) return;
   rsState.paused = !rsState.paused;
+  const player = $('runMusicPlayer');
   if (rsState.paused){
     rsState.pauseStartedAt = Date.now();
     $('rsPauseBtn').textContent = curLang()==='en' ? '▶ Resume' : '▶ Hervat';
     speakForRun(curLang()==='en' ? 'Paused.' : 'Gepauzeerd.');
+    if (!player.paused) player.pause();
   } else {
     rsState.pausedMs += Date.now() - rsState.pauseStartedAt;
     $('rsPauseBtn').textContent = curLang()==='en' ? '⏸ Pause' : '⏸ Pauze';
     speakForRun(curLang()==='en' ? 'Resumed.' : 'Hervat.');
+    if (runMusicFiles.length && player.src) player.play().catch(() => {});
   }
 });
 $('rsStopBtn').addEventListener('click', () => {
@@ -5818,6 +5911,9 @@ async function finishRunSession(completed){
   if (!rsState) return;
   clearInterval(rsState.tickId);
   if (rsState.watchId != null) navigator.geolocation.clearWatch(rsState.watchId);
+  const player = $('runMusicPlayer');
+  if (!player.paused) player.pause();
+  player.removeEventListener('ended', playNextRunTrack);
   const elapsedSec = (Date.now() - rsState.startedAt - rsState.pausedMs) / 1000;
   const km = rsState.distanceM / 1000;
   if (completed){
@@ -6064,6 +6160,7 @@ window.addEventListener('message', (ev) => {
     case 'back':        closeGarminRunCoachScreen(); break;
     case 'starttraining': $('garminRunCoachScreen').classList.add('hidden'); startRunSession(); break;
     case 'setvoice':     localStorage.setItem(RUN_VOICE_KEY, data.uri || ''); break;
+    case 'setmusic':     runMusicFiles = data.files || []; runMusicIdx = 0; break;
     case 'other-not-built': toast(curLang()==='en' ? 'Not built yet — coming later.' : 'Nog niet gebouwd — komt later.', 2500); break;
   }
 });
@@ -7303,6 +7400,15 @@ function buildGarminRunCoachHtml(){
       <p class="text-[10px] text-slate-500 mt-2">Echte stemmen van je eigen toestel — geen verzonnen coach-personas.</p>
     </div>
 
+    <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 mt-3">
+      <span class="text-xs font-bold text-white block mb-2">🎵 Eigen muziek tijdens de training</span>
+      <label for="rcMusicInput" class="w-full bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-black py-2.5 rounded-xl text-[11px] uppercase text-center block cursor-pointer">
+        📂 Kies MP3-bestanden
+        <input type="file" id="rcMusicInput" accept="audio/*" multiple class="hidden" style="display:none;">
+      </label>
+      <p id="rcMusicCount" class="text-[10px] text-slate-500 mt-2 text-center">Geen eigen muziek geladen.</p>
+    </div>
+
   </div>
 
   <div class="fixed bottom-0 left-0 right-0 bg-slate-950/95 border-t border-slate-800 backdrop-blur-md flex justify-around py-2.5">
@@ -7331,6 +7437,13 @@ function buildGarminRunCoachHtml(){
     });
     document.getElementById('rcVoiceSelect').addEventListener('change', (e) => {
       parent.postMessage({ source:'garminRunCoach', action:'setvoice', uri:e.target.value }, '*');
+    });
+    document.getElementById('rcMusicInput').addEventListener('change', (e) => {
+      const files = Array.from(e.target.files || []);
+      document.getElementById('rcMusicCount').textContent = files.length
+        ? files.length + ' nummers geladen — spelen af tijdens je training.'
+        : 'Geen eigen muziek geladen.';
+      parent.postMessage({ source:'garminRunCoach', action:'setmusic', files }, '*');
     });
 
     window.addEventListener('message', (ev) => {
