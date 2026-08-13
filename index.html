@@ -729,6 +729,10 @@
     position:fixed; top:0;left:0;right:0;bottom:0; z-index:3001; background:#020617;
   }
   #garminSetupScreen.hidden{ display:none; }
+  #garminRunCoachScreen{
+    position:fixed; top:0;left:0;right:0;bottom:0; z-index:3001; background:#020617;
+  }
+  #garminRunCoachScreen.hidden{ display:none; }
   #modeSelectTitle{ color:var(--cream); font-size:19px; font-weight:800; flex-shrink:0; }
   .mode-tiles-main{ display:flex; flex-direction:column; align-items:center; }
   .mode-tiles-top{ display:flex; gap:9px; }
@@ -778,6 +782,39 @@
     padding:calc(env(safe-area-inset-top,0px) + var(--extra-top-inset)) 20px calc(24px + env(safe-area-inset-bottom,0px) + var(--extra-bottom-inset));
   }
   #bikeSetupScreen.hidden{ display:none; }
+  #runCoachScreen{
+    position:fixed; top:0;left:0;right:0;bottom:0; z-index:3000; background:var(--green-900);
+    display:flex; align-items:center; justify-content:center; overflow-y:auto;
+    padding:calc(env(safe-area-inset-top,0px) + var(--extra-top-inset)) 20px calc(24px + env(safe-area-inset-bottom,0px) + var(--extra-bottom-inset));
+  }
+  #runCoachScreen.hidden{ display:none; }
+  #runCoachBackBtn{
+    position:absolute; left:16px; top:calc(16px + env(safe-area-inset-top,0px) + var(--extra-top-inset));
+    border:2px solid var(--amber); background:rgba(226,161,60,0.16); color:var(--amber);
+    width:42px; height:38px; border-radius:14px; box-shadow:0 2px 6px rgba(0,0,0,0.25);
+    display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:900; line-height:1;
+  }
+  #runCoachBackBtn:active{ background:rgba(226,161,60,0.3); }
+  .run-week-card{
+    background:linear-gradient(160deg,#c23b3b,#7a1f1f); border-radius:18px; padding:18px;
+    text-align:left; box-shadow:0 8px 20px rgba(0,0,0,0.3); margin-bottom:16px;
+  }
+  #runCoachWeekLabel{ color:rgba(255,255,255,0.75); font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.6px; }
+  #runCoachWeekTitle{ color:#fff; font-size:19px; font-weight:900; margin:4px 0 6px; }
+  #runCoachWeekDesc{ color:rgba(255,255,255,0.85); font-size:13px; }
+  #runCoachProgressLine{ color:rgba(255,255,255,0.65); font-size:11px; margin-top:10px; }
+  .run-voice-section{ margin-bottom:18px; text-align:left; }
+  .run-voice-section label{ color:var(--cream); font-size:12.5px; font-weight:700; display:block; margin-bottom:6px; }
+  #runCoachVoiceSelect{
+    width:100%; padding:11px 12px; border-radius:12px; border:2px solid rgba(255,255,255,0.08);
+    background:rgba(255,255,255,0.06); color:var(--cream); font-size:13px;
+  }
+  #runCoachStartBtn{
+    width:100%; border:none; border-radius:16px; padding:15px;
+    background:var(--amber); color:var(--green-900); font-size:15px; font-weight:800;
+    box-shadow:0 6px 18px rgba(226,161,60,0.3);
+  }
+  #runCoachStartBtn:active{ filter:brightness(0.92); }
   #bikeSetupBackBtn{
     position:absolute; left:16px; top:calc(16px + env(safe-area-inset-top,0px) + var(--extra-top-inset));
     border:2px solid var(--amber); background:rgba(226,161,60,0.16); color:var(--amber);
@@ -858,6 +895,7 @@
   /* Instellingen-modal moet boven de Garmin-stijl overlay-schermen (z-index 3000/3001) kunnen tonen,
      zonder de z-index van andere modals overal aan te raken. */
   #settingsModal.show{ z-index:3500; }
+  #wikiInfoModal.show{ z-index:3500; }
   .simple-modal-card{
     background:var(--cream); border-radius:18px; padding:18px; width:100%; max-width:380px;
     max-height:80vh; overflow-y:auto; box-shadow:var(--shadow);
@@ -968,7 +1006,18 @@
   body.theme-garmin #topbarBg{
     background:linear-gradient(180deg, rgba(15,23,42,0.92), rgba(15,23,42,0.85) 40%, rgba(15,23,42,0));
   }
-  body.theme-garmin .tab-hex{ background:rgba(30,41,59,0.92); }
+  body.theme-garmin .tab-hex{
+    clip-path:none; border-radius:14px; background:rgba(15,23,42,0.78);
+    border:1px solid rgba(255,255,255,0.09); box-shadow:0 4px 14px rgba(0,0,0,0.35);
+  }
+  body.theme-garmin .tab-hex.active{
+    background:var(--amber); border-color:transparent; box-shadow:0 4px 14px rgba(226,161,60,0.3);
+  }
+  body.theme-garmin #waffleBtn{
+    border-radius:14px; background:rgba(15,23,42,0.78); border:1px solid rgba(255,255,255,0.09);
+  }
+  body.theme-garmin #locateBtn,
+  body.theme-garmin #northBtn{ clip-path:none; border-radius:50%; }
   body.theme-garmin #hint{ background:rgba(15,23,42,0.94); }
   body.theme-garmin .menu-item:active{ background:rgba(255,255,255,0.06); }
   body.theme-garmin #passiveAnalyseBtn,
@@ -1185,6 +1234,11 @@
   <iframe id="garminSetupFrame" title="Garmin-stijl opzetscherm" style="border:0;width:100%;height:100%;display:block;"></iframe>
 </div>
 
+<!-- Garmin-stijl RunCoach: letterlijk Gemini's RunCoach_Pro.html, gekoppeld aan het echte 5K-schema. -->
+<div id="garminRunCoachScreen" class="hidden">
+  <iframe id="garminRunCoachFrame" title="Garmin-stijl RunCoach" style="border:0;width:100%;height:100%;display:block;"></iframe>
+</div>
+
 <div id="bikeSetupScreen" class="hidden">
   <button id="bikeSetupBackBtn" aria-label="Terug">←</button>
   <div class="bike-setup-inner">
@@ -1235,6 +1289,31 @@
         </span>
       </button>
       <div id="restPointsResult" style="display:none; margin-top:12px; background:rgba(255,255,255,0.06); border:2px solid var(--amber); border-radius:16px; padding:8px 16px;"></div>
+    </div>
+
+    <div id="natureSpotterSection" style="display:none; margin-top:18px; text-align:left;">
+      <div class="bike-setup-title" style="text-align:left; margin-bottom:10px;" data-i18n="natureSpotterTitle">🦉 Natuurspotter</div>
+      <button id="natureSpotterBtn" type="button" style="display:flex; align-items:center; gap:12px; width:100%; background:rgba(255,255,255,0.06); border:2px solid rgba(255,255,255,0.08); border-radius:16px; padding:14px 16px; cursor:pointer; text-align:left;">
+        <span style="font-size:26px; flex-shrink:0;">🦉</span>
+        <span style="text-align:left; flex:1;">
+          <b style="color:var(--cream); font-size:14.5px; display:block;" data-i18n="natureSpotterBtnTitle">Wat is hier recent gespot?</b>
+          <small style="color:rgba(246,244,238,0.65); font-size:11.5px; line-height:1.4;" data-i18n="natureSpotterBtnSub">Echte waarnemingen van andere natuurliefhebbers, via iNaturalist.</small>
+        </span>
+      </button>
+      <div id="natureSpotterResult" style="display:none; margin-top:12px; background:rgba(255,255,255,0.06); border:2px solid var(--amber); border-radius:16px; padding:8px 16px;"></div>
+    </div>
+
+    <div id="animalScannerSection" style="display:none; margin-top:18px; text-align:left;">
+      <div class="bike-setup-title" style="text-align:left; margin-bottom:10px;" data-i18n="animalScannerTitle">🐾 Dieren Scanner</div>
+      <label id="animalScannerTile" for="animalScannerInput" style="display:flex; align-items:center; gap:12px; background:rgba(255,255,255,0.06); border:2px solid rgba(255,255,255,0.08); border-radius:16px; padding:14px 16px; cursor:pointer;">
+        <span style="font-size:26px; flex-shrink:0;">📸</span>
+        <span style="text-align:left; flex:1;">
+          <b style="color:var(--cream); font-size:14.5px; display:block;" data-i18n="animalScannerTileTitle">Neem een foto van een dier</b>
+          <small style="color:rgba(246,244,238,0.65); font-size:11.5px; line-height:1.4;" id="animalScannerTileSub" data-i18n="animalScannerTileSub">100% lokaal op je toestel — geen account, geen limiet.</small>
+        </span>
+        <input type="file" id="animalScannerInput" accept="image/*" capture="environment" class="hidden" style="display:none;">
+      </label>
+      <div id="animalScannerResult" style="display:none; margin-top:12px; background:rgba(255,255,255,0.06); border:2px solid var(--amber); border-radius:16px; padding:14px 16px;"></div>
     </div>
 
     <button id="bikeSetupContinueBtn" data-i18n="bikeSetupContinueBtn">Doorgaan →</button>
@@ -1329,6 +1408,19 @@
       <button id="urlImportGoBtn" class="simple-modal-btn primary" data-i18n="urlImportLoadBtn">Laden</button>
     </div>
     <p class="simple-modal-note" data-i18n="urlImportNote">Lukt het ophalen niet (sommige sites staan dat niet toe vanuit een app), dan krijg je instructies om het bestand handmatig te downloaden en via 📂 te importeren.</p>
+  </div>
+</div>
+
+<div id="wikiInfoModal" class="simple-modal">
+  <div class="simple-modal-card">
+    <div class="simple-modal-head"><b>📖 <span id="wikiInfoTitle" data-i18n="wikiInfoTitle">Meer info</span></b><button class="simple-modal-close" data-close="wikiInfoModal">✕</button></div>
+    <div id="wikiInfoBody" style="display:flex; gap:12px; align-items:flex-start; margin:6px 0 10px;">
+      <img id="wikiInfoImg" style="display:none; width:72px; height:72px; border-radius:12px; object-fit:cover; flex-shrink:0;">
+      <p id="wikiInfoText" class="simple-modal-text" style="margin:0;">…</p>
+    </div>
+    <div class="simple-modal-actions">
+      <a id="wikiInfoLink" href="#" target="_blank" rel="noopener" class="simple-modal-btn primary" style="text-decoration:none; text-align:center; display:block;" data-i18n="wikiInfoFullArticle">Volledig artikel op Wikipedia →</a>
+    </div>
   </div>
 </div>
 
@@ -1874,6 +1966,24 @@
   <div class="simple-modal-card" id="devNotesCard">
     <div class="simple-modal-head"><b id="devNotesTitle">🛠️ Technische werking</b><button class="simple-modal-close" data-close="devNotesModal">✕</button></div>
     <div id="devNotesContent"></div>
+  </div>
+</div>
+
+<div id="runCoachScreen" class="hidden">
+  <button id="runCoachBackBtn" aria-label="Terug">←</button>
+  <div class="bike-setup-inner">
+    <div class="bike-setup-title" style="text-align:left;">🏃 Hardlopen — 5K-opbouwschema</div>
+    <div class="run-week-card">
+      <div id="runCoachWeekLabel">WEEK 1 · DAG 1</div>
+      <div id="runCoachWeekTitle">–</div>
+      <div id="runCoachWeekDesc">–</div>
+      <div id="runCoachProgressLine">–</div>
+    </div>
+    <div class="run-voice-section">
+      <label>🔊 Stem voor audio-coach</label>
+      <select id="runCoachVoiceSelect"><option value="">Standaardstem van je toestel</option></select>
+    </div>
+    <button id="runCoachStartBtn">▶ Start training</button>
   </div>
 </div>
 
@@ -3964,6 +4074,55 @@ document.querySelectorAll('.simple-modal').forEach(modal => {
   });
 });
 
+// ---------- Hardlopen: 5K-opbouwschema (loop/wandel-intervallen), voortgang, echte systeemstemmen ----------
+function buildRunWalkIntervals(reps, runSec, walkSec, warmupSec, cooldownSec){
+  const arr = [{ type:'warmup', sec:warmupSec }];
+  for (let i=0; i<reps; i++){
+    arr.push({ type:'run', sec:runSec });
+    if (i < reps-1) arr.push({ type:'walk', sec:walkSec });
+  }
+  arr.push({ type:'cooldown', sec:cooldownSec });
+  return arr;
+}
+// Opbouwprincipe: klassieke, breed gebruikte loop/wandel-progressie richting 5 km — geen letterlijke
+// tekst van een specifiek merk/programma, gewoon het algemeen bekende opbouwschema zelf.
+const RUN_5K_PROGRAM = [
+  { week:1, title:'Wennen aan het ritme', desc:'8x (1 min lopen / 2 min wandelen)', build: () => buildRunWalkIntervals(8, 60, 120, 300, 300) },
+  { week:2, title:'Iets langer doorlopen', desc:'6x (2 min lopen / 2 min wandelen)', build: () => buildRunWalkIntervals(6, 120, 120, 300, 300) },
+  { week:3, title:'Opbouwen', desc:'5x (3 min lopen / 2 min wandelen)', build: () => buildRunWalkIntervals(5, 180, 120, 300, 300) },
+  { week:4, title:'Langere loopstukken', desc:'4x (4 min lopen / 2 min wandelen)', build: () => buildRunWalkIntervals(4, 240, 120, 300, 300) },
+  { week:5, title:'Bijna daar', desc:'3x (6 min lopen / 1,5 min wandelen)', build: () => buildRunWalkIntervals(3, 360, 90, 300, 300) },
+  { week:6, title:'Grote stukken', desc:'2x (9 min lopen / 2 min wandelen)', build: () => buildRunWalkIntervals(2, 540, 120, 300, 300) },
+  { week:7, title:'Bijna ononderbroken', desc:'15 min lopen · 3 min wandelen · 10 min lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:900},{type:'walk',sec:180},{type:'run',sec:600},{type:'cooldown',sec:300}] },
+  { week:8, title:'Bijna de volle 5K', desc:'25 minuten ononderbroken lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:1500},{type:'cooldown',sec:300}] },
+  { week:9, title:'5K gehaald!', desc:'30 minuten ononderbroken lopen (± 5 km)', build: () => [{type:'warmup',sec:300},{type:'run',sec:1800},{type:'cooldown',sec:300}] }
+];
+const RUN_PROGRESS_KEY = 'run_progress_v1';
+async function getRunProgress(){
+  try{
+    const val = await storageGet(RUN_PROGRESS_KEY);
+    return val ? JSON.parse(val) : { week:1, day:1, sessionsDone:0 };
+  }catch(e){ return { week:1, day:1, sessionsDone:0 }; }
+}
+async function saveRunProgress(p){ await storageSet(RUN_PROGRESS_KEY, JSON.stringify(p)); }
+async function advanceRunProgress(){
+  const p = await getRunProgress();
+  p.sessionsDone = (p.sessionsDone || 0) + 1;
+  if (p.day >= 3){ p.day = 1; if (p.week < RUN_5K_PROGRAM.length) p.week += 1; }
+  else { p.day += 1; }
+  await saveRunProgress(p);
+  return p;
+}
+function getRunWeekData(weekNum){
+  return RUN_5K_PROGRAM.find(w => w.week === weekNum) || RUN_5K_PROGRAM[0];
+}
+// Echte systeemstemmen (geen verzonnen namen zoals "Coach Fleur") — wat de browser/het toestel zelf aanbiedt.
+function getAvailableVoices(){
+  if (!('speechSynthesis' in window)) return [];
+  return window.speechSynthesis.getVoices().filter(v => v.lang.startsWith(curLang()==='en' ? 'en' : 'nl'));
+}
+const RUN_VOICE_KEY = 'run_voice_uri';
+
 // ---------- Route via link: plak een directe GPX-downloadlink ----------
 const SAVED_LINKS_KEY = () => 'saved_links_' + (appMode || 'fiets');
 
@@ -4711,6 +4870,12 @@ const TRANSLATIONS = {
   restPointsTitle: { nl:'🪑 Rustpunten in de buurt', en:'🪑 Rest points nearby' },
   restPointsBtnTitle: { nl:'Zoek bankjes, terrassen & picknicktafels', en:'Find benches, terraces & picnic tables' },
   restPointsBtnSub: { nl:'Binnen ~900 m, via OpenStreetMap — geen account nodig.', en:'Within ~900 m, via OpenStreetMap — no account needed.' },
+  natureSpotterTitle: { nl:'🦉 Natuurspotter', en:'🦉 Nature spotter' },
+  natureSpotterBtnTitle: { nl:'Wat is hier recent gespot?', en:'What has been spotted here recently?' },
+  natureSpotterBtnSub: { nl:'Echte waarnemingen van andere natuurliefhebbers, via iNaturalist.', en:'Real sightings from other nature enthusiasts, via iNaturalist.' },
+  animalScannerTitle: { nl:'🐾 Dieren Scanner', en:'🐾 Animal Scanner' },
+  animalScannerTileTitle: { nl:'Neem een foto van een dier', en:'Take a photo of an animal' },
+  animalScannerTileSub: { nl:'100% lokaal op je toestel — geen account, geen limiet.', en:'100% on-device — no account, no limit.' },
   settingsApiKeysNote: { nl:'Alle optionele gratis sleutels op 1 plek. Elke sleutel schakelt een specifiek extraatje elders in de app vrij — zie de verwijzing bij elk veld.', en:'All optional free keys in one place. Each key unlocks a specific extra elsewhere in the app — see the note next to each field.' },
   settingsAutoPauseSub: { nl:'Rijtijd/gemiddelde snelheid tellen niet mee zolang je stilstaat (bv. koffiepauze) — hervat vanzelf zodra je weer beweegt.', en:'Ride time/average speed don\'t count while you\'re stationary (e.g. a coffee stop) — resumes automatically once you move again.' },
   settingsRoutingSub: { nl:'Alle behalve GraphHopper zijn gratis publieke servers zonder account. Je OpenRouteService-sleutel (bij 🔑 API-sleutels hierboven) blijft apart werken indien ingesteld.', en:'All except GraphHopper are free public servers without an account. Your OpenRouteService key (under 🔑 API keys above) keeps working separately if set.' },
@@ -5445,6 +5610,42 @@ function hideHubScreen(){
   $('modeSelectScreenGarmin').classList.add('hidden');
 }
 
+// ---------- RunCoach-startscherm (Standaard-stijl) ----------
+async function openRunCoachScreen(){
+  hideHubScreen();
+  $('runCoachScreen').classList.remove('hidden');
+  await renderRunCoachScreen();
+}
+function closeRunCoachScreen(){
+  $('runCoachScreen').classList.add('hidden');
+  showHubScreen();
+}
+async function renderRunCoachScreen(){
+  const p = await getRunProgress();
+  const w = getRunWeekData(p.week);
+  $('runCoachWeekLabel').textContent = `WEEK ${w.week} · DAG ${p.day}`;
+  $('runCoachWeekTitle').textContent = w.title;
+  $('runCoachWeekDesc').textContent = w.desc;
+  $('runCoachProgressLine').textContent = (p.sessionsDone || 0) + (curLang()==='en' ? ' sessions completed so far' : ' sessies afgerond tot nu toe');
+  populateRunVoiceSelect();
+}
+function populateRunVoiceSelect(){
+  const sel = $('runCoachVoiceSelect');
+  const fillList = () => {
+    const voices = getAvailableVoices();
+    const savedUri = localStorage.getItem(RUN_VOICE_KEY) || '';
+    sel.innerHTML = `<option value="">${curLang()==='en' ? 'Default voice on this device' : 'Standaardstem van je toestel'}</option>` +
+      voices.map(v => `<option value="${v.voiceURI}" ${v.voiceURI===savedUri ? 'selected' : ''}>${v.name} (${v.lang})</option>`).join('');
+  };
+  fillList();
+  if ('speechSynthesis' in window) window.speechSynthesis.addEventListener('voiceschanged', fillList, { once:true });
+  sel.onchange = () => localStorage.setItem(RUN_VOICE_KEY, sel.value);
+}
+$('runCoachBackBtn').addEventListener('click', closeRunCoachScreen);
+$('runCoachStartBtn').addEventListener('click', () => {
+  toast(curLang()==='en' ? 'The live training screen is coming in the next step.' : 'Het live trainingsscherm volgt in de volgende bouwstap.', 3500);
+});
+
 // ---------- Garmin-stijl Kompas (letterlijk Gemini's Compas.html) ----------
 let garminKompasFrameLoaded = false;
 function openGarminKompasScreen(){
@@ -5565,9 +5766,26 @@ window.addEventListener('message', (ev) => {
     case 'loopgen':    garminSetupOpenLoopGen(); break;
     case 'gpximport':  garminSetupOpenGpxImport(); break;
     case 'identifyplant': garminIdentifyPlant(data.file); break;
+    case 'identifyanimal': garminIdentifyAnimal(data.file); break;
     case 'findrestpoints': garminFindRestPoints(); break;
+    case 'findobservations': garminFindObservations(); break;
+    case 'openwiki': openWikiInfoModal(data.sciName, data.commonName); break;
   }
 });
+async function garminIdentifyAnimal(file){
+  const frame = $('garminSetupFrame');
+  const post = (payload) => { if (frame && frame.contentWindow) frame.contentWindow.postMessage(Object.assign({ source:'garminAnimalResult' }, payload), '*'); };
+  const r = await identifyAnimalPhoto(file);
+  if (!r.ok){ post({ status:'error', message: animalScannerErrorMessage(r.reason) }); return; }
+  post({ status:'ok', mobileLabel:r.mobileLabel, pct:r.pct, sciName:r.sciName, dutchName:r.dutchName, family:r.family });
+}
+async function garminFindObservations(){
+  const frame = $('garminSetupFrame');
+  const post = (payload) => { if (frame && frame.contentWindow) frame.contentWindow.postMessage(Object.assign({ source:'garminObservationsResult' }, payload), '*'); };
+  const r = await findNearbyObservations();
+  if (!r.ok){ post({ status:'error', message: observationsErrorMessage(r.reason) }); return; }
+  post({ status:'ok', items: r.items });
+}
 async function garminFindRestPoints(){
   const frame = $('garminSetupFrame');
   const post = (payload) => { if (frame && frame.contentWindow) frame.contentWindow.postMessage(Object.assign({ source:'garminRestPointsResult' }, payload), '*'); };
@@ -5579,9 +5797,14 @@ async function garminIdentifyPlant(file){
   const frame = $('garminSetupFrame');
   const post = (payload) => { if (frame && frame.contentWindow) frame.contentWindow.postMessage(Object.assign({ source:'garminPlantResult' }, payload), '*'); };
   post({ status:'loading' });
-  const r = await plantNetIdentifyCore(file);
+  const r = await identifyPlantWithFallback(file);
   if (!r.ok){ post({ status:'error', message: plantNetErrorMessage(r.reason) }); return; }
-  post({ status:'ok', commonName:r.commonName, sciName:r.sciName, pct:r.pct, matchLabel: curLang()==='en' ? 'match' : 'zekerheid' });
+  const displayName = r.source === 'plantnet' ? (r.commonName || r.sciName) : (r.dutchName || r.sciName || r.mobileLabel);
+  post({
+    status:'ok', source:r.source, commonName:displayName, sciName:r.sciName || null, pct:r.pct,
+    matchLabel: curLang()==='en' ? 'match' : 'zekerheid',
+    fallbackNote: r.source === 'fallback' ? (curLang()==='en' ? '(via local recognition)' : '(via lokale herkenning)') : null
+  });
 }
 
 // Instellingen-toegang vanuit eender welk Garmin-stijl scherm (het gele driehoekje linksboven):
@@ -5606,6 +5829,47 @@ const GARMIN_MENU_BTN_HTML = `
 const GARMIN_MENU_BTN_JS = `
     const garminMenuBtn = document.getElementById('garminMenuBtn');
     if (garminMenuBtn) garminMenuBtn.addEventListener('click', () => parent.postMessage({ source:'garminMenu', action:'settings' }, '*'));`;
+
+// ---------- Garmin-stijl RunCoach ----------
+let garminRunCoachFrameLoaded = false;
+function openGarminRunCoachScreen(){
+  hideHubScreen();
+  $('garminRunCoachScreen').classList.remove('hidden');
+  const frame = $('garminRunCoachFrame');
+  if (!garminRunCoachFrameLoaded){
+    frame.addEventListener('load', () => sendRunCoachDataToFrame(), { once:true });
+    frame.srcdoc = buildGarminRunCoachHtml();
+    garminRunCoachFrameLoaded = true;
+  } else {
+    sendRunCoachDataToFrame();
+  }
+}
+function closeGarminRunCoachScreen(){
+  $('garminRunCoachScreen').classList.add('hidden');
+  showHubScreen();
+}
+async function sendRunCoachDataToFrame(){
+  const frame = $('garminRunCoachFrame');
+  if (!frame || !frame.contentWindow) return;
+  const p = await getRunProgress();
+  const voices = getAvailableVoices().map(v => ({ uri:v.voiceURI, name:v.name, lang:v.lang }));
+  const savedUri = localStorage.getItem(RUN_VOICE_KEY) || '';
+  frame.contentWindow.postMessage({
+    source:'garminRunCoachData', week:p.week, day:p.day, sessionsDone:p.sessionsDone||0,
+    program: RUN_5K_PROGRAM.map(w => ({ week:w.week, title:w.title, desc:w.desc })),
+    voices, savedVoiceUri: savedUri
+  }, '*');
+}
+window.addEventListener('message', (ev) => {
+  const data = ev.data;
+  if (!data || data.source !== 'garminRunCoach') return;
+  switch (data.action){
+    case 'back':        closeGarminRunCoachScreen(); break;
+    case 'starttraining': toast(curLang()==='en' ? 'The live training screen is coming in the next step.' : 'Het live trainingsscherm volgt in de volgende bouwstap.', 3500); break;
+    case 'setvoice':     localStorage.setItem(RUN_VOICE_KEY, data.uri || ''); break;
+    case 'other-not-built': toast(curLang()==='en' ? 'Not built yet — coming later.' : 'Nog niet gebouwd — komt later.', 2500); break;
+  }
+});
 
 function buildGarminSetupHtml(mode){
   const isFiets = mode === 'fiets';
@@ -5692,15 +5956,25 @@ function buildGarminSetupHtml(mode){
       <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-3">Wandel-extra's</span>
       <div class="grid grid-cols-2 gap-3">
         <button id="restPointsTile" class="bg-slate-900/60 border border-sky-500/40 rounded-2xl p-2.5 text-center"><span class="text-xl block mb-0.5">☕</span><span class="text-xs font-bold text-sky-400 block">Rustpunten</span><span class="text-[9px] text-slate-500 block">Echte OSM-data</span></button>
-        <button class="stub-tile bg-slate-900/60 border border-slate-800 rounded-2xl p-2.5 text-center"><span class="text-xl block mb-0.5">🦉</span><span class="text-xs font-bold text-white block">Natuurspotter</span><span class="text-[9px] text-slate-500 block">Binnenkort</span></button>
+        <button id="natureSpotterTile" class="bg-slate-900/60 border border-teal-500/40 rounded-2xl p-2.5 text-center"><span class="text-xl block mb-0.5">🦉</span><span class="text-xs font-bold text-teal-400 block">Natuurspotter</span><span class="text-[9px] text-slate-500 block">Echte iNaturalist-data</span></button>
         <label for="floraScannerInput" class="bg-slate-900/60 border border-emerald-500/40 rounded-2xl p-2.5 text-center cursor-pointer block relative">
           <span class="text-xl block mb-0.5">📸</span><span class="text-xs font-bold text-emerald-400 block">Flora Scanner</span><span id="floraScannerSub" class="text-[9px] text-slate-500 block">Echte herkenning</span>
           <input type="file" id="floraScannerInput" accept="image/*" capture="environment" class="hidden" style="display:none;">
         </label>
         <button class="stub-tile bg-slate-900/60 border border-slate-800 rounded-2xl p-2.5 text-center"><span class="text-xl block mb-0.5">🎧</span><span class="text-xs font-bold text-white block">Audio Gids</span><span class="text-[9px] text-slate-500 block">Binnenkort</span></button>
+        <label for="animalScannerInput" class="col-span-2 bg-slate-900/60 border border-rose-500/40 rounded-2xl p-3 text-center cursor-pointer flex items-center justify-center gap-3 relative">
+          <span class="text-2xl">🐾</span>
+          <span class="text-left">
+            <span class="text-xs font-bold text-rose-400 block">Dieren Scanner</span>
+            <span id="animalScannerSub" class="text-[9px] text-slate-500 block">100% lokaal — TensorFlow.js, geen limiet</span>
+          </span>
+          <input type="file" id="animalScannerInput" accept="image/*" capture="environment" class="hidden" style="display:none;">
+        </label>
       </div>
       <div id="restPointsResultGarmin" style="display:none; margin-top:10px; background:rgba(255,255,255,0.06); border:2px solid #38bdf8; border-radius:16px; padding:10px 14px; max-height:220px; overflow-y:auto;"></div>
+      <div id="natureSpotterResultGarmin" style="display:none; margin-top:10px; background:rgba(255,255,255,0.06); border:2px solid #2dd4bf; border-radius:16px; padding:10px 14px; max-height:220px; overflow-y:auto;"></div>
       <div id="floraScannerResult" style="display:none; margin-top:10px; background:rgba(255,255,255,0.06); border:2px solid #f59e0b; border-radius:16px; padding:12px 14px;"></div>
+      <div id="animalScannerResultGarmin" style="display:none; margin-top:10px; background:rgba(255,255,255,0.06); border:2px solid #fb7185; border-radius:16px; padding:12px 14px;"></div>
     </div>`}
 
     <div class="mt-auto pt-3">
@@ -5735,6 +6009,41 @@ ${GARMIN_MENU_BTN_JS}
         parent.postMessage({ source:'garminSetup', action:'identifyplant', file }, '*');
       });
     }
+    const animalScannerInput = document.getElementById('animalScannerInput');
+    if (animalScannerInput){
+      animalScannerInput.addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        const resultEl = document.getElementById('animalScannerResultGarmin');
+        resultEl.style.display = 'block';
+        resultEl.innerHTML = '<div class="text-xs text-slate-300">Herkenningsmodel laden…</div>';
+        parent.postMessage({ source:'garminSetup', action:'identifyanimal', file }, '*');
+      });
+    }
+    window.addEventListener('message', (ev) => {
+      const d = ev.data;
+      if (!d || d.source !== 'garminAnimalResult') return;
+      const resultEl = document.getElementById('animalScannerResultGarmin');
+      if (!resultEl) return;
+      resultEl.style.display = 'block';
+      if (d.status === 'error'){
+        resultEl.innerHTML = '<div class="text-xs text-slate-300">' + d.message + '</div>';
+      } else if (d.status === 'ok'){
+        const displayName = d.dutchName || d.sciName || d.mobileLabel;
+        resultEl.innerHTML =
+          '<div class="flex items-center gap-2 mb-1"><span class="text-xl">🐾</span><div>' +
+          '<div class="text-sm font-bold text-white">' + displayName + '</div>' +
+          (d.sciName ? '<div class="text-[11px] text-slate-400 italic">' + d.sciName + (d.family ? ' · ' + d.family : '') + '</div>' : '<div class="text-[10px] text-slate-500">(gok van het model)</div>') +
+          '</div></div>' +
+          '<div class="flex items-center justify-between">' +
+          '<span class="text-[11px] font-bold text-rose-400">' + d.pct + '% zekerheid</span>' +
+          '<button id="animalScannerWikiBtnG" class="text-[11px] font-bold text-rose-400 underline">📖 Meer info</button></div>';
+        const wikiBtn = document.getElementById('animalScannerWikiBtnG');
+        if (wikiBtn) wikiBtn.addEventListener('click', () => {
+          parent.postMessage({ source:'garminSetup', action:'openwiki', sciName:d.sciName || d.mobileLabel, commonName:d.dutchName || d.mobileLabel }, '*');
+        });
+      }
+    });
     const restPointsTile = document.getElementById('restPointsTile');
     if (restPointsTile){
       restPointsTile.addEventListener('click', () => {
@@ -5744,6 +6053,42 @@ ${GARMIN_MENU_BTN_JS}
         parent.postMessage({ source:'garminSetup', action:'findrestpoints' }, '*');
       });
     }
+    const natureSpotterTile = document.getElementById('natureSpotterTile');
+    if (natureSpotterTile){
+      natureSpotterTile.addEventListener('click', () => {
+        const resultEl = document.getElementById('natureSpotterResultGarmin');
+        resultEl.style.display = 'block';
+        resultEl.innerHTML = '<div class="text-xs text-slate-300 py-1">Bezig met zoeken…</div>';
+        parent.postMessage({ source:'garminSetup', action:'findobservations' }, '*');
+      });
+    }
+    window.addEventListener('message', (ev) => {
+      const d = ev.data;
+      if (d && d.source === 'garminObservationsResult'){
+        const resultEl = document.getElementById('natureSpotterResultGarmin');
+        if (!resultEl) return;
+        resultEl.style.display = 'block';
+        if (d.status === 'error'){
+          resultEl.innerHTML = '<div class="text-xs text-slate-300 py-1">' + d.message + '</div>';
+        } else if (d.status === 'ok'){
+          resultEl.innerHTML = d.items.map((o,i) =>
+            '<div class="obs-row-g flex items-center gap-2 py-1.5 border-b border-slate-800/60 cursor-pointer" data-idx="' + i + '">' +
+            (o.photoUrl
+              ? '<img src="' + o.photoUrl + '" class="w-8 h-8 rounded-lg object-cover flex-shrink-0" loading="lazy">'
+              : '<span class="text-base w-8 text-center flex-shrink-0">' + o.emoji + '</span>') +
+            '<div class="flex-1 min-w-0"><div class="text-xs font-bold text-white truncate">' + o.emoji + ' ' + o.commonName + '</div>' +
+            '<div class="text-[10px] text-slate-500 italic truncate">' + o.sciName + '</div></div>' +
+            '<span class="text-sm text-amber-400 flex-shrink-0">📖</span></div>'
+          ).join('') + '<div class="text-[9px] text-slate-600 mt-2 text-center">Data: iNaturalist.org (CC BY-NC)</div>';
+          resultEl.querySelectorAll('.obs-row-g').forEach(row => {
+            const item = d.items[Number(row.dataset.idx)];
+            row.addEventListener('click', () => {
+              parent.postMessage({ source:'garminSetup', action:'openwiki', sciName:item.sciName, commonName:item.commonName }, '*');
+            });
+          });
+        }
+      }
+    });
     window.addEventListener('message', (ev) => {
       const d = ev.data;
       if (d && d.source === 'garminRestPointsResult'){
@@ -5777,8 +6122,16 @@ ${GARMIN_MENU_BTN_JS}
         resultEl.innerHTML =
           '<div class="flex items-center gap-2 mb-1"><span class="text-xl">🌿</span><div>' +
           '<div class="text-sm font-bold text-white">' + (d.commonName || d.sciName) + '</div>' +
-          '<div class="text-[11px] text-slate-400 italic">' + d.sciName + '</div></div></div>' +
-          '<div class="text-[11px] font-bold text-amber-400">' + d.pct + '% ' + d.matchLabel + '</div>';
+          (d.sciName ? '<div class="text-[11px] text-slate-400 italic">' + d.sciName + '</div>' : '') +
+          (d.fallbackNote ? '<div class="text-[10px] text-slate-500 mt-0.5">' + d.fallbackNote + '</div>' : '') +
+          '</div></div>' +
+          '<div class="flex items-center justify-between">' +
+          '<span class="text-[11px] font-bold text-amber-400">' + d.pct + '% ' + d.matchLabel + '</span>' +
+          '<button id="floraScannerWikiBtn" class="text-[11px] font-bold text-amber-400 underline">📖 Meer info</button></div>';
+        const wikiBtn = document.getElementById('floraScannerWikiBtn');
+        if (wikiBtn) wikiBtn.addEventListener('click', () => {
+          parent.postMessage({ source:'garminSetup', action:'openwiki', sciName:d.sciName || d.commonName, commonName:d.commonName }, '*');
+        });
       }
     });
 
@@ -6667,6 +7020,139 @@ ${GARMIN_MENU_BTN_JS}
 </html>`;
 }
 
+function buildGarminRunCoachHtml(){
+  // Gemini's RunCoach_Pro.html-opbouw, gekoppeld aan het échte 5K-schema. "Evy Podcast" en de overige
+  // onderste tabbladen (Sessie/Stats/Schema/Pijn) bestaan nog niet echt — duidelijk gemarkeerd i.p.v.
+  // te doen alsof ze werken.
+  return `<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RunCoach Pro</title>
+<script src="https://cdn.tailwindcss.com"><\/script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
+  body{ font-family:'Inter',sans-serif; }
+</style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+  <div class="w-full min-h-screen p-5 pb-24 flex flex-col">
+
+    <div class="flex justify-between items-start mb-5">
+      <div>
+        <span class="text-[10px] text-amber-500 font-black uppercase tracking-widest">AI GPS Audio Coach Pro</span>
+        <h1 class="text-xl font-black text-white flex items-center gap-1.5 mt-0.5">🏃 RunCoach Pro</h1>
+      </div>
+      <div class="flex items-center gap-2">
+        ${GARMIN_MENU_BTN_HTML}
+        <button id="rcBackBtn" class="w-9 h-9 rounded-xl bg-slate-900/70 border border-slate-800 flex items-center justify-center text-slate-300">←</button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-2 bg-slate-900/60 border border-slate-800 rounded-2xl p-1.5 mb-5">
+      <button id="rcTabLearn" class="py-2.5 rounded-xl bg-amber-500 text-slate-950 font-bold text-xs">Leren Lopen</button>
+      <button id="rcTabAdvanced" class="py-2.5 rounded-xl text-slate-400 font-bold text-xs">Volleerde Loper</button>
+    </div>
+
+    <div class="bg-gradient-to-br from-rose-600 to-red-900 rounded-2xl p-5 mb-4 shadow-xl">
+      <span class="text-[10px] font-black uppercase tracking-widest bg-black/20 text-white/90 px-2.5 py-1 rounded-full inline-block mb-2">5K Start to Run</span>
+      <h2 id="rcWeekTitle" class="text-lg font-black text-white leading-tight">Week – · Dag –</h2>
+      <p id="rcWeekDesc" class="text-sm text-white/85 mt-1">–</p>
+      <p id="rcProgressLine" class="text-[11px] text-white/60 mt-2">–</p>
+    </div>
+
+    <div class="mb-4">
+      <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Kies je audio-begeleiding</span>
+      <div class="grid grid-cols-2 gap-2">
+        <button id="rcAudioAi" class="border-2 border-amber-500 bg-amber-500/10 rounded-xl p-3 text-left">
+          <div class="text-xs font-bold text-amber-400">🤖 AI Coach</div>
+          <div class="text-[10px] text-slate-400 mt-0.5">Gesproken tijdsaankondigingen</div>
+        </button>
+        <button id="rcAudioPodcast" class="border-2 border-slate-800 bg-slate-900/50 rounded-xl p-3 text-left opacity-50">
+          <div class="text-xs font-bold text-slate-400">🎙️ Evy Podcast</div>
+          <div class="text-[10px] text-slate-500 mt-0.5">Binnenkort</div>
+        </button>
+      </div>
+    </div>
+
+    <button id="rcStartBtn" class="w-full bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-black py-3.5 rounded-2xl text-center shadow-xl tracking-wider text-xs uppercase mb-5">
+      🚀 Start Training
+    </button>
+
+    <button id="rcAccordionBtn" class="w-full flex justify-between items-center bg-slate-900/60 border border-slate-800 rounded-2xl p-4 mb-2">
+      <span class="text-xs font-bold text-amber-400">📅 9-Weken Schema</span>
+      <span id="rcAccordionChevron" class="text-slate-400">▾</span>
+    </button>
+    <div id="rcAccordionBody" class="hidden bg-slate-900/40 border border-slate-800 rounded-2xl p-3 mb-4 space-y-1.5"></div>
+
+    <button id="rcSchemaBuilderBtn" class="w-full flex justify-between items-center bg-slate-900/60 border border-slate-800 rounded-2xl p-4 mb-5 opacity-60">
+      <span class="text-xs font-bold text-slate-400">🛠️ Eigen Schema Builder</span>
+      <span class="text-[9px] text-slate-500">Binnenkort</span>
+    </button>
+
+    <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4">
+      <span class="text-xs font-bold text-white block mb-2">🔊 Stem voor audio-coach</span>
+      <select id="rcVoiceSelect" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-200">
+        <option value="">Standaardstem van je toestel</option>
+      </select>
+      <p class="text-[10px] text-slate-500 mt-2">Echte stemmen van je eigen toestel — geen verzonnen coach-personas.</p>
+    </div>
+
+  </div>
+
+  <div class="fixed bottom-0 left-0 right-0 bg-slate-950/95 border-t border-slate-800 backdrop-blur-md flex justify-around py-2.5">
+    <button class="rc-nav flex flex-col items-center gap-0.5 text-amber-400" data-active="1"><span class="text-base">🏠</span><span class="text-[9px] font-bold">Home</span></button>
+    <button class="rc-nav flex flex-col items-center gap-0.5 text-slate-500" data-nav="sessie"><span class="text-base">⏱️</span><span class="text-[9px] font-bold">Sessie</span></button>
+    <button class="rc-nav flex flex-col items-center gap-0.5 text-slate-500" data-nav="stats"><span class="text-base">📊</span><span class="text-[9px] font-bold">Stats</span></button>
+    <button class="rc-nav flex flex-col items-center gap-0.5 text-slate-500" data-nav="schema"><span class="text-base">📋</span><span class="text-[9px] font-bold">Schema</span></button>
+    <button class="rc-nav flex flex-col items-center gap-0.5 text-slate-500" data-nav="pijn"><span class="text-base">💊</span><span class="text-[9px] font-bold">Pijn/Tips</span></button>
+  </div>
+
+  <script>
+    document.getElementById('rcBackBtn').addEventListener('click', () => parent.postMessage({ source:'garminRunCoach', action:'back' }, '*'));
+    document.getElementById('rcStartBtn').addEventListener('click', () => parent.postMessage({ source:'garminRunCoach', action:'starttraining' }, '*'));
+    document.getElementById('rcTabAdvanced').addEventListener('click', () => parent.postMessage({ source:'garminRunCoach', action:'other-not-built' }, '*'));
+    document.getElementById('rcAudioPodcast').addEventListener('click', () => parent.postMessage({ source:'garminRunCoach', action:'other-not-built' }, '*'));
+    document.getElementById('rcSchemaBuilderBtn').addEventListener('click', () => parent.postMessage({ source:'garminRunCoach', action:'other-not-built' }, '*'));
+    document.querySelectorAll('.rc-nav[data-nav]').forEach(btn => {
+      btn.addEventListener('click', () => parent.postMessage({ source:'garminRunCoach', action:'other-not-built' }, '*'));
+    });
+    document.getElementById('rcAccordionBtn').addEventListener('click', () => {
+      const body = document.getElementById('rcAccordionBody');
+      const chev = document.getElementById('rcAccordionChevron');
+      const open = !body.classList.contains('hidden');
+      body.classList.toggle('hidden');
+      chev.textContent = open ? '▾' : '▴';
+    });
+    document.getElementById('rcVoiceSelect').addEventListener('change', (e) => {
+      parent.postMessage({ source:'garminRunCoach', action:'setvoice', uri:e.target.value }, '*');
+    });
+
+    window.addEventListener('message', (ev) => {
+      const d = ev.data;
+      if (!d || d.source !== 'garminRunCoachData') return;
+      document.getElementById('rcWeekTitle').textContent = 'Week ' + d.week + ' · Dag ' + d.day;
+      const wk = d.program.find(w => w.week === d.week);
+      document.getElementById('rcWeekDesc').textContent = wk ? wk.desc : '–';
+      document.getElementById('rcProgressLine').textContent = d.sessionsDone + ' sessies afgerond tot nu toe';
+
+      const accBody = document.getElementById('rcAccordionBody');
+      accBody.innerHTML = d.program.map(w => \`
+        <div class="flex items-center justify-between py-1.5 \${w.week === d.week ? 'text-amber-400' : 'text-slate-300'}">
+          <span class="text-xs font-bold">Week \${w.week} — \${w.title}</span>
+          <span class="text-[10px] text-slate-500">\${w.desc}</span>
+        </div>\`).join('');
+
+      const voiceSel = document.getElementById('rcVoiceSelect');
+      voiceSel.innerHTML = '<option value="">Standaardstem van je toestel</option>' +
+        d.voices.map(v => \`<option value="\${v.uri}" \${v.uri===d.savedVoiceUri ? 'selected' : ''}>\${v.name} (\${v.lang})</option>\`).join('');
+    });
+  <\/script>
+</body>
+</html>`;
+}
+
 window.addEventListener('message', (ev) => {
   const data = ev.data;
   if (!data || data.source !== 'garminHub') return;
@@ -6675,9 +7161,7 @@ window.addEventListener('message', (ev) => {
     case 'wandel':  openGarminSetupScreen('wandel'); break;
     case 'kompas':  openGarminKompasScreen(); break;
     case 'weer':    openGarminWeerScreen(); break;
-    case 'hardloop':
-      toast(curLang()==='en' ? 'Running mode is coming soon.' : 'Hardlopen komt binnenkort — nog in opbouw.', 3000);
-      break;
+    case 'hardloop': openGarminRunCoachScreen(); break;
   }
 });
 let poiSettingsDebounceTimer = null;
@@ -12775,6 +13259,11 @@ function openBikeSetupScreen(mode){
   $('natureIdCameraInput').value = '';
   $('restPointsSection').style.display = mode === 'wandel' ? 'block' : 'none';
   $('restPointsResult').style.display = 'none';
+  $('natureSpotterSection').style.display = mode === 'wandel' ? 'block' : 'none';
+  $('natureSpotterResult').style.display = 'none';
+  $('animalScannerSection').style.display = mode === 'wandel' ? 'block' : 'none';
+  $('animalScannerResult').style.display = 'none';
+  $('animalScannerInput').value = '';
   $('bikeSetupTitle').textContent = mode === 'fiets' ? tr('bikeSetupTitleFiets') : tr('bikeSetupTitleWandel');
   document.querySelector('#bikeRoutingProBadge b').textContent = mode === 'fiets' ? tr('bikeRoutingProTitle') : tr('walkRoutingProTitle');
   document.querySelector('#bikeRoutingProBadge span:first-child').textContent = mode === 'fiets' ? '🚴\u200d♂️' : '🥾';
@@ -12798,6 +13287,47 @@ $('restPointsBtn').addEventListener('click', async () => {
     return;
   }
   resultEl.innerHTML = renderRestPointsHtml(r.points);
+});
+$('natureSpotterBtn').addEventListener('click', async () => {
+  const resultEl = $('natureSpotterResult');
+  resultEl.style.display = 'block';
+  resultEl.innerHTML = `<div style="color:var(--cream); font-size:12.5px; padding:8px 0;">${curLang()==='en' ? 'Searching…' : 'Bezig met zoeken…'}</div>`;
+  const r = await findNearbyObservations();
+  if (!r.ok){
+    resultEl.innerHTML = `<div style="color:var(--cream); font-size:12.5px; padding:8px 0;">${observationsErrorMessage(r.reason)}</div>`;
+    return;
+  }
+  resultEl.innerHTML = renderObservationsHtml(r.items);
+  resultEl.querySelectorAll('.obs-row').forEach(row => {
+    const item = r.items[Number(row.dataset.idx)];
+    row.addEventListener('click', () => openWikiInfoModal(item.sciName, item.commonName));
+  });
+});
+$('animalScannerInput').addEventListener('change', async (e) => {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+  const resultEl = $('animalScannerResult');
+  resultEl.style.display = 'block';
+  resultEl.innerHTML = `<div style="color:var(--cream); font-size:12.5px;">${curLang()==='en' ? 'Loading recognition model…' : 'Herkenningsmodel laden…'}</div>`;
+  const r = await identifyAnimalPhoto(file);
+  if (!r.ok){
+    resultEl.innerHTML = `<div style="color:var(--cream); font-size:12.5px; line-height:1.5;">${animalScannerErrorMessage(r.reason)}</div>`;
+    return;
+  }
+  const displayName = r.dutchName || r.sciName || r.mobileLabel;
+  resultEl.innerHTML = `
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:4px;">
+      <span style="font-size:22px;">🐾</span>
+      <div>
+        <div style="color:var(--cream); font-weight:800; font-size:14.5px;">${displayName}</div>
+        ${r.sciName ? `<div style="color:rgba(246,244,238,0.65); font-size:11.5px; font-style:italic;">${r.sciName}${r.family ? ' · ' + r.family : ''}</div>` : `<div style="color:rgba(246,244,238,0.5); font-size:11px;">${curLang()==='en' ? '(model guess, not species-verified)' : '(gok van het model, geen soort-check)'}</div>`}
+      </div>
+    </div>
+    <div style="display:flex; align-items:center; justify-content:space-between;">
+      <span style="color:var(--amber); font-size:11px; font-weight:700;">${r.pct}% ${curLang()==='en' ? 'confidence' : 'zekerheid'}</span>
+      <button id="animalScannerWikiBtn" type="button" style="border:none; background:none; color:var(--amber); font-size:11px; font-weight:700; text-decoration:underline; cursor:pointer;">📖 ${curLang()==='en' ? 'More info' : 'Meer info'}</button>
+    </div>`;
+  $('animalScannerWikiBtn').addEventListener('click', () => openWikiInfoModal(r.sciName || r.mobileLabel, r.dutchName || r.mobileLabel));
 });
 // Kernlogica (geen DOM-afhankelijkheid) — herbruikt door zowel het Standaard- als het Garmin-scherm.
 async function plantNetIdentifyCore(file){
@@ -12834,6 +13364,172 @@ function plantNetErrorMessage(reason){
     case 'rate-limit': return en ? 'Daily Pl@ntNet limit reached — try again tomorrow.' : 'Dagelijkse Pl@ntNet-limiet bereikt — probeer morgen opnieuw.';
     case 'no-match': return en ? 'No match found — try a clearer photo of a leaf or flower.' : 'Geen match gevonden — probeer een duidelijkere foto van blad of bloem.';
     default: return en ? 'Identification failed — check your connection and try again.' : 'Herkenning mislukt — controleer je verbinding en probeer opnieuw.';
+  }
+}
+// Terugval-keten: eerst Pl@ntNet (specialist, beste keuze voor planten). Levert dat niets op —
+// geen sleutel, limiet bereikt, geen match, netwerkfout — dan een tweede poging via de lokale
+// MobileNet-classifier + naam-oplossing (GBIF/iNaturalist), duidelijk gelabeld als minder nauwkeurig.
+async function identifyPlantWithFallback(file){
+  const primary = await plantNetIdentifyCore(file);
+  if (primary.ok) return Object.assign({ source:'plantnet' }, primary);
+  const local = await classifyPhotoLocally(file);
+  if (!local) return { ok:false, source:'none', reason: primary.reason };
+  const resolved = await resolveSpeciesName(local.mobileLabel);
+  return {
+    ok:true, source:'fallback', primaryReason: primary.reason,
+    mobileLabel:local.mobileLabel, pct:local.pct,
+    sciName: resolved ? resolved.sciName : null,
+    dutchName: resolved ? resolved.dutchName : null,
+    family: resolved ? resolved.family : null
+  };
+}
+// ---------- Wikipedia-info (gratis, geen sleutel) — extra uitleg bij een herkende soort ----------
+async function fetchWikipediaSummary(title){
+  const lang = curLang()==='en' ? 'en' : 'nl';
+  try{
+    const res = await fetch(`https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`);
+    if (!res.ok) return { ok:false };
+    const data = await res.json();
+    if (data.type === 'disambiguation' || !data.extract) return { ok:false };
+    return {
+      ok:true, title:data.title, extract:data.extract,
+      thumbnail: data.thumbnail ? data.thumbnail.source : null,
+      pageUrl: data.content_urls ? data.content_urls.desktop.page : `https://${lang}.wikipedia.org/wiki/${encodeURIComponent(title)}`
+    };
+  }catch(e){ return { ok:false }; }
+}
+async function openWikiInfoModal(sciName, commonName){
+  $('wikiInfoTitle').textContent = commonName || sciName;
+  $('wikiInfoText').textContent = curLang()==='en' ? 'Loading…' : 'Bezig met laden…';
+  $('wikiInfoImg').style.display = 'none';
+  $('wikiInfoLink').style.display = 'none';
+  openModal('wikiInfoModal');
+  // Eerst proberen op gewone naam (leesbaarder artikel-titel), anders op wetenschappelijke naam.
+  let r = commonName ? await fetchWikipediaSummary(commonName) : { ok:false };
+  if (!r.ok) r = await fetchWikipediaSummary(sciName);
+  if (!r.ok){
+    $('wikiInfoText').textContent = curLang()==='en' ? 'No Wikipedia article found for this species.' : 'Geen Wikipedia-artikel gevonden voor deze soort.';
+    return;
+  }
+  $('wikiInfoTitle').textContent = r.title;
+  $('wikiInfoText').textContent = r.extract;
+  if (r.thumbnail){ $('wikiInfoImg').src = r.thumbnail; $('wikiInfoImg').style.display = 'block'; }
+  $('wikiInfoLink').href = r.pageUrl;
+  $('wikiInfoLink').style.display = 'block';
+}
+
+// ---------- Dieren Scanner: 100% lokale beeldherkenning via TensorFlow.js + MobileNet ----------
+// Geen server, geen sleutel, geen limiet — het model draait volledig op het toestel zelf.
+// Achteraf wordt de (Engelse) ImageNet-klasse via de gratis, publieke GBIF Species API vertaald
+// naar een Nederlandse/wetenschappelijke naam, en kan de bestaande Wikipedia-popup meer uitleg tonen.
+let animalScannerLibsPromise = null;
+let mobilenetModelPromise = null;
+function loadAnimalScannerLibs(){
+  if (animalScannerLibsPromise) return animalScannerLibsPromise;
+  animalScannerLibsPromise = new Promise((resolve, reject) => {
+    if (window.mobilenet && window.tf) { resolve(); return; }
+    const s1 = document.createElement('script');
+    s1.src = 'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs';
+    s1.onload = () => {
+      const s2 = document.createElement('script');
+      s2.src = 'https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet';
+      s2.onload = () => resolve();
+      s2.onerror = () => reject(new Error('mobilenet-load-failed'));
+      document.head.appendChild(s2);
+    };
+    s1.onerror = () => reject(new Error('tfjs-load-failed'));
+    document.head.appendChild(s1);
+  });
+  return animalScannerLibsPromise;
+}
+async function getMobilenetModel(){
+  if (!mobilenetModelPromise) mobilenetModelPromise = window.mobilenet.load();
+  return mobilenetModelPromise;
+}
+async function fileToImageElement(file){
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = () => reject(new Error('image-decode-failed'));
+    img.src = URL.createObjectURL(file);
+  });
+}
+// GBIF Species API (gratis, geen sleutel) — vertaalt een (Engelse) soortnaam naar wetenschappelijke
+// naam + Nederlandse naam (indien beschikbaar) + familie.
+async function lookupGbifSpecies(query){
+  try{
+    const res = await fetch(`https://api.gbif.org/v1/species/search?q=${encodeURIComponent(query)}&limit=1`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    const hit = data.results && data.results[0];
+    if (!hit) return null;
+    const out = { sciName: hit.canonicalName || hit.scientificName, family: hit.family || null, dutchName: null };
+    if (hit.key){
+      try{
+        const vRes = await fetch(`https://api.gbif.org/v1/species/${hit.key}/vernacularNames`);
+        if (vRes.ok){
+          const vData = await vRes.json();
+          const nl = (vData.results || []).find(v => v.language === 'nld' || v.language === 'nl');
+          if (nl) out.dutchName = nl.vernacularName;
+        }
+      }catch(e){ /* geen Nederlandse naam gevonden, geen probleem — Engelse naam blijft bruikbaar */ }
+    }
+    return out;
+  }catch(e){ return null; }
+}
+// Tweede bron voor naam-vertaling: iNaturalist se eigen taxonomie-zoekfunctie (gratis, geen sleutel).
+// Andere index dan GBIF — soms vindt de ene een Nederlandse naam waar de andere niets teruggeeft.
+async function lookupINaturalistTaxon(query){
+  try{
+    const res = await fetch(`https://api.inaturalist.org/v1/taxa?q=${encodeURIComponent(query)}&locale=nl&per_page=1`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    const hit = data.results && data.results[0];
+    if (!hit) return null;
+    return { sciName: hit.name || null, dutchName: hit.preferred_common_name || null, family: null };
+  }catch(e){ return null; }
+}
+// Combineert beide bronnen: GBIF eerst (geeft er ook meteen de familie bij), bij een onvolledig
+// resultaat (geen Nederlandse naam) wordt iNaturalist als aanvulling geraadpleegd.
+async function resolveSpeciesName(query){
+  const gbif = await lookupGbifSpecies(query);
+  if (gbif && gbif.sciName && gbif.dutchName) return gbif;
+  const inat = await lookupINaturalistTaxon(query);
+  if (!gbif) return inat;
+  if (!inat) return gbif;
+  return { sciName: gbif.sciName || inat.sciName, dutchName: gbif.dutchName || inat.dutchName, family: gbif.family || inat.family };
+}
+// Lokale beeldclassificatie (MobileNet) als losse, herbruikbare stap — gebruikt door zowel de
+// dieren-scanner als de plant-scanner-terugval hieronder.
+async function classifyPhotoLocally(file){
+  try{ await loadAnimalScannerLibs(); } catch(e){ return null; }
+  try{
+    const model = await getMobilenetModel();
+    const img = await fileToImageElement(file);
+    const predictions = await model.classify(img);
+    URL.revokeObjectURL(img.src);
+    if (!predictions || !predictions.length) return null;
+    const top = predictions[0];
+    return { mobileLabel: top.className.split(',')[0].trim(), pct: Math.round(top.probability * 100) };
+  }catch(e){ return null; }
+}
+async function identifyAnimalPhoto(file){
+  const local = await classifyPhotoLocally(file);
+  if (!local) return { ok:false, reason:'classify-failed' };
+  const resolved = await resolveSpeciesName(local.mobileLabel);
+  return {
+    ok:true, mobileLabel:local.mobileLabel, pct:local.pct,
+    sciName: resolved ? resolved.sciName : null,
+    dutchName: resolved ? resolved.dutchName : null,
+    family: resolved ? resolved.family : null
+  };
+}
+function animalScannerErrorMessage(reason){
+  const en = curLang()==='en';
+  switch(reason){
+    case 'lib-load-failed': return en ? 'Could not load the recognition model — check your connection.' : 'Kon het herkenningsmodel niet laden — controleer je verbinding.';
+    case 'no-match': return en ? 'Nothing recognizable found in this photo.' : 'Niets herkenbaars gevonden op deze foto.';
+    default: return en ? 'Recognition failed — try again.' : 'Herkenning mislukt — probeer opnieuw.';
   }
 }
 // ---------- Rustpunten (bankjes, terrassen, picknicktafels) via gratis OSM Overpass API ----------
@@ -12896,25 +13592,87 @@ function renderRestPointsHtml(points){
     <div style="color:var(--amber); font-size:11px; font-weight:700; flex-shrink:0;">${p.distanceM} m</div>
   </div>`).join('');
 }
+// ---------- Natuurspotter: recente echte waarnemingen via de gratis, publieke iNaturalist API ----------
+const ICONIC_TAXON_EMOJI = {
+  Aves:'🐦', Mammalia:'🦌', Reptilia:'🦎', Amphibia:'🐸', Insecta:'🦋', Arachnida:'🕷️',
+  Mollusca:'🐌', Plantae:'🌿', Fungi:'🍄', Actinopterygii:'🐟', Animalia:'🐾'
+};
+async function findNearbyObservations(){
+  if (!navigator.geolocation) return { ok:false, reason:'no-geo' };
+  const pos = await new Promise((resolve) => {
+    navigator.geolocation.getCurrentPosition(p => resolve(p), () => resolve(null), { timeout:10000 });
+  });
+  if (!pos) return { ok:false, reason:'no-location' };
+  const lat = pos.coords.latitude, lon = pos.coords.longitude;
+  try{
+    const url = `https://api.inaturalist.org/v1/observations?lat=${lat}&lng=${lon}&radius=5&per_page=12&order_by=observed_on&order=desc&photos=true&locale=nl`;
+    const res = await fetch(url);
+    if (!res.ok) return { ok:false, reason:'http-error' };
+    const data = await res.json();
+    const items = (data.results || []).map(o => ({
+      commonName: o.taxon ? (o.taxon.preferred_common_name || o.taxon.name) : (curLang()==='en' ? 'Unknown species' : 'Onbekende soort'),
+      sciName: o.taxon ? o.taxon.name : '',
+      emoji: (o.taxon && ICONIC_TAXON_EMOJI[o.taxon.iconic_taxon_name]) || '🔎',
+      photoUrl: (o.photos && o.photos[0]) ? o.photos[0].url.replace('square', 'small') : null,
+      observedOn: o.observed_on || null,
+      placeGuess: o.place_guess || null
+    })).filter(i => i.sciName);
+    if (!items.length) return { ok:false, reason:'no-results' };
+    return { ok:true, items };
+  } catch(err){
+    return { ok:false, reason:'network' };
+  }
+}
+function observationsErrorMessage(reason){
+  const en = curLang()==='en';
+  switch(reason){
+    case 'no-geo': return en ? 'No GPS available on this device.' : 'Geen GPS beschikbaar op dit toestel.';
+    case 'no-location': return en ? 'Location access denied.' : 'Locatietoegang geweigerd.';
+    case 'no-results': return en ? 'No recent sightings found within 5 km.' : 'Geen recente waarnemingen gevonden binnen 5 km.';
+    default: return en ? 'Could not fetch sightings — check your connection.' : 'Kon waarnemingen niet ophalen — controleer je verbinding.';
+  }
+}
+function renderObservationsHtml(items){
+  return items.map((o,i) => `<div class="obs-row" data-idx="${i}" style="display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.06); cursor:pointer;">
+    ${o.photoUrl
+      ? `<img src="${o.photoUrl}" style="width:40px; height:40px; border-radius:10px; object-fit:cover; flex-shrink:0;" loading="lazy">`
+      : `<span style="font-size:22px; flex-shrink:0; width:40px; text-align:center;">${o.emoji}</span>`}
+    <div style="flex:1; min-width:0;">
+      <div style="color:var(--cream); font-size:12.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${o.emoji} ${o.commonName}</div>
+      <div style="color:rgba(246,244,238,0.55); font-size:10.5px; font-style:italic; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${o.sciName}</div>
+    </div>
+    <span style="color:var(--amber); font-size:14px; flex-shrink:0;">📖</span>
+  </div>`).join('') + `<div style="color:rgba(246,244,238,0.4); font-size:9.5px; margin-top:8px; text-align:center;">Data: iNaturalist.org (CC BY-NC) — tik op een soort voor meer info</div>`;
+}
 async function identifyPlantPhoto(file){
   const resultEl = $('natureIdResult');
   resultEl.style.display = 'block';
   resultEl.innerHTML = `<div style="color:var(--cream); font-size:12.5px;">${curLang()==='en' ? 'Identifying…' : 'Bezig met herkennen…'}</div>`;
-  const r = await plantNetIdentifyCore(file);
+  const r = await identifyPlantWithFallback(file);
   if (!r.ok){
     const color = r.reason === 'no-key' || r.reason === 'no-match' ? 'var(--cream)' : '#ff8a8a';
     resultEl.innerHTML = `<div style="color:${color}; font-size:12.5px; line-height:1.5;">${plantNetErrorMessage(r.reason)}</div>`;
     return;
   }
+  const displayName = r.source === 'plantnet' ? (r.commonName || r.sciName) : (r.dutchName || r.sciName || r.mobileLabel);
+  const sciLine = r.source === 'plantnet' ? r.sciName : (r.sciName || null);
+  const fallbackNote = r.source === 'fallback'
+    ? `<div style="color:rgba(246,244,238,0.5); font-size:10.5px; margin-top:2px;">${curLang()==='en' ? '(via local recognition — Pl@ntNet unavailable)' : '(via lokale herkenning — Pl@ntNet niet beschikbaar)'}</div>`
+    : '';
   resultEl.innerHTML = `
     <div style="display:flex; align-items:center; gap:10px; margin-bottom:4px;">
       <span style="font-size:22px;">🌿</span>
       <div>
-        <div style="color:var(--cream); font-weight:800; font-size:14.5px;">${r.commonName || r.sciName}</div>
-        <div style="color:rgba(246,244,238,0.65); font-size:11.5px; font-style:italic;">${r.sciName}</div>
+        <div style="color:var(--cream); font-weight:800; font-size:14.5px;">${displayName}</div>
+        ${sciLine ? `<div style="color:rgba(246,244,238,0.65); font-size:11.5px; font-style:italic;">${sciLine}</div>` : ''}
+        ${fallbackNote}
       </div>
     </div>
-    <div style="color:var(--amber); font-size:11px; font-weight:700;">${r.pct}% ${curLang()==='en' ? 'match' : 'zekerheid'}</div>`;
+    <div style="display:flex; align-items:center; justify-content:space-between;">
+      <span style="color:var(--amber); font-size:11px; font-weight:700;">${r.pct}% ${curLang()==='en' ? 'match' : 'zekerheid'}</span>
+      <button id="natureIdWikiBtn" type="button" style="border:none; background:none; color:var(--amber); font-size:11px; font-weight:700; text-decoration:underline; cursor:pointer;">📖 ${curLang()==='en' ? 'More info' : 'Meer info'}</button>
+    </div>`;
+  $('natureIdWikiBtn').addEventListener('click', () => openWikiInfoModal(sciLine || r.mobileLabel, displayName));
 }
 document.querySelectorAll('.bike-type-tile').forEach(tile => {
   tile.addEventListener('click', () => {
@@ -13438,7 +14196,7 @@ async function loadAnalyseTab(tabName){
   $('analysePlaceholder').style.display = 'flex';
 }
 $('modeWandelBtn').addEventListener('click', () => openBikeSetupScreen('wandel'));
-$('modeHardloopBtn').addEventListener('click', () => toast(curLang()==='en' ? 'Running mode is coming soon.' : 'Hardlopen komt binnenkort — nog in opbouw.', 3000));
+$('modeHardloopBtn').addEventListener('click', () => openRunCoachScreen());
 $('modeWeatherBtn').addEventListener('click', () => {
   selectMode(appMode || 'fiets');
   setTimeout(() => setActiveTab('weather'), 50);
