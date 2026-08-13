@@ -815,6 +815,31 @@
     box-shadow:0 6px 18px rgba(226,161,60,0.3);
   }
   #runCoachStartBtn:active{ filter:brightness(0.92); }
+
+  #runSessionScreen{
+    position:fixed; top:0;left:0;right:0;bottom:0; z-index:3200; background:#0b0f0a;
+    display:flex; flex-direction:column; align-items:center; justify-content:space-between;
+    padding:calc(28px + env(safe-area-inset-top,0px) + var(--extra-top-inset)) 24px calc(28px + env(safe-area-inset-bottom,0px) + var(--extra-bottom-inset));
+    color:var(--cream); text-align:center;
+  }
+  #runSessionScreen.hidden{ display:none; }
+  #rsIntervalLabel{ font-size:15px; font-weight:800; letter-spacing:0.6px; text-transform:uppercase; }
+  #rsIntervalLabel.type-run{ color:#4ade80; }
+  #rsIntervalLabel.type-walk{ color:#60a5fa; }
+  #rsIntervalLabel.type-warmup, #rsIntervalLabel.type-cooldown{ color:var(--amber); }
+  #rsCountdown{ font-size:76px; font-weight:900; line-height:1; margin:14px 0 6px; font-variant-numeric:tabular-nums; }
+  #rsNextLabel{ color:rgba(246,244,238,0.55); font-size:12.5px; }
+  #rsStatsRow{ display:flex; justify-content:center; gap:28px; margin:22px 0; }
+  .rs-stat{ display:flex; flex-direction:column; align-items:center; }
+  .rs-stat b{ font-size:20px; font-weight:900; }
+  .rs-stat span{ font-size:10.5px; color:rgba(246,244,238,0.55); text-transform:uppercase; letter-spacing:0.4px; margin-top:2px; }
+  #rsControls{ display:flex; gap:12px; width:100%; max-width:340px; }
+  #rsControls button{
+    flex:1; border:none; border-radius:16px; padding:15px; font-weight:800; font-size:13.5px;
+  }
+  #rsPauseBtn{ background:var(--amber); color:var(--green-900); }
+  #rsStopBtn{ background:rgba(255,255,255,0.08); color:var(--cream); border:1.5px solid rgba(255,255,255,0.15) !important; }
+  #rsGpsWarning{ color:#ff8a8a; font-size:11px; margin-top:10px; display:none; }
   #bikeSetupBackBtn{
     position:absolute; left:16px; top:calc(16px + env(safe-area-inset-top,0px) + var(--extra-top-inset));
     border:2px solid var(--amber); background:rgba(226,161,60,0.16); color:var(--amber);
@@ -1797,6 +1822,9 @@
 
       <div class="settings-subnote" style="margin-top:14px;"><span data-i18n="settingsPlantnetSub">Pl@ntNet — voor plantherkenning via foto op het Wandelen-opzetscherm. Gratis account op my.plantnet.org (500 identificaties/dag inbegrepen).</span></div>
       <input type="text" id="plantnetKeyInput" placeholder="Jouw gratis Pl@ntNet API-sleutel…" data-i18n-placeholder="phPlantnetKey" class="settings-text-input">
+
+      <div class="settings-subnote" style="margin-top:14px;"><span data-i18n="settingsGeminiSub">Gemini — laatste terugval voor plant-/dierherkenning als de andere bronnen niets vinden. Gratis sleutel via aistudio.google.com (geen creditcard nodig).</span></div>
+      <input type="text" id="geminiKeyInput" placeholder="Jouw gratis Gemini API-sleutel…" data-i18n-placeholder="phGeminiKey" class="settings-text-input">
     </div>
 
     <div class="settings-section">
@@ -1984,6 +2012,26 @@
       <select id="runCoachVoiceSelect"><option value="">Standaardstem van je toestel</option></select>
     </div>
     <button id="runCoachStartBtn">▶ Start training</button>
+  </div>
+</div>
+
+<div id="runSessionScreen" class="hidden">
+  <div>
+    <div id="rsIntervalLabel">–</div>
+    <div id="rsCountdown">0:00</div>
+    <div id="rsNextLabel">–</div>
+  </div>
+  <div id="rsStatsRow">
+    <div class="rs-stat"><b id="rsDistance">0.00</b><span>km</span></div>
+    <div class="rs-stat"><b id="rsElapsed">0:00</b><span>tijd</span></div>
+    <div class="rs-stat"><b id="rsPace">–:–</b><span>min/km</span></div>
+  </div>
+  <div>
+    <div id="rsControls">
+      <button id="rsPauseBtn">⏸ Pauze</button>
+      <button id="rsStopBtn">■ Stop</button>
+    </div>
+    <div id="rsGpsWarning">📍 Geen goede GPS-fix — afstand kan onnauwkeurig zijn.</div>
   </div>
 </div>
 
@@ -4514,7 +4562,7 @@ async function runOfflineDiagnostics(){
 // ---------- Instellingen: thema, kompasknop, wegtype-voorkeuren ----------
 const SETTINGS_KEY = 'app_settings_v1';
 let appSettings = {
-  theme:'default', showCompassBtn:true, orsKey:'', graphhopperKey:'', geoapifyKey:'', plantnetKey:'', bikeType:'regular', mapStyle:'standard', thunderforestKey:'',
+  theme:'default', showCompassBtn:true, orsKey:'', graphhopperKey:'', geoapifyKey:'', plantnetKey:'', geminiKey:'', bikeType:'regular', mapStyle:'standard', thunderforestKey:'',
   dashTextSize:'normal', dashBold:true, largeNodesAccessibility:false, offRouteDist:35, autoReroute:false, silentReroute:false,
   overlays:{ cycling:false, hiking:false, mtb:false },
   poiLayers:{ cafe:false, restaurant:false, bakery:false, supermarket:false, pharmacy:false, bike:false, water:false, toilet:false, money:false, camping:false, charging:false, playground:false, parking:false, hotel:false }, showPoiDetails:false,
@@ -4864,6 +4912,8 @@ const TRANSLATIONS = {
   phGeoapifyKey: { nl:'Jouw gratis Geoapify API-sleutel…', en:'Your free Geoapify API key…' },
   settingsPlantnetSub: { nl:'Pl@ntNet — voor plantherkenning via foto op het Wandelen-opzetscherm. Gratis account op my.plantnet.org (500 identificaties/dag inbegrepen).', en:'Pl@ntNet — for photo-based plant identification on the Walking setup screen. Free account at my.plantnet.org (500 identifications/day included).' },
   phPlantnetKey: { nl:'Jouw gratis Pl@ntNet API-sleutel…', en:'Your free Pl@ntNet API key…' },
+  settingsGeminiSub: { nl:'Gemini — laatste terugval voor plant-/dierherkenning als de andere bronnen niets vinden. Gratis sleutel via aistudio.google.com (geen creditcard nodig).', en:'Gemini — last-resort fallback for plant/animal identification when other sources find nothing. Free key via aistudio.google.com (no credit card needed).' },
+  phGeminiKey: { nl:'Jouw gratis Gemini API-sleutel…', en:'Your free Gemini API key…' },
   natureIdTitle: { nl:'🌿 Plant herkennen', en:'🌿 Identify plant' },
   natureIdTileTitle: { nl:'Neem een foto van een plant', en:'Take a photo of a plant' },
   natureIdTileSub: { nl:'Herkenning via Pl@ntNet — werkt het best met een duidelijke blad- of bloemfoto.', en:'Identification via Pl@ntNet — works best with a clear leaf or flower photo.' },
@@ -5642,9 +5692,152 @@ function populateRunVoiceSelect(){
   sel.onchange = () => localStorage.setItem(RUN_VOICE_KEY, sel.value);
 }
 $('runCoachBackBtn').addEventListener('click', closeRunCoachScreen);
-$('runCoachStartBtn').addEventListener('click', () => {
-  toast(curLang()==='en' ? 'The live training screen is coming in the next step.' : 'Het live trainingsscherm volgt in de volgende bouwstap.', 3500);
+$('runCoachStartBtn').addEventListener('click', () => startRunSession());
+
+// ---------- Live trainingssessie: intervaltimer + GPS-afstand/tempo + gesproken aankondigingen ----------
+const RUN_INTERVAL_LABELS = {
+  warmup:  { nl:'Opwarmen — stevig wandelen', en:'Warm-up — brisk walk' },
+  run:     { nl:'Lopen', en:'Running' },
+  walk:    { nl:'Wandelen', en:'Walking' },
+  cooldown:{ nl:'Cooldown — rustig wandelen', en:'Cool-down — easy walk' }
+};
+const RUN_START_ANNOUNCE = {
+  warmup:  { nl:'Warming-up. Begin met stevig wandelen.', en:'Warm-up. Start with a brisk walk.' },
+  run:     { nl:'Start met lopen.', en:'Start running.' },
+  walk:    { nl:'Nu wandelen.', en:'Now walk.' },
+  cooldown:{ nl:'Cooldown. Wandel rustig uit.', en:'Cool-down. Walk it out easily.' }
+};
+let rsState = null; // { intervals, idx, remainingSec, tickId, watchId, distanceM, startedAt, pausedMs, pauseStartedAt, lastPos, paused }
+
+function speakForRun(text){
+  if (!('speechSynthesis' in window)) return;
+  try{
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(stripEmojiForSpeech(text));
+    u.lang = curLang()==='en' ? 'en-GB' : 'nl-BE';
+    const uri = localStorage.getItem(RUN_VOICE_KEY) || '';
+    if (uri){
+      const v = window.speechSynthesis.getVoices().find(v => v.voiceURI === uri);
+      if (v) u.voice = v;
+    }
+    if (window.speechSynthesis.getVoices().length === 0){
+      window.speechSynthesis.addEventListener('voiceschanged', () => window.speechSynthesis.speak(u), { once:true });
+    }
+    window.speechSynthesis.speak(u);
+  }catch(e){ /* spraaksynthese niet beschikbaar, negeer */ }
+}
+function fmtMMSS(totalSec){
+  const s = Math.max(0, Math.round(totalSec));
+  return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0');
+}
+async function startRunSession(){
+  const p = await getRunProgress();
+  const w = getRunWeekData(p.week);
+  const intervals = w.build();
+  rsState = {
+    intervals, idx:0, remainingSec: intervals[0].sec,
+    tickId:null, watchId:null, distanceM:0, startedAt:Date.now(), pausedMs:0, pauseStartedAt:null,
+    lastPos:null, paused:false, week:p.week, day:p.day
+  };
+  $('runCoachScreen').classList.add('hidden');
+  $('runSessionScreen').classList.remove('hidden');
+  $('rsGpsWarning').style.display = 'none';
+  updateRunSessionUI();
+  speakForRun(curLang()==='en' ? RUN_START_ANNOUNCE[intervals[0].type].en : RUN_START_ANNOUNCE[intervals[0].type].nl);
+  rsState.tickId = setInterval(tickRunSession, 1000);
+  if (navigator.geolocation){
+    rsState.watchId = navigator.geolocation.watchPosition(handleRunGpsUpdate, () => {
+      $('rsGpsWarning').style.display = 'block';
+    }, { enableHighAccuracy:true, maximumAge:1000, timeout:10000 });
+  } else {
+    $('rsGpsWarning').style.display = 'block';
+  }
+}
+function handleRunGpsUpdate(pos){
+  $('rsGpsWarning').style.display = 'none';
+  if (rsState.paused){ rsState.lastPos = pos; return; }
+  if (rsState.lastPos && pos.coords.accuracy < 30){
+    const d = haversine(rsState.lastPos.coords.latitude, rsState.lastPos.coords.longitude, pos.coords.latitude, pos.coords.longitude);
+    // GPS-jitter filteren: een "sprong" van meer dan 30m in minder dan 2s is vrijwel zeker ruis, geen echte beweging.
+    const dt = (pos.timestamp - rsState.lastPos.timestamp) / 1000;
+    if (!(d > 30 && dt < 2)) rsState.distanceM += d;
+  }
+  rsState.lastPos = pos;
+  updateRunSessionUI();
+}
+function tickRunSession(){
+  if (!rsState || rsState.paused) return;
+  rsState.remainingSec -= 1;
+  if (rsState.remainingSec <= 0){
+    rsState.idx += 1;
+    if (rsState.idx >= rsState.intervals.length){ finishRunSession(true); return; }
+    rsState.remainingSec = rsState.intervals[rsState.idx].sec;
+    const type = rsState.intervals[rsState.idx].type;
+    speakForRun(curLang()==='en' ? RUN_START_ANNOUNCE[type].en : RUN_START_ANNOUNCE[type].nl);
+  } else if (rsState.remainingSec === 10){
+    speakForRun(curLang()==='en' ? 'Ten seconds left.' : 'Nog tien seconden.');
+  }
+  updateRunSessionUI();
+}
+function updateRunSessionUI(){
+  if (!rsState) return;
+  const cur = rsState.intervals[rsState.idx];
+  const en = curLang()==='en';
+  const label = $('rsIntervalLabel');
+  label.textContent = en ? RUN_INTERVAL_LABELS[cur.type].en : RUN_INTERVAL_LABELS[cur.type].nl;
+  label.className = 'type-' + cur.type;
+  $('rsCountdown').textContent = fmtMMSS(rsState.remainingSec);
+  const next = rsState.intervals[rsState.idx + 1];
+  $('rsNextLabel').textContent = next
+    ? (en ? 'Next: ' : 'Volgende: ') + (en ? RUN_INTERVAL_LABELS[next.type].en : RUN_INTERVAL_LABELS[next.type].nl)
+    : (en ? 'Last interval' : 'Laatste interval');
+  const km = rsState.distanceM / 1000;
+  $('rsDistance').textContent = km.toFixed(2);
+  const elapsedSec = (Date.now() - rsState.startedAt - rsState.pausedMs) / 1000;
+  $('rsElapsed').textContent = fmtMMSS(elapsedSec);
+  const runningMinutes = elapsedSec / 60;
+  $('rsPace').textContent = (km > 0.05 && runningMinutes > 0) ? fmtMMSS((runningMinutes / km) * 60) : '–:–';
+}
+$('rsPauseBtn').addEventListener('click', () => {
+  if (!rsState) return;
+  rsState.paused = !rsState.paused;
+  if (rsState.paused){
+    rsState.pauseStartedAt = Date.now();
+    $('rsPauseBtn').textContent = curLang()==='en' ? '▶ Resume' : '▶ Hervat';
+    speakForRun(curLang()==='en' ? 'Paused.' : 'Gepauzeerd.');
+  } else {
+    rsState.pausedMs += Date.now() - rsState.pauseStartedAt;
+    $('rsPauseBtn').textContent = curLang()==='en' ? '⏸ Pause' : '⏸ Pauze';
+    speakForRun(curLang()==='en' ? 'Resumed.' : 'Hervat.');
+  }
 });
+$('rsStopBtn').addEventListener('click', () => {
+  if (confirm(curLang()==='en' ? 'Stop this training session?' : 'Deze training stoppen?')) finishRunSession(false);
+});
+async function finishRunSession(completed){
+  if (!rsState) return;
+  clearInterval(rsState.tickId);
+  if (rsState.watchId != null) navigator.geolocation.clearWatch(rsState.watchId);
+  const elapsedSec = (Date.now() - rsState.startedAt - rsState.pausedMs) / 1000;
+  const km = rsState.distanceM / 1000;
+  if (completed){
+    speakForRun(curLang()==='en' ? 'Training complete. Well done!' : 'Training afgerond. Goed gedaan!');
+    await advanceRunProgress();
+  }
+  try{
+    const history = await storageGet('run_history').then(v => v ? JSON.parse(v) : []).catch(() => []);
+    history.unshift({ date:new Date().toISOString(), week:rsState.week, day:rsState.day, km:Math.round(km*100)/100, durationSec:Math.round(elapsedSec), completed });
+    await storageSet('run_history', JSON.stringify(history.slice(0, 200)));
+  }catch(e){ /* geschiedenis opslaan mislukt, sessie zelf blijft wel gewoon geldig afgerond */ }
+  const summaryMsg = (curLang()==='en'
+    ? `Session ${completed ? 'completed' : 'stopped'}: ${km.toFixed(2)} km in ${fmtMMSS(elapsedSec)}.`
+    : `Sessie ${completed ? 'afgerond' : 'gestopt'}: ${km.toFixed(2)} km in ${fmtMMSS(elapsedSec)}.`);
+  rsState = null;
+  $('runSessionScreen').classList.add('hidden');
+  $('runCoachScreen').classList.remove('hidden');
+  await renderRunCoachScreen();
+  toast(summaryMsg, 4000);
+}
 
 // ---------- Garmin-stijl Kompas (letterlijk Gemini's Compas.html) ----------
 let garminKompasFrameLoaded = false;
@@ -5768,6 +5961,7 @@ window.addEventListener('message', (ev) => {
     case 'identifyplant': garminIdentifyPlant(data.file); break;
     case 'identifyanimal': garminIdentifyAnimal(data.file); break;
     case 'findrestpoints': garminFindRestPoints(); break;
+    case 'showrestpoint': showRestPointOnMap(data.point); break;
     case 'findobservations': garminFindObservations(); break;
     case 'openwiki': openWikiInfoModal(data.sciName, data.commonName); break;
   }
@@ -5777,7 +5971,10 @@ async function garminIdentifyAnimal(file){
   const post = (payload) => { if (frame && frame.contentWindow) frame.contentWindow.postMessage(Object.assign({ source:'garminAnimalResult' }, payload), '*'); };
   const r = await identifyAnimalPhoto(file);
   if (!r.ok){ post({ status:'error', message: animalScannerErrorMessage(r.reason) }); return; }
-  post({ status:'ok', mobileLabel:r.mobileLabel, pct:r.pct, sciName:r.sciName, dutchName:r.dutchName, family:r.family });
+  post({
+    status:'ok', mobileLabel:r.mobileLabel, pct:r.pct, sciName:r.sciName, dutchName:r.dutchName, family:r.family,
+    sourceNote: r.source === 'gemini' ? (curLang()==='en' ? '(via Gemini)' : '(via Gemini)') : null
+  });
 }
 async function garminFindObservations(){
   const frame = $('garminSetupFrame');
@@ -5803,7 +6000,7 @@ async function garminIdentifyPlant(file){
   post({
     status:'ok', source:r.source, commonName:displayName, sciName:r.sciName || null, pct:r.pct,
     matchLabel: curLang()==='en' ? 'match' : 'zekerheid',
-    fallbackNote: r.source === 'fallback' ? (curLang()==='en' ? '(via local recognition)' : '(via lokale herkenning)') : null
+    fallbackNote: r.source === 'fallback' ? (curLang()==='en' ? '(via local recognition)' : '(via lokale herkenning)') : (r.source === 'gemini' ? '(via Gemini)' : null)
   });
 }
 
@@ -5865,7 +6062,7 @@ window.addEventListener('message', (ev) => {
   if (!data || data.source !== 'garminRunCoach') return;
   switch (data.action){
     case 'back':        closeGarminRunCoachScreen(); break;
-    case 'starttraining': toast(curLang()==='en' ? 'The live training screen is coming in the next step.' : 'Het live trainingsscherm volgt in de volgende bouwstap.', 3500); break;
+    case 'starttraining': $('garminRunCoachScreen').classList.add('hidden'); startRunSession(); break;
     case 'setvoice':     localStorage.setItem(RUN_VOICE_KEY, data.uri || ''); break;
     case 'other-not-built': toast(curLang()==='en' ? 'Not built yet — coming later.' : 'Nog niet gebouwd — komt later.', 2500); break;
   }
@@ -6034,6 +6231,7 @@ ${GARMIN_MENU_BTN_JS}
           '<div class="flex items-center gap-2 mb-1"><span class="text-xl">🐾</span><div>' +
           '<div class="text-sm font-bold text-white">' + displayName + '</div>' +
           (d.sciName ? '<div class="text-[11px] text-slate-400 italic">' + d.sciName + (d.family ? ' · ' + d.family : '') + '</div>' : '<div class="text-[10px] text-slate-500">(gok van het model)</div>') +
+          (d.sourceNote ? '<div class="text-[10px] text-slate-500 mt-0.5">' + d.sourceNote + '</div>' : '') +
           '</div></div>' +
           '<div class="flex items-center justify-between">' +
           '<span class="text-[11px] font-bold text-rose-400">' + d.pct + '% zekerheid</span>' +
@@ -6098,13 +6296,19 @@ ${GARMIN_MENU_BTN_JS}
         if (d.status === 'error'){
           resultEl.innerHTML = '<div class="text-xs text-slate-300 py-1">' + d.message + '</div>';
         } else if (d.status === 'ok'){
-          resultEl.innerHTML = d.points.map(p =>
-            '<div class="flex items-center gap-2 py-1.5 border-b border-slate-800/60">' +
+          resultEl.innerHTML = d.points.map((p,i) =>
+            '<div class="rest-row-g flex items-center gap-2 py-1.5 border-b border-slate-800/60 cursor-pointer" data-idx="' + i + '">' +
             '<span class="text-base">' + p.emoji + '</span>' +
             '<div class="flex-1 min-w-0"><div class="text-xs font-bold text-white truncate">' + p.name + '</div>' +
             '<div class="text-[10px] text-slate-500">' + p.typeLabel + '</div></div>' +
-            '<div class="text-[11px] font-bold text-sky-400 flex-shrink-0">' + p.distanceM + ' m</div></div>'
+            '<div class="text-[11px] font-bold text-sky-400 flex-shrink-0 text-right">' + p.distanceM + ' m<br><span class="font-normal underline">bekijk</span></div></div>'
           ).join('');
+          resultEl.querySelectorAll('.rest-row-g').forEach(row => {
+            const point = d.points[Number(row.dataset.idx)];
+            row.addEventListener('click', () => {
+              parent.postMessage({ source:'garminSetup', action:'showrestpoint', point }, '*');
+            });
+          });
         }
       }
     });
@@ -7254,6 +7458,7 @@ async function loadSettings(){
   $('orsKeyInput').value = appSettings.orsKey || '';
   $('geoapifyKeyInput').value = appSettings.geoapifyKey || '';
   $('plantnetKeyInput').value = appSettings.plantnetKey || '';
+  $('geminiKeyInput').value = appSettings.geminiKey || '';
   $('graphhopperKeyInput').value = appSettings.graphhopperKey || '';
   $('bundledBE').checked = !!appSettings.bundledCountries.be;
   $('bundledNL').checked = !!appSettings.bundledCountries.nl;
@@ -7283,6 +7488,7 @@ $('thunderforestKeyInput').addEventListener('change', (e) => { appSettings.thund
 $('orsKeyInput').addEventListener('change', (e) => { appSettings.orsKey = e.target.value.trim(); saveSettings(); rerouteCurrentRouteIfAny(); });
 $('geoapifyKeyInput').addEventListener('change', (e) => { appSettings.geoapifyKey = e.target.value.trim(); saveSettings(); });
 $('plantnetKeyInput').addEventListener('change', (e) => { appSettings.plantnetKey = e.target.value.trim(); saveSettings(); });
+$('geminiKeyInput').addEventListener('change', (e) => { appSettings.geminiKey = e.target.value.trim(); saveSettings(); });
 $('graphhopperKeyInput').addEventListener('change', (e) => { appSettings.graphhopperKey = e.target.value.trim(); saveSettings(); rerouteCurrentRouteIfAny(); });
 document.querySelectorAll('input[name="language"]').forEach(radio => {
   radio.addEventListener('change', () => { appSettings.language = radio.value; saveSettings(); });
@@ -7599,7 +7805,7 @@ $('overlayMtb').addEventListener('change', (e) => { appSettings.overlays.mtb = e
 });
 $('settingsResetBtn').addEventListener('click', () => {
   appSettings = {
-    theme:'default', showCompassBtn:true, orsKey:'', graphhopperKey:'', geoapifyKey:'', plantnetKey:'', bikeType:'regular', mapStyle:'standard', thunderforestKey:'',
+    theme:'default', showCompassBtn:true, orsKey:'', graphhopperKey:'', geoapifyKey:'', plantnetKey:'', geminiKey:'', bikeType:'regular', mapStyle:'standard', thunderforestKey:'',
     dashTextSize:'normal', dashBold:true, largeNodesAccessibility:false, offRouteDist:35, autoReroute:false, silentReroute:false,
     overlays:{ cycling:false, hiking:false, mtb:false },
     poiLayers:{ cafe:false, restaurant:false, bakery:false, supermarket:false, pharmacy:false, bike:false, water:false, toilet:false, money:false, camping:false, charging:false, playground:false, parking:false, hotel:false }, showPoiDetails:false,
@@ -7658,6 +7864,7 @@ $('settingsResetBtn').addEventListener('click', () => {
   $('orsKeyInput').value = '';
   $('geoapifyKeyInput').value = '';
   $('plantnetKeyInput').value = '';
+  $('geminiKeyInput').value = '';
   $('graphhopperKeyInput').value = '';
   $('bundledBE').checked = true;
   $('bundledNL').checked = false;
@@ -13287,6 +13494,10 @@ $('restPointsBtn').addEventListener('click', async () => {
     return;
   }
   resultEl.innerHTML = renderRestPointsHtml(r.points);
+  resultEl.querySelectorAll('.rest-row').forEach(row => {
+    const point = r.points[Number(row.dataset.idx)];
+    row.addEventListener('click', () => showRestPointOnMap(point));
+  });
 });
 $('natureSpotterBtn').addEventListener('click', async () => {
   const resultEl = $('natureSpotterResult');
@@ -13315,12 +13526,16 @@ $('animalScannerInput').addEventListener('change', async (e) => {
     return;
   }
   const displayName = r.dutchName || r.sciName || r.mobileLabel;
+  const sourceNote = r.source === 'gemini'
+    ? `<div style="color:rgba(246,244,238,0.5); font-size:10.5px; margin-top:2px;">${curLang()==='en' ? '(via Gemini — other sources found nothing)' : '(via Gemini — andere bronnen vonden niets)'}</div>`
+    : '';
   resultEl.innerHTML = `
     <div style="display:flex; align-items:center; gap:10px; margin-bottom:4px;">
       <span style="font-size:22px;">🐾</span>
       <div>
         <div style="color:var(--cream); font-weight:800; font-size:14.5px;">${displayName}</div>
         ${r.sciName ? `<div style="color:rgba(246,244,238,0.65); font-size:11.5px; font-style:italic;">${r.sciName}${r.family ? ' · ' + r.family : ''}</div>` : `<div style="color:rgba(246,244,238,0.5); font-size:11px;">${curLang()==='en' ? '(model guess, not species-verified)' : '(gok van het model, geen soort-check)'}</div>`}
+        ${sourceNote}
       </div>
     </div>
     <div style="display:flex; align-items:center; justify-content:space-between;">
@@ -13330,6 +13545,17 @@ $('animalScannerInput').addEventListener('change', async (e) => {
   $('animalScannerWikiBtn').addEventListener('click', () => openWikiInfoModal(r.sciName || r.mobileLabel, r.dutchName || r.mobileLabel));
 });
 // Kernlogica (geen DOM-afhankelijkheid) — herbruikt door zowel het Standaard- als het Garmin-scherm.
+// Gedeelde timeout-wrapper — alle scanner/lookup-fetches hieronder gebruiken dit i.p.v. kale fetch(),
+// zodat een trage/haperende verbinding nooit tot een oneindig "bezig met laden…" leidt.
+async function fetchWithTimeout(url, options, timeoutMs){
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs || 12000);
+  try{
+    return await fetch(url, Object.assign({}, options, { signal: controller.signal }));
+  } finally {
+    clearTimeout(timer);
+  }
+}
 async function plantNetIdentifyCore(file){
   const key = (appSettings.plantnetKey || '').trim();
   if (!key) return { ok:false, reason:'no-key' };
@@ -13337,7 +13563,7 @@ async function plantNetIdentifyCore(file){
     const form = new FormData();
     form.append('images', file);
     form.append('organs', 'auto');
-    const res = await fetch(`https://my-api.plantnet.org/v2/identify/weurope?api-key=${encodeURIComponent(key)}`, { method:'POST', body:form });
+    const res = await fetchWithTimeout(`https://my-api.plantnet.org/v2/identify/weurope?api-key=${encodeURIComponent(key)}`, { method:'POST', body:form }, 20000); // foto-upload mag iets langer duren
     if (!res.ok){
       if (res.status === 401 || res.status === 403) return { ok:false, reason:'invalid-key' };
       if (res.status === 429) return { ok:false, reason:'rate-limit' };
@@ -13373,21 +13599,84 @@ async function identifyPlantWithFallback(file){
   const primary = await plantNetIdentifyCore(file);
   if (primary.ok) return Object.assign({ source:'plantnet' }, primary);
   const local = await classifyPhotoLocally(file);
-  if (!local) return { ok:false, source:'none', reason: primary.reason };
-  const resolved = await resolveSpeciesName(local.mobileLabel);
-  return {
-    ok:true, source:'fallback', primaryReason: primary.reason,
-    mobileLabel:local.mobileLabel, pct:local.pct,
-    sciName: resolved ? resolved.sciName : null,
-    dutchName: resolved ? resolved.dutchName : null,
-    family: resolved ? resolved.family : null
-  };
+  if (local){
+    const resolved = await resolveSpeciesName(local.mobileLabel);
+    if (resolved && (resolved.sciName || resolved.dutchName)){
+      return {
+        ok:true, source:'fallback', primaryReason: primary.reason,
+        mobileLabel:local.mobileLabel, pct:local.pct,
+        sciName: resolved.sciName, dutchName: resolved.dutchName, family: resolved.family
+      };
+    }
+  }
+  // Nog steeds niets bruikbaars — laatste terugval via Gemini (enkel als daar een sleutel voor is).
+  const gem = await identifyWithGemini(file, 'plant');
+  if (gem.ok) return { ok:true, source:'gemini', sciName:gem.sciName, dutchName:gem.dutchName, pct:gem.pct };
+  if (local) return { ok:true, source:'fallback', primaryReason: primary.reason, mobileLabel:local.mobileLabel, pct:local.pct, sciName:null, dutchName:null, family:null };
+  return { ok:false, source:'none', reason: primary.reason };
+}
+// ---------- Gemini Vision (gratis sleutel via aistudio.google.com) — laatste terugval ----------
+async function fileToBase64(file){
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(',')[1]); // enkel de base64-payload, zonder de data:-prefix
+    reader.onerror = () => reject(new Error('file-read-failed'));
+    reader.readAsDataURL(file);
+  });
+}
+async function identifyWithGemini(file, kind){
+  const key = (appSettings.geminiKey || '').trim();
+  if (!key) return { ok:false, reason:'no-key' };
+  try{
+    const base64 = await fileToBase64(file);
+    const prompt = kind === 'plant'
+      ? 'Identify the plant species in this photo. Respond with ONLY minified JSON, no markdown, no explanation: {"commonNameNL":"...", "scientificName":"...", "confidence":0-100}. If you cannot identify it, respond with {"error":"not identifiable"}.'
+      : 'Identify the animal species in this photo. Respond with ONLY minified JSON, no markdown, no explanation: {"commonNameNL":"...", "scientificName":"...", "confidence":0-100}. If you cannot identify it, respond with {"error":"not identifiable"}.';
+    const res = await fetchWithTimeout(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`,
+      {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json', 'x-goog-api-key':key },
+        body: JSON.stringify({
+          contents:[{ parts:[
+            { inline_data:{ mime_type: file.type || 'image/jpeg', data: base64 } },
+            { text: prompt }
+          ]}]
+        })
+      }, 20000
+    );
+    if (!res.ok){
+      if (res.status === 401 || res.status === 403) return { ok:false, reason:'invalid-key' };
+      if (res.status === 429) return { ok:false, reason:'rate-limit' };
+      return { ok:false, reason:'http-error' };
+    }
+    const data = await res.json();
+    const textOut = data.candidates && data.candidates[0] && data.candidates[0].content &&
+      data.candidates[0].content.parts && data.candidates[0].content.parts[0] && data.candidates[0].content.parts[0].text;
+    if (!textOut) return { ok:false, reason:'no-match' };
+    let parsed;
+    try{ parsed = JSON.parse(textOut.trim().replace(/^```json\s*|```$/g, '')); }
+    catch(e){ return { ok:false, reason:'no-match' }; }
+    if (parsed.error || !parsed.scientificName) return { ok:false, reason:'no-match' };
+    return { ok:true, dutchName: parsed.commonNameNL || null, sciName: parsed.scientificName, pct: Math.round(parsed.confidence || 60) };
+  } catch(err){
+    return { ok:false, reason:'network' };
+  }
+}
+function geminiErrorMessage(reason){
+  const en = curLang()==='en';
+  switch(reason){
+    case 'no-key': return null; // stille terugval — geen sleutel ingesteld is geen "fout", gewoon niet geconfigureerd
+    case 'invalid-key': return en ? 'Gemini key rejected — check it in Settings.' : 'Gemini-sleutel geweigerd — controleer die in Instellingen.';
+    case 'rate-limit': return en ? 'Daily Gemini limit reached.' : 'Dagelijkse Gemini-limiet bereikt.';
+    default: return null;
+  }
 }
 // ---------- Wikipedia-info (gratis, geen sleutel) — extra uitleg bij een herkende soort ----------
 async function fetchWikipediaSummary(title){
   const lang = curLang()==='en' ? 'en' : 'nl';
   try{
-    const res = await fetch(`https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`);
+    const res = await fetchWithTimeout(`https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`, {}, 10000);
     if (!res.ok) return { ok:false };
     const data = await res.json();
     if (data.type === 'disambiguation' || !data.extract) return { ok:false };
@@ -13428,18 +13717,19 @@ function loadAnimalScannerLibs(){
   if (animalScannerLibsPromise) return animalScannerLibsPromise;
   animalScannerLibsPromise = new Promise((resolve, reject) => {
     if (window.mobilenet && window.tf) { resolve(); return; }
+    const timeoutId = setTimeout(() => reject(new Error('lib-load-timeout')), 20000);
     const s1 = document.createElement('script');
     s1.src = 'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs';
     s1.onload = () => {
       const s2 = document.createElement('script');
       s2.src = 'https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet';
-      s2.onload = () => resolve();
-      s2.onerror = () => reject(new Error('mobilenet-load-failed'));
+      s2.onload = () => { clearTimeout(timeoutId); resolve(); };
+      s2.onerror = () => { clearTimeout(timeoutId); reject(new Error('mobilenet-load-failed')); };
       document.head.appendChild(s2);
     };
-    s1.onerror = () => reject(new Error('tfjs-load-failed'));
+    s1.onerror = () => { clearTimeout(timeoutId); reject(new Error('tfjs-load-failed')); };
     document.head.appendChild(s1);
-  });
+  }).catch(err => { animalScannerLibsPromise = null; throw err; }); // bij mislukking opnieuw proberen toestaan bij een volgende poging
   return animalScannerLibsPromise;
 }
 async function getMobilenetModel(){
@@ -13458,7 +13748,7 @@ async function fileToImageElement(file){
 // naam + Nederlandse naam (indien beschikbaar) + familie.
 async function lookupGbifSpecies(query){
   try{
-    const res = await fetch(`https://api.gbif.org/v1/species/search?q=${encodeURIComponent(query)}&limit=1`);
+    const res = await fetchWithTimeout(`https://api.gbif.org/v1/species/search?q=${encodeURIComponent(query)}&limit=1`, {}, 10000);
     if (!res.ok) return null;
     const data = await res.json();
     const hit = data.results && data.results[0];
@@ -13466,7 +13756,7 @@ async function lookupGbifSpecies(query){
     const out = { sciName: hit.canonicalName || hit.scientificName, family: hit.family || null, dutchName: null };
     if (hit.key){
       try{
-        const vRes = await fetch(`https://api.gbif.org/v1/species/${hit.key}/vernacularNames`);
+        const vRes = await fetchWithTimeout(`https://api.gbif.org/v1/species/${hit.key}/vernacularNames`, {}, 10000);
         if (vRes.ok){
           const vData = await vRes.json();
           const nl = (vData.results || []).find(v => v.language === 'nld' || v.language === 'nl');
@@ -13481,7 +13771,7 @@ async function lookupGbifSpecies(query){
 // Andere index dan GBIF — soms vindt de ene een Nederlandse naam waar de andere niets teruggeeft.
 async function lookupINaturalistTaxon(query){
   try{
-    const res = await fetch(`https://api.inaturalist.org/v1/taxa?q=${encodeURIComponent(query)}&locale=nl&per_page=1`);
+    const res = await fetchWithTimeout(`https://api.inaturalist.org/v1/taxa?q=${encodeURIComponent(query)}&locale=nl&per_page=1`, {}, 10000);
     if (!res.ok) return null;
     const data = await res.json();
     const hit = data.results && data.results[0];
@@ -13515,19 +13805,27 @@ async function classifyPhotoLocally(file){
 }
 async function identifyAnimalPhoto(file){
   const local = await classifyPhotoLocally(file);
-  if (!local) return { ok:false, reason:'classify-failed' };
-  const resolved = await resolveSpeciesName(local.mobileLabel);
-  return {
-    ok:true, mobileLabel:local.mobileLabel, pct:local.pct,
-    sciName: resolved ? resolved.sciName : null,
-    dutchName: resolved ? resolved.dutchName : null,
-    family: resolved ? resolved.family : null
-  };
+  if (local){
+    const resolved = await resolveSpeciesName(local.mobileLabel);
+    if (resolved && (resolved.sciName || resolved.dutchName)){
+      return {
+        ok:true, source:'mobilenet', mobileLabel:local.mobileLabel, pct:local.pct,
+        sciName: resolved.sciName, dutchName: resolved.dutchName, family: resolved.family
+      };
+    }
+  }
+  // GBIF/iNaturalist konden de MobileNet-gok niet naar een echte soort vertalen — laatste terugval
+  // via Gemini (enkel als daar een sleutel voor is), die rechtstreeks vanuit de foto herkent.
+  const gem = await identifyWithGemini(file, 'animal');
+  if (gem.ok) return { ok:true, source:'gemini', mobileLabel: local ? local.mobileLabel : null, sciName:gem.sciName, dutchName:gem.dutchName, pct:gem.pct, family:null };
+  if (local) return { ok:true, source:'mobilenet', mobileLabel:local.mobileLabel, pct:local.pct, sciName:null, dutchName:null, family:null };
+  return { ok:false, reason:'classify-failed' };
 }
 function animalScannerErrorMessage(reason){
   const en = curLang()==='en';
   switch(reason){
     case 'lib-load-failed': return en ? 'Could not load the recognition model — check your connection.' : 'Kon het herkenningsmodel niet laden — controleer je verbinding.';
+    case 'lib-load-timeout': return en ? 'Loading the recognition model took too long — check your connection and try again.' : 'Het laden van het herkenningsmodel duurde te lang — controleer je verbinding en probeer opnieuw.';
     case 'no-match': return en ? 'Nothing recognizable found in this photo.' : 'Niets herkenbaars gevonden op deze foto.';
     default: return en ? 'Recognition failed — try again.' : 'Herkenning mislukt — probeer opnieuw.';
   }
@@ -13557,7 +13855,7 @@ async function findNearbyRestPoints(){
     node["amenity"="drinking_water"](around:900,${lat},${lon});
   );out body 40;`;
   try{
-    const res = await fetch('https://overpass-api.de/api/interpreter', { method:'POST', body:'data=' + encodeURIComponent(query) });
+    const res = await fetchWithTimeout('https://overpass-api.de/api/interpreter', { method:'POST', body:'data=' + encodeURIComponent(query) }, 15000);
     if (!res.ok) return { ok:false, reason:'http-error' };
     const data = await res.json();
     const points = (data.elements || []).map(el => {
@@ -13565,7 +13863,7 @@ async function findNearbyRestPoints(){
       const meta = REST_POINT_TYPES[type] || { emoji:'📍', nl:type, en:type };
       const distanceM = Math.round(haversine(lat, lon, el.lat, el.lon));
       const name = el.tags.name || (curLang()==='en' ? meta.en : meta.nl);
-      return { name, type, emoji:meta.emoji, typeLabel: curLang()==='en' ? meta.en : meta.nl, distanceM };
+      return { name, type, emoji:meta.emoji, typeLabel: curLang()==='en' ? meta.en : meta.nl, distanceM, lat:el.lat, lon:el.lon };
     }).sort((a,b) => a.distanceM - b.distanceM).slice(0, 10);
     if (!points.length) return { ok:false, reason:'no-results' };
     return { ok:true, points };
@@ -13583,14 +13881,25 @@ function restPointErrorMessage(reason){
   }
 }
 function renderRestPointsHtml(points){
-  return points.map(p => `<div style="display:flex; align-items:center; gap:10px; padding:7px 0; border-bottom:1px solid rgba(255,255,255,0.06);">
+  return points.map((p,i) => `<div class="rest-row" data-idx="${i}" style="display:flex; align-items:center; gap:10px; padding:7px 0; border-bottom:1px solid rgba(255,255,255,0.06); cursor:pointer;">
     <span style="font-size:18px; flex-shrink:0;">${p.emoji}</span>
     <div style="flex:1; min-width:0;">
       <div style="color:var(--cream); font-size:12.5px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${p.name}</div>
       <div style="color:rgba(246,244,238,0.55); font-size:10.5px;">${p.typeLabel}</div>
     </div>
-    <div style="color:var(--amber); font-size:11px; font-weight:700; flex-shrink:0;">${p.distanceM} m</div>
+    <div style="color:var(--amber); font-size:11px; font-weight:700; flex-shrink:0; text-align:right;">${p.distanceM} m<br><span style="font-weight:400; text-decoration:underline;">${curLang()==='en' ? 'view' : 'bekijk'}</span></div>
   </div>`).join('');
+}
+// Toont een rustpunt op de échte kaart: activeert de kaart via de echte selectMode()-flow
+// (net als de "Doorgaan"-knop) en centreert/zoomt daarna op de locatie.
+function showRestPointOnMap(point){
+  $('bikeSetupScreen').classList.add('hidden');
+  $('garminSetupScreen').classList.add('hidden');
+  selectMode(bikeSetupTargetMode);
+  setTimeout(() => {
+    map.setView([point.lat, point.lon], 18, { animate:true });
+    toast(`${point.emoji} ${point.name}`, 2500);
+  }, 150);
 }
 // ---------- Natuurspotter: recente echte waarnemingen via de gratis, publieke iNaturalist API ----------
 const ICONIC_TAXON_EMOJI = {
@@ -13606,7 +13915,7 @@ async function findNearbyObservations(){
   const lat = pos.coords.latitude, lon = pos.coords.longitude;
   try{
     const url = `https://api.inaturalist.org/v1/observations?lat=${lat}&lng=${lon}&radius=5&per_page=12&order_by=observed_on&order=desc&photos=true&locale=nl`;
-    const res = await fetch(url);
+    const res = await fetchWithTimeout(url, {}, 12000);
     if (!res.ok) return { ok:false, reason:'http-error' };
     const data = await res.json();
     const items = (data.results || []).map(o => ({
@@ -13658,6 +13967,8 @@ async function identifyPlantPhoto(file){
   const sciLine = r.source === 'plantnet' ? r.sciName : (r.sciName || null);
   const fallbackNote = r.source === 'fallback'
     ? `<div style="color:rgba(246,244,238,0.5); font-size:10.5px; margin-top:2px;">${curLang()==='en' ? '(via local recognition — Pl@ntNet unavailable)' : '(via lokale herkenning — Pl@ntNet niet beschikbaar)'}</div>`
+    : r.source === 'gemini'
+    ? `<div style="color:rgba(246,244,238,0.5); font-size:10.5px; margin-top:2px;">${curLang()==='en' ? '(via Gemini — other sources found nothing)' : '(via Gemini — andere bronnen vonden niets)'}</div>`
     : '';
   resultEl.innerHTML = `
     <div style="display:flex; align-items:center; gap:10px; margin-bottom:4px;">
