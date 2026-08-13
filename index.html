@@ -166,18 +166,28 @@
   #topBarRow{
     position:absolute; left:50%; transform:translateX(-50%);
     top:calc(env(safe-area-inset-top,0px) + var(--extra-top-inset) + var(--extra-tab-gap) + 58px); z-index:1050;
-    display:flex; align-items:center;
+    display:flex; align-items:center; gap:7px;
   }
   body.dash-active #topBarRow{ top:calc(env(safe-area-inset-top,0px) + var(--extra-top-inset) + 5px); }
-
-  #waffleBtn{
-    position:absolute; left:12px;
-    top:calc(env(safe-area-inset-top,0px) + var(--extra-top-inset) + var(--extra-tab-gap) + 58px + 4.5px); z-index:1050;
-    border:none; border-radius:14px; width:44px; height:44px; background:var(--green-600);
-    color:var(--cream); box-shadow:var(--shadow); flex-shrink:0; pointer-events:auto;
-    display:flex; align-items:center; justify-content:center;
-  }
   body.dash-active #waffleBtn{ display:none; }
+
+  /* Alle knoppen bovenaan (waffle, 4 tabbladen, locatie, noorden) delen nu dezelfde losse tegel-stijl,
+     met tussenruimte i.p.v. aan elkaar geplakt, en lichten écht op bij aanraken/indrukken. */
+  .top-tile{
+    border:none; border-radius:13px; background:var(--green-600); color:var(--cream);
+    width:44px; height:44px; flex-shrink:0; box-shadow:0 3px 10px rgba(0,0,0,0.3);
+    display:flex; align-items:center; justify-content:center; font-size:18px;
+    transition:filter .1s ease, box-shadow .15s ease, transform .1s ease;
+  }
+  .top-tile.active{ background:var(--amber); color:var(--green-900); }
+  .top-tile:active{
+    filter:brightness(1.3); transform:scale(0.96);
+    box-shadow:0 0 0 3px rgba(226,161,60,0.55), 0 3px 10px rgba(0,0,0,0.3);
+  }
+  .top-tile-small{
+    width:30px; height:30px; font-size:13px; border-radius:10px;
+    background:var(--amber); color:var(--green-900);
+  }
   .waffle-grid{ display:grid; grid-template-columns:repeat(3,5px); grid-template-rows:repeat(3,5px); gap:3px; }
   .waffle-grid span{ width:5px; height:5px; border-radius:50%; background:var(--cream); }
 
@@ -189,21 +199,28 @@
   #actionMenu{
     position:absolute; right:12px; top:calc(env(safe-area-inset-top,0px) + var(--extra-top-inset) + 60px); z-index:1700;
     background:var(--cream); border-radius:18px; box-shadow:var(--shadow);
-    width:min(320px, 82vw); padding:8px; display:none; flex-direction:column;
+    width:min(340px, 88vw); padding:10px; display:none; flex-direction:column;
     max-height:75vh; overflow-y:auto;
   }
   #actionMenu.show{ display:flex; }
-  .menu-item{
-    display:flex; align-items:center; gap:12px; border:none; background:none;
-    padding:11px 10px; border-radius:12px; text-align:left; width:100%;
+  .menu-group-label{
+    font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:0.6px;
+    color:var(--amber-dark, #b8791f); margin:14px 6px 6px;
   }
-  .menu-item:active{ background:rgba(15,61,41,0.08); }
-  .mi-icon{ font-size:20px; width:28px; text-align:center; flex-shrink:0; }
-  .mi-text{ display:flex; flex-direction:column; line-height:1.3; }
-  .mi-text b{ font-size:14px; color:var(--green-900); }
-  .mi-text small{ font-size:11.5px; color:#5a6d61; }
-  .menu-sep{ height:1px; background:var(--line); margin:6px 4px; }
-  #menuVersion{ text-align:center; font-size:10.5px; color:#a9b8ae; padding:8px 4px 2px; }
+  .menu-group-label:first-child{ margin-top:4px; }
+  .menu-tile-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; }
+  .menu-item.menu-tile{
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px;
+    border:1px solid var(--line); background:rgba(15,61,41,0.03); border-radius:14px;
+    padding:12px 6px 9px; text-align:center; width:100%;
+  }
+  .menu-item.menu-tile:active{ background:rgba(15,61,41,0.1); }
+  .menu-tile .mi-icon{
+    font-size:17px; width:34px; height:34px; border-radius:50%; background:rgba(226,161,60,0.12);
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .menu-tile .mi-text{ font-size:10px; font-weight:700; color:var(--green-900); line-height:1.25; }
+  #menuVersion{ text-align:center; font-size:10.5px; color:#a9b8ae; padding:12px 4px 2px; }
   #loadBtn{
     border:none; border-radius:14px; width:44px; height:44px; background:var(--green-600);
     color:var(--cream); font-weight:700; font-size:16px; box-shadow:var(--shadow); flex-shrink:0;
@@ -279,9 +296,6 @@
   #shareLocationBtn:active{ filter:brightness(1.3); }
   #sunSub{ font-size:11px; color:rgba(246,244,238,0.45); text-align:center; max-width:270px; }
 
-  #tabBar{
-    display:flex;
-  }
   /* Enkel op dashboard/kompas/weer: een banner bovenaan in een eigen kleur die vervaagt naar de paginakleur — niet op de kaart */
   body.dash-active::before{
     content:''; position:fixed; top:0; left:0; right:0; height:130px; z-index:400;
@@ -604,7 +618,9 @@
   #passiveActionsRow{ display:flex; gap:6px; margin-top:6px; }
   #passiveActionsRow button{
     flex:1; border:none; border-radius:11px; padding:11px 4px; font-weight:800; font-size:12.5px;
+    transition:filter .1s ease, box-shadow .15s ease, transform .1s ease;
   }
+  #passiveActionsRow button:active{ filter:brightness(1.25); transform:scale(0.97); box-shadow:0 0 0 3px rgba(226,161,60,0.5); }
   #passiveReadyBtn{ background:var(--amber); color:var(--green-900); }
   #passiveReadyBtn.editing{ background:#2d5240; color:var(--cream); }
   #passiveAnalyseBtn{ background:#2d5240; color:var(--cream); }
@@ -612,7 +628,9 @@
   #actions button{
     flex:1; min-width:0; border:none; border-radius:11px; padding:9px 1px; font-weight:800; font-size:9.5px;
     display:flex; flex-direction:column; align-items:center; gap:2px; line-height:1.1;
+    transition:filter .1s ease, box-shadow .15s ease, transform .1s ease;
   }
+  #actions button:active{ filter:brightness(1.25); transform:scale(0.96); box-shadow:0 0 0 3px rgba(226,161,60,0.5); }
   #actions button .ic{ font-size:14px; }
   #clearBtn{ background:#e8e3d6; color:var(--green-900); }
   #toStartBtn{ background:#2d5240; color:var(--cream); border:2px solid transparent; display:none !important; } /* vervangen door tik-op-positie-bolletje; DOM/JS-referenties blijven intact, enkel niet meer getoond — !important nodig, anders wint de specifiekere #actions button{display:flex} regel hierboven */
@@ -856,12 +874,12 @@
 
   #runSessionScreen{
     position:fixed; top:0;left:0;right:0;bottom:0; z-index:3200; background:#0b0f0a;
-    display:flex; flex-direction:column; align-items:center;
+    display:flex; flex-direction:column; align-items:center; justify-content:space-evenly;
     padding:calc(14px + env(safe-area-inset-top,0px) + var(--extra-top-inset)) 20px calc(20px + env(safe-area-inset-bottom,0px) + var(--extra-bottom-inset));
     color:var(--cream); text-align:center; overflow-y:auto;
   }
   #runSessionScreen.hidden{ display:none; }
-  #rsMapWrap{ position:relative; width:100%; max-width:420px; height:170px; border-radius:20px; overflow:hidden; flex-shrink:0; margin-bottom:14px; box-shadow:0 8px 24px rgba(0,0,0,0.4); }
+  #rsMapWrap{ position:relative; width:100%; max-width:440px; height:225px; border-radius:22px; overflow:hidden; flex-shrink:0; box-shadow:0 8px 24px rgba(0,0,0,0.4); }
   #rsMapContainer{ width:100%; height:100%; background:#1a1f2b; }
   #rsMapBadge{
     position:absolute; top:10px; left:10px; z-index:500; background:var(--amber); color:var(--green-900);
@@ -871,36 +889,36 @@
     position:absolute; top:10px; right:10px; z-index:500; background:rgba(0,0,0,0.6); color:#f87171;
     font-size:9.5px; font-weight:800; padding:5px 9px; border-radius:10px; letter-spacing:0.4px;
   }
-  #rsMainRow{ display:flex; align-items:stretch; width:100%; max-width:420px; gap:14px; margin-bottom:10px; }
+  #rsMainRow{ display:flex; align-items:center; width:100%; max-width:440px; gap:16px; margin-top:6px; }
   #rsMainCol{ flex:1; min-width:0; }
-  #rsIntervalLabel{ font-size:15px; font-weight:800; letter-spacing:0.6px; text-transform:uppercase; }
+  #rsIntervalLabel{ font-size:16px; font-weight:800; letter-spacing:0.6px; text-transform:uppercase; }
   #rsIntervalLabel.type-run{ color:#4ade80; }
   #rsIntervalLabel.type-walk{ color:#60a5fa; }
   #rsIntervalLabel.type-warmup, #rsIntervalLabel.type-cooldown{ color:var(--amber); }
-  #rsCountdown{ font-size:58px; font-weight:900; line-height:1; margin:8px 0 4px; font-variant-numeric:tabular-nums; }
-  #rsNextLabel{ color:rgba(246,244,238,0.55); font-size:12px; }
-  #rsElapsedLine{ color:rgba(246,244,238,0.4); font-size:11px; margin-top:6px; }
+  #rsCountdown{ font-size:66px; font-weight:900; line-height:1; margin:10px 0 5px; font-variant-numeric:tabular-nums; }
+  #rsNextLabel{ color:rgba(246,244,238,0.55); font-size:12.5px; }
+  #rsElapsedLine{ color:rgba(246,244,238,0.4); font-size:11px; margin-top:7px; }
   #rsProgressRail{
-    width:34px; flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:5px;
-    overflow-y:auto; max-height:190px; padding:4px 0; scrollbar-width:none;
+    width:46px; flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:7px;
+    overflow-y:auto; max-height:250px; padding:4px 0; scrollbar-width:none;
   }
   #rsProgressRail::-webkit-scrollbar{ display:none; }
   .rs-rail-item{
-    width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center;
-    font-size:12px; flex-shrink:0; opacity:0.4; transition:all 0.2s;
+    width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-size:15px; flex-shrink:0; opacity:0.4; transition:all 0.2s;
   }
   .rs-rail-item.rail-run{ background:rgba(74,222,128,0.18); }
   .rs-rail-item.rail-walk{ background:rgba(96,165,250,0.18); }
   .rs-rail-item.rail-warmup, .rs-rail-item.rail-cooldown{ background:rgba(226,161,60,0.18); }
-  .rs-rail-item.rail-current{ opacity:1; width:32px; height:32px; font-size:15px; box-shadow:0 0 0 2px var(--amber); }
+  .rs-rail-item.rail-current{ opacity:1; width:42px; height:42px; font-size:19px; box-shadow:0 0 0 3px var(--amber); }
   .rs-rail-item.rail-done{ opacity:0.25; }
-  #rsStatsRow{ display:flex; justify-content:center; gap:24px; margin:6px 0 18px; width:100%; max-width:420px; flex-shrink:0; }
+  #rsStatsRow{ display:flex; justify-content:center; gap:24px; width:100%; max-width:440px; flex-shrink:0; }
   .rs-stat{ display:flex; flex-direction:column; align-items:center; flex:1; }
-  .rs-stat b{ font-size:19px; font-weight:900; }
+  .rs-stat b{ font-size:21px; font-weight:900; }
   .rs-stat span{ font-size:10px; color:rgba(246,244,238,0.55); text-transform:uppercase; letter-spacing:0.4px; margin-top:2px; }
-  #rsControls{ display:flex; gap:9px; width:100%; max-width:420px; }
+  #rsControls{ display:flex; gap:9px; width:100%; max-width:440px; }
   #rsControls button{
-    flex:1; border:none; border-radius:16px; padding:14px 6px; font-weight:800; font-size:12px;
+    flex:1; border:none; border-radius:16px; padding:16px 6px; font-weight:800; font-size:12.5px;
   }
   #rsPauseBtn{ background:var(--amber); color:var(--green-900); }
   #rsSplitBtn{ background:#2a5a8f; color:#fff; }
@@ -1144,24 +1162,23 @@
   body.theme-garmin #topbarBg{
     background:linear-gradient(180deg, rgba(15,23,42,0.92), rgba(15,23,42,0.85) 40%, rgba(15,23,42,0));
   }
-  body.theme-garmin .tab-hex{
-    clip-path:none; border-radius:14px; background:rgba(15,23,42,0.78);
-    border:1px solid rgba(255,255,255,0.09); box-shadow:0 4px 14px rgba(0,0,0,0.35);
+  body.theme-garmin .top-tile{
+    background:rgba(15,23,42,0.78); border:1px solid rgba(255,255,255,0.09); box-shadow:0 4px 14px rgba(0,0,0,0.35);
   }
-  body.theme-garmin .tab-hex.active{
+  body.theme-garmin .top-tile.active{
     background:var(--amber); border-color:transparent; box-shadow:0 4px 14px rgba(226,161,60,0.3);
   }
-  body.theme-garmin #waffleBtn{
-    border-radius:14px; background:rgba(15,23,42,0.78); border:1px solid rgba(255,255,255,0.09);
-  }
-  body.theme-garmin #locateBtn,
-  body.theme-garmin #northBtn{ clip-path:none; border-radius:50%; }
+  body.theme-garmin .top-tile-small{ background:var(--amber); border-color:transparent; }
   body.theme-garmin #hint{ background:rgba(15,23,42,0.94); }
   body.theme-garmin .menu-item:active{ background:rgba(255,255,255,0.06); }
   body.theme-garmin #passiveAnalyseBtn,
   body.theme-garmin #bikeRoutingProAnalyseBtn{ background:#1e293b !important; }
   body.theme-garmin #actionMenu{ background:#0f172a; }
   body.theme-garmin .menu-item .mi-text small{ color:rgba(241,245,249,0.55); }
+  body.theme-garmin .menu-group-label{ color:#e2a13c; }
+  body.theme-garmin .menu-item.menu-tile{ background:rgba(255,255,255,0.04); border-color:rgba(255,255,255,0.08); }
+  body.theme-garmin .menu-tile .mi-icon{ background:rgba(226,161,60,0.15); }
+  body.theme-garmin .menu-tile .mi-text{ color:#f1f5f9; }
 
   /* Navigatiepaneel + actieknoppen tijdens het rijden: zelfde functionaliteit/kleuren, maar met een
      subtiele glazige rand/schaduw i.p.v. platte vlakken — sluit aan bij de rest van de Garmin-look. */
@@ -1284,29 +1301,7 @@
   .elev-table .elev-desc{ color:#4caf6f; font-weight:800; }
   .elev-table-empty{ color:rgba(246,244,238,0.5); font-size:12.5px; text-align:center; padding:16px 0; }
 
-  #locateBtn{ color:var(--green-900); }
-  #locateBtn:active{ filter:brightness(0.92); }
-
-  #northBtn{ color:var(--green-900); }
   #northArrow{ display:inline-block; font-size:10px; transition:transform .25s ease; }
-  #northBtn:active{ filter:brightness(0.92); }
-
-  /* locateBtn/northBtn zitten nu in dezelfde rij (#tabBar) als de tab-hex-knoppen, maar zijn
-     directe acties (geen tabblad-toggle) — daarom altijd amber i.p.v. actief/inactief groen. */
-  .tab-hex-amber{ background:var(--amber) !important; }
-
-  /* Losse, kleine knopjes rechtsboven — half zo groot als de tab-hex-iconen (46x53), en verticaal
-     gecentreerd op diezelfde rij: (53-26)/2 ≈ 13.5px extra van boven t.o.v. de tabbalk zelf. */
-  #locateBtn, #northBtn{
-    position:absolute; right:10px;
-    top:calc(env(safe-area-inset-top,0px) + var(--extra-top-inset) + var(--extra-tab-gap) + 58px + 13.5px);
-    z-index:1050; width:23px; height:26px; border:none;
-    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
-    background:var(--amber); color:var(--green-900); font-size:10px;
-    box-shadow:0 3px 10px rgba(0,0,0,0.35);
-    display:flex; align-items:center; justify-content:center;
-  }
-  #northBtn{ right:37px; }
   #routeColorLegend{
     position:absolute; left:0; top:calc(env(safe-area-inset-top,0px) + var(--extra-top-inset) + var(--extra-tab-gap) + 122px); z-index:1050;
     background:rgba(15,20,15,0.88); border-radius:0 10px 10px 0; padding:7px 10px 7px 16px; display:flex; flex-direction:column; gap:3px;
@@ -1422,6 +1417,31 @@
       </button>
     </div>
 
+    <div id="wandelToolsSection" style="display:none; margin-top:22px; text-align:left;">
+      <div class="bike-setup-title" style="text-align:left; margin-bottom:10px;">🛠️ Route &amp; Tools</div>
+      <button id="wandelLoopGenBtnStd" type="button" style="display:flex; align-items:center; gap:12px; width:100%; background:rgba(255,255,255,0.06); border:2px solid rgba(255,255,255,0.08); border-radius:16px; padding:14px 16px; cursor:pointer; text-align:left; margin-bottom:10px;">
+        <span style="font-size:26px; flex-shrink:0;">🎲</span>
+        <span style="text-align:left; flex:1;">
+          <b style="color:var(--cream); font-size:14.5px; display:block;">Wandel-Lus Generator</b>
+          <small style="color:rgba(246,244,238,0.65); font-size:11.5px; line-height:1.4;">Genereer 3 wandellussen rond een punt</small>
+        </span>
+      </button>
+      <button id="wandelNodeListBtnStd" type="button" style="display:flex; align-items:center; gap:12px; width:100%; background:rgba(255,255,255,0.06); border:2px solid rgba(255,255,255,0.08); border-radius:16px; padding:14px 16px; cursor:pointer; text-align:left; margin-bottom:10px;">
+        <span style="font-size:26px; flex-shrink:0;">🔢</span>
+        <span style="text-align:left; flex:1;">
+          <b style="color:var(--cream); font-size:14.5px; display:block;">Knooppunten-invoer</b>
+          <small style="color:rgba(246,244,238,0.65); font-size:11.5px; line-height:1.4;">Typ een reeks nummers, de app bouwt de route</small>
+        </span>
+      </button>
+      <button id="wandelGpxImportBtnStd" type="button" style="display:flex; align-items:center; gap:12px; width:100%; background:rgba(255,255,255,0.06); border:2px solid rgba(255,255,255,0.08); border-radius:16px; padding:14px 16px; cursor:pointer; text-align:left;">
+        <span style="font-size:26px; flex-shrink:0;">📂</span>
+        <span style="text-align:left; flex:1;">
+          <b style="color:var(--cream); font-size:14.5px; display:block;">Importeer GPX-bestand</b>
+          <small style="color:rgba(246,244,238,0.65); font-size:11.5px; line-height:1.4;">Laad een wandelroute van een site of app</small>
+        </span>
+      </button>
+    </div>
+
     <div id="natureIdSection" style="display:none; margin-top:22px; text-align:left;">
       <div class="bike-setup-title" style="text-align:left; margin-bottom:10px;" data-i18n="natureIdTitle">🌿 Plant herkennen</div>
       <label id="natureIdTile" for="natureIdCameraInput" style="display:flex; align-items:center; gap:12px; background:rgba(255,255,255,0.06); border:2px solid rgba(255,255,255,0.08); border-radius:16px; padding:14px 16px; cursor:pointer;">
@@ -1507,29 +1527,40 @@
 
 <div id="menuBackdrop"></div>
 <div id="actionMenu">
-  <button class="menu-item" data-target="loadBtn"><span class="mi-icon">📍</span><span class="mi-text"><b><span data-i18n="menuLoadNodes">Laad knooppunten</span></b><small><span data-i18n="menuLoadNodesSub">in dit kaartgebied</span></small></span></button>
-  <button class="menu-item" data-target="syncBtn"><span class="mi-icon">⬇</span><span class="mi-text"><b><span data-i18n="menuSyncOffline">Knooppuntdata offline</span></b><small><span data-i18n="menuSyncOfflineSub">de nummers/locaties zelf (15×15km of heel Limburg) — geen kaartbeeld</span></small></span></button>
-  <button class="menu-item" data-target="tileCacheBtn"><span class="mi-icon">🗺️</span><span class="mi-text"><b><span data-i18n="menuTileCache">Kaartbeeld offline</span></b><small><span data-i18n="menuTileCacheSub">de zichtbare achtergrondkaart (straten, groen) langs je route</span></small></span></button>
-  <div class="menu-sep"></div>
-  <button class="menu-item" data-target="exportBtn"><span class="mi-icon">💾</span><span class="mi-text"><b><span data-i18n="menuExportRoute">Route opslaan</span></b><small><span data-i18n="menuExportRouteSub">als bestand (later opnieuw inladen)</span></small></span></button>
-  <button class="menu-item" id="shareRouteLinkBtn"><span class="mi-icon">🔗</span><span class="mi-text"><b data-i18n="menuShareRouteLink">Route delen via link</b><small data-i18n="menuShareRouteLinkSub">stuur je geplande route naar iemand anders</small></span></button>
-  <button class="menu-item" id="menuLoopGenBtn"><span class="mi-icon">🎲</span><span class="mi-text"><b data-i18n="loopGenTitle">🎲 Rondrit-generator</b><small data-i18n="menuLoopGenSub">genereer 3 routevoorstellen rond een punt</small></span></button>
-  <button class="menu-item" id="menuPlannedRoutesBtn"><span class="mi-icon">📅</span><span class="mi-text"><b data-i18n="plannedRoutesTitle">📅 Geplande routes</b><small data-i18n="menuPlannedRoutesSub">bewaarde voorstellen uit de rondrit-generator</small></span></button>
-  <button class="menu-item" data-target="gpxExportBtn"><span class="mi-icon">📤</span><span class="mi-text"><b><span data-i18n="menuGpxExport">Exporteer als GPX</span></b><small><span data-i18n="menuGpxExportSub">voor Komoot, Garmin, Strava</span></small></span></button>
-  <button class="menu-item" data-target="imageExportBtn"><span class="mi-icon">🖼️</span><span class="mi-text"><b><span data-i18n="menuImageExport">Exporteer als afbeelding</span></b><small><span data-i18n="menuImageExportSub">routekaart-PNG, offline te bekijken</span></small></span></button>
-  <button class="menu-item" data-target="importBtn"><span class="mi-icon">📂</span><span class="mi-text"><b><span data-i18n="menuImportFile">Importeer bestand</span></b><small><span data-i18n="menuImportFileSub">route, knooppunten of GPX</span></small></span></button>
-  <div class="menu-sep"></div>
-  <button class="menu-item" id="menuUrlImportBtn"><span class="mi-icon">🔗</span><span class="mi-text"><b><span data-i18n="menuUrlImport">Route via link</span></b><small><span data-i18n="menuUrlImportSub">plak een GPX-downloadlink</span></small></span></button>
-  <button class="menu-item" id="menuSavedLinksBtn"><span class="mi-icon">📚</span><span class="mi-text"><b><span data-i18n="menuSavedLinks">Mijn opgeslagen links</span></b><small><span data-i18n="menuSavedLinksSub">eerder bewaarde routes/links</span></small></span></button>
-  <button class="menu-item" id="menuPinpointsBtn"><span class="mi-icon">📍</span><span class="mi-text"><b data-i18n="pinpointsTitle">Pinpoints</b><small><span data-i18n="menuPinpointsSub">thuisadres en andere bewaarde locaties</span></small></span></button>
-  <button class="menu-item" id="menuRideHistoryBtn"><span class="mi-icon">📖</span><span class="mi-text"><b><span data-i18n="menuRideHistory">Mijn ritten</span></b><small><span data-i18n="menuRideHistorySub">overzicht van voltooide routes</span></small></span></button>
-  <div class="menu-sep"></div>
-  <button class="menu-item" id="menuSwitchModeBtn"><span class="mi-icon">🔁</span><span class="mi-text"><b data-i18n="menuSwitchMode">Wissel modus</b><small data-i18n="menuSwitchModeSub">terug naar fiets/wandel-keuze</small></span></button>
-  <div class="menu-sep"></div>
-  <button class="menu-item" id="menuSettingsBtn"><span class="mi-icon">⚙️</span><span class="mi-text"><b data-i18n="menuSettings">Instellingen</b><small data-i18n="menuSettingsSub">uiterlijk, wegvoorkeuren</small></span></button>
-  <button class="menu-item" id="menuHelpBtn"><span class="mi-icon">❓</span><span class="mi-text"><b data-i18n="menuHelp">Hulp</b><small data-i18n="menuHelpSub">uitleg over alle functies</small></span></button>
-  <button class="menu-item" id="menuDevNotesBtn"><span class="mi-icon">🛠️</span><span class="mi-text"><b data-i18n="menuDevNotes">Technische werking</b><small data-i18n="menuDevNotesSub">hoe wegdektype, routering en fallbacks precies werken</small></span></button>
-  <button class="menu-item" id="menuLogbookBtn"><span class="mi-icon">📋</span><span class="mi-text"><b data-i18n="menuLogbook">Logboek</b><small data-i18n="menuLogbookSub">overzicht van alle meldingen, ook stille</small></span></button>
+  <div class="menu-group-label" data-i18n="menuGroupNodes">Knooppunten &amp; kaart</div>
+  <div class="menu-tile-grid">
+    <button class="menu-item menu-tile" data-target="loadBtn"><span class="mi-icon">📍</span><span class="mi-text"><span data-i18n="menuLoadNodes">Laad knooppunten</span></span></button>
+    <button class="menu-item menu-tile" data-target="syncBtn"><span class="mi-icon">⬇</span><span class="mi-text"><span data-i18n="menuSyncOffline">Knooppuntdata offline</span></span></button>
+    <button class="menu-item menu-tile" data-target="tileCacheBtn"><span class="mi-icon">🗺️</span><span class="mi-text"><span data-i18n="menuTileCache">Kaartbeeld offline</span></span></button>
+  </div>
+
+  <div class="menu-group-label" data-i18n="menuGroupRoute">Route</div>
+  <div class="menu-tile-grid">
+    <button class="menu-item menu-tile" data-target="exportBtn"><span class="mi-icon">💾</span><span class="mi-text"><span data-i18n="menuExportRoute">Route opslaan</span></span></button>
+    <button class="menu-item menu-tile" id="shareRouteLinkBtn"><span class="mi-icon">🔗</span><span class="mi-text"><span data-i18n="menuShareRouteLink">Delen via link</span></span></button>
+    <button class="menu-item menu-tile" id="menuLoopGenBtn"><span class="mi-icon">🎲</span><span class="mi-text"><span data-i18n="loopGenTitleShort">Rondrit-generator</span></span></button>
+    <button class="menu-item menu-tile" id="menuPlannedRoutesBtn"><span class="mi-icon">📅</span><span class="mi-text"><span data-i18n="plannedRoutesTitleShort">Geplande routes</span></span></button>
+    <button class="menu-item menu-tile" data-target="gpxExportBtn"><span class="mi-icon">📤</span><span class="mi-text"><span data-i18n="menuGpxExport">Exporteer GPX</span></span></button>
+    <button class="menu-item menu-tile" data-target="imageExportBtn"><span class="mi-icon">🖼️</span><span class="mi-text"><span data-i18n="menuImageExport">Exporteer afbeelding</span></span></button>
+  </div>
+
+  <div class="menu-group-label" data-i18n="menuGroupImport">Inladen</div>
+  <div class="menu-tile-grid">
+    <button class="menu-item menu-tile" data-target="importBtn"><span class="mi-icon">📂</span><span class="mi-text"><span data-i18n="menuImportFile">Importeer bestand</span></span></button>
+    <button class="menu-item menu-tile" id="menuUrlImportBtn"><span class="mi-icon">🔗</span><span class="mi-text"><span data-i18n="menuUrlImport">Route via link</span></span></button>
+    <button class="menu-item menu-tile" id="menuSavedLinksBtn"><span class="mi-icon">📚</span><span class="mi-text"><span data-i18n="menuSavedLinksShort">Opgeslagen links</span></span></button>
+  </div>
+
+  <div class="menu-group-label" data-i18n="menuGroupOther">Bewaard &amp; overig</div>
+  <div class="menu-tile-grid">
+    <button class="menu-item menu-tile" id="menuPinpointsBtn"><span class="mi-icon">📍</span><span class="mi-text"><span data-i18n="pinpointsTitle">Pinpoints</span></span></button>
+    <button class="menu-item menu-tile" id="menuRideHistoryBtn"><span class="mi-icon">📖</span><span class="mi-text"><span data-i18n="menuRideHistory">Mijn ritten</span></span></button>
+    <button class="menu-item menu-tile" id="menuSwitchModeBtn"><span class="mi-icon">🔁</span><span class="mi-text"><span data-i18n="menuSwitchMode">Wissel modus</span></span></button>
+    <button class="menu-item menu-tile" id="menuSettingsBtn"><span class="mi-icon">⚙️</span><span class="mi-text"><span data-i18n="menuSettings">Instellingen</span></span></button>
+    <button class="menu-item menu-tile" id="menuHelpBtn"><span class="mi-icon">❓</span><span class="mi-text"><span data-i18n="menuHelp">Hulp</span></span></button>
+    <button class="menu-item menu-tile" id="menuDevNotesBtn"><span class="mi-icon">🛠️</span><span class="mi-text"><span data-i18n="menuDevNotesShort">Technische werking</span></span></button>
+    <button class="menu-item menu-tile" id="menuLogbookBtn"><span class="mi-icon">📋</span><span class="mi-text"><span data-i18n="menuLogbook">Logboek</span></span></button>
+  </div>
   <div id="menuVersion">v2.300 · 13 aug</div>
 </div>
 
@@ -1698,6 +1729,18 @@
     </div>
 
     <div id="loopGenResults" style="display:none;"></div>
+  </div>
+</div>
+
+<div id="nodeListModal" class="simple-modal">
+  <div class="simple-modal-card">
+    <div class="simple-modal-head"><b>🔢 Knooppunten-invoer</b><button class="simple-modal-close" data-close="nodeListModal">✕</button></div>
+    <p class="simple-modal-text">Typ of plak de knooppuntnummers in volgorde, gescheiden door komma's of spaties (bv. van een bordje onderweg).</p>
+    <textarea id="nodeListInput" placeholder="12, 45, 67, 23, 8…" rows="3"
+      style="width:100%; padding:11px 12px; border-radius:12px; border:2px solid var(--line); font-size:14px; box-sizing:border-box; font-family:inherit; resize:vertical;"></textarea>
+    <p class="settings-subnote" style="margin-top:6px;">Dit vervangt je huidige route. De app zoekt elk nummer op in de buurt van je huidige kaartweergave.</p>
+    <button id="nodeListGoBtn" class="settings-btn" style="margin-top:14px;">🔢 Route bouwen</button>
+    <div id="nodeListLoading" style="display:none; text-align:center; padding:14px 0;">Bezig met opzoeken…</div>
   </div>
 </div>
 
@@ -2625,19 +2668,17 @@
   <div id="weatherDots"><span class="wdot active"></span><span class="wdot"></span><span class="wdot"></span><span class="wdot"></span></div>
 </div>
 
-<button id="waffleBtn" type="button" title="Meer opties" data-i18n-title="titleMoreOptions">
-  <span class="waffle-grid"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span>
-</button>
 <div id="topBarRow">
-<div id="tabBar">
-  <button id="tabMapBtn" class="tab-hex active" title="Kaart" data-i18n-title="titleTabMap">🗺️</button>
-  <button id="tabDashBtn" class="tab-hex" title="Dashboard" data-i18n-title="titleTabDash">📊</button>
-  <button id="tabSunBtn" class="tab-hex" title="Kompas" data-i18n-title="titleTabCompass">🧭</button>
-  <button id="tabWeatherBtn" class="tab-hex" title="Weer" data-i18n-title="titleTabWeather">🌤️</button>
+  <button id="waffleBtn" type="button" title="Meer opties" data-i18n-title="titleMoreOptions" class="top-tile">
+    <span class="waffle-grid"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span>
+  </button>
+  <button id="tabMapBtn" class="top-tile active" title="Kaart" data-i18n-title="titleTabMap">🗺️</button>
+  <button id="tabDashBtn" class="top-tile" title="Dashboard" data-i18n-title="titleTabDash">📊</button>
+  <button id="tabSunBtn" class="top-tile" title="Kompas" data-i18n-title="titleTabCompass">🧭</button>
+  <button id="tabWeatherBtn" class="top-tile" title="Weer" data-i18n-title="titleTabWeather">🌤️</button>
+  <button id="locateBtn" class="top-tile top-tile-small" title="Ga naar mijn locatie" data-i18n-title="titleGoToLocation">🎯</button>
+  <button id="northBtn" class="top-tile top-tile-small" title="Zet noorden weer boven" data-i18n-title="titleResetNorth"><span id="northArrow">🧭</span></button>
 </div>
-</div>
-<button id="locateBtn" title="Ga naar mijn locatie" data-i18n-title="titleGoToLocation">🎯</button>
-<button id="northBtn" title="Zet noorden weer boven" data-i18n-title="titleResetNorth"><span id="northArrow">🧭</span></button>
 
 <div id="sheet">
   <div id="sheetHandle"></div>
@@ -4887,6 +4928,7 @@ const TRANSLATIONS = {
   menuHelp: { nl:'Hulp', en:'Help' },
   menuHelpSub: { nl:'uitleg over alle functies', en:'explanation of all features' },
   menuDevNotes: { nl:'Technische werking', en:'Technical details' },
+  menuDevNotesShort: { nl:'Technische werking', en:'Technical details' },
   menuDevNotesSub: { nl:'hoe wegdektype, routering en fallbacks precies werken', en:'how surface type, routing and fallbacks actually work' },
   menuLogbook: { nl:'Logboek', en:'Logbook' },
   menuLogbookSub: { nl:'overzicht van alle meldingen, ook stille', en:'overview of all messages, including silent ones' },
@@ -5108,6 +5150,7 @@ const TRANSLATIONS = {
   menuShareRouteLinkSub: { nl:'stuur je geplande route naar iemand anders', en:'send your planned route to someone else' },
   toastRouteLinkCopied: { nl:'🔗 Link naar je route gekopieerd', en:'🔗 Link to your route copied' },
   loopGenTitle: { nl:'🎲 Rondrit-generator', en:'🎲 Round-trip generator' },
+  loopGenTitleShort: { nl:'Rondrit-generator', en:'Round-trip generator' },
   menuLoopGenSub: { nl:'genereer 3 routevoorstellen rond een punt', en:'generate 3 route suggestions around a point' },
   loopGenKmLabel: { nl:'Gewenste afstand (km)', en:'Desired distance (km)' },
   loopGenViaNodesOnly: { nl:'Enkel via knooppunten', en:'Only via numbered nodes' },
@@ -5140,6 +5183,7 @@ const TRANSLATIONS = {
   loopGenLoaded: { nl:'Route geladen — pas gerust aan of druk op Start', en:'Route loaded — feel free to adjust or press Start' },
   loopGenSaved: { nl:'💾 Route bewaard bij "Geplande routes"', en:'💾 Route saved under "Planned routes"' },
   plannedRoutesTitle: { nl:'📅 Geplande routes', en:'📅 Planned routes' },
+  plannedRoutesTitleShort: { nl:'Geplande routes', en:'Planned routes' },
   menuPlannedRoutesSub: { nl:'bewaarde voorstellen uit de rondrit-generator', en:'saved suggestions from the round-trip generator' },
   plannedRoutesEmpty: { nl:'Nog geen routes bewaard. Gebruik de 🎲 Rondrit-generator en tik op "Bewaar" bij een voorstel.', en:'No routes saved yet. Use the 🎲 Round-trip generator and tap "Save" on a suggestion.' },
   settingsQuietRouting: { nl:'🤫 Verkeersluwe routering (vermijdt hoofdwegen)', en:'🤫 Low-traffic routing (avoids main roads)' },
@@ -5328,6 +5372,11 @@ const TRANSLATIONS = {
   menuUrlImport: { nl:'Route via link', en:'Route via link' },
   menuUrlImportSub: { nl:'plak een GPX-downloadlink', en:'paste a GPX download link' },
   menuSavedLinks: { nl:'Mijn opgeslagen links', en:'My saved links' },
+  menuSavedLinksShort: { nl:'Opgeslagen links', en:'Saved links' },
+  menuGroupNodes: { nl:'Knooppunten & kaart', en:'Nodes & map' },
+  menuGroupRoute: { nl:'Route', en:'Route' },
+  menuGroupImport: { nl:'Inladen', en:'Import' },
+  menuGroupOther: { nl:'Bewaard & overig', en:'Saved & more' },
   menuSavedLinksSub: { nl:'eerder bewaarde routes/links', en:'previously saved routes/links' },
   menuPinpointsSub: { nl:'thuisadres en andere bewaarde locaties', en:'home address and other saved locations' },
   menuRideHistory: { nl:'Mijn ritten', en:'My rides' },
@@ -6630,6 +6679,11 @@ function garminSetupOpenGpxImport(){
   $('bikeSetupContinueBtn').click();
   setTimeout(() => { const b = $('importBtn'); if (b) b.click(); }, 300);
 }
+function garminSetupOpenNodeList(){
+  $('garminSetupScreen').classList.add('hidden');
+  $('bikeSetupContinueBtn').click();
+  setTimeout(() => { openModal('nodeListModal'); }, 300);
+}
 async function fetchGarminSetupData(mode){
   const frame = $('garminSetupFrame');
   const post = (payload) => { if (frame && frame.contentWindow) frame.contentWindow.postMessage(Object.assign({ source:'garminSetupData' }, payload), '*'); };
@@ -6670,6 +6724,7 @@ window.addEventListener('message', (ev) => {
     case 'continue':   garminSetupContinue(); break;
     case 'loopgen':    garminSetupOpenLoopGen(); break;
     case 'gpximport':  garminSetupOpenGpxImport(); break;
+    case 'nodelist':   garminSetupOpenNodeList(); break;
     case 'identifyplant': garminIdentifyPlant(data.file); break;
     case 'identifyanimal': garminIdentifyAnimal(data.file); break;
     case 'findrestpoints': garminFindRestPoints(); break;
@@ -6898,6 +6953,30 @@ function buildGarminSetupHtml(mode){
         <span class="text-slate-500">→</span>
       </button>
     </div>` : `
+    <div class="space-y-3 mb-6">
+      <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">Route &amp; Tools</span>
+      <button id="wandelLoopGenBtn" class="w-full bg-slate-900/70 border border-slate-800 rounded-2xl p-3 flex justify-between items-center text-left">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 bg-slate-800 rounded-xl flex items-center justify-center">🎲</div>
+          <div><div class="font-bold text-xs text-slate-200">Wandel-Lus Generator</div><div class="text-[10px] text-slate-400">Genereer 3 wandellussen rond een punt</div></div>
+        </div>
+        <span class="text-slate-500">→</span>
+      </button>
+      <button id="wandelNodeListBtn" class="w-full bg-slate-900/70 border border-slate-800 rounded-2xl p-3 flex justify-between items-center text-left">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 bg-slate-800 rounded-xl flex items-center justify-center">🔢</div>
+          <div><div class="font-bold text-xs text-slate-200">Knooppunten-invoer</div><div class="text-[10px] text-slate-400">Typ een reeks nummers, app bouwt de route</div></div>
+        </div>
+        <span class="text-slate-500">→</span>
+      </button>
+      <button id="wandelGpxImportBtn" class="w-full bg-slate-900/70 border border-slate-800 rounded-2xl p-3 flex justify-between items-center text-left">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 bg-slate-800 rounded-xl flex items-center justify-center">📂</div>
+          <div><div class="font-bold text-xs text-slate-200">Importeer GPX-bestand</div><div class="text-[10px] text-slate-400">Laad een wandelroute van een site of app</div></div>
+        </div>
+        <span class="text-slate-500">→</span>
+      </button>
+    </div>
     <div class="mb-6">
       <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-3">Wandel-extra's</span>
       <div class="grid grid-cols-2 gap-3">
@@ -7092,6 +7171,12 @@ ${GARMIN_MENU_BTN_JS}
     if (loopGenBtn) loopGenBtn.addEventListener('click', () => parent.postMessage({ source:'garminSetup', action:'loopgen' }, '*'));
     const gpxImportBtn = document.getElementById('gpxImportBtn');
     if (gpxImportBtn) gpxImportBtn.addEventListener('click', () => parent.postMessage({ source:'garminSetup', action:'gpximport' }, '*'));
+    const wandelLoopGenBtn = document.getElementById('wandelLoopGenBtn');
+    if (wandelLoopGenBtn) wandelLoopGenBtn.addEventListener('click', () => parent.postMessage({ source:'garminSetup', action:'loopgen' }, '*'));
+    const wandelNodeListBtn = document.getElementById('wandelNodeListBtn');
+    if (wandelNodeListBtn) wandelNodeListBtn.addEventListener('click', () => parent.postMessage({ source:'garminSetup', action:'nodelist' }, '*'));
+    const wandelGpxImportBtn = document.getElementById('wandelGpxImportBtn');
+    if (wandelGpxImportBtn) wandelGpxImportBtn.addEventListener('click', () => parent.postMessage({ source:'garminSetup', action:'gpximport' }, '*'));
 
     document.getElementById('continueBtn').addEventListener('click', () => {
       if (selectedType) parent.postMessage({ source:'garminSetup', action:'biketype', type:selectedType }, '*');
@@ -7274,9 +7359,9 @@ function buildGarminKompasHtml(){
         }
     </style>
 </head>
-<body class="bg-[#050914] text-slate-100 min-h-screen flex items-center justify-center p-2 sm:p-4 font-sans">
+<body class="bg-[#050914] text-slate-100 min-h-screen font-sans">
 
-  <div class="w-full max-w-md bg-[#091122] rounded-[32px] p-4 border border-slate-800 shadow-2xl relative flex flex-col h-screen overflow-hidden">
+  <div class="w-full min-h-screen p-5 flex flex-col h-screen overflow-hidden">
 
     <div class="flex items-center justify-between flex-shrink-0">
       <div class="flex items-center gap-3">
@@ -7520,11 +7605,11 @@ function buildGarminWeerHtml(){
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
-<body class="bg-[#050914] text-slate-100 min-h-screen flex items-center justify-center p-2 sm:p-4 font-sans">
+<body class="bg-[#050914] text-slate-100 min-h-screen font-sans">
 
-  <div class="w-full max-w-md bg-[#091122] rounded-[32px] p-4 border border-slate-800 shadow-2xl relative flex flex-col h-screen overflow-hidden space-y-3">
+  <div class="w-full min-h-screen p-5 flex flex-col h-screen overflow-hidden space-y-3">
 
-    <div class="flex items-center justify-between">
+    <div class="flex items-center justify-between flex-shrink-0">
       <div class="flex items-center gap-3">
         <button id="backBtn" class="w-8 h-8 rounded-full bg-black/60 border border-amber-500/40 text-amber-400 flex items-center justify-center text-base flex-shrink-0">‹</button>
         <div>
@@ -11643,6 +11728,45 @@ let loopGenResults = [];
 
 $('menuLoopGenBtn').addEventListener('click', () => { closeActionMenu(); openModal('loopGenModal'); resetLoopGenForm(); });
 
+// ---------- Knooppunten-invoer: type/plak een hele reeks nummers, app zoekt en bouwt de route ----------
+$('nodeListGoBtn').addEventListener('click', async () => {
+  const raw = $('nodeListInput').value.trim();
+  if (!raw){ toast(curLang()==='en' ? 'Type in some node numbers first.' : 'Typ eerst een paar knooppuntnummers in.', 2500); return; }
+  const refs = raw.split(/[,\s]+/).map(s => s.trim()).filter(Boolean);
+  if (!refs.length) return;
+  $('nodeListGoBtn').style.display = 'none';
+  $('nodeListLoading').style.display = 'block';
+  route.length = 0;
+  arrivalActual = []; actualRouteKm = null; routeIsFromGpx = false; importedTrack = [];
+  const notFound = [];
+  const foundPoints = [];
+  for (const ref of refs){
+    try{
+      const node = await searchKnooppunt(ref);
+      if (node){
+        route.push({ id:node.id, ref:node.ref, lat:node.lat, lon:node.lon });
+        foundPoints.push([node.lat, node.lon]);
+      } else {
+        notFound.push(ref);
+      }
+    }catch(e){ notFound.push(ref); }
+  }
+  $('nodeListGoBtn').style.display = 'block';
+  $('nodeListLoading').style.display = 'none';
+  renderVisible();
+  renderRoute();
+  drawRoutePath(routeStartsFromGps);
+  if (foundPoints.length){
+    try{ map.fitBounds(L.latLngBounds(foundPoints), { padding:[60,60], maxZoom:16 }); }catch(e){}
+  }
+  closeModal('nodeListModal');
+  $('nodeListInput').value = '';
+  const summary = curLang()==='en'
+    ? `${foundPoints.length}/${refs.length} nodes found and added.` + (notFound.length ? ` Not found: ${notFound.join(', ')}` : '')
+    : `${foundPoints.length}/${refs.length} knooppunten gevonden en toegevoegd.` + (notFound.length ? ` Niet gevonden: ${notFound.join(', ')}` : '');
+  toast(summary, 5000);
+});
+
 function resetLoopGenForm(){
   $('loopGenForm').style.display = 'block';
   $('loopGenLoading').style.display = 'none';
@@ -14495,6 +14619,7 @@ function openBikeSetupScreen(mode){
   document.querySelectorAll('.nav-type-card').forEach(c => c.classList.toggle('active', c.dataset.navtype === (appSettings.navType || 'active')));
   $('bikeTypeSection').style.display = mode === 'fiets' ? 'block' : 'none';
   $('natureIdSection').style.display = mode === 'wandel' ? 'block' : 'none';
+  $('wandelToolsSection').style.display = mode === 'wandel' ? 'block' : 'none';
   $('natureIdResult').style.display = 'none';
   $('natureIdCameraInput').value = '';
   $('restPointsSection').style.display = mode === 'wandel' ? 'block' : 'none';
@@ -15041,6 +15166,21 @@ document.querySelectorAll('.nav-type-card').forEach(card => {
 $('bikeSetupContinueBtn').addEventListener('click', () => {
   $('bikeSetupScreen').classList.add('hidden');
   selectMode(bikeSetupTargetMode);
+});
+$('wandelLoopGenBtnStd').addEventListener('click', () => {
+  $('bikeSetupScreen').classList.add('hidden');
+  selectMode('wandel');
+  setTimeout(() => { const b = $('menuLoopGenBtn'); if (b) b.click(); }, 300);
+});
+$('wandelNodeListBtnStd').addEventListener('click', () => {
+  $('bikeSetupScreen').classList.add('hidden');
+  selectMode('wandel');
+  setTimeout(() => { openModal('nodeListModal'); }, 300);
+});
+$('wandelGpxImportBtnStd').addEventListener('click', () => {
+  $('bikeSetupScreen').classList.add('hidden');
+  selectMode('wandel');
+  setTimeout(() => { const b = $('importBtn'); if (b) b.click(); }, 300);
 });
 $('bikeSetupBackBtn').addEventListener('click', () => {
   $('bikeSetupScreen').classList.add('hidden');
