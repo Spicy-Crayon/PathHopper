@@ -450,7 +450,7 @@
 
   /* ---------- Garmin-stijl navigatiescherm (optioneel, via Instellingen) ---------- */
   #garminSpeedGauge{ display:none; }
-  body.theme-garmin #dashboardPanel{ background:#0a1410; }
+  body.theme-garmin #dashboardPanel{ background:#0f172a; }
   body.theme-garmin #dashSummary,
   body.theme-garmin #dashSummary2,
   body.theme-garmin #dashSummary3{
@@ -732,7 +732,7 @@
   #modeSelectTitle{ color:var(--cream); font-size:19px; font-weight:800; flex-shrink:0; }
   .mode-tiles-main{ display:flex; flex-direction:column; align-items:center; }
   .mode-tiles-top{ display:flex; gap:9px; }
-  .mode-tile-bottom{ margin-top:-30px; }
+  .mode-tile-bottom{ margin-top:-33px; }
   .mode-tile-bottom .mode-label{ margin-top:2px; }
   .mode-tile{
     border:none; background:none; padding:0; display:flex; flex-direction:column; align-items:center; gap:4px;
@@ -955,6 +955,19 @@
   body.theme-garmin #modeSelectScreen,
   body.theme-garmin #weatherPanel,
   body.theme-garmin #sunPanel{ position:relative; overflow:hidden; }
+
+  /* Kaart/navigatiescherm: enkele elementen gebruikten een hardgecodeerde donkergroene kleur i.p.v. de
+     thema-variabele, waardoor ze onder Garmin-stijl toch groen bleven ogen naast de amber/navy-look. */
+  body.theme-garmin #topbarBg{
+    background:linear-gradient(180deg, rgba(15,23,42,0.92), rgba(15,23,42,0.85) 40%, rgba(15,23,42,0));
+  }
+  body.theme-garmin .tab-hex{ background:rgba(30,41,59,0.92); }
+  body.theme-garmin #hint{ background:rgba(15,23,42,0.94); }
+  body.theme-garmin .menu-item:active{ background:rgba(255,255,255,0.06); }
+  body.theme-garmin #passiveAnalyseBtn,
+  body.theme-garmin #bikeRoutingProAnalyseBtn{ background:#1e293b !important; }
+  body.theme-garmin #actionMenu{ background:#0f172a; }
+  body.theme-garmin .menu-item .mi-text small{ color:rgba(241,245,249,0.55); }
 
   #helpContent section{ margin-bottom:18px; padding-bottom:16px; border-bottom:1px solid var(--line); }
   #helpContent section:last-child{ border-bottom:none; margin-bottom:4px; padding-bottom:0; }
@@ -5576,10 +5589,10 @@ window.addEventListener('message', (ev) => {
 });
 // Kleine herbruikbare snippet (dot-driehoekje + wiring) die in elk Garmin-iframe-template wordt geplakt.
 const GARMIN_MENU_BTN_HTML = `
-  <button id="garminMenuBtn" title="Instellingen" class="w-4 h-4 flex flex-col items-center justify-center gap-[1.5px] bg-black/60 border border-amber-500/40 rounded-md hover:border-amber-400 hover:bg-black/80 transition active:scale-95 flex-shrink-0 shadow-lg">
-    <div class="flex gap-[1.5px]"><span class="w-[2.5px] h-[2.5px] rounded-full bg-amber-400"></span><span class="w-[2.5px] h-[2.5px] rounded-full bg-amber-400"></span><span class="w-[2.5px] h-[2.5px] rounded-full bg-amber-400"></span></div>
-    <div class="flex gap-[1.5px]"><span class="w-[2.5px] h-[2.5px] rounded-full bg-amber-400"></span><span class="w-[2.5px] h-[2.5px] rounded-full bg-amber-400"></span></div>
-    <div class="flex gap-[1.5px]"><span class="w-[2.5px] h-[2.5px] rounded-full bg-amber-400"></span></div>
+  <button id="garminMenuBtn" title="Instellingen" class="w-6 h-6 flex flex-col items-center justify-center gap-[2px] bg-black/70 border border-amber-500/50 rounded-md hover:border-amber-400 hover:bg-black/90 transition active:scale-95 flex-shrink-0 shadow-lg">
+    <div class="flex gap-[2px]"><span class="w-[3.5px] h-[3.5px] rounded-full bg-amber-400"></span><span class="w-[3.5px] h-[3.5px] rounded-full bg-amber-400"></span><span class="w-[3.5px] h-[3.5px] rounded-full bg-amber-400"></span></div>
+    <div class="flex gap-[2px]"><span class="w-[3.5px] h-[3.5px] rounded-full bg-amber-400"></span><span class="w-[3.5px] h-[3.5px] rounded-full bg-amber-400"></span></div>
+    <div class="flex gap-[2px]"><span class="w-[3.5px] h-[3.5px] rounded-full bg-amber-400"></span></div>
   </button>`;
 const GARMIN_MENU_BTN_JS = `
     const garminMenuBtn = document.getElementById('garminMenuBtn');
