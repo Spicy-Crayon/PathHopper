@@ -815,6 +815,26 @@
     box-shadow:0 6px 18px rgba(226,161,60,0.3);
   }
   #runCoachStartBtn:active{ filter:brightness(0.92); }
+  .rc-toptabs{ display:flex; gap:8px; background:rgba(255,255,255,0.05); border-radius:14px; padding:5px; margin-bottom:16px; }
+  .rc-toptabs button{ flex:1; border:none; background:none; padding:10px 4px; border-radius:10px; font-size:12px; font-weight:800; color:rgba(246,244,238,0.55); }
+  .rc-toptabs button.active{ background:var(--amber); color:var(--green-900); }
+  .rc-botnav{ display:flex; justify-content:space-around; width:100%; max-width:360px; margin:18px auto 0; padding-top:12px; border-top:1px solid rgba(255,255,255,0.08); }
+  .rc-botnav button{ border:none; background:none; display:flex; flex-direction:column; align-items:center; gap:2px; color:rgba(246,244,238,0.5); font-size:9.5px; font-weight:700; }
+  .rc-botnav button.active{ color:var(--amber); }
+  .rc-botnav button .ic{ font-size:17px; }
+  .rc-panel{ display:none; text-align:left; }
+  .rc-panel.active{ display:block; }
+  .rc-stat-card{ background:rgba(255,255,255,0.06); border-radius:16px; padding:16px; text-align:center; }
+  .rc-stat-card b{ display:block; font-size:24px; font-weight:900; color:var(--amber); }
+  .rc-stat-card span{ font-size:10.5px; color:rgba(246,244,238,0.55); text-transform:uppercase; }
+  .rc-stats-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:16px; }
+  .rc-week-row{ display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.06); font-size:12.5px; }
+  .rc-week-row.current{ color:var(--amber); font-weight:800; }
+  .rc-tip{ background:rgba(255,255,255,0.06); border-radius:14px; padding:13px 15px; margin-bottom:10px; font-size:12.5px; line-height:1.5; }
+  .rc-tip b{ display:block; margin-bottom:3px; color:var(--amber); font-size:12.5px; }
+  .rc-builder-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; }
+  .rc-builder-row label{ font-size:12.5px; color:var(--cream); }
+  .rc-builder-row input{ width:80px; padding:8px 10px; border-radius:10px; border:2px solid rgba(255,255,255,0.08); background:rgba(255,255,255,0.06); color:var(--cream); font-size:13px; text-align:center; }
 
   #runSessionScreen{
     position:fixed; top:0;left:0;right:0;bottom:0; z-index:3200; background:#0b0f0a;
@@ -1276,7 +1296,10 @@
   </div>
   <div class="mode-tiles-small">
     <button class="mode-banner" id="modeCompassBtn" style="background:linear-gradient(120deg,#5a3a9e,#3a2268);">
-      <span class="mode-banner-label" data-i18n="modeKompas">Kompas</span>
+      <span style="display:flex; flex-direction:column; position:relative; z-index:2;">
+        <span class="mode-banner-label" data-i18n="modeKompas">Kompas</span>
+        <span id="hubCompassSub" style="font-size:10.5px; color:rgba(255,255,255,0.75); margin-top:2px;">–</span>
+      </span>
       <span class="mode-banner-icon">🧭</span>
     </button>
     <button class="mode-banner" id="modeWeatherBtn" style="background:linear-gradient(120deg,#2a5a8f,#16334f);">
@@ -1285,7 +1308,7 @@
     </button>
   </div>
   <div id="modeSelectHint" data-i18n="modeSelectHint">Knooppunten, navigatie, GPX, offline-gebruik — alles werkt voor beide.</div>
-  <div id="appVersionStart">v2.261 · 12 aug</div>
+  <div id="appVersionStart">v2.300 · 13 aug</div>
 </div>
 
 <!-- Garmin-stijl hub: letterlijk Gemini's keuzescherm.html-ontwerp, geïsoleerd in een iframe zodat
@@ -1452,7 +1475,7 @@
   <button class="menu-item" id="menuHelpBtn"><span class="mi-icon">❓</span><span class="mi-text"><b data-i18n="menuHelp">Hulp</b><small data-i18n="menuHelpSub">uitleg over alle functies</small></span></button>
   <button class="menu-item" id="menuDevNotesBtn"><span class="mi-icon">🛠️</span><span class="mi-text"><b data-i18n="menuDevNotes">Technische werking</b><small data-i18n="menuDevNotesSub">hoe wegdektype, routering en fallbacks precies werken</small></span></button>
   <button class="menu-item" id="menuLogbookBtn"><span class="mi-icon">📋</span><span class="mi-text"><b data-i18n="menuLogbook">Logboek</b><small data-i18n="menuLogbookSub">overzicht van alle meldingen, ook stille</small></span></button>
-  <div id="menuVersion">v2.261 · 12 aug</div>
+  <div id="menuVersion">v2.300 · 13 aug</div>
 </div>
 
 <div id="hint" data-i18n="hintInitial">Zoom of pan naar je gebied, tik dan op "Laad knooppunten"</div>
@@ -2053,27 +2076,80 @@
 <div id="runCoachScreen" class="hidden">
   <button id="runCoachBackBtn" aria-label="Terug">←</button>
   <div class="bike-setup-inner">
-    <div class="bike-setup-title" style="text-align:left;">🏃 Hardlopen — 5K-opbouwschema</div>
-    <div class="run-week-card">
-      <div id="runCoachWeekLabel">WEEK 1 · DAG 1</div>
-      <div id="runCoachWeekTitle">–</div>
-      <div id="runCoachWeekDesc">–</div>
-      <div id="runCoachProgressLine">–</div>
+    <div class="bike-setup-title" style="text-align:left;">🏃 Hardlopen</div>
+
+    <div id="rcHomePanel" class="rc-panel active">
+      <div class="rc-toptabs">
+        <button id="rcTabLearnBtn" class="active">Leren Lopen</button>
+        <button id="rcTabFreeBtn">Vrije Run</button>
+        <button id="rcTabBuilderBtn">Eigen Schema</button>
+      </div>
+
+      <div id="rcLearnContent">
+        <div class="run-week-card">
+          <div id="runCoachWeekLabel">WEEK 1 · DAG 1</div>
+          <div id="runCoachWeekTitle">–</div>
+          <div id="runCoachWeekDesc">–</div>
+          <div id="runCoachProgressLine">–</div>
+        </div>
+      </div>
+      <div id="rcFreeContent" style="display:none;">
+        <div class="run-week-card" style="background:linear-gradient(160deg,#2a5f8f,#173a5c);">
+          <div style="color:rgba(255,255,255,0.75); font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.6px;">VRIJE RUN</div>
+          <div style="color:#fff; font-size:19px; font-weight:900; margin:4px 0 6px;">Los lopen, geen schema</div>
+          <div style="color:rgba(255,255,255,0.85); font-size:13px;">Enkel GPS-afstand, tempo en tijd — stop zelf wanneer je wil.</div>
+        </div>
+      </div>
+      <div id="rcBuilderContent" style="display:none;">
+        <div class="rc-builder-row"><label>Aantal herhalingen</label><input type="number" id="rcBuildReps" value="6" min="1" max="30"></div>
+        <div class="rc-builder-row"><label>Lopen (seconden)</label><input type="number" id="rcBuildRun" value="60" min="10" max="1800" step="10"></div>
+        <div class="rc-builder-row"><label>Wandelen (seconden)</label><input type="number" id="rcBuildWalk" value="90" min="10" max="1800" step="10"></div>
+        <button id="rcBuilderStartBtn" style="width:100%; border:none; border-radius:14px; padding:13px; background:rgba(255,255,255,0.08); color:var(--cream); font-weight:800; font-size:13px; margin-bottom:16px;">▶ Start dit schema</button>
+      </div>
+
+      <div class="run-voice-section">
+        <label>🔊 Stem voor audio-coach</label>
+        <select id="runCoachVoiceSelect"><option value="">Standaardstem van je toestel</option></select>
+      </div>
+      <div class="run-voice-section">
+        <label>🎵 Eigen muziek tijdens de training</label>
+        <label id="runMusicPickLabel" for="runMusicInput" style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.06); border:2px solid rgba(255,255,255,0.08); border-radius:12px; padding:11px 12px; cursor:pointer;">
+          <span style="font-size:18px;">📂</span>
+          <span style="flex:1; text-align:left; font-size:12.5px; color:var(--cream);">Kies MP3-bestanden van je toestel…</span>
+          <input type="file" id="runMusicInput" accept="audio/*" multiple class="hidden" style="display:none;">
+        </label>
+        <div id="runMusicCount" style="font-size:11px; color:rgba(246,244,238,0.55); margin-top:6px;">Geen eigen muziek geladen — de gesproken coach blijft altijd hoorbaar.</div>
+      </div>
+      <button id="runCoachStartBtn">▶ Start training</button>
     </div>
-    <div class="run-voice-section">
-      <label>🔊 Stem voor audio-coach</label>
-      <select id="runCoachVoiceSelect"><option value="">Standaardstem van je toestel</option></select>
+
+    <div id="rcStatsPanel" class="rc-panel">
+      <div class="rc-stats-grid">
+        <div class="rc-stat-card"><b id="rcStatSessions">0</b><span>Sessies</span></div>
+        <div class="rc-stat-card"><b id="rcStatKm">0.0</b><span>Totaal km</span></div>
+        <div class="rc-stat-card"><b id="rcStatTime">0u</b><span>Totale tijd</span></div>
+      </div>
+      <div id="rcHistoryList"></div>
     </div>
-    <div class="run-voice-section">
-      <label>🎵 Eigen muziek tijdens de training</label>
-      <label id="runMusicPickLabel" for="runMusicInput" style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.06); border:2px solid rgba(255,255,255,0.08); border-radius:12px; padding:11px 12px; cursor:pointer;">
-        <span style="font-size:18px;">📂</span>
-        <span style="flex:1; text-align:left; font-size:12.5px; color:var(--cream);">Kies MP3-bestanden van je toestel…</span>
-        <input type="file" id="runMusicInput" accept="audio/*" multiple class="hidden" style="display:none;">
-      </label>
-      <div id="runMusicCount" style="font-size:11px; color:rgba(246,244,238,0.55); margin-top:6px;">Geen eigen muziek geladen — de gesproken coach blijft altijd hoorbaar.</div>
+
+    <div id="rcSchemaPanel" class="rc-panel">
+      <div class="bike-setup-title" style="text-align:left; font-size:14px; margin-bottom:6px;">9-weken 5K-opbouwschema</div>
+      <div id="rcSchemaList"></div>
     </div>
-    <button id="runCoachStartBtn">▶ Start training</button>
+
+    <div id="rcPijnPanel" class="rc-panel">
+      <div class="rc-tip"><b>🦵 Scheenbeenpijn</b>Bouw langzaam op — max. 10% meer tijd/afstand per week. Loop op zachtere ondergrond en zorg voor goede schoenen.</div>
+      <div class="rc-tip"><b>🦶 Blaren</b>Draag hardloopsokken zonder naden, en loop schoenen eerst wat in vóór een langere sessie.</div>
+      <div class="rc-tip"><b>💧 Zijsteken</b>Adem dieper en regelmatiger, vertraag even, en eet niet vlak vóór het lopen.</div>
+      <div class="rc-tip"><b>🩹 Aanhoudende pijn</b>Pijn die na rust niet wegtrekt, of die tijdens het lopen erger wordt: bouw dan een rustdag in en raadpleeg bij twijfel een arts of kinesist. Dit zijn algemene tips, geen medisch advies.</div>
+    </div>
+
+    <div class="rc-botnav">
+      <button class="rc-navbtn active" data-panel="rcHomePanel"><span class="ic">🏠</span>Home</button>
+      <button class="rc-navbtn" data-panel="rcStatsPanel"><span class="ic">📊</span>Stats</button>
+      <button class="rc-navbtn" data-panel="rcSchemaPanel"><span class="ic">📋</span>Schema</button>
+      <button class="rc-navbtn" data-panel="rcPijnPanel"><span class="ic">💊</span>Pijn/Tips</button>
+    </div>
   </div>
 </div>
 <audio id="runMusicPlayer" preload="auto"></audio>
@@ -5664,14 +5740,47 @@ function showHubScreen(){
   if (garmin){
     if (!garminHubFrameLoaded){
       const frame = $('garminHubFrame');
-      frame.addEventListener('load', () => sendHubWeatherToFrame(), { once:true });
+      frame.addEventListener('load', () => { sendHubWeatherToFrame(); sendHubHeadingToFrame(); }, { once:true });
       frame.srcdoc = buildGarminHubHtml();
       garminHubFrameLoaded = true;
     } else {
       sendHubWeatherToFrame();
+      sendHubHeadingToFrame();
     }
     fetchHubWeather();
   }
+  startHubCompassIfAndroid();
+}
+// ---------- Live kompas-richting op de hub-tegel (enkel Android — iOS vereist een tik voor toestemming) ----------
+let hubCompassStarted = false;
+let hubLastHeading = null;
+function startHubCompassIfAndroid(){
+  if (hubCompassStarted) return;
+  const isIOSPermissionFlow = (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function');
+  if (isIOSPermissionFlow || typeof DeviceOrientationEvent === 'undefined') return; // iOS: kan niet zonder tik; onbeschikbaar: niets te doen
+  window.addEventListener('deviceorientation', handleHubOrientation, true);
+  hubCompassStarted = true;
+}
+function handleHubOrientation(event){
+  let heading = null;
+  if (event.webkitCompassHeading !== undefined) heading = event.webkitCompassHeading;
+  else if (event.alpha !== null) heading = 360 - event.alpha;
+  if (heading == null) return;
+  const normalized = Math.round(heading) % 360;
+  hubLastHeading = normalized < 0 ? normalized + 360 : normalized;
+  const cardinals = cardinalsForLang();
+  const dirLabel = cardinals[Math.round(hubLastHeading / 22.5) % 16];
+  const text = hubLastHeading + '° ' + dirLabel;
+  const el = $('hubCompassSub');
+  if (el) el.textContent = text;
+  sendHubHeadingToFrame();
+}
+function sendHubHeadingToFrame(){
+  const frame = $('garminHubFrame');
+  if (!frame || !frame.contentWindow || hubLastHeading == null) return;
+  const cardinals = cardinalsForLang();
+  const dirLabel = cardinals[Math.round(hubLastHeading / 22.5) % 16];
+  frame.contentWindow.postMessage({ source:'garminHubHeading', heading:hubLastHeading, dirLabel }, '*');
 }
 function sendHubWeatherToFrame(){
   const frame = $('garminHubFrame');
@@ -5733,6 +5842,32 @@ function closeRunCoachScreen(){
   $('runCoachScreen').classList.add('hidden');
   showHubScreen();
 }
+// Bruggetjes vanuit de Garmin RunCoach-iframe: opent hetzelfde échte scherm op het juiste tabblad
+// i.p.v. een aparte Garmin-versie van Stats/Schema/Pijn/Eigen-schema te herbouwen.
+async function openRunCoachScreenOnTab(tab){
+  $('garminRunCoachScreen').classList.add('hidden');
+  $('runCoachScreen').classList.remove('hidden');
+  await renderRunCoachScreen();
+  document.querySelectorAll('.rc-navbtn').forEach(b => b.classList.remove('active'));
+  document.querySelector('.rc-navbtn[data-panel="rcHomePanel"]').classList.add('active');
+  document.querySelectorAll('.rc-panel').forEach(p => p.classList.remove('active'));
+  $('rcHomePanel').classList.add('active');
+  rcSwitchTopTab(tab);
+}
+async function openRunCoachScreenOnPanel(panel){
+  const map = { sessie:'rcHomePanel', stats:'rcStatsPanel', schema:'rcSchemaPanel', pijn:'rcPijnPanel' };
+  const panelId = map[panel] || 'rcHomePanel';
+  $('garminRunCoachScreen').classList.add('hidden');
+  $('runCoachScreen').classList.remove('hidden');
+  await renderRunCoachScreen();
+  document.querySelectorAll('.rc-navbtn').forEach(b => b.classList.remove('active'));
+  const navBtn = document.querySelector(`.rc-navbtn[data-panel="${panelId}"]`);
+  if (navBtn) navBtn.classList.add('active');
+  document.querySelectorAll('.rc-panel').forEach(p => p.classList.remove('active'));
+  $(panelId).classList.add('active');
+  if (panelId === 'rcStatsPanel') await renderRunStatsPanel();
+  if (panelId === 'rcSchemaPanel') await renderRunSchemaPanel();
+}
 async function renderRunCoachScreen(){
   const p = await getRunProgress();
   const w = getRunWeekData(p.week);
@@ -5772,6 +5907,61 @@ function playNextRunTrack(){
   runMusicIdx++;
   player.volume = 0.55;
   player.play().catch(() => { /* toestel blokkeert autoplay zonder gebruikersinteractie — muziekknop is zelf al een tik geweest, dit lukt normaal */ });
+}
+let rcActiveMode = 'learn'; // 'learn' | 'free' | 'builder'
+function rcSwitchTopTab(mode){
+  rcActiveMode = mode;
+  $('rcTabLearnBtn').classList.toggle('active', mode==='learn');
+  $('rcTabFreeBtn').classList.toggle('active', mode==='free');
+  $('rcTabBuilderBtn').classList.toggle('active', mode==='builder');
+  $('rcLearnContent').style.display = mode==='learn' ? 'block' : 'none';
+  $('rcFreeContent').style.display = mode==='free' ? 'block' : 'none';
+  $('rcBuilderContent').style.display = mode==='builder' ? 'block' : 'none';
+  $('runCoachStartBtn').style.display = mode==='builder' ? 'none' : 'block';
+}
+$('rcTabLearnBtn').addEventListener('click', () => rcSwitchTopTab('learn'));
+$('rcTabFreeBtn').addEventListener('click', () => rcSwitchTopTab('free'));
+$('rcTabBuilderBtn').addEventListener('click', () => rcSwitchTopTab('builder'));
+$('rcBuilderStartBtn').addEventListener('click', () => {
+  const reps = Math.max(1, parseInt($('rcBuildReps').value) || 1);
+  const runSec = Math.max(10, parseInt($('rcBuildRun').value) || 60);
+  const walkSec = Math.max(10, parseInt($('rcBuildWalk').value) || 60);
+  startRunSession({ custom: buildRunWalkIntervals(reps, runSec, walkSec, 300, 300) });
+});
+
+// ---------- Onderste tabbladen: Home / Stats / Schema / Pijn ----------
+document.querySelectorAll('.rc-navbtn').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    document.querySelectorAll('.rc-navbtn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.rc-panel').forEach(p => p.classList.remove('active'));
+    $(btn.dataset.panel).classList.add('active');
+    if (btn.dataset.panel === 'rcStatsPanel') await renderRunStatsPanel();
+    if (btn.dataset.panel === 'rcSchemaPanel') await renderRunSchemaPanel();
+  });
+});
+async function renderRunStatsPanel(){
+  let history = [];
+  try{ const v = await storageGet('run_history'); history = v ? JSON.parse(v) : []; }catch(e){}
+  const totalKm = history.reduce((s,r) => s + (r.km||0), 0);
+  const totalSec = history.reduce((s,r) => s + (r.durationSec||0), 0);
+  $('rcStatSessions').textContent = history.length;
+  $('rcStatKm').textContent = totalKm.toFixed(1);
+  $('rcStatTime').textContent = totalSec >= 3600 ? (totalSec/3600).toFixed(1) + 'u' : Math.round(totalSec/60) + 'm';
+  $('rcHistoryList').innerHTML = history.length ? history.slice(0,15).map(r => {
+    const d = new Date(r.date);
+    const dateLabel = d.toLocaleDateString('nl-BE', { day:'2-digit', month:'short' });
+    return `<div style="display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.06); font-size:12.5px;">
+      <span style="color:var(--cream);">${dateLabel} — ${r.km.toFixed(2)} km</span>
+      <span style="color:rgba(246,244,238,0.55);">${fmtMMSS(r.durationSec)}${r.completed ? ' ✅' : ''}</span>
+    </div>`;
+  }).join('') : `<div style="color:rgba(246,244,238,0.5); font-size:12.5px; text-align:center; padding:20px 0;">Nog geen trainingen afgerond.</div>`;
+}
+async function renderRunSchemaPanel(){
+  const p = await getRunProgress();
+  $('rcSchemaList').innerHTML = RUN_5K_PROGRAM.map(w => `<div class="rc-week-row ${w.week===p.week ? 'current' : ''}">
+    <span>Week ${w.week} — ${w.title}</span><span>${w.desc}</span>
+  </div>`).join('');
 }
 $('runCoachBackBtn').addEventListener('click', closeRunCoachScreen);
 $('runCoachStartBtn').addEventListener('click', () => startRunSession());
@@ -5818,20 +6008,31 @@ function fmtMMSS(totalSec){
   const s = Math.max(0, Math.round(totalSec));
   return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0');
 }
-async function startRunSession(){
-  const p = await getRunProgress();
-  const w = getRunWeekData(p.week);
-  const intervals = w.build();
+async function startRunSession(opts){
+  opts = opts || {};
+  let intervals, week = null, day = null, isCustom = false, freeform = false;
+  if (opts.custom){
+    intervals = opts.custom; isCustom = true;
+  } else if (rcActiveMode === 'free'){
+    intervals = [{ type:'run', sec: 999999 }]; freeform = true;
+  } else {
+    const p = await getRunProgress();
+    const w = getRunWeekData(p.week);
+    intervals = w.build();
+    week = p.week; day = p.day;
+  }
   rsState = {
     intervals, idx:0, remainingSec: intervals[0].sec,
     tickId:null, watchId:null, distanceM:0, startedAt:Date.now(), pausedMs:0, pauseStartedAt:null,
-    lastPos:null, paused:false, week:p.week, day:p.day
+    lastPos:null, paused:false, week, day, isCustom, freeform, lastAnnouncedKm:0
   };
   $('runCoachScreen').classList.add('hidden');
   $('runSessionScreen').classList.remove('hidden');
   $('rsGpsWarning').style.display = 'none';
   updateRunSessionUI();
-  speakForRun(curLang()==='en' ? RUN_START_ANNOUNCE[intervals[0].type].en : RUN_START_ANNOUNCE[intervals[0].type].nl);
+  speakForRun(freeform
+    ? (curLang()==='en' ? 'Free run started. Go at your own pace.' : 'Vrije run gestart. Loop op je eigen tempo.')
+    : (curLang()==='en' ? RUN_START_ANNOUNCE[intervals[0].type].en : RUN_START_ANNOUNCE[intervals[0].type].nl));
   if (runMusicFiles.length) playNextRunTrack();
   $('runMusicPlayer').addEventListener('ended', playNextRunTrack);
   rsState.tickId = setInterval(tickRunSession, 1000);
@@ -5853,10 +6054,16 @@ function handleRunGpsUpdate(pos){
     if (!(d > 30 && dt < 2)) rsState.distanceM += d;
   }
   rsState.lastPos = pos;
+  const km = rsState.distanceM / 1000;
+  if (Math.floor(km) > rsState.lastAnnouncedKm){
+    rsState.lastAnnouncedKm = Math.floor(km);
+    speakForRun(rsState.lastAnnouncedKm + (curLang()==='en' ? ' kilometer.' : ' kilometer.'));
+  }
   updateRunSessionUI();
 }
 function tickRunSession(){
   if (!rsState || rsState.paused) return;
+  if (rsState.freeform){ updateRunSessionUI(); return; }
   rsState.remainingSec -= 1;
   if (rsState.remainingSec <= 0){
     rsState.idx += 1;
@@ -5871,19 +6078,26 @@ function tickRunSession(){
 }
 function updateRunSessionUI(){
   if (!rsState) return;
-  const cur = rsState.intervals[rsState.idx];
   const en = curLang()==='en';
   const label = $('rsIntervalLabel');
-  label.textContent = en ? RUN_INTERVAL_LABELS[cur.type].en : RUN_INTERVAL_LABELS[cur.type].nl;
-  label.className = 'type-' + cur.type;
-  $('rsCountdown').textContent = fmtMMSS(rsState.remainingSec);
-  const next = rsState.intervals[rsState.idx + 1];
-  $('rsNextLabel').textContent = next
-    ? (en ? 'Next: ' : 'Volgende: ') + (en ? RUN_INTERVAL_LABELS[next.type].en : RUN_INTERVAL_LABELS[next.type].nl)
-    : (en ? 'Last interval' : 'Laatste interval');
+  const elapsedSec = (Date.now() - rsState.startedAt - rsState.pausedMs) / 1000;
+  if (rsState.freeform){
+    label.textContent = en ? 'Free run' : 'Vrij lopen';
+    label.className = 'type-run';
+    $('rsCountdown').textContent = fmtMMSS(elapsedSec);
+    $('rsNextLabel').textContent = en ? 'Stop whenever you like' : 'Stop zelf wanneer je wil';
+  } else {
+    const cur = rsState.intervals[rsState.idx];
+    label.textContent = en ? RUN_INTERVAL_LABELS[cur.type].en : RUN_INTERVAL_LABELS[cur.type].nl;
+    label.className = 'type-' + cur.type;
+    $('rsCountdown').textContent = fmtMMSS(rsState.remainingSec);
+    const next = rsState.intervals[rsState.idx + 1];
+    $('rsNextLabel').textContent = next
+      ? (en ? 'Next: ' : 'Volgende: ') + (en ? RUN_INTERVAL_LABELS[next.type].en : RUN_INTERVAL_LABELS[next.type].nl)
+      : (en ? 'Last interval' : 'Laatste interval');
+  }
   const km = rsState.distanceM / 1000;
   $('rsDistance').textContent = km.toFixed(2);
-  const elapsedSec = (Date.now() - rsState.startedAt - rsState.pausedMs) / 1000;
   $('rsElapsed').textContent = fmtMMSS(elapsedSec);
   const runningMinutes = elapsedSec / 60;
   $('rsPace').textContent = (km > 0.05 && runningMinutes > 0) ? fmtMMSS((runningMinutes / km) * 60) : '–:–';
@@ -5916,13 +6130,20 @@ async function finishRunSession(completed){
   player.removeEventListener('ended', playNextRunTrack);
   const elapsedSec = (Date.now() - rsState.startedAt - rsState.pausedMs) / 1000;
   const km = rsState.distanceM / 1000;
+  const isStructured = !rsState.isCustom && !rsState.freeform;
   if (completed){
     speakForRun(curLang()==='en' ? 'Training complete. Well done!' : 'Training afgerond. Goed gedaan!');
-    await advanceRunProgress();
+    if (isStructured) await advanceRunProgress();
+  } else if (rsState.freeform || rsState.isCustom){
+    speakForRun(curLang()==='en' ? 'Run stopped. Well done!' : 'Run gestopt. Goed gedaan!');
   }
   try{
     const history = await storageGet('run_history').then(v => v ? JSON.parse(v) : []).catch(() => []);
-    history.unshift({ date:new Date().toISOString(), week:rsState.week, day:rsState.day, km:Math.round(km*100)/100, durationSec:Math.round(elapsedSec), completed });
+    history.unshift({
+      date:new Date().toISOString(), week:rsState.week, day:rsState.day,
+      km:Math.round(km*100)/100, durationSec:Math.round(elapsedSec),
+      completed, freeform:rsState.freeform, custom:rsState.isCustom
+    });
     await storageSet('run_history', JSON.stringify(history.slice(0, 200)));
   }catch(e){ /* geschiedenis opslaan mislukt, sessie zelf blijft wel gewoon geldig afgerond */ }
   const summaryMsg = (curLang()==='en'
@@ -6162,6 +6383,8 @@ window.addEventListener('message', (ev) => {
     case 'setvoice':     localStorage.setItem(RUN_VOICE_KEY, data.uri || ''); break;
     case 'setmusic':     runMusicFiles = data.files || []; runMusicIdx = 0; break;
     case 'other-not-built': toast(curLang()==='en' ? 'Not built yet — coming later.' : 'Nog niet gebouwd — komt later.', 2500); break;
+    case 'opentab': openRunCoachScreenOnTab(data.tab); break;
+    case 'openpanel': openRunCoachScreenOnPanel(data.panel); break;
   }
 });
 
@@ -7196,7 +7419,7 @@ ${GARMIN_MENU_BTN_JS}
 </body>
 </html>`;
 }
-const APP_VERSION_TEXT = 'v2.261 · 12 aug';
+const APP_VERSION_TEXT = 'v2.300 · 13 aug';
 function buildGarminHubHtml(){
   // Dit is Gemini's keuzescherm.html, ongewijzigd qua opbouw/stijl — enkel: (1) een derde grote tegel
   // "Hardlopen" toegevoegd, (2) de <a href> vervangen door postMessage-oproepen naar de echte app.
@@ -7279,8 +7502,8 @@ function buildGarminHubHtml(){
             <span class="text-slate-500 group-hover:text-white transition">🧭</span>
           </div>
           <div class="mt-4">
-            <div class="text-lg font-black text-white group-hover:text-amber-400 transition flex items-center gap-1.5">Tik voor live kompas</div>
-            <span class="text-[10px] text-slate-500 mt-0.5 block">Sensor start pas na tikken</span>
+            <div id="hubKompasValue" class="text-lg font-black text-white group-hover:text-amber-400 transition flex items-center gap-1.5">Tik voor live kompas</div>
+            <span id="hubKompasSub" class="text-[10px] text-slate-500 mt-0.5 block">Sensor start pas na tikken</span>
           </div>
         </button>
 
@@ -7315,6 +7538,15 @@ ${GARMIN_MENU_BTN_JS}
       }
       valEl.innerHTML = data.temp + '°C <span class="text-xs font-normal text-slate-400">' + data.windLabel + '</span>';
       subEl.textContent = data.updatedLabel;
+    });
+    window.addEventListener('message', (ev) => {
+      const data = ev.data;
+      if (!data || data.source !== 'garminHubHeading') return;
+      const valEl = document.getElementById('hubKompasValue');
+      const subEl = document.getElementById('hubKompasSub');
+      if (!valEl) return;
+      valEl.textContent = data.heading + '° ' + data.dirLabel;
+      subEl.textContent = 'Live';
     });
   <\/script>
 </body>
@@ -7422,11 +7654,11 @@ function buildGarminRunCoachHtml(){
   <script>
     document.getElementById('rcBackBtn').addEventListener('click', () => parent.postMessage({ source:'garminRunCoach', action:'back' }, '*'));
     document.getElementById('rcStartBtn').addEventListener('click', () => parent.postMessage({ source:'garminRunCoach', action:'starttraining' }, '*'));
-    document.getElementById('rcTabAdvanced').addEventListener('click', () => parent.postMessage({ source:'garminRunCoach', action:'other-not-built' }, '*'));
+    document.getElementById('rcTabAdvanced').addEventListener('click', () => parent.postMessage({ source:'garminRunCoach', action:'opentab', tab:'free' }, '*'));
     document.getElementById('rcAudioPodcast').addEventListener('click', () => parent.postMessage({ source:'garminRunCoach', action:'other-not-built' }, '*'));
-    document.getElementById('rcSchemaBuilderBtn').addEventListener('click', () => parent.postMessage({ source:'garminRunCoach', action:'other-not-built' }, '*'));
+    document.getElementById('rcSchemaBuilderBtn').addEventListener('click', () => parent.postMessage({ source:'garminRunCoach', action:'opentab', tab:'builder' }, '*'));
     document.querySelectorAll('.rc-nav[data-nav]').forEach(btn => {
-      btn.addEventListener('click', () => parent.postMessage({ source:'garminRunCoach', action:'other-not-built' }, '*'));
+      btn.addEventListener('click', () => parent.postMessage({ source:'garminRunCoach', action:'openpanel', panel:btn.dataset.nav }, '*'));
     });
     document.getElementById('rcAccordionBtn').addEventListener('click', () => {
       const body = document.getElementById('rcAccordionBody');
