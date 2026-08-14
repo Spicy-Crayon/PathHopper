@@ -815,11 +815,11 @@
   #runCoachScreen.hidden{ display:none; }
   #runCoachBackBtn{
     position:absolute; left:16px; top:calc(16px + env(safe-area-inset-top,0px) + var(--extra-top-inset));
-    border:2px solid var(--amber); background:rgba(226,161,60,0.16); color:var(--amber);
-    width:42px; height:38px; border-radius:14px; box-shadow:0 2px 6px rgba(0,0,0,0.25);
+    border:none; background:rgba(226,161,60,0.12); color:var(--amber);
+    width:42px; height:36px; border-radius:16px; box-shadow:none;
     display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:900; line-height:1;
   }
-  #runCoachBackBtn:active{ background:rgba(226,161,60,0.3); }
+  #runCoachBackBtn:active{ background:rgba(226,161,60,0.22); }
   #runCoachScreen .bike-setup-inner{ margin-top:22px; } /* overschrijft de -25px van .bike-setup-inner (bedoeld voor het fietsscherm) zodat de kaart niet meer onder de terugknop schuift */
   .run-week-card{
     background:linear-gradient(160deg,#c23b3b,#7a1f1f); border-radius:18px; padding:18px;
@@ -972,11 +972,11 @@
   body.theme-garmin #runCoachStartBtn{ background:#e2a13c; color:#0f172a; }
   #bikeSetupBackBtn{
     position:absolute; left:16px; top:calc(16px + env(safe-area-inset-top,0px) + var(--extra-top-inset));
-    border:2px solid var(--amber); background:rgba(226,161,60,0.16); color:var(--amber);
-    width:42px; height:38px; border-radius:14px; box-shadow:0 2px 6px rgba(0,0,0,0.25);
+    border:none; background:rgba(226,161,60,0.12); color:var(--amber);
+    width:42px; height:36px; border-radius:16px; box-shadow:none;
     display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:900; line-height:1;
   }
-  #bikeSetupBackBtn:active{ background:rgba(226,161,60,0.3); }
+  #bikeSetupBackBtn:active{ background:rgba(226,161,60,0.22); }
   .bike-setup-inner{ width:100%; max-width:380px; text-align:center; margin-top:-25px; }
   .bike-setup-title{ color:var(--cream); font-size:16px; font-weight:800; margin-bottom:16px; }
 
@@ -1414,7 +1414,7 @@
 </div>
 
 <div id="bikeSetupScreen" class="hidden">
-  <button id="bikeSetupBackBtn" aria-label="Terug">←</button>
+  <button id="bikeSetupBackBtn" aria-label="Terug"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg></button>
   <div class="bike-setup-inner">
     <div id="bikeTypeSection">
       <div class="bike-setup-title" id="bikeSetupTitle" data-i18n="bikeSetupBikeTypeTitle">🚲 Kies je fietstype</div>
@@ -2275,7 +2275,7 @@
 </div>
 
 <div id="runCoachScreen" class="hidden">
-  <button id="runCoachBackBtn" aria-label="Terug">←</button>
+  <button id="runCoachBackBtn" aria-label="Terug"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg></button>
   <button id="runCoachAudioHeaderBtn" aria-label="Muziek &amp; podcast" style="position:absolute; top:16px; right:16px; z-index:10; width:38px; height:38px; border-radius:50%; border:1.5px solid rgba(226,161,60,0.4); background:rgba(0,0,0,0.25); color:var(--amber); font-size:16px; display:flex; align-items:center; justify-content:center;">🎵</button>
   <div class="bike-setup-inner">
     <div class="bike-setup-title" style="text-align:left;">🏃 Hardlopen</div>
@@ -4549,43 +4549,56 @@ async function celebrateNewMedals(newlyUnlocked){
   }
 }
 
+// Gebaseerd op het officiële NHS "Couch to 5K" podcast-schema (nhs.uk/live-well/exercise/running-and-aerobic-exercises/
+// get-running-with-couch-to-5k) — het bekendste en meest gebruikte 5K-opbouwschema wereldwijd, 9 weken, 3 sessies/week.
+// Week 5 en 6 hebben elk 3 verschillende sessies per week (dag 1/2/3 zijn dan niet identiek) — exact zoals het origineel.
 const RUN_5K_PROGRAM = [
-  { week:1, title:'Wennen aan het ritme', desc:'8x (1 min lopen / 2 min wandelen)', build: () => buildRunWalkIntervals(8, 60, 120, 300, 300) },
-  { week:2, title:'Iets langer doorlopen', desc:'6x (2 min lopen / 2 min wandelen)', build: () => buildRunWalkIntervals(6, 120, 120, 300, 300) },
-  { week:3, title:'Opbouwen', desc:'5x (3 min lopen / 2 min wandelen)', build: () => buildRunWalkIntervals(5, 180, 120, 300, 300) },
-  { week:4, title:'Langere loopstukken', desc:'4x (4 min lopen / 2 min wandelen)', build: () => buildRunWalkIntervals(4, 240, 120, 300, 300) },
-  { week:5, title:'Bijna daar', desc:'3x (6 min lopen / 1,5 min wandelen)', build: () => buildRunWalkIntervals(3, 360, 90, 300, 300) },
-  { week:6, title:'Grote stukken', desc:'2x (9 min lopen / 2 min wandelen)', build: () => buildRunWalkIntervals(2, 540, 120, 300, 300) },
-  { week:7, title:'Bijna ononderbroken', desc:'15 min lopen · 3 min wandelen · 10 min lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:900},{type:'walk',sec:180},{type:'run',sec:600},{type:'cooldown',sec:300}] },
-  { week:8, title:'Nog verder', desc:'20 minuten ononderbroken lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:1200},{type:'cooldown',sec:300}] },
-  { week:9, title:'Bijna de volle 5K', desc:'25 minuten ononderbroken lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:1500},{type:'cooldown',sec:300}] },
-  { week:10, title:'5K gehaald!', desc:'30 minuten ononderbroken lopen (± 5 km)', build: () => [{type:'warmup',sec:300},{type:'run',sec:1800},{type:'cooldown',sec:300}] }
+  { week:1, title:'Wennen aan het ritme', desc:'8x (1 min lopen / 1,5 min wandelen)', build: () => buildRunWalkIntervals(8, 60, 90, 300, 300) },
+  { week:2, title:'Iets langer doorlopen', desc:'6x (1,5 min lopen / 2 min wandelen)', build: () => buildRunWalkIntervals(6, 90, 120, 300, 300) },
+  { week:3, title:'Opbouwen', desc:'2x (1,5 min lopen/wandelen + 3 min lopen/wandelen)', build: () => [{type:'warmup',sec:300},{type:'run',sec:90},{type:'walk',sec:90},{type:'run',sec:180},{type:'walk',sec:180},{type:'run',sec:90},{type:'walk',sec:90},{type:'run',sec:180},{type:'walk',sec:180},{type:'cooldown',sec:300}] },
+  { week:4, title:'Langere loopstukken', desc:'3-1,5-5-2,5-3-1,5-5 min (lopen/wandelen)', build: () => [{type:'warmup',sec:300},{type:'run',sec:180},{type:'walk',sec:90},{type:'run',sec:300},{type:'walk',sec:150},{type:'run',sec:180},{type:'walk',sec:90},{type:'run',sec:300},{type:'cooldown',sec:300}] },
+  { week:5, title:'Drie verschillende runs', desc:'Di 5-3-8-3-5 min · Do 8-5-8 min · Zo 20 min ononderbroken', build: (day) =>
+      day===1 ? [{type:'warmup',sec:300},{type:'run',sec:300},{type:'walk',sec:180},{type:'run',sec:480},{type:'walk',sec:180},{type:'run',sec:300},{type:'cooldown',sec:300}]
+    : day===2 ? [{type:'warmup',sec:300},{type:'run',sec:480},{type:'walk',sec:300},{type:'run',sec:480},{type:'cooldown',sec:300}]
+    : contRun(1200) },
+  { week:6, title:'Grote stukken', desc:'Di 5-3-8-3-5 min · Do 10-3-10 min · Zo 25 min ononderbroken', build: (day) =>
+      day===1 ? [{type:'warmup',sec:300},{type:'run',sec:300},{type:'walk',sec:180},{type:'run',sec:480},{type:'walk',sec:180},{type:'run',sec:300},{type:'cooldown',sec:300}]
+    : day===2 ? [{type:'warmup',sec:300},{type:'run',sec:600},{type:'walk',sec:180},{type:'run',sec:600},{type:'cooldown',sec:300}]
+    : contRun(1500) },
+  { week:7, title:'Bijna ononderbroken', desc:'25 minuten ononderbroken lopen', build: () => contRun(1500) },
+  { week:8, title:'Nog verder', desc:'28 minuten ononderbroken lopen', build: () => contRun(1680) },
+  { week:9, title:'5K gehaald!', desc:'30 minuten ononderbroken lopen — je doel', build: () => contRun(1800) }
 ];
-// Vervolgschema, uitgaande van iemand die al ± 5K ononderbroken kan lopen (bv. na RUN_5K_PROGRAM) en de duur verder opbouwt naar ± 7,5K.
-const RUN_7_5K_PROGRAM = [
-  { week:1, title:'Basis leggen', desc:'20 minuten ononderbroken lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:1200},{type:'cooldown',sec:300}] },
-  { week:2, title:'Iets langer', desc:'24 minuten ononderbroken lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:1440},{type:'cooldown',sec:300}] },
-  { week:3, title:'Doorzetten', desc:'28 minuten ononderbroken lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:1680},{type:'cooldown',sec:300}] },
-  { week:4, title:'Opbouwen', desc:'32 minuten ononderbroken lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:1920},{type:'cooldown',sec:300}] },
-  { week:5, title:'Halverwege', desc:'36 minuten ononderbroken lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:2160},{type:'cooldown',sec:300}] },
-  { week:6, title:'Stevig tempo', desc:'40 minuten ononderbroken lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:2400},{type:'cooldown',sec:300}] },
-  { week:7, title:'Duurloop', desc:'44 minuten ononderbroken lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:2640},{type:'cooldown',sec:300}] },
-  { week:8, title:'Bijna zover', desc:'48 minuten ononderbroken lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:2880},{type:'cooldown',sec:300}] },
-  { week:9, title:'Laatste opbouw', desc:'50 minuten ononderbroken lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:3000},{type:'cooldown',sec:300}] },
-  { week:10, title:'7,5K gehaald!', desc:'52 minuten ononderbroken lopen (± 7,5 km)', build: () => [{type:'warmup',sec:300},{type:'run',sec:3120},{type:'cooldown',sec:300}] }
-];
-// Vervolgschema richting ± 10K duurloop.
+// Kleine helper: ononderbroken duurloop met vaste warm-up/cooldown, gebruikt door de schema's hieronder.
+function contRun(sec){ return [{type:'warmup',sec:300},{type:'run',sec:sec},{type:'cooldown',sec:300}]; }
+
+// Gebaseerd op Hal Higdon's "Novice 10K" trainingsschema (halhigdon.com/training-programs/10k-training/novice-10k) —
+// een van de bekendste en meest gebruikte beproefde 10K-opbouwschema's, oorspronkelijk 8 weken met 3 loopdagen/week
+// (dag 1 = korte duurloop, dag 2 = herstelloop, dag 3 = lange duurloop die wekelijks oploopt). Higdons kilometers zijn
+// hier 1-op-1 overgenomen en omgezet naar tijd via een rustig, aanspreekbaar tempo van ±7:00/km (Higdon: "don't worry
+// about pace, go slow, walk if you need to") — de kilometers zelf zijn dus authentiek, de duur is een schatting.
 const RUN_10K_PROGRAM = [
-  { week:1, title:'Basis leggen', desc:'30 minuten ononderbroken lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:1800},{type:'cooldown',sec:300}] },
-  { week:2, title:'Iets langer', desc:'34 minuten ononderbroken lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:2040},{type:'cooldown',sec:300}] },
-  { week:3, title:'Doorzetten', desc:'38 minuten ononderbroken lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:2280},{type:'cooldown',sec:300}] },
-  { week:4, title:'Opbouwen', desc:'42 minuten ononderbroken lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:2520},{type:'cooldown',sec:300}] },
-  { week:5, title:'Halverwege', desc:'46 minuten ononderbroken lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:2760},{type:'cooldown',sec:300}] },
-  { week:6, title:'Stevig tempo', desc:'50 minuten ononderbroken lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:3000},{type:'cooldown',sec:300}] },
-  { week:7, title:'Duurloop', desc:'55 minuten ononderbroken lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:3300},{type:'cooldown',sec:300}] },
-  { week:8, title:'Bijna zover', desc:'60 minuten ononderbroken lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:3600},{type:'cooldown',sec:300}] },
-  { week:9, title:'Laatste opbouw', desc:'65 minuten ononderbroken lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:3900},{type:'cooldown',sec:300}] },
-  { week:10, title:'10K gehaald!', desc:'70 minuten ononderbroken lopen (± 10 km)', build: () => [{type:'warmup',sec:300},{type:'run',sec:4200},{type:'cooldown',sec:300}] }
+  { week:1, title:'Basis leggen', desc:'Di 4,0 km · Do 3,2 km · Zo 4,8 km (lange duurloop)', build: (day) => contRun(day===1?1680:day===2?1350:2010) },
+  { week:2, title:'Iets verder', desc:'Di 4,0 km · Do 3,2 km · Zo 5,9 km (lange duurloop)', build: (day) => contRun(day===1?1680:day===2?1350:2490) },
+  { week:3, title:'Doorzetten', desc:'Di 4,0 km · Do 3,2 km · Zo 6,4 km (lange duurloop)', build: (day) => contRun(day===1?1680:day===2?1350:2700) },
+  { week:4, title:'Opbouwen', desc:'Di 4,8 km · Do 3,2 km · Zo 6,4 km (lange duurloop)', build: (day) => contRun(day===1?2010:day===2?1350:2700) },
+  { week:5, title:'Halverwege', desc:'Di 4,8 km · Do 3,2 km · Zo 7,3 km (lange duurloop)', build: (day) => contRun(day===1?2010:day===2?1350:3060) },
+  { week:6, title:'Stevig doorbouwen', desc:'Di 4,8 km · Do 3,2 km · Zo 8,1 km (lange duurloop)', build: (day) => contRun(day===1?2010:day===2?1350:3420) },
+  { week:7, title:'Laatste opbouw', desc:'Di 4,8 km · Do 3,2 km · Zo 8,9 km (lange duurloop)', build: (day) => contRun(day===1?2010:day===2?1350:3720) },
+  { week:8, title:'10K-week!', desc:'Di 4,8 km · Do 3,2 km · Zo 10 km — je doel', build: (day) => contRun(day===1?2010:day===2?1350:4200) }
+];
+// Zelfde beproefde Higdon-opbouw en -ritme, maar proportioneel geschaald (×0,75) naar een 7,5K-doel in plaats van 10K —
+// er bestaat geen even bekend officieel 7,5K-schema (ongebruikelijke wedstrijdafstand), dus dit is een eerlijke
+// schaling van een echt programma, geen verzonnen progressie.
+const RUN_7_5K_PROGRAM = [
+  { week:1, title:'Basis leggen', desc:'Di 3,0 km · Do 2,4 km · Zo 3,6 km (lange duurloop)', build: (day) => contRun(day===1?1260:day===2?1020:1500) },
+  { week:2, title:'Iets verder', desc:'Di 3,0 km · Do 2,4 km · Zo 4,4 km (lange duurloop)', build: (day) => contRun(day===1?1260:day===2?1020:1860) },
+  { week:3, title:'Doorzetten', desc:'Di 3,0 km · Do 2,4 km · Zo 4,8 km (lange duurloop)', build: (day) => contRun(day===1?1260:day===2?1020:2010) },
+  { week:4, title:'Opbouwen', desc:'Di 3,6 km · Do 2,4 km · Zo 4,8 km (lange duurloop)', build: (day) => contRun(day===1?1500:day===2?1020:2010) },
+  { week:5, title:'Halverwege', desc:'Di 3,6 km · Do 2,4 km · Zo 5,5 km (lange duurloop)', build: (day) => contRun(day===1?1500:day===2?1020:2310) },
+  { week:6, title:'Stevig doorbouwen', desc:'Di 3,6 km · Do 2,4 km · Zo 6,1 km (lange duurloop)', build: (day) => contRun(day===1?1500:day===2?1020:2580) },
+  { week:7, title:'Laatste opbouw', desc:'Di 3,6 km · Do 2,4 km · Zo 6,7 km (lange duurloop)', build: (day) => contRun(day===1?1500:day===2?1020:2820) },
+  { week:8, title:'7,5K-week!', desc:'Di 3,6 km · Do 2,4 km · Zo 7,5 km — je doel', build: (day) => contRun(day===1?1500:day===2?1020:3150) }
 ];
 const RUN_BUILTIN_PLANS = {
   builtin_5k:   { name:'5K Start to Run',       weeks: RUN_5K_PROGRAM },
@@ -4640,6 +4653,12 @@ async function advanceRunProgress(){
   p.sessionsDone = (p.sessionsDone || 0) + 1;
   if (p.day >= 3){ p.day = 1; if (p.week < plan.weeks.length) p.week += 1; }
   else { p.day += 1; }
+  await saveRunProgress(p);
+  return p;
+}
+async function jumpToRunWeek(week){
+  const p = await getRunProgress();
+  p.week = week; p.day = 1;
   await saveRunProgress(p);
   return p;
 }
@@ -6854,7 +6873,7 @@ async function startRunSession(opts){
     const plan = await getActivePlanMeta();
     const p = await getRunProgress();
     const w = plan.weeks.find(wk => wk.week === p.week) || plan.weeks[0];
-    intervals = w.build();
+    intervals = w.build(p.day);
     week = p.week; day = p.day;
   }
   const totalPlannedSec = (!freeform) ? intervals.reduce((s,iv) => s + iv.sec, 0) : null;
@@ -7487,6 +7506,7 @@ window.addEventListener('message', (ev) => {
     case 'setpodcaststart': runPodcastIdx = data.startIndex || 0; break;
     case 'resetevy':     resetEvyProgress(data.evyDist).then(sendRunCoachDataToFrame); break;
     case 'setplan':       setActivePlanId(data.planId).then(sendRunCoachDataToFrame); break;
+    case 'setweek':        jumpToRunWeek(data.week).then(sendRunCoachDataToFrame); break;
     case 'other-not-built': toast(curLang()==='en' ? 'Not built yet — coming later.' : 'Nog niet gebouwd — komt later.', 2500); break;
     case 'getstats': sendGarminRunCoachStats(); break;
     case 'confetti': fireConfetti(); break;
@@ -7536,7 +7556,7 @@ function buildGarminSetupHtml(mode){
   <div class="w-full min-h-screen p-5 flex flex-col">
     <div class="flex justify-between items-center mb-5">
       <div class="flex items-center gap-3">
-        <button id="backBtn" class="w-8 h-8 rounded-full bg-black/60 border border-amber-500/40 text-amber-400 flex items-center justify-center text-base flex-shrink-0">←</button>
+        <button id="backBtn" class="w-9 h-8 rounded-2xl bg-amber-500/10 flex items-center justify-center flex-shrink-0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e2a13c" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg></button>
         <div>
           <span class="text-[10px] text-slate-400 block uppercase tracking-widest font-black">${isFiets ? 'Knooppuntenroute' : 'Wandelknooppunten'}</span>
           <h1 class="text-lg font-black tracking-tight text-white flex items-center gap-1.5 mt-0.5">
@@ -8027,7 +8047,7 @@ function buildGarminKompasHtml(){
 
     <div class="flex items-center justify-between flex-shrink-0">
       <div class="flex items-center gap-3">
-        <button id="backBtn" class="w-8 h-8 rounded-full bg-black/60 border border-amber-500/40 text-amber-400 flex items-center justify-center text-base flex-shrink-0">‹</button>
+        <button id="backBtn" class="w-9 h-8 rounded-2xl bg-amber-500/10 flex items-center justify-center flex-shrink-0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e2a13c" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg></button>
         <div>
           <span class="text-[10px] font-bold tracking-widest text-slate-400 uppercase">Navigatie</span>
           <h1 class="text-lg font-bold text-white leading-none">Kompas</h1>
@@ -8276,7 +8296,7 @@ function buildGarminWeerHtml(){
 
     <div class="flex items-center justify-between flex-shrink-0">
       <div class="flex items-center gap-3">
-        <button id="backBtn" class="w-8 h-8 rounded-full bg-black/60 border border-amber-500/40 text-amber-400 flex items-center justify-center text-base flex-shrink-0">‹</button>
+        <button id="backBtn" class="w-9 h-8 rounded-2xl bg-amber-500/10 flex items-center justify-center flex-shrink-0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e2a13c" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg></button>
         <div>
           <span class="text-[10px] font-bold tracking-widest text-slate-400 uppercase">Meteo</span>
           <h1 class="text-lg font-bold text-white leading-none">Weer Dashboard</h1>
@@ -8849,6 +8869,8 @@ function buildGarminRunCoachHtml(){
   .card-swiper{ display:flex; overflow-x:auto; scroll-snap-type:x mandatory; scroll-behavior:smooth; -webkit-overflow-scrolling:touch; gap:0.75rem; padding-bottom:0.5rem; padding-top:0.25rem; }
   .card-swiper::-webkit-scrollbar{ display:none; }
   .card-item{ scroll-snap-align:center; flex:0 0 78%; max-width:280px; }
+  .week-jump-card{ cursor:pointer; transition:transform 0.12s ease; }
+  .week-jump-card:active{ transform:scale(0.97); }
   .gold-gradient{ background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
 </style>
 </head>
@@ -8857,7 +8879,7 @@ function buildGarminRunCoachHtml(){
 
     <div class="flex justify-between items-start mb-5">
       <div class="flex items-center gap-3">
-        <button id="rcBackBtn" class="w-8 h-8 rounded-full bg-black/60 border border-amber-500/40 text-amber-400 flex items-center justify-center text-base flex-shrink-0">←</button>
+        <button id="rcBackBtn" class="w-9 h-8 rounded-2xl bg-amber-500/10 flex items-center justify-center flex-shrink-0"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#e2a13c" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg></button>
         <div>
           <span class="text-[10px] text-amber-500 font-black uppercase tracking-widest">AI GPS Audio Coach Pro</span>
           <h1 class="text-lg font-black text-white flex items-center gap-1.5 mt-0.5">🏃 RunCoach Pro</h1>
@@ -8910,7 +8932,7 @@ function buildGarminRunCoachHtml(){
 
         <details class="bg-slate-900/60 rounded-2xl border border-slate-800 text-xs overflow-hidden mb-3.5">
           <summary class="p-3 font-bold text-amber-400 cursor-pointer flex justify-between items-center select-none">
-            <span class="flex items-center gap-2">📅 10-Weken Schema</span>
+            <span class="flex items-center gap-2">📅 Weekschema</span>
             <span class="text-slate-500 text-[10px]">▼ Openen</span>
           </summary>
           <div class="p-3 pt-1 border-t border-slate-800/60 bg-slate-950/40">
@@ -9209,16 +9231,26 @@ ${GARMIN_MENU_BTN_JS}
 
         const weekIcons = ['👟','⚡','🏃','🔥','🎽','🏆','🎯','🥇','🚀'];
         const cardsHtml = d.program.map((w, i) => \`
-          <div class="card-item bg-white text-slate-900 rounded-3xl p-4 shadow-xl border \${w.week === d.week ? 'border-amber-400' : 'border-amber-100'} flex flex-col justify-between">
+          <div class="card-item week-jump-card bg-white text-slate-900 rounded-3xl p-4 shadow-xl border \${w.week === d.week ? 'border-amber-400' : 'border-amber-100'} flex flex-col justify-between" data-week="\${w.week}">
             <div>
               <div class="flex justify-between items-center mb-1"><span class="text-2xl">\${weekIcons[i] || '🏃'}</span><span class="text-[9px] bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full font-bold">Week \${w.week}</span></div>
               <h3 class="text-sm font-black text-slate-900">\${w.title}</h3>
               <p class="text-[10px] text-amber-600 font-bold mt-1">\${w.desc}</p>
+              \${w.week === d.week ? '<p class="text-[9px] text-amber-500 font-bold mt-2">📍 Je zit hier nu</p>' : '<p class="text-[9px] text-slate-400 font-bold mt-2">Tik om hierheen te springen</p>'}
             </div>
           </div>\`).join('');
         document.getElementById('rcWeeksSwiper').innerHTML = cardsHtml;
         document.getElementById('rcSchemaSwiper').innerHTML = cardsHtml;
-        document.getElementById('rcSchemaPanelTitle').textContent = (d.planName || '10-weken opbouwschema') + ' — 10 weken';
+        document.querySelectorAll('.week-jump-card').forEach(card => {
+          card.addEventListener('click', () => {
+            const wk = parseInt(card.dataset.week);
+            if (wk === d.week) return; // al actief, niets te doen
+            if (confirm('Wil je je voortgang verzetten naar Week ' + wk + ' · Dag 1? Je huidige plek (Week ' + d.week + ') gaat dan verloren.')){
+              parent.postMessage({ source:'garminRunCoach', action:'setweek', week: wk }, '*');
+            }
+          });
+        });
+        document.getElementById('rcSchemaPanelTitle').textContent = (d.planName || 'Opbouwschema') + ' — ' + (d.program ? d.program.length : '10') + ' weken';
 
         if (d.evy5k) document.getElementById('rcEvyProg5').textContent = 'Week ' + d.evy5k.week + ' · Sessie ' + d.evy5k.session + '/3';
         if (d.evy10k) document.getElementById('rcEvyProg10').textContent = 'Week ' + d.evy10k.week + ' · Sessie ' + d.evy10k.session + '/3';
