@@ -220,7 +220,6 @@
     display:flex; align-items:center; justify-content:center; flex-shrink:0;
   }
   .menu-tile .mi-text{ font-size:10px; font-weight:700; color:var(--green-900); line-height:1.25; }
-  #menuVersion{ text-align:center; font-size:10.5px; color:#a9b8ae; padding:12px 4px 2px; }
   #loadBtn{
     border:none; border-radius:14px; width:44px; height:44px; background:var(--green-600);
     color:var(--cream); font-weight:700; font-size:16px; box-shadow:var(--shadow); flex-shrink:0;
@@ -1029,7 +1028,6 @@
     box-shadow:0 6px 18px rgba(226,161,60,0.3); transition:transform 0.12s ease, filter 0.12s ease;
   }
   #bikeSetupContinueBtn:active{ filter:brightness(0.92); transform:scale(0.98); }
-  #appVersionStart{ margin-top:10px; color:rgba(246,244,238,0.35); font-size:11px; letter-spacing:.5px; flex-shrink:0; align-self:flex-end; }
 
   #mapViewport{ position:absolute; top:0;left:0;right:0;bottom:0; overflow:hidden; background:var(--green-900); }
   #mapRotator{
@@ -1426,7 +1424,6 @@
     </button>
   </div>
   <div id="modeSelectHint" data-i18n="modeSelectHint">Knooppunten, navigatie, GPX, offline-gebruik — alles werkt voor beide.</div>
-  <div id="appVersionStart">v2.300 · 13 aug</div>
 </div>
 
 <!-- Garmin-stijl hub: letterlijk Gemini's keuzescherm.html-ontwerp, geïsoleerd in een iframe zodat
@@ -1629,7 +1626,6 @@
     <button class="menu-item menu-tile" id="menuDevNotesBtn"><span class="mi-icon">🛠️</span><span class="mi-text"><span data-i18n="menuDevNotesShort">Technische werking</span></span></button>
     <button class="menu-item menu-tile" id="menuLogbookBtn"><span class="mi-icon">📋</span><span class="mi-text"><span data-i18n="menuLogbook">Logboek</span></span></button>
   </div>
-  <div id="menuVersion">v2.300 · 13 aug</div>
 </div>
 
 <div id="hint" data-i18n="hintInitial">Zoom of pan naar je gebied, tik dan op "Laad knooppunten"</div>
@@ -2397,6 +2393,19 @@
     </div>
     </details>
 
+    <details class="settings-accordion"><summary>🏃 Lopen — handleiding</summary>
+    <div class="settings-section">
+      <h4>AI Coach</h4>
+      <p class="settings-note">3 ingebouwde opbouwschema's (5K/7,5K/10K), gebaseerd op resp. het officiële NHS Couch to 5K en Hal Higdon's Novice 10K-programma. Kies je afstand bovenaan, tik daarna op een weekkaartje om er handmatig naartoe te springen (met bevestiging), of bouw via "Schema wisselen of zelf opbouwen" je eigen schema.</p>
+      <h4 style="margin-top:14px;">EVY Podcast</h4>
+      <p class="settings-note">Jouw eigen 10-weken audioprogramma (5K en 10K, apart bijgehouden). De app onthoudt zelf bij welke week/sessie je zit en speelt automatisch het juiste mp3-bestand af. Een sessie al ergens anders gedaan? Tik "Deze sessie al gedaan → volgende" om handmatig door te schuiven, zonder een sessie te starten.</p>
+      <h4 style="margin-top:14px;">Vrij/Doel</h4>
+      <p class="settings-note">Vrije Run (geen limiet), Target Run op 5 of 10 km, of een HIIT-sprintschema — voor wie al comfortabel loopt en geen opbouwschema nodig heeft.</p>
+      <h4 style="margin-top:14px;">Tijdens het lopen</h4>
+      <p class="settings-note">Het gelopen spoor op de kaart kleurt live mee met je snelheid (groen = wandeltempo, tot rood = hard lopen). Het minimaliseer-knopje linksboven stuurt je naar andere tabbladen zonder de sessie te stoppen — timer en GPS blijven gewoon lopen. Na de sessie vraagt de app hoe het ging (stemming + eventuele pijnlocatie), bewaard per sessie in je stats.</p>
+    </div>
+    </details>
+
     <details class="settings-accordion"><summary data-i18n="settingsGroupSos">🆘 Valdetectie &amp; SOS</summary>
     <div class="settings-section">
       <h4 data-i18n="sosTitle">Valdetectie</h4>
@@ -2419,6 +2428,7 @@
     </details>
 
     <button id="settingsResetBtn" class="settings-reset"><span data-i18n="settingsResetBtn">Standaardinstellingen herstellen</span></button>
+    <div id="settingsVersionFooter" style="text-align:center; margin-top:16px; color:rgba(51,71,60,0.5); font-size:11px;"></div>
   </div>
 </div>
 
@@ -5180,7 +5190,7 @@ $('logbookClearBtn').addEventListener('click', () => {
   storageSet('appEventLog', JSON.stringify(appEventLog));
   renderLogbook();
 });
-$('menuSettingsBtn').addEventListener('click', () => { closeActionMenu(); openModal('settingsModal'); runOfflineDiagnostics(); checkBatteryLevel(); });
+$('menuSettingsBtn').addEventListener('click', () => { closeActionMenu(); openModal('settingsModal'); runOfflineDiagnostics(); checkBatteryLevel(); $('settingsVersionFooter').textContent = APP_VERSION_TEXT; });
 $('modeSelectSettingsBtn').addEventListener('click', () => { syncThemeSwitchRadios(); openModal('themeSwitchModal'); });
 $('openResetLoopBtn').addEventListener('click', () => { closeModal('themeSwitchModal'); openModal('resetLoopModal'); });
 $('openResetFietsWandelBtn').addEventListener('click', () => { closeModal('themeSwitchModal'); openModal('resetFietsWandelModal'); });
@@ -7746,6 +7756,7 @@ window.addEventListener('message', (ev) => {
     openModal('settingsModal');
     runOfflineDiagnostics();
     checkBatteryLevel();
+    $('settingsVersionFooter').textContent = APP_VERSION_TEXT;
   } else if (data.action === 'themeswitch'){
     syncThemeSwitchRadios();
     openModal('themeSwitchModal');
@@ -7822,6 +7833,7 @@ window.addEventListener('message', (ev) => {
     case 'setpodcast':   runPodcastFiles = data.files || []; runPodcastIdx = data.startIndex || 0; break;
     case 'setpodcaststart': runPodcastIdx = data.startIndex || 0; break;
     case 'resetevy':     resetEvyProgress(data.evyDist).then(sendRunCoachDataToFrame); break;
+    case 'advanceevy':   advanceEvyProgress(data.evyDist).then(sendRunCoachDataToFrame); break;
     case 'setplan':       setActivePlanId(data.planId).then(sendRunCoachDataToFrame); break;
     case 'setweek':        jumpToRunWeek(data.week).then(sendRunCoachDataToFrame); break;
     case 'resumesession':  resumeRunSessionView(); break;
@@ -9091,6 +9103,7 @@ function buildGarminHubHtml(){
 </head>
 <body class="bg-slate-950 min-h-screen flex items-center justify-center p-0 overflow-x-hidden">
   <div class="w-full bg-slate-950 text-slate-100 min-h-screen p-6 flex flex-col justify-between overflow-hidden relative">
+    <div class="absolute inset-0 w-full h-full bg-cover bg-center opacity-10 pointer-events-none z-0" style="background-image:url('images/achtergrond-home.jpg');"></div>
     <div class="absolute inset-0 w-full h-full pointer-events-none z-0 overflow-hidden">
       <div class="glass-ribbon absolute top-[-20%] left-[-10%] w-[120%] h-[140%]"></div>
     </div>
@@ -9100,7 +9113,6 @@ function buildGarminHubHtml(){
 
     <div class="relative z-10 w-full flex-1 flex flex-col justify-between">
       <div class="text-center pt-8">
-        <span class="text-[11px] text-amber-500 font-black uppercase tracking-widest bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20 inline-block mb-3">${APP_VERSION_TEXT}</span>
         <h1 class="text-3xl font-black tracking-tight text-white">KnooppuntenRoute</h1>
         <p class="text-xs text-slate-400 mt-2 font-medium">Kies je activiteit en bekijk de omgevingsstatus</p>
       </div>
@@ -9300,18 +9312,20 @@ function buildGarminRunCoachHtml(){
           <h2 class="text-base font-black text-white leading-tight">Jouw 10-weken audioprogramma</h2>
           <p class="text-[11px] text-white/70 mt-1">Tik je afstand aan om meteen je volgende sessie te starten — de app onthoudt zelf bij welke week/sessie je zit.</p>
         </div>
-        <div class="grid grid-cols-2 gap-2.5 mb-2">
-          <button id="rcEvyStart5" class="border-2 border-amber-500/40 bg-slate-900/60 rounded-2xl p-4 text-center">
-            <div class="text-lg mb-1">🏁</div>
-            <div class="text-sm font-black text-white">5 KM</div>
-            <div id="rcEvyProg5" class="text-[10px] text-amber-400 font-bold mt-1">Week – · Sessie –</div>
-          </button>
-          <button id="rcEvyStart10" class="border-2 border-amber-500/40 bg-slate-900/60 rounded-2xl p-4 text-center">
-            <div class="text-lg mb-1">🔥</div>
-            <div class="text-sm font-black text-white">10 KM</div>
-            <div id="rcEvyProg10" class="text-[10px] text-amber-400 font-bold mt-1">Week – · Sessie –</div>
-          </button>
-        </div>
+        <button id="rcEvyStart5" class="w-full border-2 border-amber-500/40 bg-gradient-to-br from-emerald-800/60 to-slate-900 rounded-3xl p-6 text-center mb-3">
+          <div class="text-3xl mb-1.5">🏁</div>
+          <div class="text-xl font-black text-white">5 KM</div>
+          <div class="text-[11px] text-emerald-300 mt-1">Ideaal om mee te starten</div>
+          <div id="rcEvyProg5" class="text-xs text-amber-400 font-bold mt-2.5">Week – · Sessie –</div>
+          <div id="rcEvyDone5" class="rcEvyMarkDone text-[10px] text-slate-400 underline mt-2" data-dist="5">✅ Deze sessie al gedaan → volgende</div>
+        </button>
+        <button id="rcEvyStart10" class="w-full border-2 border-amber-500/40 bg-gradient-to-br from-rose-900/60 to-slate-900 rounded-3xl p-6 text-center mb-2">
+          <div class="text-3xl mb-1.5">🔥</div>
+          <div class="text-xl font-black text-white">10 KM</div>
+          <div class="text-[11px] text-rose-300 mt-1">Voor als je verder wil bouwen</div>
+          <div id="rcEvyProg10" class="text-xs text-amber-400 font-bold mt-2.5">Week – · Sessie –</div>
+          <div id="rcEvyDone10" class="rcEvyMarkDone text-[10px] text-slate-400 underline mt-2" data-dist="10">✅ Deze sessie al gedaan → volgende</div>
+        </button>
         <div class="flex justify-center gap-5 mb-3.5">
           <button id="rcEvyReset5" class="text-[10px] text-slate-500 underline">🔄 5K herstarten</button>
           <button id="rcEvyReset10" class="text-[10px] text-slate-500 underline">🔄 10K herstarten</button>
@@ -9374,7 +9388,7 @@ function buildGarminRunCoachHtml(){
         </div>
       </details>
 
-      <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 mb-3.5">
+      <div id="rcVoiceCard" class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 mb-3.5">
         <span class="text-xs font-bold text-white block mb-2">🔊 Stem voor audio-coach</span>
         <button id="rcVoiceBtn" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-200 flex justify-between items-center">
           <span id="rcVoiceBtnLabel" class="truncate text-left">Standaardstem van je toestel</span><span class="text-slate-500 flex-shrink-0 ml-2">▾</span>
@@ -9585,6 +9599,13 @@ ${GARMIN_MENU_BTN_JS}
         rcTabBtns[k].className = 'py-2.5 rounded-xl font-bold text-[10px] ' + (k===key ? 'bg-amber-500 text-slate-950' : 'text-slate-400');
         rcTabBlocks[k].classList.toggle('hidden', k!==key);
       });
+      // Schema-builder, stemkeuze en eigen-muziek zijn enkel relevant voor AI Coach/Volleerde Loper —
+      // bij EVY praat de podcast zelf, dus die 3 kaarten nemen daar enkel onnodig ruimte in.
+      const showShared = key !== 'evy';
+      ['rcBuilderDetails','rcVoiceCard','rcMusicCard'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.toggle('hidden', !showShared);
+      });
     }
     rcTabBtns.ai.addEventListener('click', () => rcSwitchLocalTab('ai'));
     rcTabBtns.evy.addEventListener('click', () => rcSwitchLocalTab('evy'));
@@ -9660,6 +9681,15 @@ ${GARMIN_MENU_BTN_JS}
     });
     document.getElementById('rcEvyReset10').addEventListener('click', () => {
       if (confirm('De 10K-reeks terugzetten naar Week 1 · Sessie 1?')) parent.postMessage({ source:'garminRunCoach', action:'resetevy', evyDist:10 }, '*');
+    });
+    document.querySelectorAll('.rcEvyMarkDone').forEach(el => {
+      el.addEventListener('click', (e) => {
+        e.stopPropagation(); // anders start het klikken hier ook meteen een nieuwe sessie (zit binnen dezelfde knop)
+        const dist = Number(el.dataset.dist);
+        if (confirm('Deze sessie (' + dist + ' km) markeren als al gedaan en doorschuiven naar de volgende?')){
+          parent.postMessage({ source:'garminRunCoach', action:'advanceevy', evyDist:dist }, '*');
+        }
+      });
     });
 
     // ---- Eigen Schema Builder accordeon (vast open/dicht, geen extra state nodig — <details> regelt dit zelf) ----
