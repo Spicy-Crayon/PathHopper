@@ -820,6 +820,7 @@
     display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:900; line-height:1;
   }
   #runCoachBackBtn:active{ background:rgba(226,161,60,0.3); }
+  #runCoachScreen .bike-setup-inner{ margin-top:22px; } /* overschrijft de -25px van .bike-setup-inner (bedoeld voor het fietsscherm) zodat de kaart niet meer onder de terugknop schuift */
   .run-week-card{
     background:linear-gradient(160deg,#c23b3b,#7a1f1f); border-radius:18px; padding:18px;
     text-align:left; box-shadow:0 8px 20px rgba(0,0,0,0.3); margin-bottom:16px;
@@ -848,10 +849,27 @@
   .rc-stat-card{ background:rgba(255,255,255,0.06); border-radius:16px; padding:16px; text-align:center; }
   .rc-stat-card b{ display:block; font-size:24px; font-weight:900; color:var(--amber); }
   .rc-stat-card span{ font-size:10.5px; color:rgba(246,244,238,0.55); text-transform:uppercase; }
-  .rc-stats-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:16px; }
+  .rc-stats-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-bottom:16px; }
   .rc-week-row{ display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.06); font-size:12.5px; }
   .rc-week-row.current{ color:var(--amber); font-weight:800; }
   .rc-tip{ background:rgba(255,255,255,0.06); border-radius:14px; padding:13px 15px; margin-bottom:10px; font-size:12.5px; line-height:1.5; }
+  .pain-zone{ cursor:pointer; fill:rgba(226,161,60,0.35); stroke:rgba(226,161,60,0.6); stroke-width:1; transition:fill .15s; }
+  .pain-zone:hover, .pain-zone.selected{ fill:rgba(226,161,60,0.85); }
+  .pain-zone-row{ display:flex; align-items:center; gap:8px; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.06); font-size:12px; }
+  .pain-sev-btn{ border:none; border-radius:8px; padding:5px 10px; font-size:11px; font-weight:700; background:rgba(255,255,255,0.08); color:var(--cream); }
+  .pain-sev-btn.selected{ background:var(--amber); color:var(--green-900); }
+  .pain-log-row{ display:flex; justify-content:space-between; align-items:center; padding:7px 0; border-bottom:1px solid rgba(255,255,255,0.06); font-size:11.5px; }
+  @keyframes confettiFall{ 0%{ transform:translateY(0) rotate(0deg); opacity:1; } 100%{ transform:translateY(100vh) rotate(540deg); opacity:0; } }
+  .rc-medal-grid{ display:grid; grid-template-columns:repeat(5,1fr); gap:6px; margin:10px 0 16px; }
+  .rc-medal{ display:flex; flex-direction:column; align-items:center; gap:4px; padding:8px 2px; border-radius:12px; background:rgba(255,255,255,0.04); }
+  .rc-medal .medal-icon{ font-size:26px; filter:grayscale(1) opacity(0.35); transition:filter .3s; }
+  .rc-medal.unlocked .medal-icon{ filter:none; cursor:pointer; }
+  .rc-medal.unlocked{ background:rgba(226,161,60,0.1); }
+  .rc-medal span.medal-label{ font-size:9px; font-weight:800; color:rgba(246,244,238,0.55); }
+  .rc-medal.unlocked span.medal-label{ color:var(--amber); }
+  .rc-distance-chart{ display:flex; align-items:flex-end; gap:4px; height:70px; margin:8px 0; }
+  .rc-distance-chart .bar-col{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; }
+  .rc-distance-chart .bar{ width:100%; max-width:22px; background:var(--amber); border-radius:4px 4px 0 0; min-height:2px; }
   .rc-tip b{ display:block; margin-bottom:3px; color:var(--amber); font-size:12.5px; }
   .rc-builder-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:12px; }
   .run-plan-row{
@@ -875,7 +893,7 @@
   #runSessionScreen{
     position:fixed; top:0;left:0;right:0;bottom:0; z-index:3200; background:#0b0f0a;
     display:flex; flex-direction:column; align-items:center; justify-content:space-evenly;
-    padding:calc(14px + env(safe-area-inset-top,0px) + var(--extra-top-inset)) 20px calc(20px + env(safe-area-inset-bottom,0px) + var(--extra-bottom-inset));
+    padding:calc(14px + env(safe-area-inset-top,0px) + var(--extra-top-inset)) 78px calc(20px + env(safe-area-inset-bottom,0px) + var(--extra-bottom-inset)) 20px;
     color:var(--cream); text-align:center; overflow-y:auto;
   }
   #runSessionScreen.hidden{ display:none; }
@@ -889,7 +907,7 @@
     position:absolute; top:10px; right:10px; z-index:500; background:rgba(0,0,0,0.6); color:#f87171;
     font-size:9.5px; font-weight:800; padding:5px 9px; border-radius:10px; letter-spacing:0.4px;
   }
-  #rsMainRow{ display:flex; align-items:center; width:100%; max-width:440px; gap:16px; margin-top:6px; }
+  #rsMainRow{ display:flex; align-items:center; justify-content:center; width:100%; max-width:440px; margin-top:6px; }
   #rsMainCol{ flex:1; min-width:0; }
   #rsIntervalLabel{ font-size:16px; font-weight:800; letter-spacing:0.6px; text-transform:uppercase; }
   #rsIntervalLabel.type-run{ color:#4ade80; }
@@ -898,20 +916,24 @@
   #rsCountdown{ font-size:66px; font-weight:900; line-height:1; margin:10px 0 5px; font-variant-numeric:tabular-nums; }
   #rsNextLabel{ color:rgba(246,244,238,0.55); font-size:12.5px; }
   #rsElapsedLine{ color:rgba(246,244,238,0.4); font-size:11px; margin-top:7px; }
+  #rsCalorieLine{ color:rgba(246,244,238,0.55); font-size:12.5px; font-weight:700; margin-top:-4px; }
   #rsProgressRail{
-    width:46px; flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:7px;
-    overflow-y:auto; max-height:250px; padding:4px 0; scrollbar-width:none;
+    position:fixed; right:12px;
+    top:calc(14px + env(safe-area-inset-top,0px) + var(--extra-top-inset));
+    bottom:calc(20px + env(safe-area-inset-bottom,0px) + var(--extra-bottom-inset));
+    width:52px; z-index:20; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px;
+    overflow-y:auto; padding:4px 0; scrollbar-width:none;
   }
   #rsProgressRail::-webkit-scrollbar{ display:none; }
   .rs-rail-item{
-    width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center;
-    font-size:15px; flex-shrink:0; opacity:0.4; transition:all 0.2s;
+    width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    font-size:17px; flex-shrink:0; opacity:0.55; transition:all 0.2s;
   }
-  .rs-rail-item.rail-run{ background:rgba(74,222,128,0.18); }
-  .rs-rail-item.rail-walk{ background:rgba(96,165,250,0.18); }
-  .rs-rail-item.rail-warmup, .rs-rail-item.rail-cooldown{ background:rgba(226,161,60,0.18); }
-  .rs-rail-item.rail-current{ opacity:1; width:42px; height:42px; font-size:19px; box-shadow:0 0 0 3px var(--amber); }
-  .rs-rail-item.rail-done{ opacity:0.25; }
+  .rs-rail-item.rail-run{ background:rgba(74,222,128,0.30); }
+  .rs-rail-item.rail-walk{ background:rgba(96,165,250,0.30); }
+  .rs-rail-item.rail-warmup, .rs-rail-item.rail-cooldown{ background:rgba(226,161,60,0.30); }
+  .rs-rail-item.rail-current{ opacity:1; width:46px; height:46px; font-size:21px; box-shadow:0 0 0 3px var(--amber); }
+  .rs-rail-item.rail-done{ opacity:0.3; }
   #rsStatsRow{ display:flex; justify-content:center; gap:24px; width:100%; max-width:440px; flex-shrink:0; }
   .rs-stat{ display:flex; flex-direction:column; align-items:center; flex:1; }
   .rs-stat b{ font-size:21px; font-weight:900; }
@@ -1037,6 +1059,7 @@
   #wikiInfoModal.show{ z-index:3500; }
   #stopTrainingModal.show{ z-index:3500; }
   #themeSwitchModal.show{ z-index:3500; }
+  #runPlansModal.show{ z-index:3500; }
   .simple-modal-card{
     background:var(--cream); border-radius:18px; padding:18px; width:100%; max-width:380px;
     max-height:80vh; overflow-y:auto; box-shadow:var(--shadow);
@@ -1851,6 +1874,41 @@
     </div>
     </details>
 
+    <details class="settings-accordion"><summary>🏃 Hardloop-coaching</summary>
+    <div class="settings-section">
+      <h4>Welke coach-berichten wil je horen?</h4>
+      <p class="settings-note">Elke categorie kan je apart aan- of uitzetten. Standaard staat alles aan.</p>
+      <label class="settings-check"><input type="checkbox" data-coach-cat="start" checked> <span>Begroeting bij start</span></label>
+      <label class="settings-check"><input type="checkbox" data-coach-cat="countdown" checked> <span>Aftellen vóór een loop-interval (5,4,3,2,1)</span></label>
+      <label class="settings-check"><input type="checkbox" data-coach-cat="toRun" checked> <span>Aankondiging bij wisselen naar lopen</span></label>
+      <label class="settings-check"><input type="checkbox" data-coach-cat="toWalk" checked> <span>Aankondiging bij wisselen naar wandelen</span></label>
+      <label class="settings-check"><input type="checkbox" data-coach-cat="breathingTip" checked> <span>Ademhalingstips tijdens wandelpauzes</span></label>
+      <label class="settings-check"><input type="checkbox" data-coach-cat="midpoint" checked> <span>Halverwege-melding</span></label>
+      <label class="settings-check"><input type="checkbox" data-coach-cat="kmSplit" checked> <span>Kilometer-aankondigingen</span></label>
+      <label class="settings-check"><input type="checkbox" data-coach-cat="encouragement" checked> <span>Tussentijdse aanmoediging tijdens het lopen</span></label>
+      <label class="settings-check"><input type="checkbox" data-coach-cat="tempoWarning" checked> <span>Tempo-feedback bij een doelrun (te snel/te traag)</span></label>
+      <label class="settings-check"><input type="checkbox" data-coach-cat="personalRecord" checked> <span>Melding bij persoonlijk record (snelste km)</span></label>
+      <label class="settings-check"><input type="checkbox" data-coach-cat="slowdownSupport" checked> <span>Ondersteuning bij een moeilijk/traag moment</span></label>
+      <label class="settings-check"><input type="checkbox" data-coach-cat="lastInterval" checked> <span>Aankondiging van je laatste loop-interval</span></label>
+      <label class="settings-check"><input type="checkbox" data-coach-cat="progressPercent" checked> <span>Voortgang in procenten bij een doelrun</span></label>
+      <label class="settings-check"><input type="checkbox" data-coach-cat="sessionStreak" checked> <span>Aantal trainingen deze week</span></label>
+      <label class="settings-check"><input type="checkbox" data-coach-cat="didYouKnow" checked> <span>Wist-je-datjes (houding, cadans, hydratatie…)</span></label>
+      <label class="settings-check"><input type="checkbox" data-coach-cat="weatherWarning" checked> <span>Weer-waarschuwing bij start (warm/koud/regen)</span></label>
+      <label class="settings-check"><input type="checkbox" data-coach-cat="liveMedal" checked> <span>Medaille meteen vieren tijdens de run</span></label>
+    </div>
+    </details>
+
+    <details class="settings-accordion"><summary>💾 Back-up</summary>
+    <div class="settings-section">
+      <h4>Al je gegevens bewaren of terugzetten</h4>
+      <p class="settings-note">Ritten, hardloopgeschiedenis, medailles, pinpoints, eigen schema's en instellingen — alles in één bestand. Handig vóór je je browsergeschiedenis wist of van toestel wisselt.</p>
+      <button id="backupExportBtn" class="settings-btn">⬇️ Exporteer back-up (.json)</button>
+      <label for="backupImportInput" class="settings-reset" style="display:block; text-align:center; margin-top:10px; cursor:pointer;">⬆️ Importeer back-up…</label>
+      <input type="file" id="backupImportInput" accept="application/json" class="hidden" style="display:none;">
+      <p class="settings-subnote">Importeren vervangt je huidige gegevens met die uit het bestand — de app herlaadt automatisch nadien.</p>
+    </div>
+    </details>
+
     <details class="settings-accordion"><summary data-i18n="settingsGroupMap">🗺️ Kaart & knooppunten</summary>
     <div class="settings-section">
       <h4><span data-i18n="settingsBundledFiles">Meegeleverde knooppuntenbestanden</span></h4>
@@ -2041,6 +2099,9 @@
 
       <div class="settings-subnote" style="margin-top:14px;"><span data-i18n="settingsGeminiSub">Gemini — laatste terugval voor plant-/dierherkenning als de andere bronnen niets vinden. Gratis sleutel via aistudio.google.com (geen creditcard nodig).</span></div>
       <input type="text" id="geminiKeyInput" placeholder="Jouw gratis Gemini API-sleutel…" data-i18n-placeholder="phGeminiKey" class="settings-text-input">
+
+      <div class="settings-subnote" style="margin-top:14px;">OpenWeatherMap — optionele extra weerbron voor vergelijking/terugval naast Open-Meteo en MET Norway (die twee werken altijd, zonder sleutel). Gratis account op openweathermap.org (1000 aanvragen/dag inbegrepen).</div>
+      <input type="text" id="openWeatherMapKeyInput" placeholder="Jouw gratis OpenWeatherMap API-sleutel (optioneel)…" class="settings-text-input">
     </div>
 
     <div class="settings-section">
@@ -2215,6 +2276,7 @@
 
 <div id="runCoachScreen" class="hidden">
   <button id="runCoachBackBtn" aria-label="Terug">←</button>
+  <button id="runCoachAudioHeaderBtn" aria-label="Muziek &amp; podcast" style="position:absolute; top:16px; right:16px; z-index:10; width:38px; height:38px; border-radius:50%; border:1.5px solid rgba(226,161,60,0.4); background:rgba(0,0,0,0.25); color:var(--amber); font-size:16px; display:flex; align-items:center; justify-content:center;">🎵</button>
   <div class="bike-setup-inner">
     <div class="bike-setup-title" style="text-align:left;">🏃 Hardlopen</div>
 
@@ -2257,7 +2319,7 @@
         </button>
         <div id="runCoachVoiceList" class="hidden" style="margin-top:6px; background:rgba(0,0,0,0.25); border:2px solid rgba(255,255,255,0.08); border-radius:12px; overflow:hidden; max-height:210px; overflow-y:auto;"></div>
       </div>
-      <div class="run-voice-section">
+      <div class="run-voice-section" id="rcMusicSection">
         <label>🎵 Eigen muziek tijdens de training</label>
         <label id="runMusicPickLabel" for="runMusicInput" style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.06); border:2px solid rgba(255,255,255,0.08); border-radius:12px; padding:11px 12px; cursor:pointer;">
           <span style="font-size:18px;">📂</span>
@@ -2274,12 +2336,17 @@
         <div class="rc-stat-card"><b id="rcStatSessions">0</b><span>Sessies</span></div>
         <div class="rc-stat-card"><b id="rcStatKm">0.0</b><span>Totaal km</span></div>
         <div class="rc-stat-card"><b id="rcStatTime">0u</b><span>Totale tijd</span></div>
+        <div class="rc-stat-card"><b id="rcStatCalories">–</b><span>Kcal (geschat)</span></div>
       </div>
+      <div style="text-align:left; font-size:11px; font-weight:800; color:rgba(246,244,238,0.6); text-transform:uppercase; letter-spacing:0.5px; margin:14px 0 4px;">Gelopen afstand (laatste runs)</div>
+      <div id="rcDistanceChart" class="rc-distance-chart"></div>
+      <div style="text-align:left; font-size:11px; font-weight:800; color:var(--amber); text-transform:uppercase; letter-spacing:0.5px; margin:16px 0 2px;">🏅 Achievements &amp; Medailles</div>
+      <div id="rcMedalGrid" class="rc-medal-grid"></div>
       <div id="rcHistoryList"></div>
     </div>
 
     <div id="rcSchemaPanel" class="rc-panel">
-      <div class="bike-setup-title" style="text-align:left; font-size:14px; margin-bottom:6px;">9-weken 5K-opbouwschema</div>
+      <div class="bike-setup-title" style="text-align:left; font-size:14px; margin-bottom:6px;">10-weken 5K-opbouwschema</div>
       <div id="rcSchemaList"></div>
     </div>
 
@@ -2288,6 +2355,14 @@
       <div class="rc-tip"><b>🦶 Blaren</b>Draag hardloopsokken zonder naden, en loop schoenen eerst wat in vóór een langere sessie.</div>
       <div class="rc-tip"><b>💧 Zijsteken</b>Adem dieper en regelmatiger, vertraag even, en eet niet vlak vóór het lopen.</div>
       <div class="rc-tip"><b>🩹 Aanhoudende pijn</b>Pijn die na rust niet wegtrekt, of die tijdens het lopen erger wordt: bouw dan een rustdag in en raadpleeg bij twijfel een arts of kinesist. Dit zijn algemene tips, geen medisch advies.</div>
+
+      <div class="bike-setup-title" style="text-align:left; font-size:14px; margin:18px 0 8px;">🧍 Pijn-check</div>
+      <p style="font-size:11.5px; color:rgba(246,244,238,0.55); text-align:left; margin-bottom:10px;">Tik een lichaamszone aan om te registreren waar je iets voelt — puur voor je eigen overzicht, geen diagnose.</p>
+      <div id="painBodyMapWrap" style="display:flex; gap:14px; align-items:flex-start;">
+        <svg id="painBodySvg" viewBox="0 0 120 260" style="width:120px; flex-shrink:0;"></svg>
+        <div id="painZonePicker" style="flex:1;"></div>
+      </div>
+      <div id="painLogList" style="margin-top:14px;"></div>
     </div>
 
     <div class="rc-botnav">
@@ -2313,13 +2388,14 @@
       <div id="rsNextLabel">–</div>
       <div id="rsElapsedLine">Totaal: <span id="rsElapsed">0:00</span></div>
     </div>
-    <div id="rsProgressRail"></div>
   </div>
+  <div id="rsProgressRail"></div>
   <div id="rsStatsRow">
     <div class="rs-stat"><b id="rsPace">–:–</b><span>gem. pace</span></div>
     <div class="rs-stat"><b id="rsDistance">0.00</b><span>afstand</span></div>
     <div class="rs-stat"><b id="rsSplitLabel">1 km</b><span>split</span></div>
   </div>
+  <div id="rsCalorieLine">🔥 <span id="rsCalories">–</span></div>
   <div>
     <div id="rsControls">
       <button id="rsPauseBtn">⏸ Pauze</button>
@@ -2523,6 +2599,7 @@
       <div id="wTemp">–°</div>
       <div id="wCondition">–</div>
       <div id="wFeels">Voelt als –°</div>
+      <div id="wSourceNote" style="font-size:9.5px; opacity:0.5; margin-top:2px;"></div>
       <div id="wMinMax">▲–° ▼–°</div>
       <div id="wWind">💨 – </div>
 
@@ -2547,6 +2624,7 @@
         <button id="radarPlayPauseBtn" title="Pauzeer/hervat animatie">⏸️</button>
       </div>
       <div id="radarPointReading" style="display:none;"></div>
+      <div id="rainSourceNote" style="font-size:11px; color:rgba(246,244,238,0.6); text-align:center; margin:4px 0;"></div>
       <div id="radarAttribution">Weather data by <a href="https://www.rainviewer.com/" target="_blank" rel="noopener">RainViewer</a></div>
       <div id="precipTimelineWrap">
         <div id="precipTimelineLabel"><span id="precipTimelineTime">–</span> · <span id="precipTimelineVal">–</span></div>
@@ -4427,6 +4505,50 @@ function buildRunWalkIntervals(reps, runSec, walkSec, warmupSec, cooldownSec){
 }
 // Opbouwprincipe: klassieke, breed gebruikte loop/wandel-progressie richting 5 km — geen letterlijke
 // tekst van een specifiek merk/programma, gewoon het algemeen bekende opbouwschema zelf.
+// ---------- Achievements/medailles: écht ontgrendeld op basis van je langste opgeslagen run ----------
+const RUN_MEDALS = [
+  { km:1, label:'1 KM', icon:'🥉' }, { km:2, label:'2 KM', icon:'🥉' }, { km:5, label:'5 KM', icon:'🥈' },
+  { km:7.5, label:'7.5 KM', icon:'🥈' }, { km:10, label:'10 KM', icon:'🥇' }
+];
+const RUN_MEDALS_SEEN_KEY = 'run_medals_seen_v1';
+async function getMaxRunKm(){
+  try{ const v = await storageGet('run_history'); const h = v ? JSON.parse(v) : []; return h.reduce((m,r) => Math.max(m, r.km||0), 0); }catch(e){ return 0; }
+}
+async function checkNewlyUnlockedMedals(maxKm){
+  let seen = [];
+  try{ const v = await storageGet(RUN_MEDALS_SEEN_KEY); seen = v ? JSON.parse(v) : []; }catch(e){}
+  const newlyUnlocked = RUN_MEDALS.filter(m => maxKm >= m.km && !seen.includes(m.km));
+  if (newlyUnlocked.length){
+    await storageSet(RUN_MEDALS_SEEN_KEY, JSON.stringify(seen.concat(newlyUnlocked.map(m => m.km))));
+  }
+  return newlyUnlocked;
+}
+function fireConfetti(container){
+  const colors = ['#e2a13c','#4ade80','#60a5fa','#f87171','#c084fc'];
+  const layer = document.createElement('div');
+  layer.style.cssText = 'position:fixed; inset:0; z-index:9000; pointer-events:none; overflow:hidden;';
+  for (let i=0; i<60; i++){
+    const p = document.createElement('div');
+    const size = 6 + Math.random()*6;
+    p.style.cssText = `position:absolute; top:-20px; left:${Math.random()*100}%; width:${size}px; height:${size*0.4}px;
+      background:${colors[i % colors.length]}; opacity:0.95; border-radius:2px;
+      transform:rotate(${Math.random()*360}deg);
+      animation:confettiFall ${1.6 + Math.random()*1.2}s ease-in forwards; animation-delay:${Math.random()*0.3}s;`;
+    layer.appendChild(p);
+  }
+  document.body.appendChild(layer);
+  setTimeout(() => layer.remove(), 3200);
+}
+async function celebrateNewMedals(newlyUnlocked){
+  if (!newlyUnlocked.length) return;
+  for (const m of newlyUnlocked){
+    fireConfetti();
+    toast('🏅 ' + (curLang()==='en' ? 'Medal unlocked: ' : 'Medaille ontgrendeld: ') + m.label + '!', 4500);
+    speakForRun(curLang()==='en' ? `New medal unlocked: ${m.label}! Amazing.` : `Nieuwe medaille ontgrendeld: ${m.label}! Geweldig gedaan.`);
+    await new Promise(r => setTimeout(r, 900));
+  }
+}
+
 const RUN_5K_PROGRAM = [
   { week:1, title:'Wennen aan het ritme', desc:'8x (1 min lopen / 2 min wandelen)', build: () => buildRunWalkIntervals(8, 60, 120, 300, 300) },
   { week:2, title:'Iets langer doorlopen', desc:'6x (2 min lopen / 2 min wandelen)', build: () => buildRunWalkIntervals(6, 120, 120, 300, 300) },
@@ -4435,9 +4557,41 @@ const RUN_5K_PROGRAM = [
   { week:5, title:'Bijna daar', desc:'3x (6 min lopen / 1,5 min wandelen)', build: () => buildRunWalkIntervals(3, 360, 90, 300, 300) },
   { week:6, title:'Grote stukken', desc:'2x (9 min lopen / 2 min wandelen)', build: () => buildRunWalkIntervals(2, 540, 120, 300, 300) },
   { week:7, title:'Bijna ononderbroken', desc:'15 min lopen · 3 min wandelen · 10 min lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:900},{type:'walk',sec:180},{type:'run',sec:600},{type:'cooldown',sec:300}] },
-  { week:8, title:'Bijna de volle 5K', desc:'25 minuten ononderbroken lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:1500},{type:'cooldown',sec:300}] },
-  { week:9, title:'5K gehaald!', desc:'30 minuten ononderbroken lopen (± 5 km)', build: () => [{type:'warmup',sec:300},{type:'run',sec:1800},{type:'cooldown',sec:300}] }
+  { week:8, title:'Nog verder', desc:'20 minuten ononderbroken lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:1200},{type:'cooldown',sec:300}] },
+  { week:9, title:'Bijna de volle 5K', desc:'25 minuten ononderbroken lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:1500},{type:'cooldown',sec:300}] },
+  { week:10, title:'5K gehaald!', desc:'30 minuten ononderbroken lopen (± 5 km)', build: () => [{type:'warmup',sec:300},{type:'run',sec:1800},{type:'cooldown',sec:300}] }
 ];
+// Vervolgschema, uitgaande van iemand die al ± 5K ononderbroken kan lopen (bv. na RUN_5K_PROGRAM) en de duur verder opbouwt naar ± 7,5K.
+const RUN_7_5K_PROGRAM = [
+  { week:1, title:'Basis leggen', desc:'20 minuten ononderbroken lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:1200},{type:'cooldown',sec:300}] },
+  { week:2, title:'Iets langer', desc:'24 minuten ononderbroken lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:1440},{type:'cooldown',sec:300}] },
+  { week:3, title:'Doorzetten', desc:'28 minuten ononderbroken lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:1680},{type:'cooldown',sec:300}] },
+  { week:4, title:'Opbouwen', desc:'32 minuten ononderbroken lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:1920},{type:'cooldown',sec:300}] },
+  { week:5, title:'Halverwege', desc:'36 minuten ononderbroken lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:2160},{type:'cooldown',sec:300}] },
+  { week:6, title:'Stevig tempo', desc:'40 minuten ononderbroken lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:2400},{type:'cooldown',sec:300}] },
+  { week:7, title:'Duurloop', desc:'44 minuten ononderbroken lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:2640},{type:'cooldown',sec:300}] },
+  { week:8, title:'Bijna zover', desc:'48 minuten ononderbroken lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:2880},{type:'cooldown',sec:300}] },
+  { week:9, title:'Laatste opbouw', desc:'50 minuten ononderbroken lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:3000},{type:'cooldown',sec:300}] },
+  { week:10, title:'7,5K gehaald!', desc:'52 minuten ononderbroken lopen (± 7,5 km)', build: () => [{type:'warmup',sec:300},{type:'run',sec:3120},{type:'cooldown',sec:300}] }
+];
+// Vervolgschema richting ± 10K duurloop.
+const RUN_10K_PROGRAM = [
+  { week:1, title:'Basis leggen', desc:'30 minuten ononderbroken lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:1800},{type:'cooldown',sec:300}] },
+  { week:2, title:'Iets langer', desc:'34 minuten ononderbroken lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:2040},{type:'cooldown',sec:300}] },
+  { week:3, title:'Doorzetten', desc:'38 minuten ononderbroken lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:2280},{type:'cooldown',sec:300}] },
+  { week:4, title:'Opbouwen', desc:'42 minuten ononderbroken lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:2520},{type:'cooldown',sec:300}] },
+  { week:5, title:'Halverwege', desc:'46 minuten ononderbroken lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:2760},{type:'cooldown',sec:300}] },
+  { week:6, title:'Stevig tempo', desc:'50 minuten ononderbroken lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:3000},{type:'cooldown',sec:300}] },
+  { week:7, title:'Duurloop', desc:'55 minuten ononderbroken lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:3300},{type:'cooldown',sec:300}] },
+  { week:8, title:'Bijna zover', desc:'60 minuten ononderbroken lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:3600},{type:'cooldown',sec:300}] },
+  { week:9, title:'Laatste opbouw', desc:'65 minuten ononderbroken lopen', build: () => [{type:'warmup',sec:300},{type:'run',sec:3900},{type:'cooldown',sec:300}] },
+  { week:10, title:'10K gehaald!', desc:'70 minuten ononderbroken lopen (± 10 km)', build: () => [{type:'warmup',sec:300},{type:'run',sec:4200},{type:'cooldown',sec:300}] }
+];
+const RUN_BUILTIN_PLANS = {
+  builtin_5k:   { name:'5K Start to Run',       weeks: RUN_5K_PROGRAM },
+  builtin_7_5k: { name:'7,5K Opbouwschema',     weeks: RUN_7_5K_PROGRAM },
+  builtin_10k:  { name:'10K Opbouwschema',      weeks: RUN_10K_PROGRAM }
+};
 const RUN_PROGRESS_KEY = 'run_progress_v1'; // blijft de sleutel voor het ingebouwde 5K-schema (bestaande voortgang blijft dus gewoon geldig)
 const RUN_CUSTOM_PLANS_KEY = 'run_custom_plans_v1';
 const RUN_ACTIVE_PLAN_KEY = 'run_active_plan_v1';
@@ -4451,10 +4605,11 @@ async function getActivePlanId(){
 async function setActivePlanId(id){ await storageSet(RUN_ACTIVE_PLAN_KEY, id); }
 async function getActivePlanMeta(){
   const activeId = await getActivePlanId();
-  if (activeId === 'builtin') return { id:'builtin', name:'5K Start to Run', weeks: RUN_5K_PROGRAM };
+  const builtinId = activeId === 'builtin' ? 'builtin_5k' : activeId; // oude opgeslagen waarde 'builtin' blijft werken, wijst gewoon naar 5K
+  if (RUN_BUILTIN_PLANS[builtinId]) return { id: activeId, name: RUN_BUILTIN_PLANS[builtinId].name, weeks: RUN_BUILTIN_PLANS[builtinId].weeks };
   const plans = await getCustomPlans();
   const plan = plans.find(pl => pl.id === activeId);
-  if (!plan) return { id:'builtin', name:'5K Start to Run', weeks: RUN_5K_PROGRAM }; // schema verwijderd -> terugvallen op het ingebouwde
+  if (!plan) return { id:'builtin_5k', name:RUN_BUILTIN_PLANS.builtin_5k.name, weeks: RUN_5K_PROGRAM }; // schema verwijderd -> terugvallen op het ingebouwde 5K-schema
   return {
     id: plan.id, name: plan.name,
     weeks: plan.weeks.map((w, i) => ({
@@ -4464,7 +4619,10 @@ async function getActivePlanMeta(){
     }))
   };
 }
-function progressKeyFor(planId){ return planId === 'builtin' ? RUN_PROGRESS_KEY : `${RUN_PROGRESS_KEY}__${planId}`; }
+function progressKeyFor(planId){
+  if (planId === 'builtin') return RUN_PROGRESS_KEY; // bestaande 5K-voortgang, ongewijzigde sleutel
+  return `${RUN_PROGRESS_KEY}__${planId}`;
+}
 async function getRunProgress(){
   const planId = await getActivePlanId();
   try{
@@ -4485,6 +4643,43 @@ async function advanceRunProgress(){
   await saveRunProgress(p);
   return p;
 }
+// ---------- EVY Podcast: eigen 10-weken audioprogramma (5K en 10K) — mp3's staan vast op de server, app onthoudt enkel week/sessie ----------
+const EVY_TOTAL_WEEKS = 10;
+const EVY_SESSIONS_PER_WEEK = 3;
+function evyProgressKey(distKm){ return `evy_progress_${distKm}k_v1`; }
+async function getEvyProgress(distKm){
+  try{ const v = await storageGet(evyProgressKey(distKm)); return v ? JSON.parse(v) : { week:1, session:1 }; }
+  catch(e){ return { week:1, session:1 }; }
+}
+async function saveEvyProgress(distKm, p){ await storageSet(evyProgressKey(distKm), JSON.stringify(p)); }
+async function advanceEvyProgress(distKm){
+  const p = await getEvyProgress(distKm);
+  if (p.session >= EVY_SESSIONS_PER_WEEK){
+    if (p.week < EVY_TOTAL_WEEKS){ p.week += 1; p.session = 1; }
+    // anders: laatste bestand van het programma is al gespeeld, blijft staan
+  } else {
+    p.session += 1;
+  }
+  await saveEvyProgress(distKm, p);
+  return p;
+}
+async function resetEvyProgress(distKm){ const p = { week:1, session:1 }; await saveEvyProgress(distKm, p); return p; }
+// Pad-patroon: audio/evy5k/Start to Run - Aflevering 01.mp3 ... 30.mp3, en audio/evy10k/... (doorlopend genummerd, geen W/S meer) — bestanden moeten in die mappen naast index.html staan.
+function evyFilePath(distKm, p){
+  const episode = (p.week - 1) * EVY_SESSIONS_PER_WEEK + p.session; // 1 t.e.m. 30, doorlopend over de 10 weken
+  const nr = String(episode).padStart(2, '0');
+  return encodeURI(`audio/evy${distKm}k/Start to Run - Aflevering ${nr}.mp3`);
+}
+async function playEvyTrack(distKm){
+  const player = $('runMusicPlayer');
+  const p = await getEvyProgress(distKm);
+  player.src = evyFilePath(distKm, p);
+  player.volume = 0.85;
+  rsCurrentAudioPool = null; // Evy is geen wisselende pool, gewoon 1 doorlopend bestand voor de hele sessie
+  player.play().catch(() => { /* toestel blokkeert autoplay zonder gebruikersinteractie — de starttap was zelf al een tik */ });
+  return (p.week - 1) * EVY_SESSIONS_PER_WEEK + p.session; // aflevering-nummer, voor weergave in de rode sessiebanner
+}
+
 // Echte systeemstemmen (geen verzonnen namen zoals "Coach Fleur") — wat de browser/het toestel zelf aanbiedt.
 function getAvailableVoices(){
   if (!('speechSynthesis' in window)) return [];
@@ -4811,6 +5006,57 @@ document.querySelectorAll('input[name="themeMini"]').forEach(radio => {
     document.querySelector(`input[name="theme"][value="${radio.value}"]`).checked = true;
   });
 });
+// ---------- Coaching-categorieën: elke checkbox weerspiegelt/wijzigt appSettings.coachCats ----------
+function syncCoachCatCheckboxes(){
+  document.querySelectorAll('[data-coach-cat]').forEach(cb => {
+    const cat = cb.dataset.coachCat;
+    cb.checked = coachCatEnabled(cat);
+  });
+}
+document.querySelectorAll('[data-coach-cat]').forEach(cb => {
+  cb.addEventListener('change', () => {
+    if (!appSettings.coachCats) appSettings.coachCats = {};
+    appSettings.coachCats[cb.dataset.coachCat] = cb.checked;
+    saveSettings();
+  });
+});
+// ---------- Back-up: alles wat lokaal opgeslagen staat in één .json-bestand, en terug inladen ----------
+$('backupExportBtn').addEventListener('click', () => {
+  const data = {};
+  try{
+    for (let i = 0; i < localStorage.length; i++){
+      const key = localStorage.key(i);
+      data[key] = localStorage.getItem(key);
+    }
+  }catch(e){ /* localStorage niet beschikbaar, back-up wordt dan leeg — zeldzaam */ }
+  const payload = { app:'knooppunten-fietsapp', exportedAt:new Date().toISOString(), data };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type:'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'fietsapp-backup-' + new Date().toISOString().slice(0,10) + '.json';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+  toast(curLang()==='en' ? 'Backup downloaded.' : 'Back-up gedownload.', 3000);
+});
+$('backupImportInput').addEventListener('change', async (e) => {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+  try{
+    const text = await file.text();
+    const parsed = JSON.parse(text);
+    const data = parsed.data || parsed; // tolerant: werkt ook als iemand een kaal { key: value }-bestand aanlevert
+    let count = 0;
+    Object.keys(data).forEach(key => {
+      try{ localStorage.setItem(key, data[key]); count++; }catch(err){}
+    });
+    toast((curLang()==='en' ? 'Restored ' : 'Hersteld: ') + count + (curLang()==='en' ? ' items. Reloading…' : ' items. Herladen…'), 3500);
+    setTimeout(() => location.reload(), 1600);
+  }catch(err){
+    toast(curLang()==='en' ? 'Could not read that backup file.' : 'Kon dat back-upbestand niet lezen.', 4000);
+  }
+  e.target.value = '';
+});
 const diagRefreshBtnEl = document.getElementById('diagRefreshBtn');
 if (diagRefreshBtnEl) diagRefreshBtnEl.addEventListener('click', () => { runOfflineDiagnostics(); checkBatteryLevel(); });
 const diagForceUpdateBtnEl = document.getElementById('diagForceUpdateBtn');
@@ -4899,7 +5145,8 @@ let appSettings = {
   overlays:{ cycling:false, hiking:false, mtb:false },
   poiLayers:{ cafe:false, restaurant:false, bakery:false, supermarket:false, pharmacy:false, bike:false, water:false, toilet:false, money:false, camping:false, charging:false, playground:false, parking:false, hotel:false }, showPoiDetails:false,
   showWindDirection:true, autoPause:false, redNavDot:false, topOffsetPx:0, tabGapPx:0, bodyWeightKg:null, voiceOnlyMode:false, routeColorMode:'off', showWindInNav:false, eatReminderOn:false, eatIntervalMin:45, drinkReminderOn:false, drinkIntervalMin:20, segmentPrOn:true, darkArrivalWarning:true, quietRoutingMode:false, historyAudioOn:false, shakeToSurpriseOn:false, shakeKm:30, vertrekFromGps:false, avoidBufferM:18, maxOverlapPct:8, lowerGpsAccuracy:false, disableMapRotation:false, posUpdateIntervalSec:1, mapRecenterDelaySec:6, overpassSurfaceTimeoutSec:15, routingWeighting:'off', navType:'active', fallDetectionOn:false, sosContactNumber:'', sosContactName:'', routePreference:'balanced', routeLineColor:'#e2a13c', language:'en',
-  bundledCountries:{ be:true, nl:false }, routingEngine:'brouter'
+  bundledCountries:{ be:true, nl:false }, routingEngine:'brouter',
+  coachCats:{ start:true, countdown:true, toRun:true, toWalk:true, breathingTip:true, midpoint:true, kmSplit:true, encouragement:true, tempoWarning:true, personalRecord:true, slowdownSupport:true, lastInterval:true, progressPercent:true, sessionStreak:true, didYouKnow:true, weatherWarning:true, liveMedal:true }
 };
 
 // ---------- Vertalingen (fase 1: de meest zichtbare, statische schermonderdelen) ----------
@@ -6081,7 +6328,7 @@ async function renderRunCoachScreen(){
   $('runCoachWeekLabel').textContent = `WEEK ${w.week} · DAG ${p.day}`;
   $('runCoachWeekTitle').textContent = w.title;
   $('runCoachWeekDesc').textContent = w.desc;
-  $('runCoachProgressLine').textContent = (p.sessionsDone || 0) + (curLang()==='en' ? ' sessions completed so far' : ' sessies afgerond tot nu toe');
+  $('runCoachProgressLine').textContent = (p.sessionsDone || 0) + ' sessies afgerond tot nu toe';
   $('runCoachPlanName').textContent = plan.name;
   populateRunVoiceSelect();
 }
@@ -6130,23 +6377,43 @@ function poolForIntervalType(type){
   if (type === 'run') return runMusicFiles.length ? 'music' : (runPodcastFiles.length ? 'podcast' : null);
   return runPodcastFiles.length ? 'podcast' : (runMusicFiles.length ? 'music' : null);
 }
-function playNextTrackFromPool(pool){
+// ---------- Muziek/podcast met vloeiende overgang (fade-out/in) i.p.v. een harde knip ----------
+let rsFadeTimer = null;
+function fadeAudioTo(targetVolume, durationMs, onDone){
   const player = $('runMusicPlayer');
-  if (pool === 'music' && runMusicFiles.length){
-    player.src = URL.createObjectURL(runMusicFiles[runMusicIdx % runMusicFiles.length]);
-    runMusicIdx++;
-  } else if (pool === 'podcast' && runPodcastFiles.length){
-    player.src = URL.createObjectURL(runPodcastFiles[runPodcastIdx % runPodcastFiles.length]);
-    runPodcastIdx++;
-  } else return;
-  rsCurrentAudioPool = pool;
-  player.volume = 0.55;
-  player.play().catch(() => { /* toestel blokkeert autoplay zonder gebruikersinteractie — muziekknop is zelf al een tik geweest, dit lukt normaal */ });
+  clearInterval(rsFadeTimer);
+  const startVol = player.volume;
+  const steps = Math.max(4, Math.round(durationMs / 80));
+  let i = 0;
+  rsFadeTimer = setInterval(() => {
+    i++;
+    player.volume = Math.max(0, Math.min(1, startVol + (targetVolume - startVol) * (i/steps)));
+    if (i >= steps){ clearInterval(rsFadeTimer); if (onDone) onDone(); }
+  }, durationMs / steps);
 }
-function switchAudioForIntervalType(type){
+function playNextTrackFromPool(pool, opts){
+  opts = opts || {};
+  const player = $('runMusicPlayer');
+  const doSwitch = () => {
+    if (pool === 'music' && runMusicFiles.length){
+      player.src = URL.createObjectURL(runMusicFiles[runMusicIdx % runMusicFiles.length]);
+      runMusicIdx++;
+    } else if (pool === 'podcast' && runPodcastFiles.length){
+      player.src = URL.createObjectURL(runPodcastFiles[runPodcastIdx % runPodcastFiles.length]);
+      runPodcastIdx++;
+    } else return;
+    rsCurrentAudioPool = pool;
+    player.volume = opts.fade ? 0 : 0.55;
+    player.play()
+      .then(() => { if (opts.fade) fadeAudioTo(0.55, 900); })
+      .catch(() => { /* toestel blokkeert autoplay zonder gebruikersinteractie — muziekknop is zelf al een tik geweest, dit lukt normaal */ });
+  };
+  doSwitch();
+}
+function switchAudioForIntervalType(type, opts){
   const pool = poolForIntervalType(type);
   if (!pool){ rsCurrentAudioPool = null; return; }
-  if (pool !== rsCurrentAudioPool) playNextTrackFromPool(pool);
+  if (pool !== rsCurrentAudioPool) playNextTrackFromPool(pool, opts);
 }
 function handleRunTrackEnded(){
   if (rsCurrentAudioPool) playNextTrackFromPool(rsCurrentAudioPool);
@@ -6191,6 +6458,28 @@ async function renderRunStatsPanel(){
   $('rcStatSessions').textContent = history.length;
   $('rcStatKm').textContent = totalKm.toFixed(1);
   $('rcStatTime').textContent = totalSec >= 3600 ? (totalSec/3600).toFixed(1) + 'u' : Math.round(totalSec/60) + 'm';
+  const totalRunCal = history.reduce((s,r) => s + (estimateCalories(r.km, (r.durationSec||0)/60, 'hardlopen') || 0), 0);
+  $('rcStatCalories').textContent = totalRunCal > 0 ? `~${totalRunCal}` : (appSettings.bodyWeightKg ? '–' : '⚖️');
+
+  // Kleine staafgrafiek van de laatste 10 runs (oudste links, meest recente rechts)
+  const recent = history.slice(0, 10).slice().reverse();
+  const maxBar = Math.max(1, ...recent.map(r => r.km||0));
+  $('rcDistanceChart').innerHTML = recent.length ? recent.map(r =>
+    `<div class="bar-col"><div class="bar" style="height:${Math.max(4, (r.km/maxBar)*100)}%;" title="${r.km.toFixed(2)} km"></div></div>`
+  ).join('') : `<div style="color:rgba(246,244,238,0.4); font-size:11px; margin:auto;">Nog geen runs om te tonen.</div>`;
+
+  // Medailles: écht ontgrendeld op basis van je langste opgeslagen run
+  const maxKm = history.reduce((m,r) => Math.max(m, r.km||0), 0);
+  $('rcMedalGrid').innerHTML = RUN_MEDALS.map(medal => {
+    const unlocked = maxKm >= medal.km;
+    return `<div class="rc-medal ${unlocked ? 'unlocked' : ''}" data-km="${medal.km}">
+      <span class="medal-icon">${medal.icon}</span><span class="medal-label">${medal.label}</span>
+    </div>`;
+  }).join('');
+  $('rcMedalGrid').querySelectorAll('.rc-medal.unlocked').forEach(el => {
+    el.addEventListener('click', () => fireConfetti());
+  });
+
   $('rcHistoryList').innerHTML = history.length ? history.slice(0,15).map(r => {
     const d = new Date(r.date);
     const dateLabel = d.toLocaleDateString('nl-BE', { day:'2-digit', month:'short' });
@@ -6215,10 +6504,14 @@ async function openRunPlansModal(){
   openModal('runPlansModal');
 }
 async function renderRunPlansList(){
-  const activeId = await getActivePlanId();
+  const activeIdRaw = await getActivePlanId();
+  const activeId = activeIdRaw === 'builtin' ? 'builtin_5k' : activeIdRaw; // oude opgeslagen waarde telt als 5K
   const customPlans = await getCustomPlans();
-  const allPlans = [{ id:'builtin', name:'5K Start to Run', weekCount: RUN_5K_PROGRAM.length, builtin:true }]
-    .concat(customPlans.map(pl => ({ id:pl.id, name:pl.name, weekCount:pl.weeks.length, builtin:false })));
+  const allPlans = [
+    { id:'builtin_5k', name:RUN_BUILTIN_PLANS.builtin_5k.name, weekCount: RUN_5K_PROGRAM.length, builtin:true },
+    { id:'builtin_7_5k', name:RUN_BUILTIN_PLANS.builtin_7_5k.name, weekCount: RUN_7_5K_PROGRAM.length, builtin:true },
+    { id:'builtin_10k', name:RUN_BUILTIN_PLANS.builtin_10k.name, weekCount: RUN_10K_PROGRAM.length, builtin:true }
+  ].concat(customPlans.map(pl => ({ id:pl.id, name:pl.name, weekCount:pl.weeks.length, builtin:false })));
   $('runPlansList').innerHTML = allPlans.map(pl => `
     <div class="run-plan-row ${pl.id===activeId ? 'active-plan' : ''}">
       <div><b>${pl.name}</b><span>${pl.weekCount} weken${pl.id===activeId ? ' · actief' : ''}</span></div>
@@ -6311,7 +6604,91 @@ $('runPlanSaveBtn').addEventListener('click', async () => {
 });
 
 $('runCoachBackBtn').addEventListener('click', closeRunCoachScreen);
+$('runCoachAudioHeaderBtn').addEventListener('click', () => {
+  document.querySelectorAll('.rc-navbtn').forEach(b => b.classList.remove('active'));
+  document.querySelector('.rc-navbtn[data-panel="rcHomePanel"]').classList.add('active');
+  document.querySelectorAll('.rc-panel').forEach(p => p.classList.remove('active'));
+  $('rcHomePanel').classList.add('active');
+  $('rcMusicSection').scrollIntoView({ behavior:'smooth', block:'center' });
+  $('rcMusicSection').style.transition = 'box-shadow .3s';
+  $('rcMusicSection').style.boxShadow = '0 0 0 3px rgba(226,161,60,0.6)';
+  $('rcMusicSection').style.borderRadius = '14px';
+  setTimeout(() => { $('rcMusicSection').style.boxShadow = 'none'; }, 1400);
+});
 $('runCoachPlansBtn').addEventListener('click', openRunPlansModal);
+
+// ---------- Pijn-check: klikbare lichaamskaart, puur registratie, geen diagnose ----------
+const PAIN_ZONES = [
+  { id:'nek', label:'Nek', cx:60, cy:35, r:8 },
+  { id:'schouder', label:'Schouder', cx:38, cy:52, r:9 },
+  { id:'onderrug', label:'Onderrug', cx:60, cy:95, r:11 },
+  { id:'heup', label:'Heup', cx:45, cy:118, r:9 },
+  { id:'dijbeen', label:'Dijbeen/hamstring', cx:48, cy:155, r:10 },
+  { id:'knie', label:'Knie', cx:50, cy:190, r:9 },
+  { id:'kuit', label:'Kuit/scheenbeen', cx:52, cy:220, r:9 },
+  { id:'enkel', label:'Enkel', cx:53, cy:245, r:7 },
+  { id:'voet', label:'Voet', cx:55, cy:255, r:8 }
+];
+const PAIN_LOG_KEY = 'pain_log_v1';
+let painSelectedZone = null;
+let painSelectedSeverity = 'matig';
+function renderPainBodySvg(){
+  const svg = $('painBodySvg');
+  const body = `
+    <ellipse cx="60" cy="18" rx="12" ry="14" fill="rgba(255,255,255,0.12)"/>
+    <path d="M 45 40 Q 60 32 75 40 L 78 100 Q 60 108 42 100 Z" fill="rgba(255,255,255,0.1)"/>
+    <path d="M 45 42 L 30 75" stroke="rgba(255,255,255,0.1)" stroke-width="10" stroke-linecap="round"/>
+    <path d="M 75 42 L 90 75" stroke="rgba(255,255,255,0.1)" stroke-width="10" stroke-linecap="round"/>
+    <path d="M 48 100 L 45 200" stroke="rgba(255,255,255,0.1)" stroke-width="13" stroke-linecap="round"/>
+    <path d="M 72 100 L 70 200" stroke="rgba(255,255,255,0.1)" stroke-width="13" stroke-linecap="round"/>
+    <path d="M 45 200 L 53 258" stroke="rgba(255,255,255,0.1)" stroke-width="10" stroke-linecap="round"/>
+    <path d="M 70 200 L 62 258" stroke="rgba(255,255,255,0.1)" stroke-width="10" stroke-linecap="round"/>
+  `;
+  const zones = PAIN_ZONES.map(z => `<circle class="pain-zone" data-zone="${z.id}" cx="${z.cx}" cy="${z.cy}" r="${z.r}"></circle>`).join('');
+  svg.innerHTML = body + zones;
+  svg.querySelectorAll('.pain-zone').forEach(el => {
+    el.addEventListener('click', () => selectPainZone(el.dataset.zone));
+  });
+}
+function selectPainZone(zoneId){
+  painSelectedZone = zoneId;
+  $('painBodySvg').querySelectorAll('.pain-zone').forEach(el => el.classList.toggle('selected', el.dataset.zone === zoneId));
+  const zone = PAIN_ZONES.find(z => z.id === zoneId);
+  const sevOptions = [{ id:'licht', label:'Licht' }, { id:'matig', label:'Matig' }, { id:'erg', label:'Erg' }];
+  $('painZonePicker').innerHTML = `
+    <div style="font-size:13px; font-weight:800; color:var(--cream); margin-bottom:8px;">${zone.label}</div>
+    <div style="display:flex; gap:6px; margin-bottom:10px;">
+      ${sevOptions.map(s => `<button class="pain-sev-btn ${s.id===painSelectedSeverity?'selected':''}" data-sev="${s.id}">${s.label}</button>`).join('')}
+    </div>
+    <button id="painLogSaveBtn" style="width:100%; border:none; border-radius:10px; padding:9px; background:var(--amber); color:var(--green-900); font-weight:800; font-size:12px;">Registreren</button>
+  `;
+  $('painZonePicker').querySelectorAll('.pain-sev-btn').forEach(b => {
+    b.addEventListener('click', () => {
+      painSelectedSeverity = b.dataset.sev;
+      $('painZonePicker').querySelectorAll('.pain-sev-btn').forEach(x => x.classList.toggle('selected', x.dataset.sev===painSelectedSeverity));
+    });
+  });
+  $('painLogSaveBtn').addEventListener('click', async () => {
+    const log = await storageGet(PAIN_LOG_KEY).then(v => v ? JSON.parse(v) : []).catch(() => []);
+    log.unshift({ date:new Date().toISOString(), zone:zoneId, zoneLabel:zone.label, severity:painSelectedSeverity });
+    await storageSet(PAIN_LOG_KEY, JSON.stringify(log.slice(0,50)));
+    toast(curLang()==='en' ? 'Logged.' : 'Geregistreerd.', 2000);
+    painSelectedZone = null;
+    $('painBodySvg').querySelectorAll('.pain-zone').forEach(el => el.classList.remove('selected'));
+    $('painZonePicker').innerHTML = '<div style="font-size:11.5px; color:rgba(246,244,238,0.5);">Tik een zone aan om te registreren.</div>';
+    renderPainLogList();
+  });
+}
+async function renderPainLogList(){
+  const log = await storageGet(PAIN_LOG_KEY).then(v => v ? JSON.parse(v) : []).catch(() => []);
+  const sevIcon = { licht:'🟡', matig:'🟠', erg:'🔴' };
+  $('painLogList').innerHTML = log.length ? `<div style="font-size:11px; font-weight:800; color:rgba(246,244,238,0.6); text-transform:uppercase; margin-bottom:4px;">Recente registraties</div>` +
+    log.slice(0,10).map(r => `<div class="pain-log-row"><span>${sevIcon[r.severity]||''} ${r.zoneLabel}</span><span style="color:rgba(246,244,238,0.5);">${new Date(r.date).toLocaleDateString('nl-BE',{day:'2-digit',month:'short'})}</span></div>`).join('')
+    : '';
+}
+renderPainBodySvg();
+$('painZonePicker').innerHTML = '<div style="font-size:11.5px; color:rgba(246,244,238,0.5);">Tik een zone aan om te registreren.</div>';
+document.querySelector('.rc-navbtn[data-panel="rcPijnPanel"]').addEventListener('click', renderPainLogList);
 $('runCoachStartBtn').addEventListener('click', () => startRunSession());
 
 // ---------- Live trainingssessie: intervaltimer + GPS-afstand/tempo + gesproken aankondigingen ----------
@@ -6321,6 +6698,115 @@ const RUN_INTERVAL_LABELS = {
   walk:    { nl:'Wandelen', en:'Walking' },
   cooldown:{ nl:'Cooldown — rustig wandelen', en:'Cool-down — easy walk' }
 };
+// ---------- Coach-berichten: per moment een lijst varianten, telkens willekeurig gekozen zodat het
+// niet elke keer identiek klinkt. Vul gewoon een lijst aan om meer variatie toe te voegen — de code
+// die bepaalt WANNEER elke categorie gebruikt wordt, hoeft daarvoor niet aangepast te worden. ----------
+const COACH_MESSAGES = {
+  start: {
+    nl: ['Daar gaan we! Veel plezier en succes met je training.', 'Start! Mooi bezig, laten we er iets moois van maken.', 'We beginnen. Rustig opstarten, de rest volgt vanzelf.'],
+    en: ["Here we go! Have a great session.", "Let's start! Going to make this a good one.", "We're off. Ease into it, the rest will follow."]
+  },
+  countdown: {
+    nl: ['Hou je klaar, we gaan lopen over 5, 4, 3, 2, 1. Start maar!'],
+    en: ['Get ready, running starts in 5, 4, 3, 2, 1. Go!']
+  },
+  toRun: {
+    nl: ['Start met lopen. Ga ervoor!', 'En lopen maar. Mooi tempo vasthouden.', 'Tijd om te lopen — actieve pas, ontspannen schouders.'],
+    en: ['Start running. Go for it!', 'And off you run. Hold a nice pace.', 'Time to run — active stride, relaxed shoulders.']
+  },
+  toWalk: {
+    nl: ['Ok, vertraag maar. Nu gaan we tempo wandelen.', 'Goed gedaan! Wandel nu rustig door om te herstellen.', 'Tijd om te wandelen — schud je benen even los.'],
+    en: ['Okay, ease off now. Time to walk at a good pace.', 'Well done! Walk it out to recover now.', 'Time to walk — shake your legs out.']
+  },
+  breathingTip: {
+    nl: ['Wandel goed door. Als je nog kan praten of meezingen met je muziek, dan is je ademhaling goed.', 'Adem rustig in door je neus en uit door je mond — dat helpt om te herstellen.', 'Voel je je adem nog jagen? Vertraag dan nog even extra tijdens dit wandelstuk.'],
+    en: ['Keep walking steadily. If you can still talk or sing along, your breathing is right on track.', 'Breathe calmly in through your nose, out through your mouth — that helps you recover.', 'Still out of breath? Slow down a touch more during this walk.']
+  },
+  midpoint: {
+    nl: ['Halverwege je sessie! Je spieren zijn warm, blijf rechtop lopen en adem rustig door.', 'Je bent op de helft. Sterk bezig, hou dit vol.', 'Halverwege al — goed bezig, de rest gaat vanzelf.'],
+    en: ["Halfway through your session! You're warmed up, keep an upright posture and breathe steadily.", "You're at the halfway point. Strong work, keep it going.", "Already halfway — doing great, the rest will fly by."]
+  },
+  encouragement: {
+    nl: ['Goed bezig!', 'Lekker ritme, hou dit vast.', 'Sterk gedaan, blijf zo doorgaan.', 'Mooi tempo, dit voelt goed.', 'Je doet het geweldig.'],
+    en: ['Great job!', 'Nice rhythm, keep it up.', "Strong effort, keep going like this.", 'Good pace, this feels solid.', "You're doing amazing."]
+  },
+  finishCompleted: {
+    nl: ['Training afgerond. Goed gedaan!', 'Klaar! Sterk afgewerkt.', 'En dat is een wrap — knap resultaat vandaag.'],
+    en: ['Training complete. Well done!', 'Finished! Strong effort.', "And that's a wrap — great result today."]
+  },
+  finishStopped: {
+    nl: ['Run gestopt. Goed gedaan!', 'Gestopt — elke meter telt, mooi bezig.'],
+    en: ['Run stopped. Well done!', 'Stopped — every meter counts, nice work.']
+  },
+  tooFast: {
+    nl: ['Rustig aan, je loopt sneller dan gepland — bewaar wat energie.', 'Mooi snel, maar let op je tempo — niet te hard van start.'],
+    en: ['Ease off a bit, you\'re running faster than planned — save some energy.', 'Nice and quick, but watch your pace — don\'t start too hard.']
+  },
+  tooSlow: {
+    nl: ['Je zit iets onder je doeltempo — als het kan, mag het net iets vlotter.', 'Wat trager dan gepland, geen paniek — probeer het tempo lichtjes op te trekken.'],
+    en: ['You\'re a bit under your target pace — pick it up slightly if you can.', 'A touch slower than planned, no worries — try nudging the pace up a little.']
+  },
+  onTargetPace: {
+    nl: ['Mooi op schema, precies het tempo dat we willen.', 'Perfect tempo — dit is exact je doelpace.'],
+    en: ['Right on schedule, exactly the pace we want.', 'Perfect pace — this is exactly your target.']
+  },
+  personalRecord: {
+    nl: ['Dit is je snelste kilometer tot nu toe! Straf.', 'Nieuw persoonlijk record voor deze kilometer — knap!'],
+    en: ['That\'s your fastest kilometer yet! Impressive.', 'New personal best for that kilometer — great work!']
+  },
+  slowdownSupport: {
+    nl: ['Moeilijk moment? Hoort erbij, blijf gewoon bewegen — het tempo maakt nu even niet uit.', 'Voelt het zwaar? Adem rustig door, elke stap telt.'],
+    en: ['Tough moment? That\'s normal, just keep moving — pace doesn\'t matter right now.', 'Feeling heavy? Breathe steady, every step still counts.']
+  },
+  lastInterval: {
+    nl: ['Dit is je laatste loop-interval. Geef alles wat je hebt!', 'Laatste keer lopen deze sessie — maak er iets moois van.'],
+    en: ['This is your last running interval. Give it everything!', 'Last run of this session — make it count.']
+  },
+  progressPercent: {
+    nl: (pct) => `Je zit al op ${pct}% van je doel.`,
+    en: (pct) => `You're already at ${pct}% of your goal.`
+  },
+  sessionStreak: {
+    nl: (n) => n === 1 ? 'Dit is je eerste training deze week — mooi begin.' : `Dit is al je ${n}e training deze week — sterk volgehouden.`,
+    en: (n) => n === 1 ? 'This is your first session this week — great start.' : `This is already your ${n}th session this week — strong consistency.`
+  },
+  didYouKnow: {
+    nl: ['Wist je dat: een lichte voorwaartse leun vanuit je enkels je loophouding verbetert?', 'Wist je dat: een hogere cadans (kortere, snellere passen) vaak blessures voorkomt?', 'Wist je dat: op tijd drinken vóór je dorst hebt je prestatie merkbaar verbetert?', 'Wist je dat: een goede opwarming je risico op blessures flink verlaagt?', 'Wist je dat: ontspannen handen en schouders je energie besparen tijdens het lopen?'],
+    en: ['Did you know: a slight forward lean from your ankles improves your running form?', 'Did you know: a higher cadence (shorter, quicker steps) often helps prevent injury?', 'Did you know: drinking before you feel thirsty noticeably improves performance?', 'Did you know: a good warm-up significantly lowers your injury risk?', 'Did you know: relaxed hands and shoulders save energy while you run?']
+  },
+  weatherWarning: {
+    hot: { nl:(t) => `Het is best warm vandaag, ${t}°. Drink op tijd en bouw rustig op.`, en:(t) => `It's quite warm today, ${t}°. Drink on time and build up steadily.` },
+    cold: { nl:(t) => `Het is koud vandaag, ${t}°. Neem tijd om goed op te warmen.`, en:(t) => `It's cold today, ${t}°. Take time to warm up properly.` },
+    rain: { nl:() => 'Er is neerslag gemeld — let op gladde ondergrond onderweg.', en:() => 'Rain is forecast — watch for slippery surfaces along the way.' }
+  },
+  liveMedal: {
+    nl: (label) => `Nieuwe medaille ontgrendeld tijdens je run: ${label}! Geweldig.`,
+    en: (label) => `New medal unlocked during your run: ${label}! Amazing.`
+  }
+};
+function pickCoachLine(category, arg){
+  const set = COACH_MESSAGES[category];
+  if (!set) return '';
+  const val = curLang()==='en' ? set.en : set.nl;
+  if (typeof val === 'function') return val(arg);
+  if (!Array.isArray(val)) return '';
+  return val[Math.floor(Math.random() * val.length)];
+}
+function pickWeatherWarningLine(condition, arg){
+  const set = COACH_MESSAGES.weatherWarning && COACH_MESSAGES.weatherWarning[condition];
+  if (!set) return '';
+  const fn = curLang()==='en' ? set.en : set.nl;
+  return fn(arg);
+}
+// ---------- Configureerbaarheid: elke coaching-categorie apart aan/uit te zetten ----------
+const COACH_CATEGORY_DEFAULTS = {
+  start:true, countdown:true, toRun:true, toWalk:true, breathingTip:true, midpoint:true,
+  kmSplit:true, encouragement:true, tempoWarning:true, personalRecord:true, slowdownSupport:true,
+  lastInterval:true, progressPercent:true, sessionStreak:true, didYouKnow:true, weatherWarning:true, liveMedal:true
+};
+function coachCatEnabled(cat){
+  return !!(appSettings.coachCats ? appSettings.coachCats[cat] !== false : true);
+}
 const RUN_START_ANNOUNCE = {
   warmup:  { nl:'Warming-up. Begin met stevig wandelen.', en:'Warm-up. Start with a brisk walk.' },
   run:     { nl:'Start met lopen.', en:'Start running.' },
@@ -6362,7 +6848,7 @@ async function startRunSession(opts){
   const effectiveMode = opts.mode || rcActiveMode;
   if (opts.custom){
     intervals = opts.custom; isCustom = true;
-  } else if (effectiveMode === 'free'){
+  } else if (effectiveMode === 'free' || effectiveMode === 'evy'){
     intervals = [{ type:'run', sec: 999999 }]; freeform = true;
   } else {
     const plan = await getActivePlanMeta();
@@ -6371,11 +6857,26 @@ async function startRunSession(opts){
     intervals = w.build();
     week = p.week; day = p.day;
   }
+  const totalPlannedSec = (!freeform) ? intervals.reduce((s,iv) => s + iv.sec, 0) : null;
+  // Referentietempo voor "te snel/te traag"-feedback bij een doelrun: je eigen historische gemiddelde,
+  // geen verzonnen streeftempo — enkel zinvol te vergelijken als er al voldoende data is.
+  let referencePaceSecPerKm = null;
+  if (opts.targetKm){
+    try{
+      const hist = await storageGet('run_history').then(v => v ? JSON.parse(v) : []).catch(() => []);
+      const usable = hist.filter(r => r.km > 0.5 && r.durationSec > 60);
+      if (usable.length >= 2){
+        const avgPace = usable.reduce((s,r) => s + (r.durationSec / r.km), 0) / usable.length;
+        referencePaceSecPerKm = avgPace;
+      }
+    }catch(e){}
+  }
   rsState = {
     intervals, idx:0, remainingSec: intervals[0].sec,
     tickId:null, watchId:null, distanceM:0, startedAt:Date.now(), pausedMs:0, pauseStartedAt:null,
     lastPos:null, paused:false, week, day, isCustom, freeform, lastAnnouncedKm:0, targetKm: opts.targetKm || null, targetReached:false,
-    splits:[], lastSplitKm:0, lastSplitMs:0
+    splits:[], lastSplitKm:0, lastSplitMs:0, totalPlannedSec, midpointSpoken:false, lastEncouragementAt:0, countdownSpoken:false,
+    referencePaceSecPerKm, lastKmSplitStartMs:0, lastIntervalAnnounced:false, evyDist: opts.evyDist || null
   };
   $('runCoachScreen').classList.add('hidden');
   $('runSessionScreen').classList.remove('hidden');
@@ -6383,12 +6884,29 @@ async function startRunSession(opts){
   initRunSessionMap();
   renderRunProgressRail();
   updateRunSessionUI();
-  speakForRun(opts.targetKm
-    ? (curLang()==='en' ? `Target run of ${opts.targetKm} kilometer started. Go for it!` : `Doelrun van ${opts.targetKm} kilometer gestart. Aan de slag!`)
+  let startMsg = pickCoachLine('start') + ' ' + (opts.targetKm
+    ? (curLang()==='en' ? `Target run of ${opts.targetKm} kilometer.` : `Doelrun van ${opts.targetKm} kilometer.`)
     : freeform
-    ? (curLang()==='en' ? 'Free run started. Go at your own pace.' : 'Vrije run gestart. Loop op je eigen tempo.')
+    ? (curLang()==='en' ? 'Go at your own pace.' : 'Loop op je eigen tempo.')
     : (curLang()==='en' ? RUN_START_ANNOUNCE[intervals[0].type].en : RUN_START_ANNOUNCE[intervals[0].type].nl));
-  switchAudioForIntervalType(intervals[0].type);
+  // Streak: hoeveelste sessie deze week (echte data uit je geschiedenis)
+  if (coachCatEnabled('sessionStreak')){
+    try{
+      const hist = await storageGet('run_history').then(v => v ? JSON.parse(v) : []).catch(() => []);
+      const weekAgo = Date.now() - 7*86400000;
+      const thisWeekCount = hist.filter(r => new Date(r.date).getTime() >= weekAgo).length + 1;
+      startMsg += ' ' + pickCoachLine('sessionStreak', thisWeekCount);
+    }catch(e){}
+  }
+  // Weer-waarschuwing: hergebruikt de al opgehaalde, echte weerdata — geen nieuwe gok
+  if (coachCatEnabled('weatherWarning') && weatherSunCache && weatherSunCache.temp != null && (Date.now() - weatherSunCache.t < 30*60000)){
+    if (weatherSunCache.temp >= 24) startMsg += ' ' + pickWeatherWarningLine('hot', weatherSunCache.temp);
+    else if (weatherSunCache.temp <= 3) startMsg += ' ' + pickWeatherWarningLine('cold', weatherSunCache.temp);
+    else if (weatherSunCache.code != null && [51,53,55,61,63,65,80,81,82].includes(weatherSunCache.code)) startMsg += ' ' + pickWeatherWarningLine('rain');
+  }
+  speakForRun(startMsg);
+  if (opts.evyDist) playEvyTrack(opts.evyDist).then(nr => { rsState.evyEpisodeNr = nr; updateRunSessionUI(); });
+  else switchAudioForIntervalType(intervals[0].type);
   $('runMusicPlayer').addEventListener('ended', handleRunTrackEnded);
   rsState.tickId = setInterval(tickRunSession, 1000);
   if (navigator.geolocation){
@@ -6462,7 +6980,51 @@ function handleRunGpsUpdate(pos){
   const km = rsState.distanceM / 1000;
   if (Math.floor(km) > rsState.lastAnnouncedKm){
     rsState.lastAnnouncedKm = Math.floor(km);
-    speakForRun(rsState.lastAnnouncedKm + (curLang()==='en' ? ' kilometer.' : ' kilometer.'));
+    const nowMs = Date.now() - rsState.startedAt - rsState.pausedMs;
+    const thisKmSec = (nowMs - rsState.lastKmSplitStartMs) / 1000;
+    rsState.lastKmSplitStartMs = nowMs;
+    if (coachCatEnabled('kmSplit')) speakForRun(rsState.lastAnnouncedKm + (curLang()==='en' ? ' kilometer.' : ' kilometer.'));
+
+    // Persoonlijk record: snelste kilometer ooit, écht bijgehouden in opslag, niet geschat
+    if (coachCatEnabled('personalRecord')){
+      storageGet('run_fastest_km_sec').then(v => {
+        const best = v ? parseFloat(v) : null;
+        if (best == null || thisKmSec < best){
+          storageSet('run_fastest_km_sec', String(thisKmSec));
+          if (best != null) speakForRun(pickCoachLine('personalRecord')); // eerste km ooit is geen "record" om te vieren
+        }
+      }).catch(() => {});
+    }
+
+    // Tempo t.o.v. je eigen historisch gemiddelde — enkel bij een doelrun waar dat zinvol is
+    if (coachCatEnabled('tempoWarning') && rsState.referencePaceSecPerKm){
+      const diff = (thisKmSec - rsState.referencePaceSecPerKm) / rsState.referencePaceSecPerKm;
+      if (diff < -0.12) speakForRun(pickCoachLine('tooFast'));
+      else if (diff > 0.12) speakForRun(pickCoachLine('tooSlow'));
+      else if (Math.random() < 0.4) speakForRun(pickCoachLine('onTargetPace'));
+    } else if (coachCatEnabled('slowdownSupport') && rsState.lastKmSec && thisKmSec > rsState.lastKmSec * 1.25){
+      speakForRun(pickCoachLine('slowdownSupport'));
+    }
+    rsState.lastKmSec = thisKmSec;
+
+    // Voortgang t.o.v. doel, in procenten
+    if (coachCatEnabled('progressPercent') && rsState.targetKm && !rsState.targetReached){
+      const pct = Math.round((km / rsState.targetKm) * 100);
+      if (pct === 25 || pct === 50 || pct === 75) speakForRun(pickCoachLine('progressPercent', pct));
+    }
+
+    // Medaille live vieren tijdens de run zelf, niet pas achteraf
+    if (coachCatEnabled('liveMedal')){
+      checkNewlyUnlockedMedals(km).then(newMedals => {
+        if (newMedals.length){
+          fireConfetti();
+          newMedals.forEach(m => {
+            toast('🏅 ' + (curLang()==='en' ? 'Medal unlocked: ' : 'Medaille ontgrendeld: ') + m.label + '!', 4500);
+            speakForRun(pickCoachLine('liveMedal', m.label));
+          });
+        }
+      });
+    }
   }
   if (rsState.targetKm && !rsState.targetReached && km >= rsState.targetKm){
     rsState.targetReached = true;
@@ -6474,20 +7036,74 @@ function handleRunGpsUpdate(pos){
 }
 function tickRunSession(){
   if (!rsState || rsState.paused) return;
-  if (rsState.freeform){ updateRunSessionUI(); return; }
+  if (rsState.freeform){
+    // Vrije run/doelrun: geen vaste intervallen, dus geen halverwege-punt — wel af en toe aanmoediging
+    maybeSpeakEncouragement();
+    updateRunSessionUI();
+    return;
+  }
   rsState.remainingSec -= 1;
+  const upcoming = rsState.intervals[rsState.idx + 1];
   if (rsState.remainingSec <= 0){
     rsState.idx += 1;
     if (rsState.idx >= rsState.intervals.length){ finishRunSession(true); return; }
     rsState.remainingSec = rsState.intervals[rsState.idx].sec;
     const type = rsState.intervals[rsState.idx].type;
-    speakForRun(curLang()==='en' ? RUN_START_ANNOUNCE[type].en : RUN_START_ANNOUNCE[type].nl);
-    switchAudioForIntervalType(type);
+    // Laatste loop-interval aankondigen: is er nog een 'run' NA deze?
+    const isLastRun = type === 'run' && !rsState.intervals.slice(rsState.idx + 1).some(iv => iv.type === 'run');
+    if (type === 'run'){
+      if (isLastRun && coachCatEnabled('lastInterval')) speakForRun(pickCoachLine('lastInterval'));
+      else if (coachCatEnabled('toRun')) speakForRun(pickCoachLine('toRun'));
+    } else if (type === 'walk'){
+      if (coachCatEnabled('toWalk')){
+        const withTip = coachCatEnabled('breathingTip') && Math.random() < 0.5;
+        speakForRun(withTip ? pickCoachLine('toWalk') + ' ' + pickCoachLine('breathingTip') : pickCoachLine('toWalk'));
+      }
+    } else {
+      speakForRun(curLang()==='en' ? RUN_START_ANNOUNCE[type].en : RUN_START_ANNOUNCE[type].nl);
+    }
+    switchAudioForIntervalType(type, { fade:true });
     renderRunProgressRail();
-  } else if (rsState.remainingSec === 10){
+    rsState.countdownSpoken = false;
+  } else if (rsState.remainingSec === 5 && upcoming && upcoming.type === 'run' && !rsState.countdownSpoken && coachCatEnabled('countdown')){
+    // Aftellen vóór een loop-interval start, zoals gevraagd: "hou je klaar, we gaan lopen over 5,4,3,2,1"
+    // De huidige muziek/podcast begint hier al weg te faden, zodat het precies stil is tegen "start maar".
+    rsState.countdownSpoken = true;
+    speakForRun(pickCoachLine('countdown'));
+    if (rsCurrentAudioPool) fadeAudioTo(0, 4200);
+  } else if (rsState.remainingSec === 10 && !(upcoming && upcoming.type === 'run')){
     speakForRun(curLang()==='en' ? 'Ten seconds left.' : 'Nog tien seconden.');
   }
+  maybeSpeakMidpoint();
+  maybeSpeakEncouragement();
+  maybeSpeakDidYouKnow();
   updateRunSessionUI();
+}
+function maybeSpeakMidpoint(){
+  if (!rsState || rsState.midpointSpoken || !rsState.totalPlannedSec || !coachCatEnabled('midpoint')) return;
+  const elapsedSec = (Date.now() - rsState.startedAt - rsState.pausedMs) / 1000;
+  if (elapsedSec >= rsState.totalPlannedSec / 2){
+    rsState.midpointSpoken = true;
+    speakForRun(pickCoachLine('midpoint'));
+  }
+}
+function maybeSpeakDidYouKnow(){
+  // Enkel tijdens wandelpauzes, af en toe, en enkel als "wist-je-datjes" aanstaan — géén dubbeling met breathingTip
+  if (!rsState || rsState.freeform || !coachCatEnabled('didYouKnow')) return;
+  const curType = rsState.intervals[rsState.idx].type;
+  if (curType !== 'walk' && curType !== 'warmup' && curType !== 'cooldown') return;
+  if (Math.random() < 0.008) speakForRun(pickCoachLine('didYouKnow'));
+}
+function maybeSpeakEncouragement(){
+  if (!rsState || !coachCatEnabled('encouragement')) return;
+  const curType = rsState.freeform ? 'run' : rsState.intervals[rsState.idx].type;
+  if (curType !== 'run') return;
+  const elapsedSec = (Date.now() - rsState.startedAt - rsState.pausedMs) / 1000;
+  // Ongeveer om de 75-100s een korte aanmoediging tijdens het lopen zelf — niet te opdringerig
+  if (elapsedSec - rsState.lastEncouragementAt >= 80 + Math.random()*25){
+    rsState.lastEncouragementAt = elapsedSec;
+    speakForRun(pickCoachLine('encouragement'));
+  }
 }
 function updateRunSessionUI(){
   if (!rsState) return;
@@ -6495,7 +7111,9 @@ function updateRunSessionUI(){
   const label = $('rsIntervalLabel');
   const elapsedSec = (Date.now() - rsState.startedAt - rsState.pausedMs) / 1000;
   if (rsState.freeform){
-    label.textContent = rsState.targetKm ? (en ? `Target ${rsState.targetKm} km` : `Doel ${rsState.targetKm} km`) : (en ? 'Free run' : 'Vrij lopen');
+    label.textContent = rsState.evyDist
+      ? `EVY · ${rsState.evyDist} km · Aflevering ${rsState.evyEpisodeNr || '–'}`
+      : rsState.targetKm ? (en ? `Target ${rsState.targetKm} km` : `Doel ${rsState.targetKm} km`) : (en ? 'Free run' : 'Vrij lopen');
     label.className = 'type-run';
     $('rsCountdown').textContent = fmtMMSS(elapsedSec);
     const km = rsState.distanceM / 1000;
@@ -6515,6 +7133,8 @@ function updateRunSessionUI(){
   const km = rsState.distanceM / 1000;
   $('rsDistance').textContent = km.toFixed(2);
   $('rsElapsed').textContent = fmtMMSS(elapsedSec);
+  const cal = estimateCalories(km, elapsedSec / 60, 'hardlopen');
+  $('rsCalories').textContent = cal != null ? `~${cal} kcal verbruikt` : 'Vul gewicht in bij Instellingen voor kcal';
   const runningMinutes = elapsedSec / 60;
   $('rsPace').textContent = (km > 0.05 && runningMinutes > 0) ? fmtMMSS((runningMinutes / km) * 60) : '–:–';
   $('rsSplitLabel').textContent = (Math.floor(km) + 1) + ' km';
@@ -6555,7 +7175,11 @@ $('rsStopBtn').addEventListener('click', () => {
 $('stopTrainingCancelBtn').addEventListener('click', () => closeModal('stopTrainingModal'));
 $('stopTrainingConfirmBtn').addEventListener('click', () => {
   closeModal('stopTrainingModal');
-  finishRunSession(false);
+  // Bij een doelrun (Target5/Target10/EVY) telt 'gestopt nadat het doel-km al gehaald is' als afgerond,
+  // zodat de voortgang (Evy-episode, AI Coach-week) correct doorschuift. Bij een zuivere Vrije Run zonder
+  // doel-km, of bij vroegtijdig stoppen vóór het doel, blijft dit gewoon 'niet afgerond'.
+  const reachedTarget = !!(rsState && rsState.targetKm && rsState.targetReached);
+  finishRunSession(reachedTarget);
 });
 async function finishRunSession(completed){
   if (!rsState) return;
@@ -6570,10 +7194,11 @@ async function finishRunSession(completed){
   const km = rsState.distanceM / 1000;
   const isStructured = !rsState.isCustom && !rsState.freeform;
   if (completed){
-    speakForRun(curLang()==='en' ? 'Training complete. Well done!' : 'Training afgerond. Goed gedaan!');
+    speakForRun(pickCoachLine('finishCompleted'));
     if (isStructured) await advanceRunProgress();
+    if (rsState.evyDist) await advanceEvyProgress(rsState.evyDist);
   } else if (rsState.freeform || rsState.isCustom){
-    speakForRun(curLang()==='en' ? 'Run stopped. Well done!' : 'Run gestopt. Goed gedaan!');
+    speakForRun(pickCoachLine('finishStopped'));
   }
   try{
     const history = await storageGet('run_history').then(v => v ? JSON.parse(v) : []).catch(() => []);
@@ -6598,6 +7223,10 @@ async function finishRunSession(completed){
     await renderRunCoachScreen();
   }
   toast(summaryMsg, 4000);
+  // Achievements: baseer op de langste run ooit (niet enkel deze sessie), pas ná het opslaan controleren
+  const overallMaxKm = await getMaxRunKm();
+  const newMedals = await checkNewlyUnlockedMedals(overallMaxKm);
+  if (newMedals.length) setTimeout(() => celebrateNewMedals(newMedals), 1600);
 }
 
 // ---------- Garmin-stijl Kompas (letterlijk Gemini's Compas.html) ----------
@@ -6819,14 +7448,20 @@ async function sendRunCoachDataToFrame(){
   const voices = getAvailableVoices().map(v => ({ uri:v.voiceURI, name:v.name, lang:v.lang }));
   const savedUri = localStorage.getItem(RUN_VOICE_KEY) || '';
   const customPlans = await getCustomPlans();
+  const evy5k = await getEvyProgress(5);
+  const evy10k = await getEvyProgress(10);
   frame.contentWindow.postMessage({
     source:'garminRunCoachData', week:p.week, day:p.day, sessionsDone:p.sessionsDone||0,
     program: plan.weeks.map(w => ({ week:w.week, title:w.title, desc:w.desc })),
-    planName: plan.name, activePlanId: plan.id,
-    allPlans: [{ id:'builtin', name:'5K Start to Run', weekCount: RUN_5K_PROGRAM.length }].concat(
+    planName: plan.name, activePlanId: (plan.id === 'builtin' ? 'builtin_5k' : plan.id),
+    allPlans: [
+      { id:'builtin_5k', name:RUN_BUILTIN_PLANS.builtin_5k.name, weekCount: RUN_5K_PROGRAM.length },
+      { id:'builtin_7_5k', name:RUN_BUILTIN_PLANS.builtin_7_5k.name, weekCount: RUN_7_5K_PROGRAM.length },
+      { id:'builtin_10k', name:RUN_BUILTIN_PLANS.builtin_10k.name, weekCount: RUN_10K_PROGRAM.length }
+    ].concat(
       customPlans.map(pl => ({ id:pl.id, name:pl.name, weekCount:pl.weeks.length }))
     ),
-    voices, savedVoiceUri: savedUri
+    voices, savedVoiceUri: savedUri, evy5k, evy10k
   }, '*');
 }
 window.addEventListener('message', (ev) => {
@@ -6840,6 +7475,8 @@ window.addEventListener('message', (ev) => {
         startRunSession({ custom: buildRunWalkIntervals(data.reps, data.runSec, data.walkSec, 300, 300) });
       } else if (data.mode === 'target'){
         startRunSession({ mode:'free', targetKm: data.targetKm });
+      } else if (data.mode === 'evy'){
+        startRunSession({ mode:'evy', targetKm: data.evyDist, evyDist: data.evyDist });
       } else {
         startRunSession({ mode: data.mode || 'learn' });
       }
@@ -6848,8 +7485,11 @@ window.addEventListener('message', (ev) => {
     case 'setmusic':     runMusicFiles = data.files || []; runMusicIdx = 0; break;
     case 'setpodcast':   runPodcastFiles = data.files || []; runPodcastIdx = data.startIndex || 0; break;
     case 'setpodcaststart': runPodcastIdx = data.startIndex || 0; break;
+    case 'resetevy':     resetEvyProgress(data.evyDist).then(sendRunCoachDataToFrame); break;
+    case 'setplan':       setActivePlanId(data.planId).then(sendRunCoachDataToFrame); break;
     case 'other-not-built': toast(curLang()==='en' ? 'Not built yet — coming later.' : 'Nog niet gebouwd — komt later.', 2500); break;
     case 'getstats': sendGarminRunCoachStats(); break;
+    case 'confetti': fireConfetti(); break;
     case 'openplans': openRunPlansModal(); break;
   }
 });
@@ -6860,11 +7500,17 @@ async function sendGarminRunCoachStats(){
   try{ const v = await storageGet('run_history'); history = v ? JSON.parse(v) : []; }catch(e){}
   const totalKm = history.reduce((s,r) => s + (r.km||0), 0);
   const totalSec = history.reduce((s,r) => s + (r.durationSec||0), 0);
+  const maxKm = history.reduce((m,r) => Math.max(m, r.km||0), 0);
+  const totalRunCal = history.reduce((s,r) => s + (estimateCalories(r.km, (r.durationSec||0)/60, 'hardlopen') || 0), 0);
+  const recent = history.slice(0,10).slice().reverse();
   frame.contentWindow.postMessage({
     source:'garminRunCoachStats',
     sessions: history.length,
     km: totalKm.toFixed(1),
     time: totalSec >= 3600 ? (totalSec/3600).toFixed(1) + 'u' : Math.round(totalSec/60) + 'm',
+    calories: totalRunCal > 0 ? `~${totalRunCal}` : (appSettings.bodyWeightKg ? '–' : '⚖️'),
+    chart: recent.map(r => r.km || 0),
+    medals: RUN_MEDALS.map(m => ({ km:m.km, label:m.label, icon:m.icon, unlocked: maxKm >= m.km })),
     history: history.slice(0,15).map(r => ({
       dateLabel: new Date(r.date).toLocaleDateString('nl-BE', { day:'2-digit', month:'short' }),
       km: r.km.toFixed(2), duration: fmtMMSS(r.durationSec), completed: r.completed
@@ -7202,6 +7848,15 @@ ${GARMIN_MENU_BTN_JS}
 </html>`;
 }
 
+function solarElevationDeg(latDeg, hourLocal, dayOfYear){
+  // Standaard sterrenkundige formule (declinatie + uurhoek) — negeert de "tijdsvereffening" (enkele
+  // minuten effect), prima nauwkeurig genoeg voor een visuele dagcurve, geen verzonnen/geschatte cijfers.
+  const decl = 23.44 * Math.sin(Math.PI/180 * (360/365) * (284 + dayOfYear));
+  const hourAngle = 15 * (hourLocal - 12);
+  const latRad = latDeg * Math.PI/180, declRad = decl * Math.PI/180, haRad = hourAngle * Math.PI/180;
+  const sinElev = Math.sin(latRad)*Math.sin(declRad) + Math.cos(latRad)*Math.cos(declRad)*Math.cos(haRad);
+  return Math.asin(Math.max(-1, Math.min(1, sinElev))) * 180/Math.PI;
+}
 async function fetchGarminWeerData(forceLocation){
   const frame = $('garminWeerFrame');
   const post = (payload) => { if (frame && frame.contentWindow) frame.contentWindow.postMessage(Object.assign({ source:'garminWeerData' }, payload), '*'); };
@@ -7218,6 +7873,9 @@ async function fetchGarminWeerData(forceLocation){
       const cardinals = cardinalsForLang();
       const windDirLabel = data.windDir != null ? cardinals[Math.round(data.windDir / 22.5) % 16] : '–';
       const now = new Date();
+      const dayOfYear = Math.floor((now - new Date(now.getFullYear(),0,0)) / 86400000);
+      const sunCurve = [];
+      for (let h = 0; h <= 24; h += 0.5) sunCurve.push({ h, elev: solarElevationDeg(weatherLocationOverride.lat, h, dayOfYear) });
       post({
         temp:data.temp, tempMax:data.tempMax, tempMin:data.tempMin, feelsLike:data.feelsLike,
         humidity:data.humidity, windSpeed:data.windSpeed, windDir:data.windDir, windDirLabel,
@@ -7225,7 +7883,11 @@ async function fetchGarminWeerData(forceLocation){
         aqi:data.aqi, pollen:data.pollen,
         conditionText: weatherConditionText()[data.code] || '–',
         icon: WEATHER_ICONS[data.code] || '🌡️',
+        weatherSourceNote: data.weatherSourceNote || '',
+        rainSourceNote: data.rainSourceNote || '',
         sunriseText:data.sunriseText, sunsetText:data.sunsetText, sunriseMin:data.sunriseMin, sunsetMin:data.sunsetMin,
+        sunCurve, nowHour: now.getHours() + now.getMinutes()/60,
+        lat: weatherLocationOverride.lat, lng: weatherLocationOverride.lng,
         hourly: (data.hourly||[]).map(h => ({ hourLabel: h.hour === now.getHours() ? (curLang()==='en'?'Now':'Nu') : (String(h.hour).padStart(2,'0') + (curLang()==='en'?'h':'u')), temp:h.temp, icon: WEATHER_ICONS[h.code] || '🌡️' })),
         daily: (data.daily||[]).map(d => ({ dayLabel: d.date.toDateString()===now.toDateString() ? (curLang()==='en'?'Today':'Vandaag') : d.date.toLocaleDateString(curLang()==='en'?'en-GB':'nl-BE', { weekday:'short' }), max:d.max, min:d.min, icon: WEATHER_ICONS[d.code] || '🌡️' })),
         placeName: placeName || (curLang()==='en' ? 'Unknown location' : 'Locatie onbekend'),
@@ -7574,8 +8236,9 @@ ${GARMIN_MENU_BTN_JS}
 }
 
 function buildGarminWeerHtml(){
-  // Gemini's weer.html-lay-out (Radar-tab vervangen door een duidelijke "nog niet gekoppeld"-melding,
-  // in plaats van nagemaakte/fictieve neerslagbalken te tonen — dat zou misleidend zijn tijdens een rit).
+  // Gemini's weer.html-lay-out. Radar en zonnestand-grafiek gebruiken nu echte databronnen
+  // (RainViewer publieke API, resp. een standaard sterrenkundige berekening) i.p.v. de eerdere
+  // "nog niet gekoppeld"-melding.
   return `<!DOCTYPE html>
 <html lang="nl">
 <head>
@@ -7583,6 +8246,8 @@ function buildGarminWeerHtml(){
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Uitgebreid Weerbericht - Meteo</title>
   <script src="https://cdn.tailwindcss.com"><\/script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"><\/script>
   <style>
     .custom-scroll::-webkit-scrollbar { width: 4px; }
     .custom-scroll::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); border-radius: 8px; }
@@ -7630,6 +8295,7 @@ function buildGarminWeerHtml(){
         <div class="text-3xl font-extrabold text-white tracking-tight" id="main-temp-display">--°C</div>
         <div class="text-xs font-medium text-slate-300 mt-0.5" id="main-weather-desc">Data laden...</div>
         <div class="text-[10px] font-semibold text-sky-400 mt-1" id="main-temp-range">▲ --° max • ▼ --° min</div>
+        <div class="text-[9px] text-slate-500 mt-1" id="main-weather-source"></div>
       </div>
       <div class="flex flex-col items-center justify-center min-w-[70px]">
         <div id="main-weather-icon-container" class="w-14 h-14 flex items-center justify-center text-5xl">🌡️</div>
@@ -7648,9 +8314,14 @@ function buildGarminWeerHtml(){
     <div class="flex-1 min-h-0 overflow-y-auto custom-scroll pr-1">
 
       <div id="content-radar" class="tab-content hidden space-y-3">
-        <div class="bg-[#0b1426] rounded-2xl p-6 border border-slate-800 text-center text-sm text-slate-400">
-          🛰️ Neerslagradar is nog niet gekoppeld aan een echte databron.<br>
-          <span class="text-xs">Komt in een latere stap — geen nagemaakte data getoond.</span>
+        <div id="garminRadarMapWrap" style="position:relative; width:100%; height:260px; border-radius:16px; overflow:hidden; border:1px solid #1e293b;">
+          <div id="garminRadarMap" style="width:100%; height:100%; background:#0b1426;"></div>
+          <div id="radarTimeLabel" class="absolute top-2.5 left-2.5 bg-black/60 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg" style="position:absolute; z-index:500;">Laden…</div>
+        </div>
+        <p class="text-[10px] text-slate-500 text-center">Neerslagradar via RainViewer — publieke, gratis databron, geen account nodig.</p>
+        <div class="bg-[#0b1426] rounded-xl p-3 border border-slate-800/80 text-center">
+          <span class="text-[10px] font-bold text-amber-400 block mb-1">🔍 Bronnen vergeleken</span>
+          <p id="rainSourceNote" class="text-[11px] text-slate-300">–</p>
         </div>
       </div>
 
@@ -7661,6 +8332,15 @@ function buildGarminWeerHtml(){
             <span class="text-[10px] text-slate-500">Veeg voor meer →</span>
           </div>
           <div id="hourly-forecast-container" class="flex gap-2 overflow-x-auto no-scrollbar pb-1"></div>
+        </div>
+        <div class="bg-[#0b1426] rounded-2xl p-4 border border-slate-800/80 space-y-2">
+          <h3 class="text-xs font-bold text-slate-300 flex items-center gap-1.5"><span>☀️</span> Zonnestand vandaag</h3>
+          <svg id="sunCurveSvg" viewBox="0 0 300 90" style="width:100%; height:90px;"></svg>
+          <div class="flex justify-between text-[10px] text-slate-500">
+            <span id="sunCurveRiseLabel">🌅 –:–</span>
+            <span id="sunCurveNowLabel" class="text-amber-400 font-bold">–</span>
+            <span id="sunCurveSetLabel">🌇 –:–</span>
+          </div>
         </div>
         <div class="bg-[#0b1426] rounded-2xl p-4 border border-slate-800/80 space-y-3">
           <h3 class="text-xs font-bold text-slate-300 flex items-center gap-1.5"><span>📅</span> Verwachting voor de komende dagen</h3>
@@ -7805,6 +8485,7 @@ ${GARMIN_MENU_BTN_JS}
         btn.classList.add('bg-amber-500','text-slate-950','font-bold','shadow-md'); btn.classList.remove('text-slate-400');
         document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
         document.getElementById('content-' + tab).classList.remove('hidden');
+        if (tab === 'radar' && garminRadarMap) setTimeout(() => garminRadarMap.invalidateSize(), 50);
       });
     });
 
@@ -7813,6 +8494,48 @@ ${GARMIN_MENU_BTN_JS}
       if (mins == null) return '--u --m';
       const h = Math.floor(mins/60), m = Math.round(mins%60);
       return h + 'u ' + m + 'm';
+    }
+
+    // ---------- Radar: echte publieke RainViewer-tegels, korte animatie door de laatste beelden ----------
+    let garminRadarMap = null;
+    let garminRadarLayers = [];
+    let garminRadarFrames = [];
+    let garminRadarIdx = 0;
+    let garminRadarTimer = null;
+    function initGarminRadarMap(lat, lng){
+      if (garminRadarMap) return; // eenmalig initialiseren; nieuwe locatie-fetches passen gewoon de bestaande kaart aan
+      garminRadarMap = L.map('garminRadarMap', { zoomControl:false, attributionControl:false }).setView([lat, lng], 7);
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png', { subdomains:'abcd' }).addTo(garminRadarMap);
+      L.circleMarker([lat, lng], { radius:6, color:'#fff', weight:2, fillColor:'#3b82f6', fillOpacity:1 }).addTo(garminRadarMap);
+      fetch('https://api.rainviewer.com/public/weather-maps.json')
+        .then(r => r.json())
+        .then(rv => {
+          const past = rv?.radar?.past || [];
+          const nowcast = rv?.radar?.nowcast || [];
+          const frames = [...past, ...nowcast];
+          if (!frames.length){ document.getElementById('radarTimeLabel').textContent = 'Geen recente radardata'; return; }
+          garminRadarFrames = frames;
+          garminRadarLayers = frames.map(f =>
+            L.tileLayer(\`https://tilecache.rainviewer.com\${f.path}/256/{z}/{x}/{y}/4/1_1.png\`, { opacity:0 }).addTo(garminRadarMap)
+          );
+          garminRadarIdx = past.length > 0 ? past.length - 1 : 0;
+          showGarminRadarFrame(garminRadarIdx);
+          garminRadarTimer = setInterval(() => {
+            garminRadarIdx = (garminRadarIdx + 1) % garminRadarLayers.length;
+            showGarminRadarFrame(garminRadarIdx);
+          }, 700);
+        })
+        .catch(() => { document.getElementById('radarTimeLabel').textContent = 'Radar niet beschikbaar'; });
+      setTimeout(() => garminRadarMap.invalidateSize(), 200);
+    }
+    function showGarminRadarFrame(i){
+      garminRadarLayers.forEach((layer, idx) => layer.setOpacity(idx === i ? 0.65 : 0));
+      const f = garminRadarFrames[i];
+      if (!f) return;
+      const isForecast = i >= (garminRadarFrames.length - (garminRadarFrames.filter((x,j)=>j>=i && x).length));
+      const d2 = new Date(f.time * 1000);
+      const timeStr = String(d2.getHours()).padStart(2,'0') + ':' + String(d2.getMinutes()).padStart(2,'0');
+      document.getElementById('radarTimeLabel').textContent = timeStr;
     }
 
     window.addEventListener('message', (ev) => {
@@ -7828,6 +8551,9 @@ ${GARMIN_MENU_BTN_JS}
       document.getElementById('main-temp-display').textContent = (d.temp ?? '--') + '°C';
       document.getElementById('main-weather-desc').textContent = d.conditionText || '--';
       document.getElementById('main-temp-range').innerHTML = '▲ ' + (d.tempMax ?? '--') + '° max • ▼ ' + (d.tempMin ?? '--') + '° min';
+      document.getElementById('main-weather-source').textContent = d.weatherSourceNote || '';
+      const rainNoteEl = document.getElementById('rainSourceNote');
+      if (rainNoteEl) rainNoteEl.textContent = d.rainSourceNote || '–';
       document.getElementById('main-weather-icon-container').textContent = d.icon || '🌡️';
       document.getElementById('location-name-display').textContent = (d.placeName || '').toUpperCase();
 
@@ -7865,6 +8591,43 @@ ${GARMIN_MENU_BTN_JS}
         const now = new Date(); const nowMin = now.getHours()*60 + now.getMinutes();
         document.getElementById('val-remaining-light').textContent = fmtMin(Math.max(0, d.sunsetMin - nowMin));
       }
+
+      // Zonnestand-grafiek: echte berekening (declinatie + uurhoek), meegestuurd vanuit de hoofdpagina
+      if (d.sunCurve && d.sunCurve.length){
+        const svg = document.getElementById('sunCurveSvg');
+        const W = 300, H = 90, pad = 6;
+        const elevs = d.sunCurve.map(p => p.elev);
+        const maxE = Math.max(...elevs, 5), minE = Math.min(...elevs, -5);
+        const range = maxE - minE || 1;
+        const xFor = h => pad + (h/24) * (W - pad*2);
+        const yFor = e => H - pad - ((e - minE)/range) * (H - pad*2);
+        const pathD = d.sunCurve.map((p,i) => (i===0?'M':'L') + xFor(p.h).toFixed(1) + ',' + yFor(p.elev).toFixed(1)).join(' ');
+        const horizonY = yFor(0).toFixed(1);
+        const nowX = xFor(d.nowHour).toFixed(1);
+        // Interpoleer de zonhoogte op "nu" voor de positie van het bolletje op de curve zelf
+        let nowElev = 0;
+        for (let i=0; i<d.sunCurve.length-1; i++){
+          if (d.nowHour >= d.sunCurve[i].h && d.nowHour <= d.sunCurve[i+1].h){
+            const t = (d.nowHour - d.sunCurve[i].h) / (d.sunCurve[i+1].h - d.sunCurve[i].h);
+            nowElev = d.sunCurve[i].elev + t * (d.sunCurve[i+1].elev - d.sunCurve[i].elev);
+            break;
+          }
+        }
+        const nowY = yFor(nowElev).toFixed(1);
+        svg.innerHTML = \`
+          <line x1="\${pad}" y1="\${horizonY}" x2="\${W-pad}" y2="\${horizonY}" stroke="#334155" stroke-width="1" stroke-dasharray="3,3"/>
+          <path d="\${pathD} L \${xFor(24)},\${horizonY} L \${xFor(0)},\${horizonY} Z" fill="url(#sunGrad)" opacity="0.25"/>
+          <path d="\${pathD}" fill="none" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="\${nowX}" cy="\${nowY}" r="5" fill="#fbbf24" stroke="#0b1426" stroke-width="2"/>
+          <defs><linearGradient id="sunGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fbbf24"/><stop offset="100%" stop-color="#fbbf24" stop-opacity="0"/></linearGradient></defs>
+        \`;
+        document.getElementById('sunCurveRiseLabel').textContent = '🌅 ' + (d.sunriseText || '–:–');
+        document.getElementById('sunCurveSetLabel').textContent = '🌇 ' + (d.sunsetText || '–:–');
+        document.getElementById('sunCurveNowLabel').textContent = 'Nu: ' + Math.round(nowElev) + '° boven horizon';
+      }
+
+      // Radar: echte RainViewer-tegels, zelfde publieke bron als de Standaard-kaart
+      if (d.lat != null && d.lng != null) initGarminRadarMap(d.lat, d.lng);
 
       // UV
       if (d.uvIndex != null){
@@ -8100,19 +8863,37 @@ function buildGarminRunCoachHtml(){
           <h1 class="text-lg font-black text-white flex items-center gap-1.5 mt-0.5">🏃 RunCoach Pro</h1>
         </div>
       </div>
-      ${GARMIN_MENU_BTN_HTML('mini')}
+      <div class="flex items-center gap-2">
+        <button id="rcAudioHeaderBtn" class="w-8 h-8 rounded-full bg-black/60 border border-amber-500/40 text-amber-400 flex items-center justify-center text-base flex-shrink-0">🎵</button>
+        ${GARMIN_MENU_BTN_HTML('mini')}
+      </div>
     </div>
 
     <!-- ===== HOME-paneel ===== -->
     <div id="rcHomePanel" class="rc-panel active">
 
-      <div class="grid grid-cols-2 gap-2 bg-slate-900/60 border border-slate-800 rounded-2xl p-1.5 mb-4">
-        <button id="rcTabLearn" class="py-2.5 rounded-xl bg-amber-500 text-slate-950 font-bold text-xs">🔰 Leren Lopen</button>
-        <button id="rcTabAdvanced" class="py-2.5 rounded-xl text-slate-400 font-bold text-xs">⚡ Volleerde Loper</button>
+      <div class="grid grid-cols-3 gap-1.5 bg-slate-900/60 border border-slate-800 rounded-2xl p-1.5 mb-4">
+        <button id="rcTabAI" class="py-2.5 rounded-xl bg-amber-500 text-slate-950 font-bold text-[10px]">🤖 AI Coach</button>
+        <button id="rcTabEvy" class="py-2.5 rounded-xl text-slate-400 font-bold text-[10px]">🎧 EVY</button>
+        <button id="rcTabAdvanced" class="py-2.5 rounded-xl text-slate-400 font-bold text-[10px]">⚡ Vrij/Doel</button>
       </div>
 
-      <!-- ---- Leren Lopen ---- -->
+      <!-- ---- AI Coach ---- -->
       <div id="rcLearnBlock">
+        <div class="bg-slate-900/40 border border-slate-800 rounded-2xl p-3 mb-3">
+          <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block mb-1.5">🤖 AI Coach — kies je doel-afstand</span>
+          <div class="grid grid-cols-3 gap-1.5">
+            <button id="rcPlan5k" data-plan="builtin_5k" class="rc-plan-btn border-2 border-slate-800 bg-slate-900/50 opacity-70 rounded-xl py-2 text-center">
+              <div class="text-[11px] font-black text-white">5 KM</div>
+            </button>
+            <button id="rcPlan7_5k" data-plan="builtin_7_5k" class="rc-plan-btn border-2 border-slate-800 bg-slate-900/50 opacity-70 rounded-xl py-2 text-center">
+              <div class="text-[11px] font-black text-white">7,5 KM</div>
+            </button>
+            <button id="rcPlan10k" data-plan="builtin_10k" class="rc-plan-btn border-2 border-slate-800 bg-slate-900/50 opacity-70 rounded-xl py-2 text-center">
+              <div class="text-[11px] font-black text-white">10 KM</div>
+            </button>
+          </div>
+        </div>
         <div class="bg-gradient-to-br from-rose-600 to-red-900 rounded-2xl p-5 mb-3 shadow-xl">
           <span id="rcPlanBadge" class="text-[10px] font-black uppercase tracking-widest bg-black/20 text-white/90 px-2.5 py-1 rounded-full inline-block mb-2">5K Start to Run</span>
           <h2 id="rcWeekTitle" class="text-lg font-black text-white leading-tight">Week – · Dag –</h2>
@@ -8123,25 +8904,13 @@ function buildGarminRunCoachHtml(){
           <span class="text-slate-300">📚 Schema wisselen of zelf opbouwen</span><span class="text-slate-500">›</span>
         </button>
 
-        <div class="bg-slate-900/40 border border-slate-800 rounded-2xl p-3 mb-3.5 space-y-1.5">
-          <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Kies je audio-begeleiding:</span>
-          <div class="grid grid-cols-2 gap-2">
-            <button id="rcAudioAiLearn" class="border-2 border-amber-500 bg-amber-500/10 rounded-xl p-2.5 text-left flex items-center gap-2">
-              <span class="text-lg">🤖</span><div><div class="text-[11px] font-black text-white">AI Coach</div><div class="text-[9px] text-slate-400">Eigen MP3 + Spraak</div></div>
-            </button>
-            <button id="rcAudioPodcastLearn" class="border-2 border-slate-800 bg-slate-900/50 rounded-xl p-2.5 text-left flex items-center gap-2 opacity-70">
-              <span class="text-lg">🎙️</span><div><div class="text-[11px] font-black text-white">Podcast</div><div id="rcPodcastSubLearn" class="text-[9px] text-slate-400">Eigen afleveringen</div></div>
-            </button>
-          </div>
-        </div>
-
         <button id="rcStartBtn" class="w-full gold-gradient text-slate-950 font-black py-3.5 rounded-2xl text-center shadow-xl tracking-wider text-xs uppercase mb-3.5">
           🚀 Start Training
         </button>
 
         <details class="bg-slate-900/60 rounded-2xl border border-slate-800 text-xs overflow-hidden mb-3.5">
           <summary class="p-3 font-bold text-amber-400 cursor-pointer flex justify-between items-center select-none">
-            <span class="flex items-center gap-2">📅 9-Weken Schema</span>
+            <span class="flex items-center gap-2">📅 10-Weken Schema</span>
             <span class="text-slate-500 text-[10px]">▼ Openen</span>
           </summary>
           <div class="p-3 pt-1 border-t border-slate-800/60 bg-slate-950/40">
@@ -8150,23 +8919,36 @@ function buildGarminRunCoachHtml(){
         </details>
       </div>
 
+      <!-- ---- EVY Podcast (eigen tab, los van AI Coach) ---- -->
+      <div id="rcEvyBlock" class="hidden">
+        <div class="bg-gradient-to-br from-purple-700 to-indigo-950 rounded-2xl p-5 mb-3.5 shadow-xl text-center">
+          <span class="text-[10px] font-black uppercase tracking-widest bg-black/20 text-white/90 px-2.5 py-1 rounded-full inline-block mb-2">EVY Podcast</span>
+          <h2 class="text-base font-black text-white leading-tight">Jouw 10-weken audioprogramma</h2>
+          <p class="text-[11px] text-white/70 mt-1">Tik je afstand aan om meteen je volgende sessie te starten — de app onthoudt zelf bij welke week/sessie je zit.</p>
+        </div>
+        <div class="grid grid-cols-2 gap-2.5 mb-2">
+          <button id="rcEvyStart5" class="border-2 border-amber-500/40 bg-slate-900/60 rounded-2xl p-4 text-center">
+            <div class="text-lg mb-1">🏁</div>
+            <div class="text-sm font-black text-white">5 KM</div>
+            <div id="rcEvyProg5" class="text-[10px] text-amber-400 font-bold mt-1">Week – · Sessie –</div>
+          </button>
+          <button id="rcEvyStart10" class="border-2 border-amber-500/40 bg-slate-900/60 rounded-2xl p-4 text-center">
+            <div class="text-lg mb-1">🔥</div>
+            <div class="text-sm font-black text-white">10 KM</div>
+            <div id="rcEvyProg10" class="text-[10px] text-amber-400 font-bold mt-1">Week – · Sessie –</div>
+          </button>
+        </div>
+        <div class="flex justify-center gap-5 mb-3.5">
+          <button id="rcEvyReset5" class="text-[10px] text-slate-500 underline">🔄 5K herstarten</button>
+          <button id="rcEvyReset10" class="text-[10px] text-slate-500 underline">🔄 10K herstarten</button>
+        </div>
+      </div>
+
       <!-- ---- Volleerde Loper ---- -->
       <div id="rcAdvancedBlock" class="hidden">
         <div class="bg-slate-900/60 border border-amber-500/30 rounded-2xl p-4 text-center mb-3.5">
           <span class="text-[10px] text-amber-400 font-black uppercase tracking-widest block mb-0.5">Volleerde Lopers</span>
           <h2 class="text-base font-black text-white">Vrije & Doelgerichte Runs</h2>
-        </div>
-
-        <div class="bg-slate-900/40 border border-slate-800 rounded-2xl p-3 mb-3.5 space-y-1.5">
-          <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Audio begeleiding voor je run:</span>
-          <div class="grid grid-cols-2 gap-2">
-            <button id="rcAudioAiAdv" class="border-2 border-amber-500 bg-amber-500/10 rounded-xl p-2 text-left flex items-center gap-2">
-              <span class="text-base">🤖</span><div><div class="text-[11px] font-black text-white">AI Coach</div><div class="text-[8px] text-slate-400">Splits &amp; Motivatie</div></div>
-            </button>
-            <button id="rcAudioPodcastAdv" class="border-2 border-slate-800 bg-slate-900/50 rounded-xl p-2 text-left flex items-center gap-2 opacity-70">
-              <span class="text-base">🎙️</span><div><div class="text-[11px] font-black text-white">Podcast</div><div id="rcPodcastSubAdv" class="text-[8px] text-slate-400">Eigen afleveringen</div></div>
-            </button>
-          </div>
         </div>
 
         <div class="grid grid-cols-2 gap-2.5 mb-3.5">
@@ -8227,23 +9009,13 @@ function buildGarminRunCoachHtml(){
         <p class="text-[10px] text-slate-500 mt-2">Echte stemmen van je eigen toestel — geen verzonnen coach-personas.</p>
       </div>
 
-      <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 mb-3.5">
+      <div id="rcMusicCard" class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 mb-3.5">
         <span class="text-xs font-bold text-white block mb-2">🎵 Muziek — speelt tijdens de loop-intervallen</span>
         <label for="rcMusicInput" class="w-full bg-slate-800 text-slate-100 font-bold py-2.5 rounded-xl text-[11px] uppercase text-center block cursor-pointer">
           📂 Kies MP3-bestanden
           <input type="file" id="rcMusicInput" accept="audio/*" multiple class="hidden" style="display:none;">
         </label>
         <p id="rcMusicCount" class="text-[10px] text-slate-500 mt-2 text-center">Geen eigen muziek geladen.</p>
-      </div>
-
-      <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4">
-        <span class="text-xs font-bold text-white block mb-2">🎙️ Podcast — speelt tijdens de wandel-/rustintervallen</span>
-        <label for="rcPodcastInput" class="w-full bg-slate-800 text-slate-100 font-bold py-2.5 rounded-xl text-[11px] uppercase text-center block cursor-pointer">
-          📂 Kies afleveringen
-          <input type="file" id="rcPodcastInput" accept="audio/*" multiple class="hidden" style="display:none;">
-        </label>
-        <p id="rcPodcastCount" class="text-[10px] text-slate-500 mt-2 mb-2 text-center">Geen podcast geladen — eigen bestanden van je toestel, geen gebundelde inhoud.</p>
-        <div id="rcPodcastList" class="space-y-1"></div>
       </div>
 
     </div>
@@ -8259,7 +9031,7 @@ function buildGarminRunCoachHtml(){
 
     <!-- ===== STATS-paneel ===== -->
     <div id="rcStatsPanel" class="rc-panel">
-      <div class="grid grid-cols-3 gap-2 mb-4">
+      <div class="grid grid-cols-2 gap-2 mb-4">
         <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-3 text-center">
           <div id="rcStatSessions" class="text-2xl font-black text-amber-400">0</div>
           <div class="text-[9px] text-slate-500 uppercase tracking-wide mt-1">Sessies</div>
@@ -8272,6 +9044,18 @@ function buildGarminRunCoachHtml(){
           <div id="rcStatTime" class="text-2xl font-black text-amber-400">0u</div>
           <div class="text-[9px] text-slate-500 uppercase tracking-wide mt-1">Totale tijd</div>
         </div>
+        <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-3 text-center">
+          <div id="rcStatCalories" class="text-2xl font-black text-amber-400">–</div>
+          <div class="text-[9px] text-slate-500 uppercase tracking-wide mt-1">Kcal (geschat)</div>
+        </div>
+      </div>
+      <div class="bg-slate-900/40 border border-slate-800 rounded-2xl p-3.5 mb-4">
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Gelopen afstand (laatste runs)</span>
+        <div id="rcDistanceChart" class="flex items-end gap-1" style="height:60px;"></div>
+      </div>
+      <div class="mb-2">
+        <span class="text-[10px] font-bold text-amber-400 uppercase tracking-wider block mb-2">🏅 Achievements &amp; Medailles</span>
+        <div id="rcMedalGrid" class="grid grid-cols-5 gap-1.5 mb-4"></div>
       </div>
       <div id="rcHistoryList" class="bg-slate-900/40 border border-slate-800 rounded-2xl p-3"></div>
     </div>
@@ -8279,7 +9063,7 @@ function buildGarminRunCoachHtml(){
     <!-- ===== SCHEMA-paneel ===== -->
     <div id="rcSchemaPanel" class="rc-panel">
       <div class="bg-slate-900/40 border border-slate-800 rounded-2xl p-4">
-        <span class="text-xs font-bold text-amber-400 block mb-2">9-weken 5K-opbouwschema</span>
+        <span id="rcSchemaPanelTitle" class="text-xs font-bold text-amber-400 block mb-2">10-weken opbouwschema</span>
         <div id="rcSchemaSwiper" class="card-swiper"></div>
       </div>
     </div>
@@ -8315,36 +9099,41 @@ function buildGarminRunCoachHtml(){
   </div>
 
   <script>
+${GARMIN_MENU_BTN_JS}
     document.getElementById('rcBackBtn').addEventListener('click', () => parent.postMessage({ source:'garminRunCoach', action:'back' }, '*'));
-
-    // ---- Lokale tabwissel Leren Lopen / Volleerde Loper ----
-    document.getElementById('rcTabLearn').addEventListener('click', () => {
-      document.getElementById('rcTabLearn').className = 'py-2.5 rounded-xl bg-amber-500 text-slate-950 font-bold text-xs';
-      document.getElementById('rcTabAdvanced').className = 'py-2.5 rounded-xl text-slate-400 font-bold text-xs';
-      document.getElementById('rcLearnBlock').classList.remove('hidden');
-      document.getElementById('rcAdvancedBlock').classList.add('hidden');
+    document.getElementById('rcAudioHeaderBtn').addEventListener('click', () => {
+      document.querySelectorAll('.rc-navbtn').forEach(b => { b.classList.remove('active'); b.style.color = ''; });
+      document.querySelector('.rc-navbtn[data-panel="rcHomePanel"]').classList.add('active');
+      document.querySelectorAll('.rc-panel').forEach(p => p.classList.remove('active'));
+      document.getElementById('rcHomePanel').classList.add('active');
+      const musicCard = document.getElementById('rcMusicCard');
+      if (musicCard){
+        musicCard.scrollIntoView({ behavior:'smooth', block:'center' });
+        musicCard.style.transition = 'box-shadow .3s';
+        musicCard.style.boxShadow = '0 0 0 3px rgba(245,158,11,0.6)';
+        setTimeout(() => { musicCard.style.boxShadow = 'none'; }, 1400);
+      }
     });
-    document.getElementById('rcTabAdvanced').addEventListener('click', () => {
-      document.getElementById('rcTabAdvanced').className = 'py-2.5 rounded-xl bg-amber-500 text-slate-950 font-bold text-xs';
-      document.getElementById('rcTabLearn').className = 'py-2.5 rounded-xl text-slate-400 font-bold text-xs';
-      document.getElementById('rcAdvancedBlock').classList.remove('hidden');
-      document.getElementById('rcLearnBlock').classList.add('hidden');
-    });
 
-    // ---- Audio-mode tegels (louter visueel, beide bronnen blijven altijd beschikbaar) ----
-    function wireAudioPair(aiId, podId){
-      const ai = document.getElementById(aiId), pod = document.getElementById(podId);
-      ai.addEventListener('click', () => {
-        ai.className = ai.className.replace('border-slate-800 bg-slate-900/50 opacity-70', 'border-amber-500 bg-amber-500/10');
-        pod.className = pod.className.replace('border-amber-500 bg-amber-500/10', 'border-slate-800 bg-slate-900/50 opacity-70');
-      });
-      pod.addEventListener('click', () => {
-        pod.className = pod.className.replace('border-slate-800 bg-slate-900/50 opacity-70', 'border-amber-500 bg-amber-500/10');
-        ai.className = ai.className.replace('border-amber-500 bg-amber-500/10', 'border-slate-800 bg-slate-900/50 opacity-70');
+    // ---- Lokale tabwissel AI Coach / EVY / Volleerde Loper ----
+    const rcTabBtns = { ai: document.getElementById('rcTabAI'), evy: document.getElementById('rcTabEvy'), adv: document.getElementById('rcTabAdvanced') };
+    const rcTabBlocks = { ai: document.getElementById('rcLearnBlock'), evy: document.getElementById('rcEvyBlock'), adv: document.getElementById('rcAdvancedBlock') };
+    function rcSwitchLocalTab(key){
+      Object.keys(rcTabBtns).forEach(k => {
+        rcTabBtns[k].className = 'py-2.5 rounded-xl font-bold text-[10px] ' + (k===key ? 'bg-amber-500 text-slate-950' : 'text-slate-400');
+        rcTabBlocks[k].classList.toggle('hidden', k!==key);
       });
     }
-    wireAudioPair('rcAudioAiLearn', 'rcAudioPodcastLearn');
-    wireAudioPair('rcAudioAiAdv', 'rcAudioPodcastAdv');
+    rcTabBtns.ai.addEventListener('click', () => rcSwitchLocalTab('ai'));
+    rcTabBtns.evy.addEventListener('click', () => rcSwitchLocalTab('evy'));
+    rcTabBtns.adv.addEventListener('click', () => rcSwitchLocalTab('adv'));
+
+    // ---- AI Coach: kies één van de 3 ingebouwde doel-afstanden (5/7,5/10 km) ----
+    document.querySelectorAll('.rc-plan-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        parent.postMessage({ source:'garminRunCoach', action:'setplan', planId: btn.dataset.plan }, '*');
+      });
+    });
 
     // ---- 4 tegels bij Volleerde Loper: elk start echt, met eigen instelling ----
     document.querySelectorAll('.rc-runtype').forEach(btn => {
@@ -8381,25 +9170,18 @@ function buildGarminRunCoachHtml(){
       parent.postMessage({ source:'garminRunCoach', action:'setmusic', files }, '*');
     });
 
-    // ---- Podcast: eigen bestandenlijst waaruit je kiest waar je start (geen zwarte-doos-teller) ----
-    document.getElementById('rcPodcastInput').addEventListener('change', (e) => {
-      const files = Array.from(e.target.files || []);
-      const countLabel = files.length ? files.length + ' afleveringen geladen.' : 'Geen podcast geladen — eigen bestanden van je toestel, geen gebundelde inhoud.';
-      document.getElementById('rcPodcastCount').textContent = countLabel;
-      document.getElementById('rcPodcastSubLearn').textContent = files.length ? files.length + ' geladen' : 'Eigen afleveringen';
-      document.getElementById('rcPodcastSubAdv').textContent = files.length ? files.length + ' geladen' : 'Eigen afleveringen';
-      const listEl = document.getElementById('rcPodcastList');
-      listEl.innerHTML = files.map((f, i) => \`
-        <label class="flex items-center gap-2 bg-slate-950/60 border border-slate-800 rounded-lg px-2.5 py-2 text-[11px] text-slate-300 cursor-pointer">
-          <input type="radio" name="rcPodcastStart" value="\${i}" \${i===0 ? 'checked' : ''} class="accent-amber-500">
-          <span class="truncate">\${f.name}</span>
-        </label>\`).join('');
-      parent.postMessage({ source:'garminRunCoach', action:'setpodcast', files, startIndex:0 }, '*');
-      listEl.querySelectorAll('input[name="rcPodcastStart"]').forEach(radio => {
-        radio.addEventListener('change', () => {
-          parent.postMessage({ source:'garminRunCoach', action:'setpodcaststart', startIndex: parseInt(radio.value) }, '*');
-        });
-      });
+    // ---- EVY Podcast: vaste bestanden op de server (audio/evy5k/Start to Run - Aflevering NN.mp3, audio/evy10k/...) — app onthoudt zelf de voortgang ----
+    document.getElementById('rcEvyStart5').addEventListener('click', () => {
+      parent.postMessage({ source:'garminRunCoach', action:'starttraining', mode:'evy', evyDist:5 }, '*');
+    });
+    document.getElementById('rcEvyStart10').addEventListener('click', () => {
+      parent.postMessage({ source:'garminRunCoach', action:'starttraining', mode:'evy', evyDist:10 }, '*');
+    });
+    document.getElementById('rcEvyReset5').addEventListener('click', () => {
+      if (confirm('De 5K-reeks terugzetten naar Week 1 · Sessie 1?')) parent.postMessage({ source:'garminRunCoach', action:'resetevy', evyDist:5 }, '*');
+    });
+    document.getElementById('rcEvyReset10').addEventListener('click', () => {
+      if (confirm('De 10K-reeks terugzetten naar Week 1 · Sessie 1?')) parent.postMessage({ source:'garminRunCoach', action:'resetevy', evyDist:10 }, '*');
     });
 
     // ---- Eigen Schema Builder accordeon (vast open/dicht, geen extra state nodig — <details> regelt dit zelf) ----
@@ -8436,6 +9218,15 @@ function buildGarminRunCoachHtml(){
           </div>\`).join('');
         document.getElementById('rcWeeksSwiper').innerHTML = cardsHtml;
         document.getElementById('rcSchemaSwiper').innerHTML = cardsHtml;
+        document.getElementById('rcSchemaPanelTitle').textContent = (d.planName || '10-weken opbouwschema') + ' — 10 weken';
+
+        if (d.evy5k) document.getElementById('rcEvyProg5').textContent = 'Week ' + d.evy5k.week + ' · Sessie ' + d.evy5k.session + '/3';
+        if (d.evy10k) document.getElementById('rcEvyProg10').textContent = 'Week ' + d.evy10k.week + ' · Sessie ' + d.evy10k.session + '/3';
+
+        document.querySelectorAll('.rc-plan-btn').forEach(btn => {
+          const active = btn.dataset.plan === d.activePlanId;
+          btn.className = 'rc-plan-btn border-2 rounded-xl py-2 text-center ' + (active ? 'border-amber-500 bg-amber-500/10' : 'border-slate-800 bg-slate-900/50 opacity-70');
+        });
 
         const voiceOptions = [{ uri:'', label:'Standaardstem van je toestel' }].concat(
           d.voices.map(v => ({ uri:v.uri, label:v.name + ' (' + v.lang + ')' }))
@@ -8460,6 +9251,21 @@ function buildGarminRunCoachHtml(){
         document.getElementById('rcStatSessions').textContent = d.sessions;
         document.getElementById('rcStatKm').textContent = d.km;
         document.getElementById('rcStatTime').textContent = d.time;
+        document.getElementById('rcStatCalories').textContent = d.calories;
+        const maxBar = Math.max(1, ...(d.chart||[]));
+        document.getElementById('rcDistanceChart').innerHTML = (d.chart||[]).length ? d.chart.map(km => \`
+          <div style="flex:1; display:flex; align-items:flex-end; height:100%;">
+            <div style="width:100%; max-width:18px; margin:0 auto; border-radius:4px 4px 0 0; background:#f59e0b; min-height:2px; height:\${Math.max(4,(km/maxBar)*100)}%;" title="\${km.toFixed(2)} km"></div>
+          </div>\`).join('') : '<div class="text-slate-500 text-[11px] m-auto">Nog geen runs om te tonen.</div>';
+        document.getElementById('rcMedalGrid').innerHTML = (d.medals||[]).map(m => \`
+          <div class="flex flex-col items-center gap-1 rounded-xl p-2 \${m.unlocked ? 'bg-amber-500/10' : 'bg-slate-900/60'}" data-km="\${m.km}">
+            <span style="font-size:22px; \${m.unlocked ? '' : 'filter:grayscale(1) opacity(0.35);'}" class="\${m.unlocked ? 'rc-medal-clickable' : ''}">\${m.icon}</span>
+            <span style="font-size:8px; font-weight:800; color:\${m.unlocked ? '#f59e0b' : '#64748b'};">\${m.label}</span>
+          </div>\`).join('');
+        document.querySelectorAll('.rc-medal-clickable').forEach(el => {
+          el.style.cursor = 'pointer';
+          el.addEventListener('click', () => parent.postMessage({ source:'garminRunCoach', action:'confetti' }, '*'));
+        });
         document.getElementById('rcHistoryList').innerHTML = d.history.length ? d.history.map(r => \`
           <div class="flex justify-between items-center py-2 border-b border-slate-800/60 last:border-0 text-xs">
             <span class="text-slate-200">\${r.dateLabel} — \${r.km} km</span>
@@ -8504,6 +9310,7 @@ function applySettings(){
   if (route.length >= 2) applyRouteColoring();
   if (appSettings.shakeToSurpriseOn) requestShakeMotionPermission();
   if (appSettings.fallDetectionOn) requestFallDetectionPermission();
+  syncCoachCatCheckboxes();
   translatePage();
 }
 async function loadSettings(){
@@ -8576,6 +9383,7 @@ async function loadSettings(){
   $('geoapifyKeyInput').value = appSettings.geoapifyKey || '';
   $('plantnetKeyInput').value = appSettings.plantnetKey || '';
   $('geminiKeyInput').value = appSettings.geminiKey || '';
+  $('openWeatherMapKeyInput').value = appSettings.openWeatherMapKey || '';
   $('graphhopperKeyInput').value = appSettings.graphhopperKey || '';
   $('bundledBE').checked = !!appSettings.bundledCountries.be;
   $('bundledNL').checked = !!appSettings.bundledCountries.nl;
@@ -8606,6 +9414,7 @@ $('orsKeyInput').addEventListener('change', (e) => { appSettings.orsKey = e.targ
 $('geoapifyKeyInput').addEventListener('change', (e) => { appSettings.geoapifyKey = e.target.value.trim(); saveSettings(); });
 $('plantnetKeyInput').addEventListener('change', (e) => { appSettings.plantnetKey = e.target.value.trim(); saveSettings(); });
 $('geminiKeyInput').addEventListener('change', (e) => { appSettings.geminiKey = e.target.value.trim(); saveSettings(); });
+$('openWeatherMapKeyInput').addEventListener('change', (e) => { appSettings.openWeatherMapKey = e.target.value.trim(); saveSettings(); });
 $('graphhopperKeyInput').addEventListener('change', (e) => { appSettings.graphhopperKey = e.target.value.trim(); saveSettings(); rerouteCurrentRouteIfAny(); });
 document.querySelectorAll('input[name="language"]').forEach(radio => {
   radio.addEventListener('change', () => { appSettings.language = radio.value; saveSettings(); });
@@ -13172,10 +13981,11 @@ if (statsRecordsToggleBtn) statsRecordsToggleBtn.addEventListener('click', () =>
 });
 
 // Ruwe calorie-schatting: MET-waarde (metabolic equivalent) x gewicht x uren. Fietsen ~gematigd tempo
-// MET 6, wandelen MET 3.5 — een eenvoudige, veelgebruikte vuistregel, geen medisch nauwkeurige meting.
+// MET 6, wandelen MET 3.5, hardlopen (mix van loop-/wandelintervallen) MET 7 — een eenvoudige,
+// veelgebruikte vuistregel, geen medisch nauwkeurige meting.
 function estimateCalories(km, durationMin, mode){
   if (!appSettings.bodyWeightKg || !durationMin) return null;
-  const met = mode === 'wandel' ? 3.5 : 6;
+  const met = mode === 'wandel' ? 3.5 : mode === 'hardlopen' ? 7 : 6;
   const hours = durationMin / 60;
   return Math.round(met * appSettings.bodyWeightKg * hours);
 }
@@ -13283,6 +14093,65 @@ let weatherSunCache = null; // { t: Date.now(), lat, lon, temp, code, sunsetText
 let weatherLocationOverride = null; // { lat, lng } wanneer de gebruiker op "mijn locatie" tikte
 let weatherPlaceCache = null; // { lat, lng, name }
 
+// ---------- Extra, onafhankelijke weerbronnen voor vergelijking/fallback — geen sleutel nodig ----------
+async function fetchMetNorwayCurrent(lat, lon){
+  try{
+    const res = await fetch(`https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=${lat.toFixed(4)}&lon=${lon.toFixed(4)}`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    const ts = data?.properties?.timeseries?.[0];
+    if (!ts) return null;
+    const details = ts.data.instant.details;
+    const next1h = ts.data.next_1_hours;
+    const symbol = next1h?.summary?.symbol_code || ts.data.next_6_hours?.summary?.symbol_code || '';
+    const precipMm = next1h?.details?.precipitation_amount ?? null;
+    return {
+      source:'MET Norway', temp: Math.round(details.air_temperature), windSpeed: Math.round(details.wind_speed * 3.6),
+      symbol, icon: metNorwaySymbolToIcon(symbol),
+      rainExpected: /rain|showers|sleet|snow|thunder/.test(symbol), precipMm
+    };
+  }catch(e){ return null; }
+}
+function metNorwaySymbolToIcon(symbol){
+  if (!symbol) return '🌡️';
+  if (symbol.includes('thunder')) return '⛈️';
+  if (symbol.includes('snow')) return '❄️';
+  if (symbol.includes('sleet')) return '🌨️';
+  if (symbol.includes('rain') || symbol.includes('showers')) return '🌧️';
+  if (symbol.includes('fog')) return '🌫️';
+  if (symbol.includes('partlycloudy')) return '⛅';
+  if (symbol.includes('cloudy')) return '☁️';
+  if (symbol.includes('clearsky') || symbol.includes('fair')) return '☀️';
+  return '🌡️';
+}
+const RAIN_CODES = [51,53,55,56,57,61,63,65,66,67,71,73,75,77,80,81,82,85,86,95,96,99];
+function buildRainComparisonNote(openMeteoRainSoon, metNorway){
+  if (metNorway == null || metNorway.rainExpected == null){
+    return openMeteoRainSoon
+      ? (curLang()==='en' ? 'Open-Meteo expects rain soon.' : 'Open-Meteo verwacht binnenkort regen.')
+      : (curLang()==='en' ? 'Open-Meteo expects it to stay dry.' : 'Open-Meteo verwacht droog weer.');
+  }
+  const metRain = metNorway.rainExpected;
+  if (openMeteoRainSoon === metRain){
+    return metRain
+      ? (curLang()==='en' ? 'Both sources expect rain soon — fairly reliable.' : 'Beide bronnen verwachten binnenkort regen — vrij betrouwbaar.')
+      : (curLang()==='en' ? 'Both sources expect it to stay dry.' : 'Beide bronnen verwachten droog weer.');
+  }
+  return curLang()==='en'
+    ? `Sources disagree: ${openMeteoRainSoon ? 'Open-Meteo expects rain, MET Norway doesn\'t' : 'MET Norway expects rain, Open-Meteo doesn\'t'} — treat as a possibility, not a certainty.`
+    : `Bronnen zijn het oneens: ${openMeteoRainSoon ? 'Open-Meteo verwacht regen, MET Norway niet' : 'MET Norway verwacht regen, Open-Meteo niet'} — reken op een kans, geen zekerheid.`;
+}
+async function fetchOpenWeatherMapCurrent(lat, lon){
+  const key = appSettings.openWeatherMapKey;
+  if (!key) return null;
+  try{
+    const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${key}`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (data.main?.temp == null) return null;
+    return { source:'OpenWeatherMap', temp: Math.round(data.main.temp), windSpeed: Math.round((data.wind?.speed||0)*3.6) };
+  }catch(e){ return null; }
+}
 async function loadWeatherAndSun(){
   const c = weatherLocationOverride || map.getCenter();
   const fresh = weatherSunCache && (Date.now() - weatherSunCache.t < 15*60000)
@@ -13290,14 +14159,16 @@ async function loadWeatherAndSun(){
   if (fresh) return weatherSunCache;
 
   try{
-    const [wRes, sRes, aqRes] = await Promise.all([
-      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${c.lat}&longitude=${c.lng}&current=temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,wind_direction_10m,weather_code,dew_point_2m,surface_pressure,visibility,cloud_cover&hourly=temperature_2m,weather_code,surface_pressure&past_hours=6&minutely_15=precipitation&daily=temperature_2m_max,temperature_2m_min,uv_index_max,weather_code&models=knmi_seamless&forecast_days=6&timezone=auto`),
-      fetch(`https://api.sunrise-sunset.org/v2?lat=${c.lat}&lng=${c.lng}`),
-      fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${c.lat}&longitude=${c.lng}&current=european_aqi,pm10,pm2_5,sulphur_dioxide,carbon_monoxide,alder_pollen,birch_pollen,grass_pollen,mugwort_pollen,olive_pollen,ragweed_pollen`)
+    const [wRes, sRes, aqRes, metNorway, owm] = await Promise.all([
+      fetch(`https://api.open-meteo.com/v1/forecast?latitude=${c.lat}&longitude=${c.lng}&current=temperature_2m,apparent_temperature,relative_humidity_2m,wind_speed_10m,wind_direction_10m,weather_code,dew_point_2m,surface_pressure,visibility,cloud_cover&hourly=temperature_2m,weather_code,surface_pressure&past_hours=6&minutely_15=precipitation&daily=temperature_2m_max,temperature_2m_min,uv_index_max,weather_code&models=knmi_seamless&forecast_days=6&timezone=auto`).catch(() => null),
+      fetch(`https://api.sunrise-sunset.org/v2?lat=${c.lat}&lng=${c.lng}`).catch(() => null),
+      fetch(`https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${c.lat}&longitude=${c.lng}&current=european_aqi,pm10,pm2_5,sulphur_dioxide,carbon_monoxide,alder_pollen,birch_pollen,grass_pollen,mugwort_pollen,olive_pollen,ragweed_pollen`).catch(() => null),
+      fetchMetNorwayCurrent(c.lat, c.lng),
+      fetchOpenWeatherMapCurrent(c.lat, c.lng)
     ]);
-    const wData = wRes.ok ? await wRes.json() : null;
-    const sData = sRes.ok ? await sRes.json() : null;
-    const aqData = aqRes.ok ? await aqRes.json() : null;
+    const wData = (wRes && wRes.ok) ? await wRes.json() : null;
+    const sData = (sRes && sRes.ok) ? await sRes.json() : null;
+    const aqData = (aqRes && aqRes.ok) ? await aqRes.json() : null;
 
     let temp = null, code = null, feelsLike = null, humidity = null, windSpeed = null, windDir = null, dewPoint = null;
     let tempMax = null, tempMin = null, uvIndex = null, aqi = null, pm25 = null, pm10 = null, so2 = null, co = null, pollen = null;
@@ -13306,6 +14177,8 @@ async function loadWeatherAndSun(){
     let sunriseText = null, sunsetText = null, dawnText = null, duskText = null;
     let sunriseMin = null, sunsetMin = null, dawnMin = null, duskMin = null;
     let hourly = [], daily = [];
+    let weatherSourceNote = null;
+    let rainSourceNote = null;
     if (wData && wData.current){
       temp = Math.round(wData.current.temperature_2m);
       code = wData.current.weather_code;
@@ -13317,6 +14190,43 @@ async function loadWeatherAndSun(){
       pressure = Math.round(wData.current.surface_pressure);
       visibility = wData.current.visibility != null ? Math.round(wData.current.visibility / 1000) : null; // m -> km
       cloudCover = wData.current.cloud_cover;
+
+      // Onafhankelijke bronnen vergelijken: bij goede overeenstemming (≤2°) blijft Open-Meteo leidend
+      // (rijkste databron: uurverwachting, AQI, pollen…); bij grotere afwijking wordt het gemiddelde
+      // getoond, zodat één uitschieter niet alles domineert.
+      const otherTemps = [metNorway, owm].filter(s => s && s.temp != null);
+      if (otherTemps.length){
+        const avgOther = otherTemps.reduce((s,o) => s+o.temp, 0) / otherTemps.length;
+        const diff = Math.abs(temp - avgOther);
+        const names = ['Open-Meteo'].concat(otherTemps.map(o => o.source));
+        if (diff > 2){
+          temp = Math.round((temp + avgOther) / 2);
+          weatherSourceNote = (curLang()==='en' ? 'Averaged: ' : 'Gemiddelde van: ') + names.join(', ') + ` (${curLang()==='en'?'sources differed':'bronnen weken af'} ~${diff.toFixed(1)}°)`;
+        } else {
+          weatherSourceNote = names.join(' + ') + ' — ' + (curLang()==='en' ? 'sources agree' : 'bronnen komen overeen');
+        }
+      } else {
+        weatherSourceNote = 'Open-Meteo';
+      }
+
+      // Regen-vergelijking: kijkt naar het huidige weertype + eerstkomende 2 uur bij Open-Meteo,
+      // en de "komend uur"-verwachting van MET Norway — apart van de temperatuurvergelijking hierboven.
+      const nextCodes = (wData.hourly && Array.isArray(wData.hourly.weather_code)) ? wData.hourly.weather_code.slice(0, 2) : [];
+      const openMeteoRainSoon = RAIN_CODES.includes(code) || nextCodes.some(c => RAIN_CODES.includes(c));
+      rainSourceNote = buildRainComparisonNote(openMeteoRainSoon, metNorway);
+    } else {
+      // Open-Meteo niet bereikbaar: terugvallen op wat wél beschikbaar is, in volgorde van voorkeur.
+      const fallback = metNorway || owm;
+      if (fallback){
+        temp = fallback.temp; windSpeed = fallback.windSpeed;
+        code = fallback.symbol ? null : null; // geen 1-op-1 WMO-code beschikbaar vanuit deze bronnen
+        weatherSourceNote = (curLang()==='en' ? 'Fallback source: ' : 'Terugvalbron: ') + fallback.source + ' (Open-Meteo ' + (curLang()==='en'?'unavailable':'niet bereikbaar') + ')';
+      }
+      if (metNorway && metNorway.rainExpected != null){
+        rainSourceNote = metNorway.rainExpected
+          ? (curLang()==='en' ? 'MET Norway expects rain soon.' : 'MET Norway verwacht binnenkort regen.')
+          : (curLang()==='en' ? 'MET Norway expects it to stay dry.' : 'MET Norway verwacht droog weer.');
+      }
     }
     if (wData && wData.daily){
       tempMax = Math.round(wData.daily.temperature_2m_max[0]);
@@ -13390,7 +14300,7 @@ async function loadWeatherAndSun(){
       tempMax, tempMin, uvIndex, aqi, pm25, pm10, so2, co, pressure, visibility, cloudCover, pressureTrend, pressureTrendDelta, pollen,
       hourly, daily, precipTimeline,
       sunriseText, sunsetText, dawnText, duskText, sunriseMin, sunsetMin, dawnMin, duskMin,
-      moonriseText, moonsetText, moonPhase, moonIllum
+      moonriseText, moonsetText, moonPhase, moonIllum, weatherSourceNote, rainSourceNote
     };
   }catch(e){ /* geen internet of dienst niet bereikbaar, negeer stil */ }
   return weatherSunCache;
@@ -13530,6 +14440,8 @@ async function renderWeatherPanel(){
     $('wTemp').textContent = (data.temp != null ? data.temp : '–') + '°';
     $('wCondition').textContent = weatherConditionText()[data.code] || '–';
     $('wFeels').textContent = tr('wFeelsLike') + (data.feelsLike != null ? data.feelsLike : '–') + '°';
+    $('wSourceNote').textContent = data.weatherSourceNote || '';
+    if ($('rainSourceNote')) $('rainSourceNote').textContent = data.rainSourceNote || '';
     $('wMinMax').textContent = `▲${data.tempMax ?? '–'}° ▼${data.tempMin ?? '–'}°`;
     $('wWind').textContent = `💨 ${windDirText(data.windDir)} ${data.windSpeed ?? '–'} ${curLang()==='en' ? 'km/h' : 'km/u'}`;
     $('wAqiVal').textContent = aqiLabel(data.aqi);
