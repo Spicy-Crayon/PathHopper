@@ -1186,7 +1186,7 @@
     background:linear-gradient(180deg, rgba(15,23,42,0.92), rgba(15,23,42,0.85) 40%, rgba(15,23,42,0));
   }
   body.theme-garmin .top-tile{
-    background:rgba(15,23,42,0.78); border:1px solid rgba(255,255,255,0.09); box-shadow:0 4px 14px rgba(0,0,0,0.35);
+    background:rgba(15,23,42,0.94); border:2px solid rgba(255,255,255,0.16); box-shadow:0 4px 14px rgba(0,0,0,0.4);
   }
   body.theme-garmin .top-tile.active{
     background:var(--amber); border-color:transparent; box-shadow:0 4px 14px rgba(226,161,60,0.3);
@@ -1210,7 +1210,18 @@
   }
   body.theme-garmin #actions button{
     border-radius:14px; border:1px solid rgba(255,255,255,0.08);
+    padding:10px 2px; gap:4px; font-size:10px;
   }
+  body.theme-garmin #actions button .ic{
+    width:28px; height:28px; border-radius:9px; display:flex; align-items:center; justify-content:center;
+    font-size:14px; margin-bottom:1px;
+  }
+  body.theme-garmin #clearBtn .ic{ background:rgba(148,163,184,0.2); color:#cbd5e1; }
+  body.theme-garmin #elevationBtn .ic{ background:rgba(226,161,60,0.22); color:#e2a13c; }
+  body.theme-garmin #detourBtn .ic{ background:rgba(255,255,255,0.15); color:#fff; }
+  body.theme-garmin #toStartBtn .ic{ background:rgba(255,255,255,0.15); color:#fff; }
+  body.theme-garmin #resumeNavBtn .ic,
+  body.theme-garmin #navBtn .ic{ background:rgba(15,23,42,0.2); color:#0f172a; }
   body.theme-garmin #dashList li{
     border:1px solid rgba(255,255,255,0.06);
   }
@@ -1347,6 +1358,16 @@
 </style>
 </head>
 <body>
+<script>
+  // Thema synchroon toepassen vóórdat de rest van de pagina rendert — voorkomt de korte 'flits' van
+  // Standaard-stijl naar Garmin-stijl die ontstond doordat het echte thema pas na een asynchrone
+  // opslag-lookup (loadSettings) bekend werd. localStorage is synchroon, dus dit gebeurt meteen.
+  (function(){
+    try{
+      if (localStorage.getItem('app_theme_sync') === 'garmin') document.body.classList.add('theme-garmin');
+    }catch(e){}
+  })();
+</script>
 
 <div id="modeSelectScreen">
   <button id="modeSelectSettingsBtn" aria-label="Instellingen"><span class="waffle-grid"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></button>
@@ -6197,6 +6218,7 @@ function tr(key){
 function applyTheme(theme){
   document.body.classList.remove('theme-garmin');
   if (theme === 'garmin') document.body.classList.add('theme-garmin');
+  try{ localStorage.setItem('app_theme_sync', theme === 'garmin' ? 'garmin' : 'default'); }catch(e){}
   // Altijd (opnieuw) tonen zodra je niet middenin een rit zit — idempotent en veilig, lost robuuster
   // op dat een thema-wissel soms niet live doorkwam terwijl je al op de hub stond.
   if (appMode === null) showHubScreen();
@@ -7388,6 +7410,7 @@ async function garminIdentifyAnimal(file){
   if (!r.ok){ post({ status:'error', message: animalScannerErrorMessage(r.reason) }); return; }
   post({
     status:'ok', mobileLabel:r.mobileLabel, pct:r.pct, sciName:r.sciName, dutchName:r.dutchName, family:r.family,
+    alternatives: r.alternatives || [],
     sourceNote: r.source === 'gemini' ? (curLang()==='en' ? '(via Gemini)' : '(via Gemini)') : null
   });
 }
@@ -7415,6 +7438,7 @@ async function garminIdentifyPlant(file){
   post({
     status:'ok', source:r.source, commonName:displayName, sciName:r.sciName || null, pct:r.pct,
     matchLabel: curLang()==='en' ? 'match' : 'zekerheid',
+    alternatives: r.alternatives || [],
     fallbackNote: r.source === 'fallback' ? (curLang()==='en' ? '(via local recognition)' : '(via lokale herkenning)') : (r.source === 'gemini' ? '(via Gemini)' : null)
   });
 }
@@ -7721,6 +7745,10 @@ ${GARMIN_MENU_BTN_JS}
         resultEl.innerHTML = '<div class="text-xs text-slate-300">' + d.message + '</div>';
       } else if (d.status === 'ok'){
         const displayName = d.dutchName || d.sciName || d.mobileLabel;
+        const alts = (d.alternatives || []).filter(a => a.dutchName || a.sciName);
+        const altsHtml = alts.length ? '<div class="mt-2 pt-2 border-t border-slate-700/60"><div class="text-[9px] text-slate-500 mb-1">Klopt dit niet? Andere gokken:</div><div class="flex flex-wrap gap-1.5">' +
+          alts.map((a,i) => '<button class="animalAltBtnG text-[10px] font-bold border border-rose-500/40 bg-rose-500/10 text-rose-300 rounded-lg px-2 py-1" data-idx="' + i + '">' + (a.dutchName || a.sciName) + ' (' + a.pct + '%)</button>').join('') +
+          '</div></div>' : '';
         resultEl.innerHTML =
           '<div class="flex items-center gap-2 mb-1"><span class="text-xl">🐾</span><div>' +
           '<div class="text-sm font-bold text-white">' + displayName + '</div>' +
@@ -7729,10 +7757,17 @@ ${GARMIN_MENU_BTN_JS}
           '</div></div>' +
           '<div class="flex items-center justify-between">' +
           '<span class="text-[11px] font-bold text-rose-400">' + d.pct + '% zekerheid</span>' +
-          '<button id="animalScannerWikiBtnG" class="text-[11px] font-bold text-rose-400 underline">📖 Meer info</button></div>';
+          '<button id="animalScannerWikiBtnG" class="text-[11px] font-bold text-rose-400 underline">📖 Meer info</button></div>' +
+          altsHtml;
         const wikiBtn = document.getElementById('animalScannerWikiBtnG');
         if (wikiBtn) wikiBtn.addEventListener('click', () => {
           parent.postMessage({ source:'garminSetup', action:'openwiki', sciName:d.sciName || d.mobileLabel, commonName:d.dutchName || d.mobileLabel }, '*');
+        });
+        resultEl.querySelectorAll('.animalAltBtnG').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const a = alts[Number(btn.dataset.idx)];
+            parent.postMessage({ source:'garminSetup', action:'openwiki', sciName:a.sciName || a.mobileLabel, commonName:a.dutchName || a.mobileLabel }, '*');
+          });
         });
       }
     });
@@ -7817,6 +7852,10 @@ ${GARMIN_MENU_BTN_JS}
       } else if (d.status === 'error'){
         resultEl.innerHTML = '<div class="text-xs text-slate-300">' + d.message + '</div>';
       } else if (d.status === 'ok'){
+        const alts = (d.alternatives || []).filter(a => a.commonName || a.sciName);
+        const altsHtml = alts.length ? '<div class="mt-2 pt-2 border-t border-slate-700/60"><div class="text-[9px] text-slate-500 mb-1">Klopt dit niet? Andere gokken:</div><div class="flex flex-wrap gap-1.5">' +
+          alts.map((a,i) => '<button class="plantAltBtnG text-[10px] font-bold border border-amber-500/40 bg-amber-500/10 text-amber-300 rounded-lg px-2 py-1" data-idx="' + i + '">' + (a.commonName || a.sciName) + ' (' + a.pct + '%)</button>').join('') +
+          '</div></div>' : '';
         resultEl.innerHTML =
           '<div class="flex items-center gap-2 mb-1"><span class="text-xl">🌿</span><div>' +
           '<div class="text-sm font-bold text-white">' + (d.commonName || d.sciName) + '</div>' +
@@ -7825,10 +7864,17 @@ ${GARMIN_MENU_BTN_JS}
           '</div></div>' +
           '<div class="flex items-center justify-between">' +
           '<span class="text-[11px] font-bold text-amber-400">' + d.pct + '% ' + d.matchLabel + '</span>' +
-          '<button id="floraScannerWikiBtn" class="text-[11px] font-bold text-amber-400 underline">📖 Meer info</button></div>';
+          '<button id="floraScannerWikiBtn" class="text-[11px] font-bold text-amber-400 underline">📖 Meer info</button></div>' +
+          altsHtml;
         const wikiBtn = document.getElementById('floraScannerWikiBtn');
         if (wikiBtn) wikiBtn.addEventListener('click', () => {
           parent.postMessage({ source:'garminSetup', action:'openwiki', sciName:d.sciName || d.commonName, commonName:d.commonName }, '*');
+        });
+        resultEl.querySelectorAll('.plantAltBtnG').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const a = alts[Number(btn.dataset.idx)];
+            parent.postMessage({ source:'garminSetup', action:'openwiki', sciName:a.sciName || a.commonName, commonName:a.commonName }, '*');
+          });
         });
       }
     });
@@ -15631,6 +15677,14 @@ $('animalScannerInput').addEventListener('change', async (e) => {
   const sourceNote = r.source === 'gemini'
     ? `<div style="color:rgba(246,244,238,0.5); font-size:10.5px; margin-top:2px;">${curLang()==='en' ? '(via Gemini — other sources found nothing)' : '(via Gemini — andere bronnen vonden niets)'}</div>`
     : '';
+  const alts = (r.alternatives || []).filter(a => a.dutchName || a.sciName);
+  const altsHtml = alts.length ? `
+    <div style="margin-top:8px; padding-top:8px; border-top:1px solid rgba(246,244,238,0.12);">
+      <div style="color:rgba(246,244,238,0.5); font-size:10px; margin-bottom:4px;">${curLang()==='en' ? 'Not right? Other guesses:' : 'Klopt dit niet? Andere gokken:'}</div>
+      <div style="display:flex; flex-wrap:wrap; gap:6px;">
+        ${alts.map((a,i) => `<button class="animalAltBtn" data-idx="${i}" type="button" style="border:1px solid rgba(226,161,60,0.4); background:rgba(226,161,60,0.08); color:var(--amber); border-radius:10px; padding:4px 9px; font-size:11px; font-weight:700;">${a.dutchName || a.sciName || a.mobileLabel} (${a.pct}%)</button>`).join('')}
+      </div>
+    </div>` : '';
   resultEl.innerHTML = `
     <div style="display:flex; align-items:center; gap:10px; margin-bottom:4px;">
       <span style="font-size:22px;">🐾</span>
@@ -15643,8 +15697,15 @@ $('animalScannerInput').addEventListener('change', async (e) => {
     <div style="display:flex; align-items:center; justify-content:space-between;">
       <span style="color:var(--amber); font-size:11px; font-weight:700;">${r.pct}% ${curLang()==='en' ? 'confidence' : 'zekerheid'}</span>
       <button id="animalScannerWikiBtn" type="button" style="border:none; background:none; color:var(--amber); font-size:11px; font-weight:700; text-decoration:underline; cursor:pointer;">📖 ${curLang()==='en' ? 'More info' : 'Meer info'}</button>
-    </div>`;
+    </div>
+    ${altsHtml}`;
   $('animalScannerWikiBtn').addEventListener('click', () => openWikiInfoModal(r.sciName || r.mobileLabel, r.dutchName || r.mobileLabel));
+  resultEl.querySelectorAll('.animalAltBtn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const a = alts[Number(btn.dataset.idx)];
+      openWikiInfoModal(a.sciName || a.mobileLabel, a.dutchName || a.mobileLabel);
+    });
+  });
 });
 // Kernlogica (geen DOM-afhankelijkheid) — herbruikt door zowel het Standaard- als het Garmin-scherm.
 // Gedeelde timeout-wrapper — alle scanner/lookup-fetches hieronder gebruiken dit i.p.v. kale fetch(),
@@ -15674,11 +15735,20 @@ async function plantNetIdentifyCore(file){
     const data = await res.json();
     const top = data.results && data.results[0];
     if (!top) return { ok:false, reason:'no-match' };
+    // PlantNet geeft standaard meerdere kandidaten terug met een eigen score — vroeger gooiden we
+    // alles behalve de allereerste weg. Bij een lage/twijfelachtige score (vaak bij insecten/planten
+    // die op elkaar lijken) is dat riskant, dus geven we nu ook de 2e/3e gok mee voor in de UI.
+    const alternatives = (data.results || []).slice(1, 3).map(r => ({
+      commonName: (r.species.commonNames && r.species.commonNames[0]) || null,
+      sciName: r.species.scientificNameWithoutAuthor,
+      pct: Math.round(r.score * 100)
+    }));
     return {
       ok:true,
       commonName: (top.species.commonNames && top.species.commonNames[0]) || null,
       sciName: top.species.scientificNameWithoutAuthor,
-      pct: Math.round(top.score * 100)
+      pct: Math.round(top.score * 100),
+      alternatives
     };
   } catch(err){
     return { ok:false, reason:'network' };
@@ -15704,10 +15774,15 @@ async function identifyPlantWithFallback(file){
   if (local){
     const resolved = await resolveSpeciesName(local.mobileLabel);
     if (resolved && (resolved.sciName || resolved.dutchName)){
+      const altResolved = await Promise.all((local.alternatives || []).map(async (a) => {
+        const r = await resolveSpeciesName(a.mobileLabel);
+        return { mobileLabel:a.mobileLabel, pct:a.pct, sciName:r ? r.sciName : null, commonName:r ? r.dutchName : null };
+      }));
       return {
         ok:true, source:'fallback', primaryReason: primary.reason,
         mobileLabel:local.mobileLabel, pct:local.pct,
-        sciName: resolved.sciName, dutchName: resolved.dutchName, family: resolved.family
+        sciName: resolved.sciName, dutchName: resolved.dutchName, family: resolved.family,
+        alternatives: altResolved
       };
     }
   }
@@ -15898,11 +15973,14 @@ async function classifyPhotoLocally(file){
   try{
     const model = await getMobilenetModel();
     const img = await fileToImageElement(file);
-    const predictions = await model.classify(img);
+    const predictions = await model.classify(img); // MobileNet geeft standaard de top-3 klassen terug
     URL.revokeObjectURL(img.src);
     if (!predictions || !predictions.length) return null;
-    const top = predictions[0];
-    return { mobileLabel: top.className.split(',')[0].trim(), pct: Math.round(top.probability * 100) };
+    const clean = predictions.map(p => ({ mobileLabel: p.className.split(',')[0].trim(), pct: Math.round(p.probability * 100) }));
+    // Vroeger gebruikten we enkel clean[0] en gooiden we de andere 2 kandidaten weg. MobileNet is een
+    // algemeen 1000-klassen ImageNet-model, niet gespecialiseerd in insecten/dieren — bij een lage
+    // zekerheid (bv. 60%) zit de juiste soort vaak wél al bij de 2e of 3e gok. Die geven we nu mee.
+    return { ...clean[0], alternatives: clean.slice(1, 3) };
   }catch(e){ return null; }
 }
 async function identifyAnimalPhoto(file){
@@ -15910,9 +15988,16 @@ async function identifyAnimalPhoto(file){
   if (local){
     const resolved = await resolveSpeciesName(local.mobileLabel);
     if (resolved && (resolved.sciName || resolved.dutchName)){
+      // De 2 alternatieve gokken ook oplossen naar een naam (best-effort, mag stil falen — dan tonen
+      // we voor die kandidaat gewoon de rauwe ImageNet-klasse als terugval).
+      const altResolved = await Promise.all((local.alternatives || []).map(async (a) => {
+        const r = await resolveSpeciesName(a.mobileLabel);
+        return { mobileLabel:a.mobileLabel, pct:a.pct, sciName:r ? r.sciName : null, dutchName:r ? r.dutchName : null };
+      }));
       return {
         ok:true, source:'mobilenet', mobileLabel:local.mobileLabel, pct:local.pct,
-        sciName: resolved.sciName, dutchName: resolved.dutchName, family: resolved.family
+        sciName: resolved.sciName, dutchName: resolved.dutchName, family: resolved.family,
+        alternatives: altResolved
       };
     }
   }
@@ -16072,6 +16157,14 @@ async function identifyPlantPhoto(file){
     : r.source === 'gemini'
     ? `<div style="color:rgba(246,244,238,0.5); font-size:10.5px; margin-top:2px;">${curLang()==='en' ? '(via Gemini — other sources found nothing)' : '(via Gemini — andere bronnen vonden niets)'}</div>`
     : '';
+  const alts = (r.alternatives || []).filter(a => a.commonName || a.sciName);
+  const altsHtml = alts.length ? `
+    <div style="margin-top:8px; padding-top:8px; border-top:1px solid rgba(246,244,238,0.12);">
+      <div style="color:rgba(246,244,238,0.5); font-size:10px; margin-bottom:4px;">${curLang()==='en' ? 'Not right? Other guesses:' : 'Klopt dit niet? Andere gokken:'}</div>
+      <div style="display:flex; flex-wrap:wrap; gap:6px;">
+        ${alts.map((a,i) => `<button class="plantAltBtn" data-idx="${i}" type="button" style="border:1px solid rgba(226,161,60,0.4); background:rgba(226,161,60,0.08); color:var(--amber); border-radius:10px; padding:4px 9px; font-size:11px; font-weight:700;">${a.commonName || a.sciName} (${a.pct}%)</button>`).join('')}
+      </div>
+    </div>` : '';
   resultEl.innerHTML = `
     <div style="display:flex; align-items:center; gap:10px; margin-bottom:4px;">
       <span style="font-size:22px;">🌿</span>
@@ -16084,8 +16177,15 @@ async function identifyPlantPhoto(file){
     <div style="display:flex; align-items:center; justify-content:space-between;">
       <span style="color:var(--amber); font-size:11px; font-weight:700;">${r.pct}% ${curLang()==='en' ? 'match' : 'zekerheid'}</span>
       <button id="natureIdWikiBtn" type="button" style="border:none; background:none; color:var(--amber); font-size:11px; font-weight:700; text-decoration:underline; cursor:pointer;">📖 ${curLang()==='en' ? 'More info' : 'Meer info'}</button>
-    </div>`;
+    </div>
+    ${altsHtml}`;
   $('natureIdWikiBtn').addEventListener('click', () => openWikiInfoModal(sciLine || r.mobileLabel, displayName));
+  resultEl.querySelectorAll('.plantAltBtn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const a = alts[Number(btn.dataset.idx)];
+      openWikiInfoModal(a.sciName || a.commonName, a.commonName || a.sciName);
+    });
+  });
 }
 document.querySelectorAll('.bike-type-tile').forEach(tile => {
   tile.addEventListener('click', () => {
