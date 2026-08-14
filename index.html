@@ -6438,7 +6438,7 @@ function showHubScreen(){
     if (!garminHubFrameLoaded){
       const frame = $('garminHubFrame');
       frame.addEventListener('load', () => { sendHubWeatherToFrame(); sendHubHeadingToFrame(); }, { once:true });
-      frame.srcdoc = buildGarminHubHtml();
+      frame.srcdoc = translateGarminHtmlIfEnglish(buildGarminHubHtml());
       garminHubFrameLoaded = true;
     } else {
       sendHubWeatherToFrame();
@@ -7578,7 +7578,7 @@ function openGarminKompasScreen(){
   hideHubScreen();
   $('garminKompasScreen').classList.remove('hidden');
   if (!garminKompasFrameLoaded){
-    $('garminKompasFrame').srcdoc = buildGarminKompasHtml();
+    $('garminKompasFrame').srcdoc = translateGarminHtmlIfEnglish(buildGarminKompasHtml());
     garminKompasFrameLoaded = true;
   }
 }
@@ -7598,7 +7598,7 @@ function openGarminWeerScreen(){
   hideHubScreen();
   $('garminWeerScreen').classList.remove('hidden');
   if (!garminWeerFrameLoaded){
-    $('garminWeerFrame').srcdoc = buildGarminWeerHtml();
+    $('garminWeerFrame').srcdoc = translateGarminHtmlIfEnglish(buildGarminWeerHtml());
     garminWeerFrameLoaded = true;
   } else {
     fetchGarminWeerData();
@@ -7626,7 +7626,7 @@ function openGarminSetupScreen(mode){
   $('garminSetupScreen').classList.remove('hidden');
   const frame = $('garminSetupFrame');
   frame.addEventListener('load', () => fetchGarminSetupData(mode), { once:true });
-  frame.srcdoc = buildGarminSetupHtml(mode);
+  frame.srcdoc = translateGarminHtmlIfEnglish(buildGarminSetupHtml(mode));
 }
 function closeGarminSetupScreen(){
   $('garminSetupScreen').classList.add('hidden');
@@ -7777,7 +7777,7 @@ function openGarminRunCoachScreen(){
   const frame = $('garminRunCoachFrame');
   if (!garminRunCoachFrameLoaded){
     frame.addEventListener('load', () => sendRunCoachDataToFrame(), { once:true });
-    frame.srcdoc = buildGarminRunCoachHtml();
+    frame.srcdoc = translateGarminHtmlIfEnglish(buildGarminRunCoachHtml());
     garminRunCoachFrameLoaded = true;
   } else {
     sendRunCoachDataToFrame();
@@ -9109,7 +9109,7 @@ function buildGarminHubHtml(){
     </div>
     <div class="absolute top-10 right-10 w-40 h-40 bg-amber-500/10 rounded-full blur-3xl pointer-events-none z-0"></div>
     <div class="absolute bottom-20 left-10 w-40 h-40 bg-sky-500/10 rounded-full blur-3xl pointer-events-none z-0"></div>
-    <div class="absolute right-6 z-20" style="top:calc(1.5rem + env(safe-area-inset-top,0px) + 20px);">${GARMIN_MENU_BTN_HTML('mini')}</div>
+    <div class="absolute right-6 z-20" style="top:calc(1.5rem + env(safe-area-inset-top,0px));">${GARMIN_MENU_BTN_HTML('mini')}</div>
 
     <div class="relative z-10 w-full flex-1 flex flex-col justify-between">
       <div class="text-center pt-8">
@@ -14537,6 +14537,143 @@ function estimateCalories(km, durationMin, mode){
 // Nauwkeurigere calorie-schatting op basis van gemeten hartslag (Keytel et al., 2005) — heeft naast
 // gewicht ook leeftijd en geslacht nodig. Zonder hartslagband of zonder leeftijd/geslacht valt de rest
 // van de app terug op estimateCalories() hierboven (gewicht + tijd, minder nauwkeurig maar altijd bruikbaar).
+// ---------- Vertaling van de Tailwind-stijl schermen (Hub/Setup/Kompas/Weer/RunCoach) ----------
+// Die 5 iframe-schermen zijn helemaal apart van de rest van de app opgebouwd (eigen HTML-document per
+// scherm) en hadden daardoor nooit data-i18n meegekregen — alles stond vast in het Nederlands, ook als
+// Engels aanstond. In plaats van elke regel van die ~5 functies om te bouwen naar data-i18n (zeer
+// foutgevoelig, gigantische diff), vertalen we hier de kant-en-klare HTML-string vlak vóór hij in de
+// iframe geladen wordt: elk exact Nederlands tekstfragment tussen > en < wordt vervangen door zijn
+// Engelse tegenhanger uit dit woordenboek, enkel als Engels de actieve taal is.
+const GARMIN_NL_EN_DICT = {
+  // Hub (keuzescherm)
+  "AI-coach, opbouwschema's en audio-begeleiding": 'AI coach, training plans and audio guidance',
+  'Het Weer': 'The Weather', 'Ik ga Fietsen': 'Go Cycling', 'Ik ga Hardlopen': 'Go Running', 'Ik ga Wandelen': 'Go Walking',
+  'Kies je activiteit en bekijk de omgevingsstatus': 'Choose your activity and check the local status',
+  'Knooppunten, navigatie, GPX en offline kaarten': 'Junction nodes, navigation, GPX and offline maps',
+  'Kompas &amp; Sensoren': 'Compass &amp; Sensors', 'Locatie ophalen…': 'Getting location…',
+  'Sensor start pas na tikken': 'Sensor only starts after tapping', 'Tik voor live kompas': 'Tap for live compass',
+  'Wandelnetwerken, rustige paden en natuurroutes': 'Walking networks, quiet paths and nature routes',
+  // Setup (fiets/wandel keuze binnen een modus)
+  '1. Kies je fietstype': '1. Choose your bike type', '100% lokaal — TensorFlow.js, geen limiet': '100% local — TensorFlow.js, no limit',
+  'ACTIEF LIVE': 'ACTIVE LIVE', 'Audio Gids': 'Audio Guide', 'Bezig met herkennen…': 'Identifying…', 'Bezig met zoeken…': 'Searching…',
+  'Binnenkort': 'Coming soon', 'Data: iNaturalist.org (CC BY-NC)': 'Data: iNaturalist.org (CC BY-NC)', 'Deze week': 'This week',
+  'Dieren Scanner': 'Animal Scanner', 'Echte OSM-data': 'Real OSM data', 'Echte herkenning': 'Real recognition',
+  'Echte iNaturalist-data': 'Real iNaturalist data', 'Flora Scanner': 'Plant Scanner',
+  'Genereer 3 routevoorstellen rond een punt': 'Generate 3 route suggestions around a point',
+  'Genereer 3 wandellussen rond een punt': 'Generate 3 walking loops around a point',
+  'Herkenningsmodel laden…': 'Loading recognition model…', 'Importeer GPX-bestand': 'Import GPX file',
+  'Klopt dit niet? Andere gokken:': "Not right? Other guesses:", 'Knooppunten-invoer': 'Node number entry',
+  'Laad een wandelroute van een site of app': 'Load a walking route from a site or app',
+  'Laad routes van Komoot, Garmin of Strava': 'Load routes from Komoot, Garmin or Strava',
+  'Live routelijn & meteen herberekenen onderweg.': 'Live route line & instant recalculation on the go.',
+  'Mountainbike': 'Mountain bike', 'Natuurspotter': 'Nature spotter', 'Racefiets': 'Road bike',
+  'Rondrit-generator': 'Loop route generator', 'Route & Tools': 'Route & Tools', 'Route &amp; Tools': 'Route &amp; Tools',
+  'Rustpunten': 'Rest stops', 'Stadsfiets': 'City bike', 'Typ een reeks nummers, app bouwt de route': 'Type a series of numbers, the app builds the route',
+  'Uit je eigen ritgeschiedenis': 'From your own ride history', "Wandel-Lus Generator": 'Walking Loop Generator',
+  "Wandel-extra's": 'Walking extras', 'bekijk': 'view', '📖 Meer info': '📖 More info',
+  // Kompas
+  'Bezig met starten…': 'Starting…', 'Kompas - Fietsapp': 'Compass - Cycling app', 'Kompas': 'Compass', 'Navigatie': 'Navigation',
+  // Weer
+  'Uitgebreid Advies & Toelichting': 'Detailed Advice & Explanation', 'Verwachting voor de komende dagen': 'Forecast for the coming days',
+  'Zonnestand vandaag': "Sun position today", 'Advies': 'Advice', 'Buitenactiviteiten': 'Outdoor activities',
+  'Data laden...': 'Loading data...', 'Details': 'Details', 'Even geduld, we halen het actuele weerbericht op.': 'One moment, fetching the current weather report.',
+  'Gedetailleerde Parameters': 'Detailed Parameters', 'Koude': 'Cold', 'LADEN...': 'LOADING...', 'LUCHTDRUK': 'AIR PRESSURE',
+  'LUCHTKWALITEIT': 'AIR QUALITY', 'Laden...': 'Loading...', 'Laden…': 'Loading…', 'Lengte van de dag': 'Length of day',
+  'Luchtvochtigheid': 'Humidity', 'Meteo': 'Weather', 'Muggenactiviteit': 'Mosquito activity', 'Pollen': 'Pollen',
+  'Pollenbericht': 'Pollen report', 'Radar': 'Radar', 'Resterende daglicht': 'Remaining daylight', 'Stand van de zon': 'Sun position',
+  'Sterrenkijken': 'Stargazing', 'Trend': 'Trend', 'UV-INDEX': 'UV INDEX', 'Uitgebreid Weerbericht - Meteo': 'Detailed Weather Report - Weather',
+  'Veeg voor meer →': 'Swipe for more →', 'Verwachting per uur': 'Hourly forecast', 'Weer Dashboard': 'Weather Dashboard',
+  'Weerbericht geladen': 'Weather report loaded', 'Windkracht': 'Wind force', 'Windrichting': 'Wind direction',
+  '🔍 Bronnen vergeleken': '🔍 Sources compared',
+  // RunCoach — tabs, algemeen
+  'Home': 'Home', 'Sessie': 'Session', 'Sessies': 'Sessions', 'Stats': 'Stats', 'Schema': 'Plan', 'Pijn/Tips': 'Pain/Tips',
+  '5K Start to Run': '5K Start to Run', '10-weken opbouwschema': '10-week training plan', '📅 Weekschema': '📅 Weekly plan',
+  '🤖 AI Coach': '🤖 AI Coach', '🤖 AI Coach — kies je doel-afstand': '🤖 AI Coach — choose your target distance',
+  '📚 Schema wisselen of zelf opbouwen': '📚 Switch plan or build your own', '5 KM': '5 KM', '10 KM': '10 KM', '7,5 KM': '7.5 KM',
+  'Week – · Dag –': 'Week – · Day –', 'Week – · Sessie –': 'Week – · Session –', '✅ Deze sessie al gedaan → volgende': '✅ This session already done → next',
+  '📍 Je zit hier nu': '📍 You are here now', 'Tik om hierheen te springen': 'Tap to jump here', '▼ Openen': '▼ Open',
+  'Nog geen trainingen afgerond.': 'No training sessions completed yet.', 'Nog geen runs om te tonen.': 'No runs to show yet.',
+  'Totaal km': 'Total km', 'Totale tijd': 'Total time', 'Kcal (geschat)': 'Kcal (estimated)',
+  'Gelopen afstand (laatste runs)': 'Distance run (recent runs)', '🏅 Achievements &amp; Medailles': '🏅 Achievements &amp; Medals',
+  // RunCoach — EVY
+  '🎧 EVY': '🎧 EVY', 'EVY Podcast': 'EVY Podcast', "Jouw 10-weken audioprogramma": 'Your 10-week audio programme',
+  'Geen actieve sessie': 'No active session', '🔄 5K herstarten': '🔄 Restart 5K', '🔄 10K herstarten': '🔄 Restart 10K',
+  'Je sessie loopt nog!': 'Your session is still running!', 'Timer en GPS-tracking bleven gewoon actief op de achtergrond.': 'The timer and GPS tracking kept running in the background.',
+  '▶️ Terug naar live scherm': '▶️ Back to live screen',
+  // RunCoach — Vrij/Doel
+  '⚡ Vrij/Doel': '⚡ Free/Target', 'Vrije & Doelgerichte Runs': 'Free & Target Runs', 'Volleerde Lopers': 'Advanced Runners',
+  'Vrije Run': 'Free Run', 'Geen limiet. Gewoon lekker lopen!': 'No limit. Just enjoy your run!',
+  '5 KM Target Run': '5 KM Target Run', '10 KM Target Run': '10 KM Target Run', 'Target run op tijd en km-splits.': 'Target run on time and km splits.',
+  'Ideaal om mee te starten': 'Ideal to get started', 'Gevorderde duurloop op tempo.': 'Advanced tempo endurance run.',
+  'HIIT Sprint Run': 'HIIT Sprint Run', '30s Sprint / 30s Herstel': '30s Sprint / 30s Recovery', 'Voor als je verder wil bouwen': "For when you're ready to push further",
+  '🛠️ Eigen Schema Builder': '🛠️ Custom Plan Builder', 'Aantal Herhalingen:': 'Number of repetitions:',
+  'Hardlopen (sec):': 'Running (sec):', 'Wandelen (sec):': 'Walking (sec):', 'Start Mijn Eigen Schema 🚀': 'Start My Own Plan 🚀',
+  // RunCoach — audio/muziek
+  '🔊 Stem voor audio-coach': '🔊 Voice for audio coach', 'Standaardstem van je toestel': "Your device's default voice",
+  'Echte stemmen van je eigen toestel — geen verzonnen coach-personas.': 'Real voices from your own device — no made-up coach personas.',
+  '🎵 Muziek — speelt tijdens de loop-intervallen': '🎵 Music — plays during the run intervals', 'Geen eigen muziek geladen.': 'No music of your own loaded.',
+  // RunCoach — Pijn/Tips
+  'Pijn — blessures &amp; symptomen': 'Pain — injuries &amp; symptoms', 'Waar doet het pijn, en wat kan het zijn?': "Where does it hurt, and what could it be?",
+  'Tips — blessures voorkomen': 'Tips — preventing injuries', 'Opbouw, herstel, RICE-methode en meer': 'Build-up, recovery, the RICE method and more',
+  "Stretching — instructievideo's": 'Stretching — instruction videos', '‹ Terug': '‹ Back', 'Oorzaak:': 'Cause:', 'Symptomen:': 'Symptoms:',
+  '🦵 Scheenbeenvliesontsteking (shin splints)': '🦵 Shin splints', ' te snel opgebouwde belasting, harde ondergrond.': ' load increased too quickly, hard surfaces.',
+  ' zeurende pijn langs de scheenbeenrand.': ' nagging pain along the edge of the shin.',
+  '🦶 Plantaire fasciitis': '🦶 Plantar fasciitis', ' ontsteking van de voetzoolpees door overbelasting.': ' inflammation of the plantar tendon from overuse.',
+  ' stekende pijn onder de hiel, vaak ergst bij de eerste stappen \'s ochtends.': " stabbing pain under the heel, often worst with the first steps in the morning.",
+  '🦿 Achillespees-tendinitis': '🦿 Achilles tendinitis', ' chronische overbelasting van de achillespees.': ' chronic overuse of the Achilles tendon.',
+  ' pijn en stijfheid achteraan de enkel/kuit.': ' pain and stiffness at the back of the ankle/calf.',
+  '🦵 Kuitspier-verrekking': '🦵 Calf strain', ' de kuitspier scheurt (deels) los, vaak richting de achillespees.': ' the calf muscle (partially) tears, often near the Achilles tendon.',
+  ' plotse, scherpe pijn — soms hoorbare "knap".': ' sudden, sharp pain — sometimes an audible "pop".',
+  '🦵 Hamstring-verrekking': '🦵 Hamstring strain', ' onvoldoende of geen opwarming.': ' insufficient or no warm-up.',
+  ' plotse, scherpe pijn achteraan de dij.': ' sudden, sharp pain at the back of the thigh.',
+  '🦵 Liesblessure': '🦵 Groin injury', ' overrekking van de binnenste dijspieren.': ' overstretching of the inner thigh muscles.',
+  ' pijn in de lies, vergelijkbaar met een liesbreuk-gevoel.': ' pain in the groin, similar to a hernia-like feeling.',
+  '🦴 ITB-syndroom (band aan buitenkant dij)': '🦴 ITB syndrome (band on outer thigh)', ' wrijving van de bindweefselband over de knie/heup.': ' friction of the connective tissue band over the knee/hip.',
+  ' pijn aan de buitenkant van heup of knie.': ' pain on the outside of the hip or knee.',
+  '🦵 Lopersknie (patellofemorale pijn)': "🦵 Runner's knee (patellofemoral pain)", ' niet altijd eenduidig — vaak overbelasting rond de knieschijf.': ' not always clear-cut — often overuse around the kneecap.',
+  ' pijn rond/onder de knieschijf.': ' pain around/under the kneecap.',
+  '🍑 Piriformis-syndroom': '🍑 Piriformis syndrome', ' verkramping van de piriformis-spier in de bil.': ' cramping of the piriformis muscle in the buttock.',
+  ' uitstralende pijn langs de achterkant van het been.': ' radiating pain down the back of the leg.',
+  '🚨 Wanneer naar een arts?': '🚨 When to see a doctor?',
+  '🦵 Scheenbeenpijn': '🦵 Shin pain', '🦶 Blaren': '🦶 Blisters', '💧 Zijsteken': '💧 Side stitch',
+  '📋 10 manieren om blessures te vermijden': '📋 10 ways to avoid injuries',
+  '1. Warm op met een korte wandeling vóór het stretchen': '1. Warm up with a short walk before stretching',
+  '2. Stretch voor én na het lopen, vooral de hamstrings': '2. Stretch before and after running, especially the hamstrings',
+  '3. Rond je run af met een korte wandeling': '3. Finish your run with a short walk',
+  '4. Loop niet elke dag': "4. Don't run every day", '5. Loop op een vlakke ondergrond': '5. Run on flat terrain',
+  '6. Verkort je pasfrequentie/steplengte bij vermoeidheid': '6. Shorten your stride/cadence when tired',
+  '7. Doe krachtoefeningen op je rustdagen': '7. Do strength exercises on your rest days',
+  '8. Draag de juiste schoenen voor jouw voet': '8. Wear the right shoes for your foot',
+  '9. Zorg voor voldoende voeding/voedingsstoffen': '9. Get enough nutrition/nutrients',
+  '10. Blijf voldoende gehydrateerd': '10. Stay well hydrated',
+  '✅ Klaar om terug te lopen na een blessure?': '✅ Ready to run again after an injury?',
+  '1. Kan je 30 minuten stevig doorwandelen?': '1. Can you walk briskly for 30 minutes?',
+  '2. Kan je 30 seconden op 1 been balanceren?': '2. Can you balance on 1 leg for 30 seconds?',
+  '3. Lukken 15-20 gecontroleerde 1-beens-kniebuigingen?': '3. Can you do 15-20 controlled single-leg squats?',
+  '4. Lukken 20-30 kuitheffingen op 1 been?': '4. Can you do 20-30 single-leg calf raises?',
+  '5. Kan je pijnvrij springen/hinkelen?': '5. Can you jump/hop pain-free?',
+  '🧊 RICE — een lichte blessure zelf verzorgen': '🧊 RICE — treating a minor injury yourself',
+  'Rest:': 'Rest:', 'Ice:': 'Ice:', 'Compression:': 'Compression:', 'Elevation:': 'Elevation:',
+  ' bouw dagelijkse belasting af.': ' reduce daily load.', ' koel 20 min., minstens 4x per dag.': ' cool for 20 min., at least 4x per day.',
+  ' elastisch verband om zwelling te beperken.': ' elastic bandage to limit swelling.', ' leg het lichaamsdeel hoger dan je hart.': ' raise the body part above your heart.',
+  'Opent op YouTube in een nieuw tabblad.': 'Opens on YouTube in a new tab.', 'Vóór het lopen': 'Before running', 'Na het lopen': 'After running',
+  'Gericht op kuit/achillespees': 'Focused on calf/Achilles',
+  '5 Minute Warm Up Before Running — dynamische stretches': '5 Minute Warm Up Before Running — dynamic stretches',
+  'The Best Dynamic Warm Up for Runners': 'The Best Dynamic Warm Up for Runners',
+  '8 Min Post-Run Stretching — cool down': '8 Min Post-Run Stretching — cool down',
+  '10 Min. Post-Run Stretch — rustige cooldown': '10 Min. Post-Run Stretch — gentle cooldown',
+  'Do These Stretches After Every Run': 'Do These Stretches After Every Run',
+  'Calf Stretch for Runners — wandstretch': 'Calf Stretch for Runners — wall stretch'
+};
+function translateGarminHtmlIfEnglish(html){
+  if (curLang() !== 'en') return html;
+  let out = html;
+  for (const nl in GARMIN_NL_EN_DICT){
+    out = out.split('>' + nl + '<').join('>' + GARMIN_NL_EN_DICT[nl] + '<');
+  }
+  return out;
+}
+
 function estimateCaloriesFromHR(avgBpm, durationMin){
   if (!avgBpm || !durationMin || !appSettings.bodyWeightKg || !appSettings.bodyAge || !appSettings.bodyGender) return null;
   const w = appSettings.bodyWeightKg, a = appSettings.bodyAge;
