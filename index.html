@@ -908,6 +908,10 @@
     font-size:9.5px; font-weight:800; padding:5px 9px; border-radius:10px; letter-spacing:0.4px;
   }
   #rsMainRow{ display:flex; align-items:center; justify-content:center; width:100%; max-width:440px; margin-top:6px; }
+  body.theme-garmin #rsMainRow{
+    background:#131b2e; border:1px solid rgba(255,255,255,0.08); border-radius:20px;
+    padding:20px 16px; box-shadow:0 4px 14px rgba(0,0,0,0.3);
+  }
   #rsMainCol{ flex:1; min-width:0; }
   #rsIntervalLabel{ font-size:16px; font-weight:800; letter-spacing:0.6px; text-transform:uppercase; }
   #rsIntervalLabel.type-run{ color:#4ade80; }
@@ -917,25 +921,29 @@
   #rsNextLabel{ color:rgba(246,244,238,0.55); font-size:12.5px; }
   #rsElapsedLine{ color:rgba(246,244,238,0.4); font-size:11px; margin-top:7px; }
   #rsCalorieLine{ color:rgba(246,244,238,0.55); font-size:12.5px; font-weight:700; margin-top:-4px; }
+  #rsHrLine{ color:#ff8a9a; font-size:12.5px; font-weight:700; margin-top:3px; cursor:pointer; }
   #rsProgressRail{
     position:fixed; right:12px;
     top:calc(14px + env(safe-area-inset-top,0px) + var(--extra-top-inset));
     bottom:calc(20px + env(safe-area-inset-bottom,0px) + var(--extra-bottom-inset));
-    width:52px; z-index:20; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px;
+    width:52px; z-index:20; display:flex; flex-direction:column; align-items:center; justify-content:space-between; gap:10px;
     overflow-y:auto; padding:4px 0; scrollbar-width:none;
   }
   #rsProgressRail::-webkit-scrollbar{ display:none; }
   .rs-rail-item{
     width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center;
-    font-size:17px; flex-shrink:0; opacity:0.55; transition:all 0.2s;
+    font-size:17px; flex-shrink:0; opacity:0.75; transition:all 0.2s;
   }
-  .rs-rail-item.rail-run{ background:rgba(74,222,128,0.30); }
-  .rs-rail-item.rail-walk{ background:rgba(96,165,250,0.30); }
-  .rs-rail-item.rail-warmup, .rs-rail-item.rail-cooldown{ background:rgba(226,161,60,0.30); }
+  .rs-rail-item.rail-run{ background:rgba(74,222,128,0.45); }
+  .rs-rail-item.rail-walk{ background:rgba(96,165,250,0.45); }
+  .rs-rail-item.rail-warmup, .rs-rail-item.rail-cooldown{ background:rgba(226,161,60,0.45); }
   .rs-rail-item.rail-current{ opacity:1; width:46px; height:46px; font-size:21px; box-shadow:0 0 0 3px var(--amber); }
-  .rs-rail-item.rail-done{ opacity:0.3; }
+  .rs-rail-item.rail-done{ opacity:0.4; }
   #rsStatsRow{ display:flex; justify-content:center; gap:24px; width:100%; max-width:440px; flex-shrink:0; }
   .rs-stat{ display:flex; flex-direction:column; align-items:center; flex:1; }
+  body.theme-garmin .rs-stat{
+    background:#131b2e; border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:10px 6px;
+  }
   .rs-stat b{ font-size:21px; font-weight:900; }
   .rs-stat span{ font-size:10px; color:rgba(246,244,238,0.55); text-transform:uppercase; letter-spacing:0.4px; margin-top:2px; }
   #rsControls{ display:flex; gap:9px; width:100%; max-width:440px; }
@@ -945,7 +953,13 @@
   #rsPauseBtn{ background:var(--amber); color:var(--green-900); }
   #rsSplitBtn{ background:#2a5a8f; color:#fff; }
   #rsStopBtn{ background:rgba(255,255,255,0.08); color:var(--cream); border:1.5px solid rgba(255,255,255,0.15) !important; }
-  #rsGpsWarning{ color:#ff8a8a; font-size:11px; margin-top:10px; display:none; }
+  #rsGpsWarning{ color:#ff8a8a; font-size:11px; margin-top:6px; display:none; }
+  #rsMinimizeBtn{
+    position:absolute; left:16px; top:calc(14px + env(safe-area-inset-top,0px) + var(--extra-top-inset));
+    z-index:30; border:none; background:rgba(226,161,60,0.12); color:var(--amber);
+    width:42px; height:36px; border-radius:16px; display:flex; align-items:center; justify-content:center;
+  }
+  #rsMinimizeBtn:active{ background:rgba(226,161,60,0.22); }
 
   /* Garmin-thema: zelfde scherm/logica, enkel de kleuren/vormen omgezet naar de donkere navy/amber-look. */
   body.theme-garmin #runSessionScreen{ background:#050914; }
@@ -1060,6 +1074,9 @@
   #stopTrainingModal.show{ z-index:3500; }
   #themeSwitchModal.show{ z-index:3500; }
   #runPlansModal.show{ z-index:3500; }
+  #runFeedbackModal.show{ z-index:3500; }
+  #spotifyModal.show{ z-index:3500; }
+  #rideStravaModal.show{ z-index:3500; }
   .simple-modal-card{
     background:var(--cream); border-radius:18px; padding:18px; width:100%; max-width:380px;
     max-height:80vh; overflow-y:auto; box-shadow:var(--shadow);
@@ -1068,6 +1085,8 @@
   .simple-modal-head b{ font-size:16px; color:var(--green-900); }
   .simple-modal-close{ border:none; background:rgba(15,61,41,0.08); color:var(--green-900); width:30px; height:30px; border-radius:50%; font-size:14px; }
   .simple-modal-text{ font-size:13px; color:#4b5f54; margin:0 0 10px; }
+  .rfMoodBtn.rf-selected{ border-color:var(--amber) !important; background:rgba(226,161,60,0.15) !important; }
+  .rfPainChip.rf-selected{ border-color:var(--amber) !important; background:rgba(226,161,60,0.15) !important; color:var(--amber) !important; }
   .simple-modal-note{ font-size:11.5px; color:#7a8c81; margin-top:10px; }
 
   #helpCard{ max-width:440px; max-height:85vh; }
@@ -1675,8 +1694,97 @@
   <div class="simple-modal-card" style="max-width:320px;">
     <div class="simple-modal-head"><b>🎨 <span data-i18n="themeSwitchTitle">Stijl wisselen</span></b><button class="simple-modal-close" data-close="themeSwitchModal">✕</button></div>
     <label class="settings-radio"><input type="radio" name="themeMini" value="default"> <span><span data-i18n="settingsThemeDefault">🟢 Standaard</span></span></label>
-    <label class="settings-radio"><input type="radio" name="themeMini" value="garmin"> <span><span data-i18n="settingsThemeGarmin">⌚ Garmin-stijl (zwart/rood)</span></span></label>
+    <label class="settings-radio"><input type="radio" name="themeMini" value="garmin"> <span><span data-i18n="settingsThemeGarmin">⌚ Tailwind-stijl (zwart/rood)</span></span></label>
     <p class="simple-modal-text" style="margin-top:10px;" data-i18n="themeSwitchFullHint">Alle overige instellingen vind je op de Fiets- of Wandel-pagina.</p>
+    <div style="border-top:1px solid var(--line); margin-top:14px; padding-top:12px;">
+      <p class="simple-modal-text" style="margin-bottom:8px;">🗑️ Zelf kiezen wat je wist:</p>
+      <button id="openResetLoopBtn" class="simple-modal-btn" style="width:100%; margin-bottom:6px;">🏃 Reset Lopen…</button>
+      <button id="openResetFietsWandelBtn" class="simple-modal-btn" style="width:100%;">🚴🥾 Reset Fiets &amp; Wandel-voorkeuren…</button>
+    </div>
+  </div>
+</div>
+
+<div id="rideStravaModal" class="simple-modal">
+  <div class="simple-modal-card" style="max-width:320px; text-align:center;">
+    <div class="simple-modal-head"><b>🟠 Naar Strava?</b><button class="simple-modal-close" data-close="rideStravaModal">✕</button></div>
+    <p class="simple-modal-text">Rit opgeslagen. Ook uploaden naar Strava?</p>
+    <div style="display:flex; gap:8px;">
+      <button id="rideStravaSkipBtn" class="simple-modal-btn" style="flex:1;">Nee</button>
+      <button id="rideStravaUploadBtn" class="simple-modal-btn primary" style="flex:1; background:#fc4c02; border-color:#fc4c02;">🟠 Uploaden</button>
+    </div>
+  </div>
+</div>
+
+<div id="spotifyModal" class="simple-modal">
+  <div class="simple-modal-card" style="max-width:320px; text-align:center;">
+    <div class="simple-modal-head"><b>🎧 Spotify</b><button class="simple-modal-close" data-close="spotifyModal">✕</button></div>
+    <div id="spotifyNotConnected">
+      <p class="simple-modal-text">Nog niet verbonden met Spotify.</p>
+      <button id="spotifyModalConnectBtn" style="padding:10px 18px; border:none; border-radius:12px; background:#1DB954; color:#0b0f0a; font-weight:800; font-size:13px; cursor:pointer;">Verbind met Spotify</button>
+    </div>
+    <div id="spotifyPlayingView" class="hidden">
+      <img id="spotifyAlbumArt" src="" alt="" style="width:140px; height:140px; border-radius:14px; margin:0 auto 12px; display:block; box-shadow:0 6px 18px rgba(0,0,0,0.4);">
+      <div id="spotifyTrackName" style="font-weight:800; font-size:14.5px; color:var(--cream); margin-bottom:2px;">–</div>
+      <div id="spotifyArtistName" style="font-size:12px; color:rgba(246,244,238,0.6); margin-bottom:16px;">–</div>
+      <div style="display:flex; justify-content:center; gap:18px; align-items:center;">
+        <button id="spotifyPrevBtn" style="background:none; border:none; font-size:22px; cursor:pointer; color:var(--cream);">⏮</button>
+        <button id="spotifyPlayPauseBtn" style="background:#1DB954; border:none; border-radius:50%; width:48px; height:48px; font-size:20px; cursor:pointer; color:#0b0f0a;">⏸</button>
+        <button id="spotifyNextBtn" style="background:none; border:none; font-size:22px; cursor:pointer; color:var(--cream);">⏭</button>
+      </div>
+    </div>
+    <div id="spotifyNothingPlaying" class="hidden">
+      <p class="simple-modal-text">Er speelt momenteel niets op Spotify.</p>
+    </div>
+  </div>
+</div>
+
+<div id="runFeedbackModal" class="simple-modal">
+  <div class="simple-modal-card" style="max-width:360px; text-align:center;">
+    <div class="simple-modal-head"><b>Hoe ging het?</b><button class="simple-modal-close" data-close="runFeedbackModal">✕</button></div>
+    <div style="display:flex; justify-content:center; gap:20px; margin:12px 0 18px;">
+      <button class="rfMoodBtn" data-mood="happy" style="background:none; border:2px solid var(--line); border-radius:16px; padding:10px 22px; font-size:34px; cursor:pointer;">😄</button>
+      <button class="rfMoodBtn" data-mood="sad" style="background:none; border:2px solid var(--line); border-radius:16px; padding:10px 22px; font-size:34px; cursor:pointer;">😔</button>
+    </div>
+    <p class="simple-modal-text" style="margin-bottom:8px;">Had je ergens pijn?</p>
+    <div style="display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-bottom:6px;">
+      <button class="rfPainChip rf-selected" data-area="none" style="border:1.5px solid var(--line); background:none; border-radius:20px; padding:6px 14px; font-size:12.5px; font-weight:700; color:var(--cream); cursor:pointer;">Geen pijn 👍</button>
+      <button class="rfPainChip" data-area="rug" style="border:1.5px solid var(--line); background:none; border-radius:20px; padding:6px 14px; font-size:12.5px; font-weight:700; color:var(--cream); cursor:pointer;">Rug</button>
+      <button class="rfPainChip" data-area="heup" style="border:1.5px solid var(--line); background:none; border-radius:20px; padding:6px 14px; font-size:12.5px; font-weight:700; color:var(--cream); cursor:pointer;">Heup</button>
+      <button class="rfPainChip" data-area="dij" style="border:1.5px solid var(--line); background:none; border-radius:20px; padding:6px 14px; font-size:12.5px; font-weight:700; color:var(--cream); cursor:pointer;">Dij</button>
+      <button class="rfPainChip" data-area="knie" style="border:1.5px solid var(--line); background:none; border-radius:20px; padding:6px 14px; font-size:12.5px; font-weight:700; color:var(--cream); cursor:pointer;">Knie</button>
+      <button class="rfPainChip" data-area="kuit" style="border:1.5px solid var(--line); background:none; border-radius:20px; padding:6px 14px; font-size:12.5px; font-weight:700; color:var(--cream); cursor:pointer;">Kuit</button>
+      <button class="rfPainChip" data-area="achilles" style="border:1.5px solid var(--line); background:none; border-radius:20px; padding:6px 14px; font-size:12.5px; font-weight:700; color:var(--cream); cursor:pointer;">Achilles</button>
+      <button class="rfPainChip" data-area="voet" style="border:1.5px solid var(--line); background:none; border-radius:20px; padding:6px 14px; font-size:12.5px; font-weight:700; color:var(--cream); cursor:pointer;">Voet</button>
+    </div>
+    <p class="simple-modal-text" style="font-size:10.5px; margin-bottom:14px;">Meerdere plekken mogelijk — wordt bewaard bij deze sessie in je stats.</p>
+    <button id="runFeedbackStravaBtn" style="width:100%; margin-bottom:10px; padding:9px; border:none; border-radius:12px; background:#fc4c02; color:#fff; font-weight:800; font-size:12.5px; cursor:pointer;">🟠 Ook naar Strava uploaden</button>
+    <div style="display:flex; gap:8px;">
+      <button id="runFeedbackSkipBtn" class="simple-modal-btn" style="flex:1;">Overslaan</button>
+      <button id="runFeedbackSaveBtn" class="simple-modal-btn primary" style="flex:1;">Opslaan</button>
+    </div>
+  </div>
+</div>
+
+<div id="resetLoopModal" class="simple-modal">
+  <div class="simple-modal-card" style="max-width:340px;">
+    <div class="simple-modal-head"><b>🏃 Reset Lopen</b><button class="simple-modal-close" data-close="resetLoopModal">✕</button></div>
+    <p class="simple-modal-text">Kies wat je wil wissen — enkel wat je aanvinkt wordt gewist, de rest blijft gewoon staan.</p>
+    <label class="settings-radio"><input type="checkbox" id="resetLoopAiCoach"> <span>AI Coach-voortgang (welke week/dag, alle 3 schema's)</span></label>
+    <label class="settings-radio"><input type="checkbox" id="resetLoopEvy"> <span>EVY-voortgang (5K + 10K, terug naar Week 1 · Sessie 1)</span></label>
+    <label class="settings-radio"><input type="checkbox" id="resetLoopCustomPlans"> <span>Je eigen opgebouwde schema's (worden volledig verwijderd)</span></label>
+    <label class="settings-radio"><input type="checkbox" id="resetLoopHistory"> <span>Loopgeschiedenis &amp; stats (sessies, km, tijd, kcal)</span></label>
+    <button id="confirmResetLoopBtn" class="simple-modal-btn primary" style="width:100%; margin-top:12px; background:#c0392b;">Wis geselecteerde onderdelen</button>
+  </div>
+</div>
+
+<div id="resetFietsWandelModal" class="simple-modal">
+  <div class="simple-modal-card" style="max-width:340px;">
+    <div class="simple-modal-head"><b>🚴🥾 Reset Fiets &amp; Wandel</b><button class="simple-modal-close" data-close="resetFietsWandelModal">✕</button></div>
+    <p class="simple-modal-text">Kaartlagen, POI-filters en dashboard-instellingen gelden voor fiets én wandel samen — die kunnen niet apart per activiteit gewist worden. Fietstype is wél alleen voor fietsen.</p>
+    <label class="settings-radio"><input type="checkbox" id="resetFwBikeType"> <span>Fietstype (terug naar 'gewone fiets')</span></label>
+    <label class="settings-radio"><input type="checkbox" id="resetFwMapPrefs"> <span>Kaartlagen, POI-filters &amp; kaartstijl (fiets + wandel samen)</span></label>
+    <label class="settings-radio"><input type="checkbox" id="resetFwDash"> <span>Dashboard-weergave (tekstgrootte, vetgedrukt, toegankelijkheid)</span></label>
+    <button id="confirmResetFwBtn" class="simple-modal-btn primary" style="width:100%; margin-top:12px; background:#c0392b;">Wis geselecteerde onderdelen</button>
   </div>
 </div>
 
@@ -1896,7 +2004,7 @@
     <div class="settings-section">
       <h4 data-i18n="settingsAppearance">Uiterlijk</h4>
       <label class="settings-radio"><input type="radio" name="theme" value="default" checked> <span><span data-i18n="settingsThemeDefault">🟢 Standaard (huidig)</span></span></label>
-      <label class="settings-radio"><input type="radio" name="theme" value="garmin"> <span><span data-i18n="settingsThemeGarmin">⌚ Garmin-stijl (zwart/rood)</span></span></label>
+      <label class="settings-radio"><input type="radio" name="theme" value="garmin"> <span><span data-i18n="settingsThemeGarmin">⌚ Tailwind-stijl (zwart/rood)</span></span></label>
     </div>
     </details>
 
@@ -2069,6 +2177,23 @@
           <input type="number" id="settingBodyWeight" placeholder="75" min="20" max="250" style="width:80px; padding:7px 9px; border:1px solid var(--line); border-radius:9px; font-size:13.5px;"> kg
         </div>
       </div>
+      <p class="settings-note" style="margin-top:14px;">Leeftijd en geslacht zijn optioneel, maar maken de calorie-schatting nauwkeuriger zodra je een hartslagband verbindt (die formule heeft dit nodig, gewicht alleen volstaat niet).</p>
+      <div style="font-size:13.5px; color:#33473c; margin-top:6px;">
+        <span>🎂 Leeftijd</span>
+        <div style="margin-top:6px;">
+          <input type="number" id="settingAge" placeholder="35" min="10" max="110" style="width:80px; padding:7px 9px; border:1px solid var(--line); border-radius:9px; font-size:13.5px;"> jaar
+        </div>
+      </div>
+      <div style="font-size:13.5px; color:#33473c; margin-top:12px;">
+        <span>⚧ Geslacht</span>
+        <div style="margin-top:6px;">
+          <select id="settingGender" style="padding:7px 9px; border:1px solid var(--line); border-radius:9px; font-size:13.5px;">
+            <option value="">— niet opgegeven —</option>
+            <option value="male">Man</option>
+            <option value="female">Vrouw</option>
+          </select>
+        </div>
+      </div>
     </div>
 
     </details>
@@ -2128,6 +2253,17 @@
 
       <div class="settings-subnote" style="margin-top:14px;">OpenWeatherMap — optionele extra weerbron voor vergelijking/terugval naast Open-Meteo en MET Norway (die twee werken altijd, zonder sleutel). Gratis account op openweathermap.org (1000 aanvragen/dag inbegrepen).</div>
       <input type="text" id="openWeatherMapKeyInput" placeholder="Jouw gratis OpenWeatherMap API-sleutel (optioneel)…" class="settings-text-input">
+
+      <div class="settings-subnote" style="margin-top:14px;">Spotify — voor het 'nu speelt'-icoontje bij fietsen/lopen. Gratis Developer-app op developer.spotify.com/dashboard — geen API-sleutel maar een <b>Client ID</b>. Zet als Redirect URI exact het adres van deze pagina.</div>
+      <input type="text" id="spotifyClientIdInput" placeholder="Jouw Spotify Client ID…" class="settings-text-input">
+      <button id="spotifyConnectBtn" type="button" style="margin-top:8px; padding:8px 14px; border:1px solid var(--line); border-radius:10px; background:#1DB954; color:#0b0f0a; font-weight:800; font-size:12.5px; cursor:pointer;">🎧 Verbind met Spotify</button>
+      <span id="spotifyConnectStatus" style="margin-left:8px; font-size:11.5px; color:#33473c;"></span>
+
+      <div class="settings-subnote" style="margin-top:18px;">Strava — om afgeronde ritten/loop-sessies met 1 tik te uploaden. Gratis app op strava.com/settings/api. <b>Let op:</b> Strava's inlogmethode vereist (i.t.t. Spotify) ook een Client Secret, die — omdat dit een pagina zonder eigen server is — mee in de broncode van deze pagina zichtbaar komt te staan. Voor een hobbyproject voor eigen gebruik is dat een aanvaard risico, maar wees je ervan bewust.</div>
+      <input type="text" id="stravaClientIdInput" placeholder="Jouw Strava Client ID…" class="settings-text-input">
+      <input type="text" id="stravaClientSecretInput" placeholder="Jouw Strava Client Secret…" class="settings-text-input" style="margin-top:6px;">
+      <button id="stravaConnectBtn" type="button" style="margin-top:8px; padding:8px 14px; border:1px solid var(--line); border-radius:10px; background:#fc4c02; color:#fff; font-weight:800; font-size:12.5px; cursor:pointer;">🟠 Verbind met Strava</button>
+      <span id="stravaConnectStatus" style="margin-left:8px; font-size:11.5px; color:#33473c;"></span>
     </div>
 
     <div class="settings-section">
@@ -2402,6 +2538,9 @@
 <audio id="runMusicPlayer" preload="auto"></audio>
 
 <div id="runSessionScreen" class="hidden">
+  <button id="rsMinimizeBtn" aria-label="Minimaliseren" title="Naar andere tabbladen — de sessie blijft gewoon lopen">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+  </button>
   <div id="rsMapWrap">
     <div id="rsMapBadge"><span id="rsMapBadgeText">0m @ 0.0 km/u</span></div>
     <div id="rsLiveBadge">● LIVE RUN</div>
@@ -2422,13 +2561,14 @@
     <div class="rs-stat"><b id="rsSplitLabel">1 km</b><span>split</span></div>
   </div>
   <div id="rsCalorieLine">🔥 <span id="rsCalories">–</span></div>
+  <div id="rsHrLine"><span id="rsHrValue">❤️ verbind hartslagband</span></div>
   <div>
     <div id="rsControls">
       <button id="rsPauseBtn">⏸ Pauze</button>
       <button id="rsSplitBtn">🚩 Split</button>
       <button id="rsStopBtn">■ Stop</button>
     </div>
-    <div id="rsGpsWarning">📍 Geen goede GPS-fix — afstand kan onnauwkeurig zijn.</div>
+    <div id="rsGpsWarning">📍 Zwakke GPS-fix</div>
   </div>
 </div>
 
@@ -2534,6 +2674,7 @@
   <div id="dashSummary3">
     <div class="dash-stat"><span id="dashWeather">–</span><small id="dashWeatherLabel" data-i18n="dashWeer">weer</small></div>
     <div class="dash-stat"><span id="dashSunset">–</span><small data-i18n="dashZonsondergang">zonsondergang</small></div>
+    <div class="dash-stat" id="dashHrTile"><span id="dashHrValue">❤️ verbind</span><small>hartslag</small></div>
   </div>
 
   <div id="dashElevSection">
@@ -2781,6 +2922,7 @@
   <button id="tabWeatherBtn" class="top-tile" title="Weer" data-i18n-title="titleTabWeather">🌤️</button>
   <button id="locateBtn" class="top-tile top-tile-small" title="Ga naar mijn locatie" data-i18n-title="titleGoToLocation">🎯</button>
   <button id="northBtn" class="top-tile top-tile-small" title="Zet noorden weer boven" data-i18n-title="titleResetNorth"><span id="northArrow">🧭</span></button>
+  <button id="spotifyTileBtn" class="top-tile top-tile-small" title="Spotify — nu speelt" style="color:#1DB954;">🎧</button>
 </div>
 
 <div id="sheet">
@@ -4782,6 +4924,7 @@ async function saveRideToHistory(){
     geometry,
     speeds,
     ascent: lastElevationProfile ? Math.round(lastElevationProfile.ascent) : null,
+    avgBpm: avgHrSamples(),
     label: routeIsFromGpx ? 'GPX-route' : `${route[0]?.ref ?? '?'} → ${route[route.length-1]?.ref ?? '?'}`
   };
   const history = await getRideHistory();
@@ -5039,6 +5182,52 @@ $('logbookClearBtn').addEventListener('click', () => {
 });
 $('menuSettingsBtn').addEventListener('click', () => { closeActionMenu(); openModal('settingsModal'); runOfflineDiagnostics(); checkBatteryLevel(); });
 $('modeSelectSettingsBtn').addEventListener('click', () => { syncThemeSwitchRadios(); openModal('themeSwitchModal'); });
+$('openResetLoopBtn').addEventListener('click', () => { closeModal('themeSwitchModal'); openModal('resetLoopModal'); });
+$('openResetFietsWandelBtn').addEventListener('click', () => { closeModal('themeSwitchModal'); openModal('resetFietsWandelModal'); });
+
+$('confirmResetLoopBtn').addEventListener('click', async () => {
+  const doAiCoach = $('resetLoopAiCoach').checked;
+  const doEvy = $('resetLoopEvy').checked;
+  const doCustom = $('resetLoopCustomPlans').checked;
+  const doHistory = $('resetLoopHistory').checked;
+  if (!doAiCoach && !doEvy && !doCustom && !doHistory){ toast('Niets aangevinkt om te wissen.', 2000); return; }
+  if (!confirm('Zeker? Dit kan niet ongedaan gemaakt worden.')) return;
+  if (doAiCoach){
+    // Voortgang van alle 3 ingebouwde schema's wissen, plus van elk eigen schema (elk heeft z'n eigen sleutel).
+    await storageSet(RUN_PROGRESS_KEY, JSON.stringify({ week:1, day:1, sessionsDone:0 }));
+    await storageSet(progressKeyFor('builtin_7_5k'), JSON.stringify({ week:1, day:1, sessionsDone:0 }));
+    await storageSet(progressKeyFor('builtin_10k'), JSON.stringify({ week:1, day:1, sessionsDone:0 }));
+    const plans = await getCustomPlans();
+    for (const pl of plans) await storageSet(progressKeyFor(pl.id), JSON.stringify({ week:1, day:1, sessionsDone:0 }));
+    await setActivePlanId('builtin_5k');
+  }
+  if (doEvy){ await resetEvyProgress(5); await resetEvyProgress(10); }
+  if (doCustom){ await saveCustomPlans([]); }
+  if (doHistory){ await storageSet('run_history', JSON.stringify([])); }
+  closeModal('resetLoopModal');
+  toast('Gewist.', 2000);
+});
+
+$('confirmResetFwBtn').addEventListener('click', async () => {
+  const doBikeType = $('resetFwBikeType').checked;
+  const doMapPrefs = $('resetFwMapPrefs').checked;
+  const doDash = $('resetFwDash').checked;
+  if (!doBikeType && !doMapPrefs && !doDash){ toast('Niets aangevinkt om te wissen.', 2000); return; }
+  if (!confirm('Zeker? Dit kan niet ongedaan gemaakt worden.')) return;
+  if (doBikeType) appSettings.bikeType = 'regular';
+  if (doMapPrefs){
+    appSettings.mapStyle = 'standard';
+    appSettings.overlays = { cycling:false, hiking:false, mtb:false };
+    appSettings.poiLayers = { cafe:false, restaurant:false, bakery:false, supermarket:false, pharmacy:false, bike:false, water:false, toilet:false, money:false, camping:false, charging:false, playground:false, parking:false, hotel:false };
+    appSettings.showPoiDetails = false;
+  }
+  if (doDash){
+    appSettings.dashTextSize = 'normal'; appSettings.dashBold = true; appSettings.largeNodesAccessibility = false;
+  }
+  saveSettings();
+  closeModal('resetFietsWandelModal');
+  toast('Gewist.', 2000);
+});
 function syncThemeSwitchRadios(){
   const r = document.querySelector(`input[name="themeMini"][value="${appSettings.theme}"]`);
   if (r) r.checked = true;
@@ -5188,7 +5377,7 @@ let appSettings = {
   dashTextSize:'normal', dashBold:true, largeNodesAccessibility:false, offRouteDist:35, autoReroute:false, silentReroute:false,
   overlays:{ cycling:false, hiking:false, mtb:false },
   poiLayers:{ cafe:false, restaurant:false, bakery:false, supermarket:false, pharmacy:false, bike:false, water:false, toilet:false, money:false, camping:false, charging:false, playground:false, parking:false, hotel:false }, showPoiDetails:false,
-  showWindDirection:true, autoPause:false, redNavDot:false, topOffsetPx:0, tabGapPx:0, bodyWeightKg:null, voiceOnlyMode:false, routeColorMode:'off', showWindInNav:false, eatReminderOn:false, eatIntervalMin:45, drinkReminderOn:false, drinkIntervalMin:20, segmentPrOn:true, darkArrivalWarning:true, quietRoutingMode:false, historyAudioOn:false, shakeToSurpriseOn:false, shakeKm:30, vertrekFromGps:false, avoidBufferM:18, maxOverlapPct:8, lowerGpsAccuracy:false, disableMapRotation:false, posUpdateIntervalSec:1, mapRecenterDelaySec:6, overpassSurfaceTimeoutSec:15, routingWeighting:'off', navType:'active', fallDetectionOn:false, sosContactNumber:'', sosContactName:'', routePreference:'balanced', routeLineColor:'#e2a13c', language:'en',
+  showWindDirection:true, autoPause:false, redNavDot:false, topOffsetPx:0, tabGapPx:0, bodyWeightKg:null, bodyAge:null, bodyGender:'', spotifyClientId:'', stravaClientId:'', stravaClientSecret:'', voiceOnlyMode:false, routeColorMode:'off', showWindInNav:false, eatReminderOn:false, eatIntervalMin:45, drinkReminderOn:false, drinkIntervalMin:20, segmentPrOn:true, darkArrivalWarning:true, quietRoutingMode:false, historyAudioOn:false, shakeToSurpriseOn:false, shakeKm:30, vertrekFromGps:false, avoidBufferM:18, maxOverlapPct:8, lowerGpsAccuracy:false, disableMapRotation:false, posUpdateIntervalSec:1, mapRecenterDelaySec:6, overpassSurfaceTimeoutSec:15, routingWeighting:'off', navType:'active', fallDetectionOn:false, sosContactNumber:'', sosContactName:'', routePreference:'balanced', routeLineColor:'#e2a13c', language:'en',
   bundledCountries:{ be:true, nl:false }, routingEngine:'brouter',
   coachCats:{ start:true, countdown:true, toRun:true, toWalk:true, breathingTip:true, midpoint:true, kmSplit:true, encouragement:true, tempoWarning:true, personalRecord:true, slowdownSupport:true, lastInterval:true, progressPercent:true, sessionStreak:true, didYouKnow:true, weatherWarning:true, liveMedal:true }
 };
@@ -5566,7 +5755,7 @@ const TRANSLATIONS = {
   settingsBE: { nl:'🇧🇪 België', en:'🇧🇪 Belgium' },
   settingsNL: { nl:'🇳🇱 Nederland', en:'🇳🇱 Netherlands' },
   settingsThemeDefault: { nl:'🟢 Standaard (huidig)', en:'🟢 Default (current)' },
-  settingsThemeGarmin: { nl:'⌚ Garmin-stijl (zwart/rood)', en:'⌚ Garmin style (black/red)' },
+  settingsThemeGarmin: { nl:'⌚ Tailwind-stijl (zwart/rood)', en:'⌚ Tailwind style (black/red)' },
   settingsShowCompassBtn: { nl:'🧭 Toon kompasknop bovenop de kaart', en:'🧭 Show compass button on the map' },
   settingsMapStandard: { nl:'🗺️ Standaard', en:'🗺️ Default' },
   settingsMapCyclosm: { nl:'🚴 Fietskaart (CyclOSM) — toont fietspaden/-netwerken duidelijker', en:'🚴 Cycle map (CyclOSM) — shows cycle paths/networks more clearly' },
@@ -5636,7 +5825,7 @@ const TRANSLATIONS = {
   settingsTextNormal: { nl:'🔤 Normaal', en:'🔤 Normal' },
   settingsTextSmaller: { nl:'🔎 Kleiner (handig op kleinere schermen)', en:'🔎 Smaller (handy on smaller screens)' },
   settingsBold: { nl:'🅱️ Vetgedrukt', en:'🅱️ Bold' },
-  settingsGarminStyle: { nl:'⌚ Garmin-stijl (donkerder, grotere tegels, ronde snelheidsmeter)', en:'⌚ Garmin style (darker, bigger tiles, circular speed gauge)' },
+  settingsGarminStyle: { nl:'⌚ Tailwind-stijl (donkerder, grotere tegels, ronde snelheidsmeter)', en:'⌚ Tailwind style (darker, bigger tiles, circular speed gauge)' },
   settingsLargeNodes: { nl:'🔍 Grotere knopen en cijfers op de kaart (slechtziend-vriendelijk)', en:'🔍 Larger nodes and numbers on the map (accessible for low vision)' },
   settingsDevSensitive: { nl:'🎯 Gevoelig (20 m)', en:'🎯 Sensitive (20 m)' },
   settingsDevNormal: { nl:'⚖️ Normaal (35 m)', en:'⚖️ Normal (35 m)' },
@@ -6503,7 +6692,7 @@ async function renderRunStatsPanel(){
   $('rcStatSessions').textContent = history.length;
   $('rcStatKm').textContent = totalKm.toFixed(1);
   $('rcStatTime').textContent = totalSec >= 3600 ? (totalSec/3600).toFixed(1) + 'u' : Math.round(totalSec/60) + 'm';
-  const totalRunCal = history.reduce((s,r) => s + (estimateCalories(r.km, (r.durationSec||0)/60, 'hardlopen') || 0), 0);
+  const totalRunCal = history.reduce((s,r) => s + (caloriesForEntry(r, (r.durationSec||0)/60, 'hardlopen') || 0), 0);
   $('rcStatCalories').textContent = totalRunCal > 0 ? `~${totalRunCal}` : (appSettings.bodyWeightKg ? '–' : '⚖️');
 
   // Kleine staafgrafiek van de laatste 10 runs (oudste links, meest recente rechts)
@@ -6528,8 +6717,10 @@ async function renderRunStatsPanel(){
   $('rcHistoryList').innerHTML = history.length ? history.slice(0,15).map(r => {
     const d = new Date(r.date);
     const dateLabel = d.toLocaleDateString('nl-BE', { day:'2-digit', month:'short' });
+    const moodIcon = r.mood === 'happy' ? ' 😄' : r.mood === 'sad' ? ' 😔' : '';
+    const painIcon = (r.painAreas && r.painAreas.length) ? ` 🩹${r.painAreas.length>1 ? ' ('+r.painAreas.length+'x)' : ''}` : '';
     return `<div style="display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.06); font-size:12.5px;">
-      <span style="color:var(--cream);">${dateLabel} — ${r.km.toFixed(2)} km</span>
+      <span style="color:var(--cream);">${dateLabel} — ${r.km.toFixed(2)} km${moodIcon}${painIcon}</span>
       <span style="color:rgba(246,244,238,0.55);">${fmtMMSS(r.durationSec)}${r.completed ? ' ✅' : ''}</span>
     </div>`;
   }).join('') : `<div style="color:rgba(246,244,238,0.5); font-size:12.5px; text-align:center; padding:20px 0;">Nog geen trainingen afgerond.</div>`;
@@ -6859,9 +7050,11 @@ const RUN_START_ANNOUNCE = {
   cooldown:{ nl:'Cooldown. Wandel rustig uit.', en:'Cool-down. Walk it out easily.' }
 };
 let rsState = null; // { intervals, idx, remainingSec, tickId, watchId, distanceM, startedAt, pausedMs, pauseStartedAt, lastPos, paused }
+let lastFinishedRunBreadcrumbs = []; // kruimelspoor van de laatst afgeronde loopsessie, voor de Strava-upload-knop in de feedback-modal
 
 function speakForRun(text){
   if (!('speechSynthesis' in window)) return;
+  if (rsState && rsState.evyDist) return; // EVY: de podcast zelf is de coaching, de app-stem mag daar niet doorheen praten
   try{
     window.speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(stripEmojiForSpeech(text));
@@ -6889,6 +7082,7 @@ function fmtMMSS(totalSec){
 }
 async function startRunSession(opts){
   opts = opts || {};
+  hrSamples = []; // vorige sessie mag het gemiddelde van deze nieuwe sessie niet beïnvloeden
   let intervals, week = null, day = null, isCustom = false, freeform = false;
   const effectiveMode = opts.mode || rcActiveMode;
   if (opts.custom){
@@ -6921,7 +7115,8 @@ async function startRunSession(opts){
     tickId:null, watchId:null, distanceM:0, startedAt:Date.now(), pausedMs:0, pauseStartedAt:null,
     lastPos:null, paused:false, week, day, isCustom, freeform, lastAnnouncedKm:0, targetKm: opts.targetKm || null, targetReached:false,
     splits:[], lastSplitKm:0, lastSplitMs:0, totalPlannedSec, midpointSpoken:false, lastEncouragementAt:0, countdownSpoken:false,
-    referencePaceSecPerKm, lastKmSplitStartMs:0, lastIntervalAnnounced:false, evyDist: opts.evyDist || null
+    referencePaceSecPerKm, lastKmSplitStartMs:0, lastIntervalAnnounced:false, evyDist: opts.evyDist || null,
+    breadcrumbs:[]
   };
   $('runCoachScreen').classList.add('hidden');
   $('runSessionScreen').classList.remove('hidden');
@@ -6999,6 +7194,7 @@ function renderRunProgressRail(){
 function handleRunGpsUpdate(pos){
   $('rsGpsWarning').style.display = 'none';
   if (rsState.paused){ rsState.lastPos = pos; return; }
+  rsState.breadcrumbs.push({ lat:pos.coords.latitude, lon:pos.coords.longitude, ele:pos.coords.altitude, t:Date.now() });
   let speedKmh = 0;
   if (rsState.lastPos && pos.coords.accuracy < 30){
     const d = haversine(rsState.lastPos.coords.latitude, rsState.lastPos.coords.longitude, pos.coords.latitude, pos.coords.longitude);
@@ -7178,8 +7374,9 @@ function updateRunSessionUI(){
   const km = rsState.distanceM / 1000;
   $('rsDistance').textContent = km.toFixed(2);
   $('rsElapsed').textContent = fmtMMSS(elapsedSec);
-  const cal = estimateCalories(km, elapsedSec / 60, 'hardlopen');
-  $('rsCalories').textContent = cal != null ? `~${cal} kcal verbruikt` : 'Vul gewicht in bij Instellingen voor kcal';
+  const cal = hrSamples.length ? estimateCaloriesFromHR(avgHrSamples(), elapsedSec / 60) : null;
+  const calFallback = cal != null ? cal : estimateCalories(km, elapsedSec / 60, 'hardlopen');
+  $('rsCalories').textContent = calFallback != null ? `~${calFallback} kcal verbruikt` : 'Vul gewicht in bij Instellingen voor kcal';
   const runningMinutes = elapsedSec / 60;
   $('rsPace').textContent = (km > 0.05 && runningMinutes > 0) ? fmtMMSS((runningMinutes / km) * 60) : '–:–';
   $('rsSplitLabel').textContent = (Math.floor(km) + 1) + ' km';
@@ -7226,6 +7423,29 @@ $('stopTrainingConfirmBtn').addEventListener('click', () => {
   const reachedTarget = !!(rsState && rsState.targetKm && rsState.targetReached);
   finishRunSession(reachedTarget);
 });
+// Minimaliseren: de sessie (timers, GPS-tracking, muziek) blijft gewoon actief op de achtergrond —
+// enkel het scherm wisselt, zodat je tijdens het lopen ook nog Stats/Schema/Pijn-Tips kan bekijken.
+function minimizeRunSession(){
+  if (!rsState) return;
+  $('runSessionScreen').classList.add('hidden');
+  if (appSettings.theme === 'garmin'){
+    $('garminRunCoachScreen').classList.remove('hidden');
+    sendRunCoachDataToFrame();
+  } else {
+    $('runCoachScreen').classList.remove('hidden');
+    renderRunCoachScreen();
+  }
+}
+function resumeRunSessionView(){
+  if (!rsState) return;
+  $('garminRunCoachScreen').classList.add('hidden');
+  $('runCoachScreen').classList.add('hidden');
+  $('runSessionScreen').classList.remove('hidden');
+}
+$('rsMinimizeBtn').addEventListener('click', minimizeRunSession);
+$('rsHrLine').addEventListener('click', () => { if (!hrDevice) connectHeartRateMonitor(); });
+$('dashHrTile').addEventListener('click', () => { if (!hrDevice) connectHeartRateMonitor(); });
+
 async function finishRunSession(completed){
   if (!rsState) return;
   clearInterval(rsState.tickId);
@@ -7247,17 +7467,20 @@ async function finishRunSession(completed){
   }
   try{
     const history = await storageGet('run_history').then(v => v ? JSON.parse(v) : []).catch(() => []);
+    var historyEntryDate = new Date().toISOString();
     history.unshift({
-      date:new Date().toISOString(), week:rsState.week, day:rsState.day,
+      date:historyEntryDate, week:rsState.week, day:rsState.day,
       km:Math.round(km*100)/100, durationSec:Math.round(elapsedSec),
-      completed, freeform:rsState.freeform, custom:rsState.isCustom
+      completed, freeform:rsState.freeform, custom:rsState.isCustom, avgBpm: avgHrSamples()
     });
     await storageSet('run_history', JSON.stringify(history.slice(0, 200)));
   }catch(e){ /* geschiedenis opslaan mislukt, sessie zelf blijft wel gewoon geldig afgerond */ }
   const summaryMsg = (curLang()==='en'
     ? `Session ${completed ? 'completed' : 'stopped'}: ${km.toFixed(2)} km in ${fmtMMSS(elapsedSec)}.`
     : `Sessie ${completed ? 'afgerond' : 'gestopt'}: ${km.toFixed(2)} km in ${fmtMMSS(elapsedSec)}.`);
+  const rsBreadcrumbsSnapshot = rsState.breadcrumbs || [];
   rsState = null;
+  lastFinishedRunBreadcrumbs = rsBreadcrumbsSnapshot;
   $('runSessionScreen').classList.add('hidden');
   // Terug naar het scherm waar de training vandaan kwam — Garmin-stijl blijft in Garmin, Standaard in Standaard.
   if (appSettings.theme === 'garmin'){
@@ -7272,7 +7495,72 @@ async function finishRunSession(completed){
   const overallMaxKm = await getMaxRunKm();
   const newMedals = await checkNewlyUnlockedMedals(overallMaxKm);
   if (newMedals.length) setTimeout(() => celebrateNewMedals(newMedals), 1600);
+  // Stemming/pijn-feedback: enkel vragen bij een sessie met echte afstand (geen per-ongeluk-getikte start/stop).
+  if (km > 0.05 && historyEntryDate) setTimeout(() => openRunFeedbackModal(historyEntryDate), newMedals.length ? 2200 : 400);
 }
+
+// ---------- Na-sessie feedback: stemming + eventuele pijnlocatie, per sessie bewaard in de geschiedenis ----------
+let runFeedbackTargetDate = null;
+let runFeedbackMood = null;
+const runFeedbackPainAreas = new Set();
+function openRunFeedbackModal(historyDate){
+  runFeedbackTargetDate = historyDate;
+  runFeedbackMood = null;
+  runFeedbackPainAreas.clear();
+  document.querySelectorAll('.rfMoodBtn').forEach(b => b.classList.remove('rf-selected'));
+  document.querySelectorAll('.rfPainChip').forEach(b => b.classList.remove('rf-selected'));
+  openModal('runFeedbackModal');
+}
+document.querySelectorAll('.rfMoodBtn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    runFeedbackMood = btn.dataset.mood;
+    document.querySelectorAll('.rfMoodBtn').forEach(b => b.classList.toggle('rf-selected', b === btn));
+  });
+});
+document.querySelectorAll('.rfPainChip').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const area = btn.dataset.area;
+    if (area === 'none'){
+      runFeedbackPainAreas.clear();
+      document.querySelectorAll('.rfPainChip').forEach(b => b.classList.toggle('rf-selected', b === btn));
+    } else {
+      document.querySelector('.rfPainChip[data-area="none"]').classList.remove('rf-selected');
+      if (runFeedbackPainAreas.has(area)){ runFeedbackPainAreas.delete(area); btn.classList.remove('rf-selected'); }
+      else { runFeedbackPainAreas.add(area); btn.classList.add('rf-selected'); }
+    }
+  });
+});
+$('runFeedbackSaveBtn').addEventListener('click', async () => {
+  if (!runFeedbackTargetDate) return;
+  try{
+    const history = await storageGet('run_history').then(v => v ? JSON.parse(v) : []).catch(() => []);
+    const entry = history.find(h => h.date === runFeedbackTargetDate);
+    if (entry){
+      entry.mood = runFeedbackMood;
+      entry.painAreas = Array.from(runFeedbackPainAreas);
+      await storageSet('run_history', JSON.stringify(history));
+    }
+  }catch(e){ /* niet kritiek, sessie zelf staat al veilig opgeslagen */ }
+  closeModal('runFeedbackModal');
+});
+// Overslaan mag ook zonder iets te selecteren — geen enkele feedback opslaan is prima.
+$('runFeedbackSkipBtn').addEventListener('click', () => { runFeedbackTargetDate = null; closeModal('runFeedbackModal'); });
+$('runFeedbackStravaBtn').addEventListener('click', async () => {
+  const btn = $('runFeedbackStravaBtn');
+  btn.disabled = true; btn.textContent = '🟠 Bezig met uploaden…';
+  await uploadActivityToStrava(lastFinishedRunBreadcrumbs, `Loopsessie ${new Date().toLocaleDateString('nl-BE')}`, 'Run');
+  btn.disabled = false; btn.textContent = '🟠 Ook naar Strava uploaden';
+});
+$('rideStravaSkipBtn').addEventListener('click', () => closeModal('rideStravaModal'));
+$('rideStravaUploadBtn').addEventListener('click', async () => {
+  const btn = $('rideStravaUploadBtn');
+  btn.disabled = true; btn.textContent = '🟠 Bezig…';
+  const sportType = appMode === 'wandel' ? 'Walk' : 'Ride';
+  const name = `${modeTitle()} ${new Date().toLocaleDateString('nl-BE')}`;
+  const ok = await uploadActivityToStrava(navBreadcrumbs, name, sportType);
+  btn.disabled = false; btn.textContent = '🟠 Uploaden';
+  if (ok) closeModal('rideStravaModal');
+});
 
 // ---------- Garmin-stijl Kompas (letterlijk Gemini's Compas.html) ----------
 let garminKompasFrameLoaded = false;
@@ -7405,6 +7693,7 @@ window.addEventListener('message', (ev) => {
     case 'showrestpoint': showRestPointOnMap(data.point); break;
     case 'findobservations': garminFindObservations(); break;
     case 'openwiki': openWikiInfoModal(data.sciName, data.commonName); break;
+    case 'openspotify': openSpotifyModal(); break;
   }
 });
 async function garminIdentifyAnimal(file){
@@ -7508,7 +7797,7 @@ async function sendRunCoachDataToFrame(){
     ].concat(
       customPlans.map(pl => ({ id:pl.id, name:pl.name, weekCount:pl.weeks.length }))
     ),
-    voices, savedVoiceUri: savedUri, evy5k, evy10k
+    voices, savedVoiceUri: savedUri, evy5k, evy10k, sessionActive: !!rsState
   }, '*');
 }
 window.addEventListener('message', (ev) => {
@@ -7535,6 +7824,7 @@ window.addEventListener('message', (ev) => {
     case 'resetevy':     resetEvyProgress(data.evyDist).then(sendRunCoachDataToFrame); break;
     case 'setplan':       setActivePlanId(data.planId).then(sendRunCoachDataToFrame); break;
     case 'setweek':        jumpToRunWeek(data.week).then(sendRunCoachDataToFrame); break;
+    case 'resumesession':  resumeRunSessionView(); break;
     case 'other-not-built': toast(curLang()==='en' ? 'Not built yet — coming later.' : 'Nog niet gebouwd — komt later.', 2500); break;
     case 'getstats': sendGarminRunCoachStats(); break;
     case 'confetti': fireConfetti(); break;
@@ -7549,7 +7839,7 @@ async function sendGarminRunCoachStats(){
   const totalKm = history.reduce((s,r) => s + (r.km||0), 0);
   const totalSec = history.reduce((s,r) => s + (r.durationSec||0), 0);
   const maxKm = history.reduce((m,r) => Math.max(m, r.km||0), 0);
-  const totalRunCal = history.reduce((s,r) => s + (estimateCalories(r.km, (r.durationSec||0)/60, 'hardlopen') || 0), 0);
+  const totalRunCal = history.reduce((s,r) => s + (caloriesForEntry(r, (r.durationSec||0)/60, 'hardlopen') || 0), 0);
   const recent = history.slice(0,10).slice().reverse();
   frame.contentWindow.postMessage({
     source:'garminRunCoachStats',
@@ -7561,10 +7851,16 @@ async function sendGarminRunCoachStats(){
     medals: RUN_MEDALS.map(m => ({ km:m.km, label:m.label, icon:m.icon, unlocked: maxKm >= m.km })),
     history: history.slice(0,15).map(r => ({
       dateLabel: new Date(r.date).toLocaleDateString('nl-BE', { day:'2-digit', month:'short' }),
-      km: r.km.toFixed(2), duration: fmtMMSS(r.durationSec), completed: r.completed
+      km: r.km.toFixed(2), duration: fmtMMSS(r.durationSec), completed: r.completed,
+      mood: r.mood || null, painCount: (r.painAreas && r.painAreas.length) || 0
     }))
   }, '*');
 }
+
+// Gedeelde 'tegel/knop/kader'-achtergrondkleur voor alle Tailwind-stijl schermen (RunCoach/Kompas/Weer/
+// Setup/Hub) — overschrijft de bg-slate-900-varianten (kaarten/knoppen/kaders) naar exact #131b2e.
+// bg-slate-950 (het paginaniveau-donker op de achtergrond) blijft bewust ongemoeid, voor dieptecontrast.
+const TAILWIND_CARD_BG = `[class*="bg-slate-900"]{ background-color:#131b2e !important; }`;
 
 function buildGarminSetupHtml(mode){
   const isFiets = mode === 'fiets';
@@ -7579,6 +7875,7 @@ function buildGarminSetupHtml(mode){
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap');
   body { font-family: 'Inter', sans-serif; }
 </style>
+<style>${TAILWIND_CARD_BG}</style>
 </head>
 <body class="bg-slate-950 min-h-screen text-slate-100 overflow-x-hidden">
   <div class="w-full min-h-screen p-5 flex flex-col">
@@ -8090,6 +8387,7 @@ function buildGarminKompasHtml(){
             z-index: 10;
         }
     </style>
+<style>${TAILWIND_CARD_BG}</style>
 </head>
 <body class="bg-[#050914] text-slate-100 min-h-screen font-sans">
 
@@ -8111,7 +8409,7 @@ function buildGarminKompasHtml(){
       </div>
     </div>
 
-    <div class="flex-1 flex items-start justify-center relative cursor-grab active:cursor-grabbing pt-2 min-h-0" id="compassContainer">
+    <div class="flex-1 flex items-center justify-center relative cursor-grab active:cursor-grabbing pt-2 min-h-0" id="compassContainer">
       <div class="water-float w-[min(78vw,270px)] h-[min(78vw,270px)] bg-gradient-to-br from-[#0a1324] via-[#0d182e] to-[#080d1a] rounded-full shadow-[0_20px_45px_rgba(0,0,0,0.7)] border border-slate-800/80 flex items-center justify-center relative overflow-hidden">
 
         <div class="absolute top-2 text-red-500 font-bold text-sm z-20">N</div>
@@ -8339,6 +8637,7 @@ function buildGarminWeerHtml(){
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
+<style>${TAILWIND_CARD_BG}</style>
 </head>
 <body class="bg-[#050914] text-slate-100 min-h-screen font-sans">
 
@@ -8788,6 +9087,7 @@ function buildGarminHubHtml(){
     transform: rotate(-15deg) scale(1.4);
   }
 </style>
+<style>${TAILWIND_CARD_BG}</style>
 </head>
 <body class="bg-slate-950 min-h-screen flex items-center justify-center p-0 overflow-x-hidden">
   <div class="w-full bg-slate-950 text-slate-100 min-h-screen p-6 flex flex-col justify-between overflow-hidden relative">
@@ -8923,6 +9223,7 @@ function buildGarminRunCoachHtml(){
   .week-jump-card:active{ transform:scale(0.97); }
   .gold-gradient{ background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
 </style>
+<style>${TAILWIND_CARD_BG}</style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen">
   <div class="w-full min-h-screen p-5 pb-24 flex flex-col">
@@ -8937,6 +9238,7 @@ function buildGarminRunCoachHtml(){
       </div>
       <div class="flex items-center gap-2">
         <button id="rcAudioHeaderBtn" class="w-8 h-8 rounded-full bg-black/60 border border-amber-500/40 text-amber-400 flex items-center justify-center text-base flex-shrink-0">🎵</button>
+        <button id="rcSpotifyBtn" class="w-8 h-8 rounded-full bg-black/60 border flex items-center justify-center text-base flex-shrink-0" style="border-color:rgba(29,185,84,0.4); color:#1DB954;">🎧</button>
         ${GARMIN_MENU_BTN_HTML('mini')}
       </div>
     </div>
@@ -9094,10 +9396,16 @@ function buildGarminRunCoachHtml(){
 
     <!-- ===== SESSIE-paneel ===== -->
     <div id="rcSessiePanel" class="rc-panel">
-      <div class="bg-slate-900/40 border border-slate-800 rounded-2xl p-6 text-center">
+      <div id="rcSessieInactive" class="bg-slate-900/40 border border-slate-800 rounded-2xl p-6 text-center">
         <span class="text-3xl block mb-2">⏱️</span>
         <p class="text-sm font-bold text-white mb-1">Geen actieve sessie</p>
-        <p class="text-[11px] text-slate-500">Start een training via Home — tijdens het lopen zie je hier je live tijd, afstand en tempo.</p>
+        <p class="text-[11px] text-slate-500">Start een training via Home — je kan daarna gerust naar andere tabbladen, de sessie blijft gewoon lopen.</p>
+      </div>
+      <div id="rcSessieActive" class="hidden bg-gradient-to-br from-rose-600 to-red-900 rounded-2xl p-6 text-center shadow-xl">
+        <span class="text-3xl block mb-2">🏃</span>
+        <p class="text-sm font-black text-white mb-1">Je sessie loopt nog!</p>
+        <p class="text-[11px] text-white/70 mb-4">Timer en GPS-tracking bleven gewoon actief op de achtergrond.</p>
+        <button id="rcResumeSessionBtn" class="w-full gold-gradient text-slate-950 font-black py-3 rounded-xl text-xs uppercase">▶️ Terug naar live scherm</button>
       </div>
     </div>
 
@@ -9142,22 +9450,101 @@ function buildGarminRunCoachHtml(){
 
     <!-- ===== PIJN/TIPS-paneel ===== -->
     <div id="rcPijnPanel" class="rc-panel space-y-2">
-      <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5">
-        <div class="text-xs font-bold text-amber-400 mb-1">🦵 Scheenbeenpijn</div>
-        <div class="text-[11px] text-slate-400 leading-relaxed">Bouw langzaam op — max. 10% meer tijd/afstand per week. Loop op zachtere ondergrond en zorg voor goede schoenen.</div>
+
+      <!-- ---- Menu: 3 lange knoppen ---- -->
+      <div id="rcPijnMenu" class="space-y-2.5">
+        <button class="rcPijnNavBtn w-full flex items-center gap-3 bg-slate-900/60 border border-rose-500/30 rounded-2xl p-4 text-left" data-target="rcPijnSubBlessures">
+          <span class="text-2xl">🩹</span>
+          <span class="flex-1"><span class="block text-sm font-black text-white">Pijn — blessures &amp; symptomen</span><span class="block text-[11px] text-slate-400">Waar doet het pijn, en wat kan het zijn?</span></span>
+          <span class="text-slate-500">›</span>
+        </button>
+        <button class="rcPijnNavBtn w-full flex items-center gap-3 bg-slate-900/60 border border-amber-500/30 rounded-2xl p-4 text-left" data-target="rcPijnSubTips">
+          <span class="text-2xl">💡</span>
+          <span class="flex-1"><span class="block text-sm font-black text-white">Tips — blessures voorkomen</span><span class="block text-[11px] text-slate-400">Opbouw, herstel, RICE-methode en meer</span></span>
+          <span class="text-slate-500">›</span>
+        </button>
+        <button class="rcPijnNavBtn w-full flex items-center gap-3 bg-slate-900/60 border border-teal-500/30 rounded-2xl p-4 text-left" data-target="rcPijnSubStretch">
+          <span class="text-2xl">🧘</span>
+          <span class="flex-1"><span class="block text-sm font-black text-white">Stretching — instructievideo's</span><span class="block text-[11px] text-slate-400">Voor en na het lopen</span></span>
+          <span class="text-slate-500">›</span>
+        </button>
       </div>
-      <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5">
-        <div class="text-xs font-bold text-amber-400 mb-1">🦶 Blaren</div>
-        <div class="text-[11px] text-slate-400 leading-relaxed">Draag hardloopsokken zonder naden, en loop schoenen eerst wat in vóór een langere sessie.</div>
+
+      <!-- ---- Sub: Pijn/blessures ---- -->
+      <div id="rcPijnSubBlessures" class="hidden space-y-2">
+        <button class="rcPijnBackBtn text-[11px] font-bold text-slate-400 mb-1">‹ Terug</button>
+        <p class="text-[10px] text-slate-500 leading-relaxed mb-2">Algemene, veelvoorkomende oorzaken en symptomen bij lopers — geen diagnose. Bij twijfel of aanhoudende klachten: raadpleeg een arts of kinesist.</p>
+        <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5"><div class="text-xs font-bold text-rose-400 mb-1">🦵 Scheenbeenvliesontsteking (shin splints)</div><div class="text-[11px] text-slate-400 leading-relaxed"><b>Oorzaak:</b> te snel opgebouwde belasting, harde ondergrond.<br><b>Symptomen:</b> zeurende pijn langs de scheenbeenrand.</div></div>
+        <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5"><div class="text-xs font-bold text-rose-400 mb-1">🦶 Plantaire fasciitis</div><div class="text-[11px] text-slate-400 leading-relaxed"><b>Oorzaak:</b> ontsteking van de voetzoolpees door overbelasting.<br><b>Symptomen:</b> stekende pijn onder de hiel, vaak ergst bij de eerste stappen 's ochtends.</div></div>
+        <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5"><div class="text-xs font-bold text-rose-400 mb-1">🦿 Achillespees-tendinitis</div><div class="text-[11px] text-slate-400 leading-relaxed"><b>Oorzaak:</b> chronische overbelasting van de achillespees.<br><b>Symptomen:</b> pijn en stijfheid achteraan de enkel/kuit.</div></div>
+        <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5"><div class="text-xs font-bold text-rose-400 mb-1">🦵 Kuitspier-verrekking</div><div class="text-[11px] text-slate-400 leading-relaxed"><b>Oorzaak:</b> de kuitspier scheurt (deels) los, vaak richting de achillespees.<br><b>Symptomen:</b> plotse, scherpe pijn — soms hoorbare "knap".</div></div>
+        <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5"><div class="text-xs font-bold text-rose-400 mb-1">🦵 Hamstring-verrekking</div><div class="text-[11px] text-slate-400 leading-relaxed"><b>Oorzaak:</b> onvoldoende of geen opwarming.<br><b>Symptomen:</b> plotse, scherpe pijn achteraan de dij.</div></div>
+        <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5"><div class="text-xs font-bold text-rose-400 mb-1">🦵 Liesblessure</div><div class="text-[11px] text-slate-400 leading-relaxed"><b>Oorzaak:</b> overrekking van de binnenste dijspieren.<br><b>Symptomen:</b> pijn in de lies, vergelijkbaar met een liesbreuk-gevoel.</div></div>
+        <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5"><div class="text-xs font-bold text-rose-400 mb-1">🦴 ITB-syndroom (band aan buitenkant dij)</div><div class="text-[11px] text-slate-400 leading-relaxed"><b>Oorzaak:</b> wrijving van de bindweefselband over de knie/heup.<br><b>Symptomen:</b> pijn aan de buitenkant van heup of knie.</div></div>
+        <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5"><div class="text-xs font-bold text-rose-400 mb-1">🦵 Lopersknie (patellofemorale pijn)</div><div class="text-[11px] text-slate-400 leading-relaxed"><b>Oorzaak:</b> niet altijd eenduidig — vaak overbelasting rond de knieschijf.<br><b>Symptomen:</b> pijn rond/onder de knieschijf.</div></div>
+        <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5"><div class="text-xs font-bold text-rose-400 mb-1">🍑 Piriformis-syndroom</div><div class="text-[11px] text-slate-400 leading-relaxed"><b>Oorzaak:</b> verkramping van de piriformis-spier in de bil.<br><b>Symptomen:</b> uitstralende pijn langs de achterkant van het been.</div></div>
+        <div class="bg-slate-900/60 border border-rose-500/40 rounded-2xl p-3.5"><div class="text-xs font-bold text-rose-400 mb-1">🚨 Wanneer naar een arts?</div><div class="text-[11px] text-slate-400 leading-relaxed">Bij hevige pijn, zwelling, gevoelloosheid, als je niet meer kan steunen op het been, of bij een abnormaal/instabiel gewricht.</div></div>
       </div>
-      <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5">
-        <div class="text-xs font-bold text-amber-400 mb-1">💧 Zijsteken</div>
-        <div class="text-[11px] text-slate-400 leading-relaxed">Adem dieper en regelmatiger, vertraag even, en eet niet vlak vóór het lopen.</div>
+
+      <!-- ---- Sub: Tips ---- -->
+      <div id="rcPijnSubTips" class="hidden space-y-2">
+        <button class="rcPijnBackBtn text-[11px] font-bold text-slate-400 mb-1">‹ Terug</button>
+        <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5"><div class="text-xs font-bold text-amber-400 mb-1">🦵 Scheenbeenpijn</div><div class="text-[11px] text-slate-400 leading-relaxed">Bouw langzaam op — max. 10% meer tijd/afstand per week. Loop op zachtere ondergrond en zorg voor goede schoenen.</div></div>
+        <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5"><div class="text-xs font-bold text-amber-400 mb-1">🦶 Blaren</div><div class="text-[11px] text-slate-400 leading-relaxed">Draag hardloopsokken zonder naden, en loop schoenen eerst wat in vóór een langere sessie.</div></div>
+        <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5"><div class="text-xs font-bold text-amber-400 mb-1">💧 Zijsteken</div><div class="text-[11px] text-slate-400 leading-relaxed">Adem dieper en regelmatiger, vertraag even, en eet niet vlak vóór het lopen.</div></div>
+        <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5"><div class="text-xs font-bold text-amber-400 mb-1">🩹 Aanhoudende pijn</div><div class="text-[11px] text-slate-400 leading-relaxed">Pijn die na rust niet wegtrekt, of erger wordt tijdens het lopen: bouw een rustdag in en raadpleeg bij twijfel een arts of kinesist.</div></div>
+        <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5">
+          <div class="text-xs font-bold text-amber-400 mb-1.5">📋 10 manieren om blessures te vermijden</div>
+          <div class="text-[11px] text-slate-400 leading-relaxed space-y-0.5">
+            <div>1. Warm op met een korte wandeling vóór het stretchen</div>
+            <div>2. Stretch voor én na het lopen, vooral de hamstrings</div>
+            <div>3. Rond je run af met een korte wandeling</div>
+            <div>4. Loop niet elke dag</div>
+            <div>5. Loop op een vlakke ondergrond</div>
+            <div>6. Verkort je pasfrequentie/steplengte bij vermoeidheid</div>
+            <div>7. Doe krachtoefeningen op je rustdagen</div>
+            <div>8. Draag de juiste schoenen voor jouw voet</div>
+            <div>9. Zorg voor voldoende voeding/voedingsstoffen</div>
+            <div>10. Blijf voldoende gehydrateerd</div>
+          </div>
+        </div>
+        <div class="bg-slate-900/60 border border-teal-500/30 rounded-2xl p-3.5">
+          <div class="text-xs font-bold text-teal-400 mb-1.5">✅ Klaar om terug te lopen na een blessure?</div>
+          <div class="text-[11px] text-slate-400 leading-relaxed space-y-0.5">
+            <div>1. Kan je 30 minuten stevig doorwandelen?</div>
+            <div>2. Kan je 30 seconden op 1 been balanceren?</div>
+            <div>3. Lukken 15-20 gecontroleerde 1-beens-kniebuigingen?</div>
+            <div>4. Lukken 20-30 kuitheffingen op 1 been?</div>
+            <div>5. Kan je pijnvrij springen/hinkelen?</div>
+          </div>
+          <div class="text-[10px] text-slate-500 mt-1.5">Alle 5 gehaald zonder pijn? Dan is voorzichtig herstarten meestal veilig.</div>
+        </div>
+        <div class="bg-slate-900/60 border border-sky-500/30 rounded-2xl p-3.5">
+          <div class="text-xs font-bold text-sky-400 mb-1.5">🧊 RICE — een lichte blessure zelf verzorgen</div>
+          <div class="text-[11px] text-slate-400 leading-relaxed">
+            <b>Rest:</b> bouw dagelijkse belasting af.<br>
+            <b>Ice:</b> koel 20 min., minstens 4x per dag.<br>
+            <b>Compression:</b> elastisch verband om zwelling te beperken.<br>
+            <b>Elevation:</b> leg het lichaamsdeel hoger dan je hart.
+          </div>
+        </div>
       </div>
-      <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5">
-        <div class="text-xs font-bold text-amber-400 mb-1">🩹 Aanhoudende pijn</div>
-        <div class="text-[11px] text-slate-400 leading-relaxed">Pijn die na rust niet wegtrekt, of erger wordt tijdens het lopen: bouw een rustdag in en raadpleeg bij twijfel een arts of kinesist. Algemene tips, geen medisch advies.</div>
+
+      <!-- ---- Sub: Stretching-video's ---- -->
+      <div id="rcPijnSubStretch" class="hidden space-y-2">
+        <button class="rcPijnBackBtn text-[11px] font-bold text-slate-400 mb-1">‹ Terug</button>
+        <p class="text-[10px] text-slate-500 leading-relaxed mb-2">Opent op YouTube in een nieuw tabblad.</p>
+        <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wide block mt-1">Vóór het lopen</span>
+        <a href="https://www.youtube.com/watch?v=5cKxUUVeVVI" target="_blank" rel="noopener" class="flex items-center gap-3 bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5"><span class="text-xl">▶️</span><span class="flex-1 text-[12px] font-bold text-white">5 Minute Warm Up Before Running — dynamische stretches</span></a>
+        <a href="https://www.youtube.com/watch?v=8dIHS_UVfQ4" target="_blank" rel="noopener" class="flex items-center gap-3 bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5"><span class="text-xl">▶️</span><span class="flex-1 text-[12px] font-bold text-white">The Best Dynamic Warm Up for Runners</span></a>
+        <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wide block mt-2">Na het lopen</span>
+        <a href="https://www.youtube.com/watch?v=MCf2QDOsy0E" target="_blank" rel="noopener" class="flex items-center gap-3 bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5"><span class="text-xl">▶️</span><span class="flex-1 text-[12px] font-bold text-white">8 Min Post-Run Stretching — cool down</span></a>
+        <a href="https://www.youtube.com/watch?v=FbmLx-PahO4" target="_blank" rel="noopener" class="flex items-center gap-3 bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5"><span class="text-xl">▶️</span><span class="flex-1 text-[12px] font-bold text-white">10 Min. Post-Run Stretch — rustige cooldown</span></a>
+        <a href="https://www.youtube.com/watch?v=dVwzwkSOuhs" target="_blank" rel="noopener" class="flex items-center gap-3 bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5"><span class="text-xl">▶️</span><span class="flex-1 text-[12px] font-bold text-white">Do These Stretches After Every Run</span></a>
+        <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wide block mt-2">Gericht op kuit/achillespees</span>
+        <a href="https://www.youtube.com/watch?v=zGLD19PC_Jg" target="_blank" rel="noopener" class="flex items-center gap-3 bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5"><span class="text-xl">▶️</span><span class="flex-1 text-[12px] font-bold text-white">Calf Stretch for Runners — wandstretch</span></a>
       </div>
+
     </div>
 
   </div>
@@ -9185,6 +9572,9 @@ ${GARMIN_MENU_BTN_JS}
         musicCard.style.boxShadow = '0 0 0 3px rgba(245,158,11,0.6)';
         setTimeout(() => { musicCard.style.boxShadow = 'none'; }, 1400);
       }
+    });
+    document.getElementById('rcSpotifyBtn').addEventListener('click', () => {
+      parent.postMessage({ source:'garminSetup', action:'openspotify' }, '*');
     });
 
     // ---- Lokale tabwissel AI Coach / EVY / Volleerde Loper ----
@@ -9243,6 +9633,22 @@ ${GARMIN_MENU_BTN_JS}
     });
 
     // ---- EVY Podcast: vaste bestanden op de server (audio/evy5k/Start to Run - Aflevering NN.mp3, audio/evy10k/...) — app onthoudt zelf de voortgang ----
+    document.getElementById('rcResumeSessionBtn').addEventListener('click', () => {
+      parent.postMessage({ source:'garminRunCoach', action:'resumesession' }, '*');
+    });
+    // ---- Pijn/Tips: menu <-> 3 subpagina's ----
+    document.querySelectorAll('.rcPijnNavBtn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.getElementById('rcPijnMenu').classList.add('hidden');
+        document.getElementById(btn.dataset.target).classList.remove('hidden');
+      });
+    });
+    document.querySelectorAll('.rcPijnBackBtn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#rcPijnPanel > div').forEach(d => d.classList.add('hidden'));
+        document.getElementById('rcPijnMenu').classList.remove('hidden');
+      });
+    });
     document.getElementById('rcEvyStart5').addEventListener('click', () => {
       parent.postMessage({ source:'garminRunCoach', action:'starttraining', mode:'evy', evyDist:5 }, '*');
     });
@@ -9303,6 +9709,8 @@ ${GARMIN_MENU_BTN_JS}
         document.getElementById('rcSchemaPanelTitle').textContent = (d.planName || 'Opbouwschema') + ' — ' + (d.program ? d.program.length : '10') + ' weken';
 
         if (d.evy5k) document.getElementById('rcEvyProg5').textContent = 'Week ' + d.evy5k.week + ' · Sessie ' + d.evy5k.session + '/3';
+        document.getElementById('rcSessieInactive').classList.toggle('hidden', !!d.sessionActive);
+        document.getElementById('rcSessieActive').classList.toggle('hidden', !d.sessionActive);
         if (d.evy10k) document.getElementById('rcEvyProg10').textContent = 'Week ' + d.evy10k.week + ' · Sessie ' + d.evy10k.session + '/3';
 
         document.querySelectorAll('.rc-plan-btn').forEach(btn => {
@@ -9350,7 +9758,7 @@ ${GARMIN_MENU_BTN_JS}
         });
         document.getElementById('rcHistoryList').innerHTML = d.history.length ? d.history.map(r => \`
           <div class="flex justify-between items-center py-2 border-b border-slate-800/60 last:border-0 text-xs">
-            <span class="text-slate-200">\${r.dateLabel} — \${r.km} km</span>
+            <span class="text-slate-200">\${r.dateLabel} — \${r.km} km\${r.mood === 'happy' ? ' 😄' : r.mood === 'sad' ? ' 😔' : ''}\${r.painCount ? ' 🩹' + (r.painCount > 1 ? ' ('+r.painCount+'x)' : '') : ''}</span>
             <span class="text-slate-500">\${r.duration}\${r.completed ? ' ✅' : ''}</span>
           </div>\`).join('') : '<div class="text-slate-500 text-xs text-center py-4">Nog geen trainingen afgerond.</div>';
       }
@@ -9460,6 +9868,13 @@ async function loadSettings(){
   $('settingEatReminder').checked = !!appSettings.eatReminderOn;
   $('settingEatInterval').value = appSettings.eatIntervalMin || 45;
   $('settingBodyWeight').value = appSettings.bodyWeightKg || '';
+  $('settingAge').value = appSettings.bodyAge || '';
+  $('settingGender').value = appSettings.bodyGender || '';
+  $('spotifyClientIdInput').value = appSettings.spotifyClientId || '';
+  $('spotifyConnectStatus').textContent = isSpotifyConnected() ? '✅ verbonden' : '';
+  $('stravaClientIdInput').value = appSettings.stravaClientId || '';
+  $('stravaClientSecretInput').value = appSettings.stravaClientSecret || '';
+  $('stravaConnectStatus').textContent = isStravaConnected() ? '✅ verbonden' : '';
   $('thunderforestKeyInput').value = appSettings.thunderforestKey || '';
   $('orsKeyInput').value = appSettings.orsKey || '';
   $('geoapifyKeyInput').value = appSettings.geoapifyKey || '';
@@ -9778,6 +10193,13 @@ $('settingDrinkInterval').addEventListener('change', (e) => { appSettings.drinkI
 $('settingEatReminder').addEventListener('change', (e) => { appSettings.eatReminderOn = e.target.checked; saveSettings(); if (navActive) setupFuelReminders(); });
 $('settingEatInterval').addEventListener('change', (e) => { appSettings.eatIntervalMin = parseInt(e.target.value, 10) || 45; saveSettings(); if (navActive) setupFuelReminders(); });
 $('settingBodyWeight').addEventListener('change', (e) => { appSettings.bodyWeightKg = parseInt(e.target.value, 10) || null; saveSettings(); });
+$('settingAge').addEventListener('change', (e) => { appSettings.bodyAge = parseInt(e.target.value, 10) || null; saveSettings(); });
+$('settingGender').addEventListener('change', (e) => { appSettings.bodyGender = e.target.value || ''; saveSettings(); });
+$('spotifyClientIdInput').addEventListener('change', (e) => { appSettings.spotifyClientId = e.target.value.trim(); saveSettings(); });
+$('spotifyConnectBtn').addEventListener('click', connectSpotify);
+$('stravaClientIdInput').addEventListener('change', (e) => { appSettings.stravaClientId = e.target.value.trim(); saveSettings(); });
+$('stravaClientSecretInput').addEventListener('change', (e) => { appSettings.stravaClientSecret = e.target.value.trim(); saveSettings(); });
+$('stravaConnectBtn').addEventListener('click', connectStrava);
 $('settingShowPoiDetails').addEventListener('change', (e) => { appSettings.showPoiDetails = e.target.checked; saveSettings(); });
 async function onBundledCountryToggle(key, checked){
   appSettings.bundledCountries[key] = checked;
@@ -9817,7 +10239,7 @@ $('settingsResetBtn').addEventListener('click', () => {
     dashTextSize:'normal', dashBold:true, largeNodesAccessibility:false, offRouteDist:35, autoReroute:false, silentReroute:false,
     overlays:{ cycling:false, hiking:false, mtb:false },
     poiLayers:{ cafe:false, restaurant:false, bakery:false, supermarket:false, pharmacy:false, bike:false, water:false, toilet:false, money:false, camping:false, charging:false, playground:false, parking:false, hotel:false }, showPoiDetails:false,
-    showWindDirection:true, autoPause:false, redNavDot:false, topOffsetPx:0, tabGapPx:0, bodyWeightKg:null, voiceOnlyMode:false, routeColorMode:'off', showWindInNav:false, eatReminderOn:false, eatIntervalMin:45, drinkReminderOn:false, drinkIntervalMin:20, segmentPrOn:true, darkArrivalWarning:true, quietRoutingMode:false, historyAudioOn:false, shakeToSurpriseOn:false, shakeKm:30, vertrekFromGps:false, avoidBufferM:18, maxOverlapPct:8, lowerGpsAccuracy:false, disableMapRotation:false, posUpdateIntervalSec:1, mapRecenterDelaySec:6, overpassSurfaceTimeoutSec:15, routingWeighting:'off', navType:'active', fallDetectionOn:false, sosContactNumber:'', sosContactName:'', routePreference:'balanced', routeLineColor:'#e2a13c', language:'en',
+    showWindDirection:true, autoPause:false, redNavDot:false, topOffsetPx:0, tabGapPx:0, bodyWeightKg:null, bodyAge:null, bodyGender:'', spotifyClientId:'', stravaClientId:'', stravaClientSecret:'', voiceOnlyMode:false, routeColorMode:'off', showWindInNav:false, eatReminderOn:false, eatIntervalMin:45, drinkReminderOn:false, drinkIntervalMin:20, segmentPrOn:true, darkArrivalWarning:true, quietRoutingMode:false, historyAudioOn:false, shakeToSurpriseOn:false, shakeKm:30, vertrekFromGps:false, avoidBufferM:18, maxOverlapPct:8, lowerGpsAccuracy:false, disableMapRotation:false, posUpdateIntervalSec:1, mapRecenterDelaySec:6, overpassSurfaceTimeoutSec:15, routingWeighting:'off', navType:'active', fallDetectionOn:false, sosContactNumber:'', sosContactName:'', routePreference:'balanced', routeLineColor:'#e2a13c', language:'en',
     bundledCountries:{ be:true, nl:false }, routingEngine:'brouter'
   };
   saveSettings();
@@ -9868,6 +10290,8 @@ $('settingsResetBtn').addEventListener('click', () => {
   $('settingEatReminder').checked = false;
   $('settingEatInterval').value = 45;
   $('settingBodyWeight').value = '';
+  $('settingAge').value = '';
+  $('settingGender').value = '';
   $('thunderforestKeyInput').value = '';
   $('orsKeyInput').value = '';
   $('geoapifyKeyInput').value = '';
@@ -9883,6 +10307,8 @@ $('settingsResetBtn').addEventListener('click', () => {
   toast(tr('toastDefaultsRestored'), 2500);
 });
 loadSettings();
+handleSpotifyCallbackIfPresent();
+handleStravaCallbackIfPresent();
 storageGet('appEventLog').then(saved => { try{ if (saved) appEventLog = JSON.parse(saved); }catch(e){ appEventLog = []; } }).catch(() => {});
 
 // ---------- Wissel modus ----------
@@ -13599,6 +14025,7 @@ function startNav(){
   lastArrowRotation = 0;
   isOffRoute = false;
   navStartTime = Date.now();
+  hrSamples = []; // vorige rit mag het gemiddelde van deze nieuwe rit niet beïnvloeden
   rideSavedThisSession = false;
   navBreadcrumbs = [{ lat: lastPosition ? lastPosition.coords.latitude : route[0].lat, lon: lastPosition ? lastPosition.coords.longitude : route[0].lon, t: Date.now() }];
   lastBreadcrumbTime = Date.now();
@@ -13696,7 +14123,10 @@ function stopNav(){
     // Enkel bewaren als er ook echt iets gebeurd is — een paar seconden per ongeluk op Start drukken en
     // meteen weer Stop hoeft niet als "rit" te tellen.
     if (km > 0.15 || arrivalActual.length > 0){
-      saveRideToHistory().then(entry => { lastCompletedRide = entry; });
+      saveRideToHistory().then(entry => {
+        lastCompletedRide = entry;
+        if (isStravaConnected() && navBreadcrumbs.length > 1) openModal('rideStravaModal');
+      });
     }
     rideSavedThisSession = true;
   }
@@ -13933,7 +14363,10 @@ function renderPosition(){
       document.querySelector('.navDist small').textContent = '';
       if (appSettings.darkArrivalWarning) announceDarkArrivalIfNeeded();
       rideSavedThisSession = true;
-      saveRideToHistory().then(entry => { lastCompletedRide = entry; });
+      saveRideToHistory().then(entry => {
+        lastCompletedRide = entry;
+        if (isStravaConnected() && navBreadcrumbs.length > 1) openModal('rideStravaModal');
+      });
       if (!routeIsFromGpx) setTimeout(() => openModal('reverseTripModal'), 1200); // even laten ademen na de aankomst-melding
     } else {
       toast(pointLabel(target) + ' bereikt → op naar ' + route[navTargetIndex].ref);
@@ -14071,6 +14504,299 @@ function estimateCalories(km, durationMin, mode){
   const hours = durationMin / 60;
   return Math.round(met * appSettings.bodyWeightKg * hours);
 }
+// Nauwkeurigere calorie-schatting op basis van gemeten hartslag (Keytel et al., 2005) — heeft naast
+// gewicht ook leeftijd en geslacht nodig. Zonder hartslagband of zonder leeftijd/geslacht valt de rest
+// van de app terug op estimateCalories() hierboven (gewicht + tijd, minder nauwkeurig maar altijd bruikbaar).
+function estimateCaloriesFromHR(avgBpm, durationMin){
+  if (!avgBpm || !durationMin || !appSettings.bodyWeightKg || !appSettings.bodyAge || !appSettings.bodyGender) return null;
+  const w = appSettings.bodyWeightKg, a = appSettings.bodyAge;
+  const perMin = appSettings.bodyGender === 'female'
+    ? (-20.4022 + 0.4472*avgBpm - 0.1263*w + 0.074*a) / 4.184
+    : (-55.0969 + 0.6309*avgBpm + 0.1988*w + 0.2017*a) / 4.184;
+  const total = perMin * durationMin;
+  return total > 0 ? Math.round(total) : null;
+}
+
+// ---------- Hartslagband (Web Bluetooth, standaard Heart Rate-profiel 0x180D) ----------
+// Gedeeld tussen fietsen/wandelen (dashboard) en hardlopen (runSessionScreen) — één verbinding volstaat
+// voor de hele sessie, welk scherm ook actief is. Web Bluetooth werkt enkel op Chrome/Android (niet Safari/iOS).
+let hrDevice = null, hrCharacteristic = null;
+let currentBPM = null;
+let hrSamples = []; // voor het sessiegemiddelde, gebruikt in estimateCaloriesFromHR() achteraf
+function parseHeartRateValue(dataView){
+  const flags = dataView.getUint8(0);
+  const is16bit = (flags & 0x1) === 1;
+  return is16bit ? dataView.getUint16(1, true) : dataView.getUint8(1);
+}
+async function connectHeartRateMonitor(){
+  if (!navigator.bluetooth){
+    toast(curLang()==='en' ? 'Bluetooth is not available in this browser (works on Chrome/Android).' : 'Bluetooth is niet beschikbaar in deze browser (werkt op Chrome/Android).', 3500);
+    return false;
+  }
+  try{
+    hrDevice = await navigator.bluetooth.requestDevice({ filters:[{ services:['heart_rate'] }] });
+    hrDevice.addEventListener('gattserverdisconnected', () => { currentBPM = null; updateHrBadges(); });
+    const server = await hrDevice.gatt.connect();
+    const service = await server.getPrimaryService('heart_rate');
+    hrCharacteristic = await service.getCharacteristic('heart_rate_measurement');
+    await hrCharacteristic.startNotifications();
+    hrCharacteristic.addEventListener('characteristicvaluechanged', (e) => {
+      currentBPM = parseHeartRateValue(e.target.value);
+      hrSamples.push(currentBPM);
+      updateHrBadges();
+    });
+    toast(curLang()==='en' ? `Connected: ${hrDevice.name || 'heart rate monitor'}` : `Verbonden: ${hrDevice.name || 'hartslagband'}`, 2500);
+    updateHrBadges();
+    return true;
+  }catch(e){
+    if (e.name !== 'NotFoundError') toast(curLang()==='en' ? 'Could not connect to heart rate monitor.' : 'Kon niet verbinden met de hartslagband.', 3000);
+    return false;
+  }
+}
+function disconnectHeartRateMonitor(){
+  if (hrDevice && hrDevice.gatt.connected) hrDevice.gatt.disconnect();
+  hrDevice = null; hrCharacteristic = null; currentBPM = null;
+  updateHrBadges();
+}
+function avgHrSamples(){ return hrSamples.length ? Math.round(hrSamples.reduce((s,v) => s+v, 0) / hrSamples.length) : null; }
+// Kiest per historie-item de beste beschikbare calorie-schatting: hartslag-gebaseerd (nauwkeuriger) als
+// er tijdens die sessie een hartslag gemeten werd, anders de gewicht+tijd-vuistregel als terugval.
+function caloriesForEntry(r, durationMin, mode){
+  if (r.avgBpm){ const hr = estimateCaloriesFromHR(r.avgBpm, durationMin); if (hr != null) return hr; }
+  return estimateCalories(r.km, durationMin, mode);
+}
+// Werkt alle zichtbare hartslag-badges bij (fiets/wandel-dashboard én het loopscherm) — welke van de twee
+// er ook net zichtbaar is, deze functie raakt beide id's aan (een niet-bestaand element wordt overgeslagen).
+function updateHrBadges(){
+  const label = currentBPM ? `❤️ ${currentBPM}` : (hrDevice ? '❤️ …' : '❤️ verbind');
+  ['dashHrValue','rsHrValue'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = label; });
+}
+
+// ---------- Spotify (Authorization Code + PKCE, volledig client-side — geen backend/geheime sleutel nodig) ----------
+const SPOTIFY_TOKENS_KEY = 'spotify_tokens_v1';
+const SPOTIFY_VERIFIER_KEY = 'spotify_pkce_verifier'; // kortstondig, enkel nodig tussen de redirect heen en terug
+function spotifyRedirectUri(){ return location.origin + location.pathname; } // moet exact als Redirect URI in het Spotify-dashboard staan
+function randomPkceString(len){
+  const arr = new Uint8Array(len);
+  crypto.getRandomValues(arr);
+  return Array.from(arr, b => 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'[b % 62]).join('');
+}
+async function sha256Base64Url(str){
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return btoa(String.fromCharCode(...new Uint8Array(digest))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+async function connectSpotify(){
+  const clientId = (appSettings.spotifyClientId || '').trim();
+  if (!clientId){ toast(curLang()==='en' ? 'Fill in your Spotify Client ID first (Settings).' : 'Vul eerst je Spotify Client ID in (Instellingen).', 3000); return; }
+  const verifier = randomPkceString(64);
+  localStorage.setItem(SPOTIFY_VERIFIER_KEY, verifier);
+  const challenge = await sha256Base64Url(verifier);
+  const params = new URLSearchParams({
+    client_id: clientId, response_type:'code', redirect_uri: spotifyRedirectUri(),
+    code_challenge_method:'S256', code_challenge: challenge,
+    scope:'user-read-currently-playing user-read-playback-state user-modify-playback-state'
+  });
+  location.href = 'https://accounts.spotify.com/authorize?' + params.toString();
+}
+// Wordt bij elke pagina-load aangeroepen: als de URL net terugkomt van Spotify (?code=...), de code
+// meteen inwisselen voor een token en de rommelige query-string weer van de adresbalk vegen.
+async function handleSpotifyCallbackIfPresent(){
+  const url = new URL(location.href);
+  const code = url.searchParams.get('code');
+  if (!code) return;
+  const verifier = localStorage.getItem(SPOTIFY_VERIFIER_KEY);
+  history.replaceState({}, '', location.pathname); // ?code=... weg uit de zichtbare URL, ongeacht of het lukt
+  if (!verifier) return;
+  try{
+    const res = await fetch('https://accounts.spotify.com/api/token', {
+      method:'POST', headers:{ 'Content-Type':'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        grant_type:'authorization_code', code, redirect_uri: spotifyRedirectUri(),
+        client_id: (appSettings.spotifyClientId || '').trim(), code_verifier: verifier
+      })
+    });
+    if (!res.ok) throw new Error('token-exchange-failed');
+    const data = await res.json();
+    localStorage.setItem(SPOTIFY_TOKENS_KEY, JSON.stringify({
+      access_token:data.access_token, refresh_token:data.refresh_token, expires_at: Date.now() + (data.expires_in*1000)
+    }));
+    toast(curLang()==='en' ? '🎧 Spotify connected!' : '🎧 Spotify verbonden!', 2500);
+  }catch(e){ toast(curLang()==='en' ? 'Spotify connection failed.' : 'Verbinden met Spotify mislukt.', 3000); }
+}
+async function getSpotifyAccessToken(){
+  let raw = localStorage.getItem(SPOTIFY_TOKENS_KEY);
+  if (!raw) return null;
+  let tok;
+  try{ tok = JSON.parse(raw); }catch(e){ return null; }
+  if (Date.now() < tok.expires_at - 30000) return tok.access_token; // nog minstens 30s geldig
+  // Token ververst automatisch, zonder dat je opnieuw moet inloggen — dat is precies waarvoor refresh_token dient.
+  try{
+    const res = await fetch('https://accounts.spotify.com/api/token', {
+      method:'POST', headers:{ 'Content-Type':'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ grant_type:'refresh_token', refresh_token:tok.refresh_token, client_id:(appSettings.spotifyClientId || '').trim() })
+    });
+    if (!res.ok) throw new Error('refresh-failed');
+    const data = await res.json();
+    tok = { access_token:data.access_token, refresh_token: data.refresh_token || tok.refresh_token, expires_at: Date.now() + (data.expires_in*1000) };
+    localStorage.setItem(SPOTIFY_TOKENS_KEY, JSON.stringify(tok));
+    return tok.access_token;
+  }catch(e){ localStorage.removeItem(SPOTIFY_TOKENS_KEY); return null; }
+}
+function isSpotifyConnected(){ return !!localStorage.getItem(SPOTIFY_TOKENS_KEY); }
+async function fetchSpotifyNowPlaying(){
+  const token = await getSpotifyAccessToken();
+  if (!token) return null;
+  try{
+    const res = await fetch('https://api.spotify.com/v1/me/player/currently-playing', { headers:{ Authorization:'Bearer ' + token } });
+    if (res.status === 204) return { playing:false }; // niets aan het spelen
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (!data || !data.item) return { playing:false };
+    return {
+      playing: data.is_playing, name: data.item.name,
+      artists: data.item.artists.map(a => a.name).join(', '),
+      albumArt: data.item.album.images[2] ? data.item.album.images[2].url : (data.item.album.images[0] ? data.item.album.images[0].url : null),
+      progressMs: data.progress_ms, durationMs: data.item.duration_ms
+    };
+  }catch(e){ return null; }
+}
+async function spotifyPlayerAction(action){ // 'play' | 'pause' | 'next' | 'previous'
+  const token = await getSpotifyAccessToken();
+  if (!token) return;
+  const method = (action === 'next' || action === 'previous') ? 'POST' : 'PUT';
+  try{ await fetch(`https://api.spotify.com/v1/me/player/${action}`, { method, headers:{ Authorization:'Bearer ' + token } }); }catch(e){}
+}
+
+// ---------- Strava (standaard OAuth2 authorization-code-flow — géén PKCE-alternatief bij Strava, dus de
+// client secret staat noodgedwongen mee in de broncode van deze pagina; zie de instellingen-uitleg). ----------
+const STRAVA_TOKENS_KEY = 'strava_tokens_v1';
+function stravaRedirectUri(){ return location.origin + location.pathname; }
+function connectStrava(){
+  const clientId = (appSettings.stravaClientId || '').trim();
+  if (!clientId){ toast(curLang()==='en' ? 'Fill in your Strava Client ID first (Settings).' : 'Vul eerst je Strava Client ID in (Instellingen).', 3000); return; }
+  const params = new URLSearchParams({
+    client_id: clientId, response_type:'code', redirect_uri: stravaRedirectUri(),
+    approval_prompt:'auto', scope:'activity:write,activity:read_all'
+  });
+  location.href = 'https://www.strava.com/oauth/authorize?' + params.toString();
+}
+async function handleStravaCallbackIfPresent(){
+  const url = new URL(location.href);
+  const code = url.searchParams.get('code');
+  const scope = url.searchParams.get('scope');
+  if (!code || !scope || !scope.includes('activity')) return; // dit was een Spotify-callback, niet Strava (of niets)
+  history.replaceState({}, '', location.pathname);
+  try{
+    const res = await fetch('https://www.strava.com/oauth/token', {
+      method:'POST', headers:{ 'Content-Type':'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        client_id:(appSettings.stravaClientId || '').trim(), client_secret:(appSettings.stravaClientSecret || '').trim(),
+        code, grant_type:'authorization_code'
+      })
+    });
+    if (!res.ok) throw new Error('token-exchange-failed');
+    const data = await res.json();
+    localStorage.setItem(STRAVA_TOKENS_KEY, JSON.stringify({
+      access_token:data.access_token, refresh_token:data.refresh_token, expires_at: data.expires_at * 1000
+    }));
+    toast(curLang()==='en' ? '🟠 Strava connected!' : '🟠 Strava verbonden!', 2500);
+  }catch(e){ toast(curLang()==='en' ? 'Strava connection failed.' : 'Verbinden met Strava mislukt.', 3000); }
+}
+function isStravaConnected(){ return !!localStorage.getItem(STRAVA_TOKENS_KEY); }
+async function getStravaAccessToken(){
+  let raw = localStorage.getItem(STRAVA_TOKENS_KEY);
+  if (!raw) return null;
+  let tok;
+  try{ tok = JSON.parse(raw); }catch(e){ return null; }
+  if (Date.now() < tok.expires_at - 60000) return tok.access_token;
+  try{
+    const res = await fetch('https://www.strava.com/oauth/token', {
+      method:'POST', headers:{ 'Content-Type':'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        client_id:(appSettings.stravaClientId || '').trim(), client_secret:(appSettings.stravaClientSecret || '').trim(),
+        refresh_token:tok.refresh_token, grant_type:'refresh_token'
+      })
+    });
+    if (!res.ok) throw new Error('refresh-failed');
+    const data = await res.json();
+    tok = { access_token:data.access_token, refresh_token:data.refresh_token, expires_at: data.expires_at * 1000 };
+    localStorage.setItem(STRAVA_TOKENS_KEY, JSON.stringify(tok));
+    return tok.access_token;
+  }catch(e){ localStorage.removeItem(STRAVA_TOKENS_KEY); return null; }
+}
+// Bouwt een GPX met echte tijdstempels (nodig voor Strava om tempo/snelheid te berekenen) uit een
+// kruimelspoor {lat,lon,t,ele?} — gedeeld tussen een fietsrit (navBreadcrumbs) en een loopsessie (rsState.breadcrumbs).
+function buildGpxFromBreadcrumbs(breadcrumbs, name){
+  const trkpts = breadcrumbs.map(b => `      <trkpt lat="${b.lat}" lon="${b.lon}"><time>${new Date(b.t).toISOString()}</time>${b.ele != null ? `<ele>${Math.round(b.ele)}</ele>` : ''}</trkpt>`).join('\n');
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="Knooppunten-app" xmlns="http://www.topografix.com/GPX/1/1">
+  <trk>
+    <name>${name}</name>
+    <trkseg>
+${trkpts}
+    </trkseg>
+  </trk>
+</gpx>`;
+}
+// sportType: Strava's eigen waarden, bv. 'Run', 'Ride', 'Hike', 'Walk'.
+async function uploadActivityToStrava(breadcrumbs, name, sportType){
+  const token = await getStravaAccessToken();
+  if (!token){ toast(curLang()==='en' ? 'Not connected to Strava yet (Settings).' : 'Nog niet verbonden met Strava (Instellingen).', 3000); return false; }
+  if (!breadcrumbs || breadcrumbs.length < 2){ toast(curLang()==='en' ? 'Not enough GPS data to upload.' : 'Te weinig GPS-data om te uploaden.', 3000); return false; }
+  try{
+    const gpx = buildGpxFromBreadcrumbs(breadcrumbs, name);
+    const form = new FormData();
+    form.append('file', new Blob([gpx], { type:'application/gpx+xml' }), 'activity.gpx');
+    form.append('data_type', 'gpx');
+    form.append('name', name);
+    form.append('sport_type', sportType);
+    const res = await fetch('https://www.strava.com/api/v3/uploads', { method:'POST', headers:{ Authorization:'Bearer ' + token }, body: form });
+    if (!res.ok) throw new Error('upload-failed');
+    toast(curLang()==='en' ? '🟠 Uploaded to Strava!' : '🟠 Geüpload naar Strava!', 3000);
+    return true;
+  }catch(e){
+    toast(curLang()==='en' ? 'Strava upload failed.' : 'Upload naar Strava mislukt.', 3000);
+    return false;
+  }
+}
+let spotifyPollId = null;
+async function refreshSpotifyModal(){
+  if (!isSpotifyConnected()){
+    $('spotifyNotConnected').classList.remove('hidden');
+    $('spotifyPlayingView').classList.add('hidden');
+    $('spotifyNothingPlaying').classList.add('hidden');
+    return;
+  }
+  $('spotifyNotConnected').classList.add('hidden');
+  const now = await fetchSpotifyNowPlaying();
+  if (!now || !now.playing && !now.name){
+    $('spotifyPlayingView').classList.add('hidden');
+    $('spotifyNothingPlaying').classList.remove('hidden');
+    return;
+  }
+  $('spotifyNothingPlaying').classList.add('hidden');
+  $('spotifyPlayingView').classList.remove('hidden');
+  $('spotifyTrackName').textContent = now.name;
+  $('spotifyArtistName').textContent = now.artists;
+  if (now.albumArt) $('spotifyAlbumArt').src = now.albumArt;
+  $('spotifyPlayPauseBtn').textContent = now.playing ? '⏸' : '▶️';
+}
+function openSpotifyModal(){
+  openModal('spotifyModal');
+  refreshSpotifyModal();
+  clearInterval(spotifyPollId);
+  spotifyPollId = setInterval(refreshSpotifyModal, 5000); // elke 5s bijwerken zolang de popup open staat
+}
+$('spotifyTileBtn').addEventListener('click', openSpotifyModal);
+document.querySelector('#spotifyModal .simple-modal-close').addEventListener('click', () => clearInterval(spotifyPollId));
+$('spotifyModalConnectBtn').addEventListener('click', connectSpotify);
+$('spotifyPlayPauseBtn').addEventListener('click', async () => {
+  const playing = $('spotifyPlayPauseBtn').textContent === '⏸';
+  await spotifyPlayerAction(playing ? 'pause' : 'play');
+  setTimeout(refreshSpotifyModal, 500);
+});
+$('spotifyPrevBtn').addEventListener('click', async () => { await spotifyPlayerAction('previous'); setTimeout(refreshSpotifyModal, 500); });
+$('spotifyNextBtn').addEventListener('click', async () => { await spotifyPlayerAction('next'); setTimeout(refreshSpotifyModal, 500); });
 
 async function renderLifetimeStats(period){
   const history = await getRideHistory();
@@ -14117,7 +14843,7 @@ async function renderLifetimeStats(period){
   }
 
   if (appSettings.bodyWeightKg){
-    const totalCal = filtered.reduce((sum, r) => sum + (estimateCalories(r.km, r.durationMin, appMode) || 0), 0);
+    const totalCal = filtered.reduce((sum, r) => sum + (caloriesForEntry(r, r.durationMin, appMode) || 0), 0);
     $('statsCalories').textContent = totalCal > 0 ? `~${totalCal} kcal` : '–';
   } else {
     $('statsCalories').textContent = curLang()==='en' ? 'Set your weight in Settings' : 'Vul je gewicht in bij Instellingen';
