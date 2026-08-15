@@ -729,7 +729,35 @@
   .leaflet-control-attribution{ display:none; } /* vervangen door onze eigen vaste #mapAttribution, die niet meeroteert */
 
   /* Startscherm: honingraat-tegels fiets/wandel */
-  #modeSelectScreen{
+  /* Dissolve-overgang bij het wisselen van stijl: een volschermige laag die eerst ondoorzichtig wordt
+     (huidige stijl verdwijnt), dan — ná de omwisseling zelf — weer wegvloeit (nieuwe stijl verschijnt). */
+  #themeDissolveOverlay{
+    position:fixed; top:0; left:0; right:0; bottom:0; z-index:9999; background:#050914;
+    opacity:0; pointer-events:none; transition:opacity 0.45s ease;
+  }
+  #themeDissolveOverlay.show{ opacity:1; }
+  /* 'Glas dat zich vult'-intro: een vaag/wazig glaspaneel dat bij het opstarten van onder naar boven
+     wegtrekt en de content onthult, gecombineerd met een subtiele lichtglans die er doorheen glijdt. */
+  .glassFillIntro{
+    position:absolute; inset:0; z-index:50; pointer-events:none; overflow:hidden;
+    background:linear-gradient(180deg, rgba(148,197,255,0.16), rgba(148,197,255,0.05));
+    backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+    animation: glassFillReveal 1.3s cubic-bezier(0.65,0,0.35,1) forwards;
+  }
+  .glassFillIntro::after{
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(115deg, transparent 40%, rgba(255,255,255,0.35) 50%, transparent 60%);
+    background-size:250% 250%; background-position:120% 0;
+    animation: glassFillShimmer 1.3s ease-out forwards;
+  }
+  @keyframes glassFillReveal{
+    0%{ clip-path:inset(0% 0% 0% 0%); opacity:1; }
+    75%{ clip-path:inset(0% 0% 100% 0%); opacity:1; }
+    100%{ clip-path:inset(0% 0% 100% 0%); opacity:0; }
+  }
+  @keyframes glassFillShimmer{
+    0%{ background-position:120% 0; } 100%{ background-position:-20% 0; }
+  }
     position:fixed; top:0;left:0;right:0;bottom:0; z-index:3000; background:var(--green-900);
     display:flex; flex-direction:column; align-items:center; justify-content:space-between;
     padding:calc(40px + env(safe-area-inset-top,0px) + var(--extra-top-inset)) 20px calc(24px + env(safe-area-inset-bottom,0px) + var(--extra-bottom-inset));
@@ -1390,6 +1418,8 @@
     }catch(e){}
   })();
 </script>
+
+<div id="themeDissolveOverlay"></div>
 
 <div id="modeSelectScreen">
   <button id="modeSelectSettingsBtn" aria-label="Instellingen"><span class="waffle-grid"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></button>
@@ -2398,11 +2428,19 @@
       <h4>AI Coach</h4>
       <p class="settings-note">3 ingebouwde opbouwschema's (5K/7,5K/10K), gebaseerd op resp. het officiële NHS Couch to 5K en Hal Higdon's Novice 10K-programma. Kies je afstand bovenaan, tik daarna op een weekkaartje om er handmatig naartoe te springen (met bevestiging), of bouw via "Schema wisselen of zelf opbouwen" je eigen schema.</p>
       <h4 style="margin-top:14px;">EVY Podcast</h4>
-      <p class="settings-note">Jouw eigen 10-weken audioprogramma (5K en 10K, apart bijgehouden). De app onthoudt zelf bij welke week/sessie je zit en speelt automatisch het juiste mp3-bestand af. Een sessie al ergens anders gedaan? Tik "Deze sessie al gedaan → volgende" om handmatig door te schuiven, zonder een sessie te starten.</p>
+      <p class="settings-note">Jouw eigen 10-weken audioprogramma (5K en 10K, apart bijgehouden). De app onthoudt zelf bij welke week/sessie je zit en speelt automatisch het juiste mp3-bestand af. Een sessie al ergens anders gedaan? Tik "Deze sessie al gedaan → volgende" om handmatig door te schuiven, zonder een sessie te starten. Tijdens EVY blijft de app-stem stil — de podcast zelf is dan je coaching.</p>
       <h4 style="margin-top:14px;">Vrij/Doel</h4>
       <p class="settings-note">Vrije Run (geen limiet), Target Run op 5 of 10 km, of een HIIT-sprintschema — voor wie al comfortabel loopt en geen opbouwschema nodig heeft.</p>
       <h4 style="margin-top:14px;">Tijdens het lopen</h4>
       <p class="settings-note">Het gelopen spoor op de kaart kleurt live mee met je snelheid (groen = wandeltempo, tot rood = hard lopen). Het minimaliseer-knopje linksboven stuurt je naar andere tabbladen zonder de sessie te stoppen — timer en GPS blijven gewoon lopen. Na de sessie vraagt de app hoe het ging (stemming + eventuele pijnlocatie), bewaard per sessie in je stats.</p>
+      <h4 style="margin-top:14px;">Pijn/Tips-tabblad</h4>
+      <p class="settings-note">3 subpagina's: <b>Pijn</b> (veelvoorkomende blessures met oorzaak/symptoom), <b>Tips</b> (blessures vermijden, RICE-methode, terug-lopen-checklist) en <b>Stretching</b> (instructievideo's op YouTube, voor/na het lopen).</p>
+      <h4 style="margin-top:14px;">Hartslagband</h4>
+      <p class="settings-note">Tik op het ❤️-icoontje (bij lopen én bij fietsen/wandelen) om via Bluetooth te verbinden met een hartslagband/-horloge. Zodra je gewicht, leeftijd én geslacht zijn ingevuld (Instellingen → Persoonlijk), gebruikt de calorie-schatting automatisch de nauwkeurigere hartslag-gebaseerde formule i.p.v. enkel gewicht+tijd.</p>
+      <h4 style="margin-top:14px;">Spotify &amp; Strava</h4>
+      <p class="settings-note">Het 🎧-icoontje (bij fietsen/lopen) toont wat er nu speelt op Spotify, met bediening. Na een sessie kan je met 1 tik uploaden naar Strava. Beide vereisen een eenmalige, gratis registratie — zie de velden hieronder bij Persoonlijk.</p>
+      <h4 style="margin-top:14px;">Alles resetten</h4>
+      <p class="settings-note">Via "Stijl wisselen" (tandwiel-icoon) vind je aparte reset-knoppen: "Reset Lopen" (AI Coach-voortgang, EVY-voortgang, eigen schema's, loopgeschiedenis — apart aan te vinken) en "Reset Fiets &amp; Wandel" (voorkeuren zoals fietstype/kaartlagen).</p>
     </div>
     </details>
 
@@ -5172,8 +5210,74 @@ async function renderSavedLinks(){
 }
 $('menuSavedLinksBtn').addEventListener('click', () => { closeActionMenu(); renderSavedLinks(); openModal('savedLinksModal'); });
 $('menuRideHistoryBtn').addEventListener('click', () => { closeActionMenu(); renderRideHistory(); openModal('rideHistoryModal'); });
-$('menuHelpBtn').addEventListener('click', () => { closeActionMenu(); openModal('helpModal'); });
-$('menuDevNotesBtn').addEventListener('click', () => { closeActionMenu(); openModal('devNotesModal'); });
+$('menuHelpBtn').addEventListener('click', () => { closeActionMenu(); renderHelpContent(); openModal('helpModal'); });
+function renderHelpContent(){
+  const en = curLang() === 'en';
+  const isFiets = appMode === 'fiets';
+  const isWandel = appMode === 'wandel';
+  const modeSection = isFiets ? `
+    <section>
+      <h3>🚴 ${en ? 'Cycling' : 'Fietsen'}</h3>
+      <p>${en ? '<b>Plan a route:</b> tap junction nodes on the map in order, or type a series of node numbers directly.' : '<b>Route plannen:</b> tik knooppunten in volgorde aan op de kaart, of typ een reeks nummers rechtstreeks in.'}</p>
+      <p>${en ? '<b>Bike type</b> (Settings) affects route preferences: road bike avoids unpaved paths, mountain bike prefers them.' : '<b>Fietstype</b> (Instellingen) beïnvloedt de route-voorkeuren: racefiets vermijdt onverharde paden, mountainbike zoekt ze juist op.'}</p>
+      <p>${en ? 'Once your route is ready, tap <b>Start</b> — the line follows your live GPS position and reroutes automatically if you go off-route.' : 'Zodra je route klaar is, tik je op <b>Start</b> — de lijn volgt je live GPS-positie en herberekent automatisch als je van de route afwijkt.'}</p>
+    </section>` : isWandel ? `
+    <section>
+      <h3>🥾 ${en ? 'Walking' : 'Wandelen'}</h3>
+      <p>${en ? 'Same node-based planning as cycling, but using walking networks — usually quieter paths through nature.' : 'Zelfde knooppunt-gebaseerd plannen als bij fietsen, maar op wandelnetwerken — meestal rustigere paden door de natuur.'}</p>
+      <p>${en ? '<b>Walking extras:</b> Rest Stops (benches/cafés), Nature Spotter (real iNaturalist sightings nearby), Plant Scanner and Animal Scanner (photo-based recognition).' : "<b>Wandel-extra's:</b> Rustpunten (bankjes/cafés), Natuurspotter (echte iNaturalist-waarnemingen in de buurt), Flora Scanner en Dieren Scanner (foto-herkenning)."}</p>
+    </section>` : '';
+  $('helpContent').innerHTML = `
+    <section>
+      <h3>🗺️ ${en ? 'Route planning' : 'Route plannen'}</h3>
+      <p>${en ? 'Search a place, junction node, or POI (café, bakery…) in the search bar, or tap directly on the map.' : 'Zoek een plaats, knooppunt of café/bakker via de zoekbalk, of tik rechtstreeks op de kaart.'}</p>
+      <p>${en ? 'Drag points in the route list to reorder them. The red "X" removes a point.' : 'Sleep punten in de routelijst om ze te herschikken. Het rode kruisje verwijdert een punt.'}</p>
+      <p>${en ? 'The <b>Loop Generator</b> and <b>Node number entry</b> tools (Tools menu) build a route for you automatically.' : 'De <b>Rondrit-generator</b> en <b>Knooppunten-invoer</b> (Tools-menu) bouwen automatisch een route voor je.'}</p>
+    </section>
+    ${modeSection}
+    <section>
+      <h3>🏔️ ${en ? 'Elevation & analysis' : 'Hoogte & analyse'}</h3>
+      <p>${en ? 'The "Height" button shows the elevation profile of your route. "Analysis" adds surface type, wind and gradient per section.' : 'De knop "Hoogte" toont het hoogteprofiel van je route. "Analyse" voegt wegdektype, wind en helling per stuk toe.'}</p>
+    </section>
+    <section>
+      <h3>📥 ${en ? 'Import & export' : 'Importeren & exporteren'}</h3>
+      <p>${en ? 'Import a GPX file from another app (Komoot, Garmin, Strava…), or export your own route as GPX or a shareable link.' : "Importeer een GPX-bestand van een andere app (Komoot, Garmin, Strava…), of exporteer je eigen route als GPX of een deelbare link."}</p>
+    </section>
+    <section>
+      <h3>🏃 ${en ? 'RunCoach' : 'RunCoach'}</h3>
+      <p>${en ? 'Full guided running coach with build-up plans, your own EVY audio programme, heart rate, and Strava upload — see the separate running manual in Settings for details.' : 'Volledige begeleide loopcoach met opbouwschema\'s, je eigen EVY-audioprogramma, hartslag en Strava-upload — zie de aparte loop-handleiding in Instellingen voor details.'}</p>
+    </section>
+    <section>
+      <h3>⚙️ ${en ? 'Personalisation' : 'Personalisatie'}</h3>
+      <p>${en ? 'Under Settings you can switch between Standard and Tailwind style, connect Spotify/Strava/a heart rate monitor, and fill in free API keys (Pl@ntNet, Gemini) for smarter recognition.' : 'Onder Instellingen kan je wisselen tussen Standaard- en Tailwind-stijl, Spotify/Strava/een hartslagband koppelen, en gratis API-sleutels (Pl@ntNet, Gemini) invullen voor slimmere herkenning.'}</p>
+    </section>`;
+}
+$('menuDevNotesBtn').addEventListener('click', () => { closeActionMenu(); renderDevNotesContent(); openModal('devNotesModal'); });
+function renderDevNotesContent(){
+  const en = curLang() === 'en';
+  $('devNotesContent').innerHTML = `
+    <section>
+      <h3>🧱 ${en ? 'Architecture' : 'Architectuur'}</h3>
+      <p>${en ? 'One single static <code>index.html</code> file — no build step, no server, hosted as-is on GitHub Pages. All logic runs client-side in your browser.' : 'Eén enkel statisch <code>index.html</code>-bestand — geen build-stap, geen server, gewoon zo gehost op GitHub Pages. Alle logica draait client-side in je browser.'}</p>
+      <p>${en ? 'The Tailwind-style screens (RunCoach, Compass, Weather, Setup, Hub) each run inside their own <code>&lt;iframe srcdoc&gt;</code>, communicating with the main page via <code>postMessage</code>.' : 'De Tailwind-stijl schermen (RunCoach, Kompas, Weer, Setup, Hub) draaien elk in hun eigen <code>&lt;iframe srcdoc&gt;</code>, en praten met de hoofdpagina via <code>postMessage</code>.'}</p>
+    </section>
+    <section>
+      <h3>💾 ${en ? 'Storage' : 'Opslag'}</h3>
+      <p>${en ? 'Everything (settings, history, custom plans, progress) is saved in your browser\'s <code>localStorage</code> — nothing is sent to a server of mine. Clearing your browser data removes it.' : 'Alles (instellingen, geschiedenis, eigen schema\'s, voortgang) wordt bewaard in de <code>localStorage</code> van je browser — er gaat niets naar een server van mij. Browsergegevens wissen verwijdert het dus ook.'}</p>
+    </section>
+    <section>
+      <h3>📡 ${en ? 'External data sources' : 'Externe databronnen'}</h3>
+      <p>${en ? '<b>Routing:</b> OpenRouteService, GraphHopper or Geoapify (your own free key, Settings).<br><b>Map tiles:</b> OpenStreetMap / Thunderforest.<br><b>Elevation:</b> up to 3 fallback APIs, ending in Open-Meteo.<br><b>Weather:</b> Open-Meteo and MET Norway (no key needed), optionally OpenWeatherMap.<br><b>Species ID:</b> Pl@ntNet (plants), Gemini vision + GBIF/iNaturalist (animals), with a local MobileNet model as final fallback.' : '<b>Routing:</b> OpenRouteService, GraphHopper of Geoapify (je eigen gratis sleutel, Instellingen).<br><b>Kaarttegels:</b> OpenStreetMap / Thunderforest.<br><b>Hoogte:</b> tot 3 terugval-API\'s, eindigend bij Open-Meteo.<br><b>Weer:</b> Open-Meteo en MET Norway (geen sleutel nodig), optioneel OpenWeatherMap.<br><b>Soortherkenning:</b> Pl@ntNet (planten), Gemini vision + GBIF/iNaturalist (dieren), met een lokaal MobileNet-model als laatste terugval.'}</p>
+    </section>
+    <section>
+      <h3>🔌 ${en ? 'Offline & service worker' : 'Offline & service worker'}</h3>
+      <p>${en ? 'A service worker (<code>sw.js</code>) caches the app shell and map tiles for offline use. This also means updates can take a moment to appear — clear cached images/files and fully close the browser after an update if something looks outdated.' : 'Een service worker (<code>sw.js</code>) cachet de app zelf en kaarttegels voor offline gebruik. Dat betekent ook dat updates soms even op zich laten wachten — wis afbeeldingen/bestanden in cache en sluit de browser volledig af na een update als iets verouderd oogt.'}</p>
+    </section>
+    <section>
+      <h3>🔐 ${en ? 'API keys & login' : 'API-sleutels & inloggen'}</h3>
+      <p>${en ? 'All API keys you fill in (routing, Pl@ntNet, Gemini, Spotify, Strava, weather) stay only on your own device — never sent anywhere except straight to that service itself. Spotify uses a secure login flow (PKCE) with no secret exposed; Strava\'s login method does require its Client Secret to be present in this page\'s own source code, since Strava has no PKCE alternative — fine for personal use, just be aware it is technically visible to anyone who inspects the page.' : 'Alle API-sleutels die je invult (routing, Pl@ntNet, Gemini, Spotify, Strava, weer) blijven enkel op je eigen toestel — nooit ergens anders naartoe dan rechtstreeks naar die dienst zelf. Spotify gebruikt een veilige inlogmethode (PKCE) zonder geheime sleutel. Strava\'s inlogmethode vereist wél dat de Client Secret in de broncode van deze pagina zelf staat, want Strava heeft geen PKCE-alternatief — voor persoonlijk gebruik geen probleem, maar wees je ervan bewust dat die technisch zichtbaar is voor wie de pagina inspecteert.'}</p>
+    </section>`;
+}
 $('menuLogbookBtn').addEventListener('click', () => { closeActionMenu(); renderLogbook(); openModal('logbookModal'); });
 function renderLogbook(){
   $('logbookTitle').textContent = curLang()==='en' ? '📋 Logbook' : '📋 Logboek';
@@ -6418,22 +6522,41 @@ function tr(key){
   return entry ? entry[lang] : key;
 }
 
-function applyTheme(theme){
+async function applyTheme(theme){
+  const changed = document.body.classList.contains('theme-garmin') !== (theme === 'garmin');
+  const overlay = $('themeDissolveOverlay');
+  if (changed && overlay){
+    overlay.classList.add('show');
+    await new Promise(r => setTimeout(r, 450)); // wachten tot de laag volledig ondoorzichtig is
+  }
   document.body.classList.remove('theme-garmin');
   if (theme === 'garmin') document.body.classList.add('theme-garmin');
   try{ localStorage.setItem('app_theme_sync', theme === 'garmin' ? 'garmin' : 'default'); }catch(e){}
   // Altijd (opnieuw) tonen zodra je niet middenin een rit zit — idempotent en veilig, lost robuuster
   // op dat een thema-wissel soms niet live doorkwam terwijl je al op de hub stond.
   if (appMode === null) showHubScreen();
+  if (changed && overlay){
+    await new Promise(r => setTimeout(r, 80)); // heel even laten "zetten" vóór het wegvloeit, anders zie je de wissel zelf nog flitsen
+    overlay.classList.remove('show');
+  }
 }
 
 // ---------- Garmin-hub (letterlijk Gemini's keuzescherm.html, in een iframe) ----------
 let garminHubFrameLoaded = false;
 let hubWeatherCache = null; // { t, temp, windLabel }
+let hubIntroPlayed = false;
 function showHubScreen(){
   const garmin = (appSettings.theme === 'garmin');
   $('modeSelectScreen').classList.toggle('hidden', garmin);
   $('modeSelectScreenGarmin').classList.toggle('hidden', !garmin);
+  if (!garmin && !hubIntroPlayed){
+    hubIntroPlayed = true;
+    const div = document.createElement('div');
+    div.className = 'glassFillIntro';
+    $('modeSelectScreen').appendChild(div);
+    setTimeout(() => div.remove(), 1400);
+  }
+  if (garmin) hubIntroPlayed = true; // Tailwind-stijl speelt zijn eigen intro al af binnen het iframe zelf
   if (garmin){
     if (!garminHubFrameLoaded){
       const frame = $('garminHubFrame');
@@ -9103,6 +9226,7 @@ function buildGarminHubHtml(){
 </head>
 <body class="bg-slate-950 min-h-screen flex items-center justify-center p-0 overflow-x-hidden">
   <div class="w-full bg-slate-950 text-slate-100 min-h-screen p-6 flex flex-col justify-between overflow-hidden relative">
+    <div class="glassFillIntro"></div>
     <div class="absolute inset-0 w-full h-full bg-cover bg-center opacity-40 pointer-events-none z-0" style="background-image:url('achtergrond-home.jpg');"></div>
     <div class="absolute inset-0 w-full h-full pointer-events-none z-0 overflow-hidden">
       <div class="glass-ribbon absolute top-[-20%] left-[-10%] w-[120%] h-[140%]"></div>
@@ -16667,6 +16791,9 @@ function plantNetErrorMessage(reason){
 async function identifyPlantWithFallback(file){
   const primary = await plantNetIdentifyCore(file);
   if (primary.ok) return Object.assign({ source:'plantnet' }, primary);
+  // Pl@ntNet vond niets — Gemini is een sterkere 2e keuze dan het generieke lokale model hieronder.
+  const gem = await identifyWithGemini(file, 'plant');
+  if (gem.ok) return { ok:true, source:'gemini', sciName:gem.sciName, dutchName:gem.dutchName, pct:gem.pct };
   const local = await classifyPhotoLocally(file);
   if (local){
     const resolved = await resolveSpeciesName(local.mobileLabel, 'Plantae');
@@ -16683,9 +16810,6 @@ async function identifyPlantWithFallback(file){
       };
     }
   }
-  // Nog steeds niets bruikbaars — laatste terugval via Gemini (enkel als daar een sleutel voor is).
-  const gem = await identifyWithGemini(file, 'plant');
-  if (gem.ok) return { ok:true, source:'gemini', sciName:gem.sciName, dutchName:gem.dutchName, pct:gem.pct };
   if (local) return { ok:true, source:'fallback', primaryReason: primary.reason, mobileLabel:local.mobileLabel, pct:local.pct, sciName:null, dutchName:null, family:null };
   return { ok:false, source:'none', reason: primary.reason };
 }
@@ -16890,6 +17014,10 @@ async function classifyPhotoLocally(file){
   }catch(e){ return null; }
 }
 async function identifyAnimalPhoto(file){
+  // Gemini eerst als daar een sleutel voor is ingevuld — een echt AI-vision-model dat rechtstreeks naar
+  // de foto kijkt, veel betrouwbaarder voor soortherkenning dan het generieke lokale model hieronder.
+  const gem = await identifyWithGemini(file, 'animal');
+  if (gem.ok) return { ok:true, source:'gemini', mobileLabel:null, sciName:gem.sciName, dutchName:gem.dutchName, pct:gem.pct, family:null };
   const local = await classifyPhotoLocally(file);
   if (local){
     const resolved = await resolveSpeciesName(local.mobileLabel, 'Animalia');
@@ -16907,10 +17035,6 @@ async function identifyAnimalPhoto(file){
       };
     }
   }
-  // GBIF/iNaturalist konden de MobileNet-gok niet naar een echte soort vertalen — laatste terugval
-  // via Gemini (enkel als daar een sleutel voor is), die rechtstreeks vanuit de foto herkent.
-  const gem = await identifyWithGemini(file, 'animal');
-  if (gem.ok) return { ok:true, source:'gemini', mobileLabel: local ? local.mobileLabel : null, sciName:gem.sciName, dutchName:gem.dutchName, pct:gem.pct, family:null };
   if (local) return { ok:true, source:'mobilenet', mobileLabel:local.mobileLabel, pct:local.pct, sciName:null, dutchName:null, family:null };
   return { ok:false, reason:'classify-failed' };
 }
