@@ -736,28 +736,6 @@
     opacity:0; pointer-events:none; transition:opacity 0.95s ease;
   }
   #themeDissolveOverlay.show{ opacity:1; }
-  /* 'Glas dat zich vult'-intro: een vaag/wazig glaspaneel dat bij het opstarten van onder naar boven
-     wegtrekt en de content onthult, gecombineerd met een subtiele lichtglans die er doorheen glijdt. */
-  .glassFillIntro{
-    position:absolute; inset:0; z-index:50; pointer-events:none; overflow:hidden;
-    background:linear-gradient(180deg, rgba(148,197,255,0.30), rgba(148,197,255,0.12));
-    backdrop-filter:blur(22px); -webkit-backdrop-filter:blur(22px);
-    animation: glassFillReveal 2.4s cubic-bezier(0.65,0,0.35,1) forwards;
-  }
-  .glassFillIntro::after{
-    content:''; position:absolute; inset:0;
-    background:linear-gradient(115deg, transparent 35%, rgba(255,255,255,0.55) 50%, transparent 65%);
-    background-size:250% 250%; background-position:120% 0;
-    animation: glassFillShimmer 2.4s ease-out forwards;
-  }
-  @keyframes glassFillReveal{
-    0%{ clip-path:inset(0% 0% 0% 0%); opacity:1; }
-    80%{ clip-path:inset(0% 0% 100% 0%); opacity:1; }
-    100%{ clip-path:inset(0% 0% 100% 0%); opacity:0; }
-  }
-  @keyframes glassFillShimmer{
-    0%{ background-position:120% 0; } 100%{ background-position:-20% 0; }
-  }
   #modeSelectScreen{
     position:fixed; top:0;left:0;right:0;bottom:0; z-index:3000; background:var(--green-900);
     display:flex; flex-direction:column; align-items:center; justify-content:space-between;
@@ -841,6 +819,7 @@
     padding:calc(env(safe-area-inset-top,0px) + var(--extra-top-inset)) 20px calc(24px + env(safe-area-inset-bottom,0px) + var(--extra-bottom-inset));
   }
   #runCoachScreen.hidden{ display:none; }
+  #spotifyPlayingView.hidden, #spotifyNothingPlaying.hidden, #runCoachVoiceList.hidden, #runPlanBuilderView.hidden, #rcSessieActiveStd.hidden, #rcSessieInactiveStd.hidden{ display:none; }
   #runCoachBackBtn{
     position:absolute; left:16px; top:calc(16px + env(safe-area-inset-top,0px) + var(--extra-top-inset));
     border:none; background:rgba(226,161,60,0.12); color:var(--amber);
@@ -1104,6 +1083,7 @@
   #runFeedbackModal.show{ z-index:3500; }
   #spotifyModal.show{ z-index:3500; }
   #rideStravaModal.show{ z-index:3500; }
+  #zombieSetupModal.show{ z-index:3500; }
   .simple-modal-card{
     background:var(--cream); border-radius:18px; padding:18px; width:100%; max-width:380px;
     max-height:80vh; overflow-y:auto; box-shadow:var(--shadow);
@@ -1739,6 +1719,45 @@
       <button id="rideStravaSkipBtn" class="simple-modal-btn" style="flex:1;" data-i18n="rsNo">Nee</button>
       <button id="rideStravaUploadBtn" class="simple-modal-btn primary" style="flex:1; background:#fc4c02; border-color:#fc4c02;" data-i18n="rsUpload">🟠 Uploaden</button>
     </div>
+  </div>
+</div>
+
+<div id="zombieSetupModal" class="simple-modal">
+  <div class="simple-modal-card" style="max-width:360px;">
+    <div class="simple-modal-head"><b>🧟 Zombie Run</b><button class="simple-modal-close" data-close="zombieSetupModal">✕</button></div>
+    <p class="simple-modal-text">Verhaal-mp3's + zombie-geluiden moet je zelf uploaden naar <code>audio/zombierun/</code> (zie 🛠️ Technische werking voor het exacte pad). Kies je instellingen voor deze run:</p>
+    <label style="font-size:12px; font-weight:800; color:var(--cream); display:block; margin-bottom:4px;">Verhaallijn</label>
+    <select id="zombieStorylineSelect" class="settings-text-input" style="margin-bottom:4px;">
+      <option value="1">Verhaal 1</option>
+      <option value="2">Verhaal 2</option>
+      <option value="3">Verhaal 3</option>
+      <option value="4">Verhaal 4</option>
+      <option value="5">Verhaal 5</option>
+    </select>
+    <div id="zombieStorylineProgress" style="font-size:11px; color:rgba(246,244,238,0.55); margin-bottom:12px;">Deel 1</div>
+    <button id="zombieResetStorylineBtn" style="background:none; border:none; color:rgba(246,244,238,0.5); font-size:10.5px; text-decoration:underline; margin-bottom:12px;">🔄 Deze verhaallijn herstarten</button>
+
+    <label style="font-size:12px; font-weight:800; color:var(--cream); display:block; margin-bottom:4px;">Drempelsnelheid om te ontsnappen</label>
+    <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+      <input type="number" id="zombieThresholdInput" value="8" min="4" max="20" step="0.5" style="width:70px; padding:8px; border:1px solid var(--line); border-radius:9px;"> <span style="font-size:12px; color:var(--cream);">km/u</span>
+    </div>
+
+    <label style="font-size:12px; font-weight:800; color:var(--cream); display:block; margin-bottom:4px;">Duur van een achtervolging</label>
+    <div style="display:flex; align-items:center; gap:8px; margin-bottom:14px;">
+      <input type="number" id="zombieChaseDurationInput" value="45" min="15" max="180" step="5" style="width:70px; padding:8px; border:1px solid var(--line); border-radius:9px;"> <span style="font-size:12px; color:var(--cream);">seconden</span>
+    </div>
+
+    <label style="font-size:12px; font-weight:800; color:var(--cream); display:block; margin-bottom:4px;">Rustig lopen (enkel muziek) tussen verhaal en achtervolging</label>
+    <div style="display:flex; align-items:center; gap:8px; margin-bottom:14px;">
+      <input type="number" id="zombieInterludeDurationInput" value="25" min="0" max="120" step="5" style="width:70px; padding:8px; border:1px solid var(--line); border-radius:9px;"> <span style="font-size:12px; color:var(--cream);">seconden (0 = uitschakelen)</span>
+    </div>
+
+    <label style="font-size:12px; font-weight:800; color:var(--cream); display:block; margin-bottom:6px;">Als je ingehaald wordt...</label>
+    <label class="settings-radio"><input type="radio" name="zombieConsequence" value="points" checked> <span>Punten verliezen, verhaal loopt door</span></label>
+    <label class="settings-radio"><input type="radio" name="zombieConsequence" value="extend"> <span>Punten verliezen + verlengde achtervolging</span></label>
+    <label class="settings-radio"><input type="radio" name="zombieConsequence" value="fail"> <span>Missie-onderdeel telt als mislukt</span></label>
+
+    <button id="zombieStartBtn" class="simple-modal-btn primary" style="width:100%; margin-top:14px; background:#7a1f16;">🧟 Start Zombie Run</button>
   </div>
 </div>
 
@@ -2487,18 +2506,24 @@
 
 <div id="runCoachScreen" class="hidden">
   <button id="runCoachBackBtn" aria-label="Terug"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg></button>
-  <button id="runCoachAudioHeaderBtn" aria-label="Muziek &amp; podcast" style="position:absolute; top:16px; right:16px; z-index:10; width:38px; height:38px; border-radius:50%; border:1.5px solid rgba(226,161,60,0.4); background:rgba(0,0,0,0.25); color:var(--amber); font-size:16px; display:flex; align-items:center; justify-content:center;">🎵</button>
+  <button id="runCoachAudioHeaderBtn" aria-label="Muziek &amp; podcast" style="position:absolute; top:16px; right:60px; z-index:10; width:38px; height:38px; border-radius:50%; border:1.5px solid rgba(226,161,60,0.4); background:rgba(0,0,0,0.25); color:var(--amber); font-size:16px; display:flex; align-items:center; justify-content:center;">🎵</button>
+  <button id="runCoachSpotifyBtn" aria-label="Spotify" style="position:absolute; top:16px; right:16px; z-index:10; width:38px; height:38px; border-radius:50%; border:1.5px solid rgba(29,185,84,0.4); background:rgba(0,0,0,0.25); color:#1DB954; font-size:16px; display:flex; align-items:center; justify-content:center;">🎧</button>
   <div class="bike-setup-inner">
     <div class="bike-setup-title" style="text-align:left;">🏃 Hardlopen</div>
 
     <div id="rcHomePanel" class="rc-panel active">
       <div class="rc-toptabs">
-        <button id="rcTabLearnBtn" class="active">Leren Lopen</button>
-        <button id="rcTabFreeBtn">Vrije Run</button>
-        <button id="rcTabBuilderBtn">Eigen Schema</button>
+        <button id="rcTabLearnBtn" class="active">🤖 AI Coach</button>
+        <button id="rcTabEvyBtn">🎧 EVY</button>
+        <button id="rcTabFreeBtn">⚡ Vrij/Doel</button>
       </div>
 
       <div id="rcLearnContent">
+        <div class="rc-distance-picker" style="display:flex; gap:6px; margin-bottom:10px;">
+          <button class="rc-dist-btn active" data-plan="builtin_5k" style="flex:1; border:2px solid var(--amber); background:rgba(226,161,60,0.12); border-radius:12px; padding:9px 4px; color:var(--cream); font-weight:800; font-size:12px;">5 KM</button>
+          <button class="rc-dist-btn" data-plan="builtin_7_5k" style="flex:1; border:2px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.04); border-radius:12px; padding:9px 4px; color:var(--cream); font-weight:800; font-size:12px;">7,5 KM</button>
+          <button class="rc-dist-btn" data-plan="builtin_10k" style="flex:1; border:2px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.04); border-radius:12px; padding:9px 4px; color:var(--cream); font-weight:800; font-size:12px;">10 KM</button>
+        </div>
         <div class="run-week-card">
           <div id="runCoachWeekLabel">WEEK 1 · DAG 1</div>
           <div id="runCoachWeekTitle">–</div>
@@ -2508,19 +2533,53 @@
         <button id="runCoachPlansBtn" style="width:100%; border:1.5px solid var(--line); background:rgba(255,255,255,0.04); border-radius:12px; padding:10px; font-size:12px; font-weight:700; color:var(--cream); margin:10px 0 4px; display:flex; justify-content:space-between; align-items:center;">
           <span>📚 Schema: <b id="runCoachPlanName">5K Start to Run</b></span><span style="opacity:0.6;">wissel/bouw ›</span>
         </button>
+        <button id="runCoachStartBtn">▶ Start training</button>
       </div>
-      <div id="rcFreeContent" style="display:none;">
-        <div class="run-week-card" style="background:linear-gradient(160deg,#2a5f8f,#173a5c);">
-          <div style="color:rgba(255,255,255,0.75); font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.6px;">VRIJE RUN</div>
-          <div style="color:#fff; font-size:19px; font-weight:900; margin:4px 0 6px;">Los lopen, geen schema</div>
-          <div style="color:rgba(255,255,255,0.85); font-size:13px;">Enkel GPS-afstand, tempo en tijd — stop zelf wanneer je wil.</div>
+
+      <div id="rcEvyContent" style="display:none;">
+        <div class="run-week-card" style="background:linear-gradient(160deg,#6d28d9,#2e1065);">
+          <div style="color:rgba(255,255,255,0.75); font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.6px;">EVY PODCAST</div>
+          <div style="color:#fff; font-size:17px; font-weight:900; margin:4px 0 6px;">Jouw 10-weken audioprogramma</div>
+          <div style="color:rgba(255,255,255,0.85); font-size:12px;">Tik je afstand aan om je volgende sessie te starten — de app onthoudt zelf bij welke week/sessie je zit.</div>
+        </div>
+        <div style="display:flex; gap:8px; margin:10px 0;">
+          <button id="rcEvyStart5Std" style="flex:1; border:2px solid rgba(226,161,60,0.4); background:rgba(255,255,255,0.04); border-radius:14px; padding:14px 6px; color:var(--cream);">
+            <div style="font-size:15px; margin-bottom:2px;">🏁 5 KM</div>
+            <div id="rcEvyProg5Std" style="font-size:10.5px; color:var(--amber); font-weight:700;">Week – · Sessie –</div>
+          </button>
+          <button id="rcEvyStart10Std" style="flex:1; border:2px solid rgba(226,161,60,0.4); background:rgba(255,255,255,0.04); border-radius:14px; padding:14px 6px; color:var(--cream);">
+            <div style="font-size:15px; margin-bottom:2px;">🔥 10 KM</div>
+            <div id="rcEvyProg10Std" style="font-size:10.5px; color:var(--amber); font-weight:700;">Week – · Sessie –</div>
+          </button>
+        </div>
+        <div style="display:flex; justify-content:center; gap:18px; margin-bottom:14px;">
+          <button id="rcEvyReset5Std" style="background:none; border:none; color:rgba(246,244,238,0.5); font-size:11px; text-decoration:underline;">🔄 5K herstarten</button>
+          <button id="rcEvyReset10Std" style="background:none; border:none; color:rgba(246,244,238,0.5); font-size:11px; text-decoration:underline;">🔄 10K herstarten</button>
         </div>
       </div>
-      <div id="rcBuilderContent" style="display:none;">
-        <div class="rc-builder-row"><label>Aantal herhalingen</label><input type="number" id="rcBuildReps" value="6" min="1" max="30"></div>
-        <div class="rc-builder-row"><label>Lopen (seconden)</label><input type="number" id="rcBuildRun" value="60" min="10" max="1800" step="10"></div>
-        <div class="rc-builder-row"><label>Wandelen (seconden)</label><input type="number" id="rcBuildWalk" value="90" min="10" max="1800" step="10"></div>
-        <button id="rcBuilderStartBtn" style="width:100%; border:none; border-radius:14px; padding:13px; background:rgba(255,255,255,0.08); color:var(--cream); font-weight:800; font-size:13px; margin-bottom:16px;">▶ Start dit schema</button>
+
+      <div id="rcFreeContent" style="display:none;">
+        <div class="run-week-card" style="background:linear-gradient(160deg,#2a5f8f,#173a5c); cursor:pointer;" id="rcFreeRunCardStd">
+          <div style="color:rgba(255,255,255,0.75); font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.6px;">VRIJE RUN</div>
+          <div style="color:#fff; font-size:19px; font-weight:900; margin:4px 0 6px;">Los lopen, geen schema</div>
+          <div style="color:rgba(255,255,255,0.85); font-size:13px;">Enkel GPS-afstand, tempo en tijd — stop zelf wanneer je wil. Tik hier om te starten.</div>
+        </div>
+        <div style="display:flex; gap:8px; margin:10px 0;">
+          <button id="rcTarget5BtnStd" style="flex:1; border:1.5px solid var(--line); background:rgba(255,255,255,0.04); border-radius:12px; padding:10px 4px; color:var(--cream); font-size:11.5px; font-weight:700;">🏁 5 KM Target Run</button>
+          <button id="rcTarget10BtnStd" style="flex:1; border:1.5px solid var(--line); background:rgba(255,255,255,0.04); border-radius:12px; padding:10px 4px; color:var(--cream); font-size:11.5px; font-weight:700;">🔥 10 KM Target Run</button>
+        </div>
+        <button id="rcZombieBtnStd" class="run-week-card" style="width:100%; text-align:left; background:linear-gradient(160deg,#3a1a1a,#1a0a0a); border:1.5px solid rgba(220,60,60,0.4); cursor:pointer; margin-bottom:10px;">
+          <div style="color:#ff8a8a; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.6px;">🧟 ZOMBIE RUN</div>
+          <div style="color:#fff; font-size:17px; font-weight:900; margin:4px 0 6px;">Verhaal + achtervolgingen</div>
+          <div style="color:rgba(255,255,255,0.75); font-size:12px;">Loop sneller dan de zombies of verlies punten. Tik hier voor instellingen.</div>
+        </button>
+        <details id="rcBuilderDetailsStd" style="margin-bottom:14px;">
+          <summary style="font-size:12px; font-weight:800; color:var(--cream); padding:10px 0; cursor:pointer;">🛠️ Eigen Schema Builder (1 sessie)</summary>
+          <div class="rc-builder-row"><label>Aantal herhalingen</label><input type="number" id="rcBuildReps" value="6" min="1" max="30"></div>
+          <div class="rc-builder-row"><label>Lopen (seconden)</label><input type="number" id="rcBuildRun" value="60" min="10" max="1800" step="10"></div>
+          <div class="rc-builder-row"><label>Wandelen (seconden)</label><input type="number" id="rcBuildWalk" value="90" min="10" max="1800" step="10"></div>
+          <button id="rcBuilderStartBtn" style="width:100%; border:none; border-radius:14px; padding:13px; background:rgba(255,255,255,0.08); color:var(--cream); font-weight:800; font-size:13px;">▶ Start dit schema</button>
+        </details>
       </div>
 
       <div class="run-voice-section">
@@ -2539,7 +2598,20 @@
         </label>
         <div id="runMusicCount" style="font-size:11px; color:rgba(246,244,238,0.55); margin-top:6px;">Geen eigen muziek geladen — de gesproken coach blijft altijd hoorbaar.</div>
       </div>
-      <button id="runCoachStartBtn">▶ Start training</button>
+    </div>
+
+    <div id="rcSessiePanel" class="rc-panel">
+      <div id="rcSessieInactiveStd" class="run-week-card" style="text-align:center;">
+        <div style="font-size:26px; margin-bottom:6px;">⏱️</div>
+        <div style="font-weight:800; color:var(--cream); margin-bottom:4px;">Geen actieve sessie</div>
+        <div style="font-size:11.5px; color:rgba(246,244,238,0.55);">Start een training via Home — je kan daarna gerust naar andere tabbladen, de sessie blijft gewoon lopen.</div>
+      </div>
+      <div id="rcSessieActiveStd" class="run-week-card hidden" style="background:linear-gradient(160deg,#c0392b,#7a1f16); text-align:center;">
+        <div style="font-size:26px; margin-bottom:6px;">🏃</div>
+        <div style="font-weight:900; color:#fff; margin-bottom:4px;">Je sessie loopt nog!</div>
+        <div style="font-size:11.5px; color:rgba(255,255,255,0.75); margin-bottom:14px;">Timer en GPS-tracking bleven gewoon actief op de achtergrond.</div>
+        <button id="rcResumeSessionBtnStd" style="width:100%; border:none; border-radius:12px; padding:11px; background:var(--amber); color:#0f172a; font-weight:900; font-size:12px; text-transform:uppercase;">▶️ Terug naar live scherm</button>
+      </div>
     </div>
 
     <div id="rcStatsPanel" class="rc-panel">
@@ -2567,6 +2639,37 @@
       <div class="rc-tip"><b>💧 Zijsteken</b>Adem dieper en regelmatiger, vertraag even, en eet niet vlak vóór het lopen.</div>
       <div class="rc-tip"><b>🩹 Aanhoudende pijn</b>Pijn die na rust niet wegtrekt, of die tijdens het lopen erger wordt: bouw dan een rustdag in en raadpleeg bij twijfel een arts of kinesist. Dit zijn algemene tips, geen medisch advies.</div>
 
+      <details style="margin:16px 0;">
+        <summary style="font-size:13px; font-weight:800; color:var(--cream); padding:8px 0; cursor:pointer;">🩹 Veelvoorkomende blessures — oorzaak &amp; symptomen</summary>
+        <div class="rc-tip"><b>🦵 Scheenbeenvliesontsteking</b>Oorzaak: te snel opgebouwde belasting. Symptomen: zeurende pijn langs de scheenbeenrand.</div>
+        <div class="rc-tip"><b>🦶 Plantaire fasciitis</b>Oorzaak: overbelaste voetzoolpees. Symptomen: stekende hielpijn, vaak ergst 's ochtends.</div>
+        <div class="rc-tip"><b>🦿 Achillespees-tendinitis</b>Oorzaak: chronische overbelasting. Symptomen: pijn/stijfheid achteraan enkel/kuit.</div>
+        <div class="rc-tip"><b>🦵 Kuitspier-verrekking</b>Oorzaak: (deels) losscheuren van de kuitspier. Symptomen: plotse, scherpe pijn.</div>
+        <div class="rc-tip"><b>🦵 Hamstring-verrekking</b>Oorzaak: onvoldoende opwarming. Symptomen: plotse, scherpe pijn achteraan de dij.</div>
+        <div class="rc-tip"><b>🦵 Liesblessure</b>Oorzaak: overrekte binnenste dijspieren. Symptomen: pijn in de lies.</div>
+        <div class="rc-tip"><b>🦴 ITB-syndroom</b>Oorzaak: wrijving buitenkant dij/knie. Symptomen: pijn buitenkant heup/knie.</div>
+        <div class="rc-tip"><b>🦵 Lopersknie</b>Oorzaak: overbelasting rond de knieschijf. Symptomen: pijn rond/onder de knieschijf.</div>
+        <div class="rc-tip"><b>🍑 Piriformis-syndroom</b>Oorzaak: verkrampte bilspier. Symptomen: uitstralende pijn achterkant been.</div>
+        <div class="rc-tip" style="border-color:rgba(226,161,60,0.4);"><b>🚨 Wanneer naar een arts?</b>Bij hevige pijn, zwelling, gevoelloosheid, niet kunnen steunen, of een instabiel gewricht.</div>
+      </details>
+
+      <details style="margin:16px 0;">
+        <summary style="font-size:13px; font-weight:800; color:var(--cream); padding:8px 0; cursor:pointer;">📋 10 manieren om blessures te vermijden</summary>
+        <div class="rc-tip" style="line-height:1.9;">1. Warm op met een korte wandeling vóór het stretchen<br>2. Stretch voor én na het lopen, vooral de hamstrings<br>3. Rond je run af met een korte wandeling<br>4. Loop niet elke dag<br>5. Loop op een vlakke ondergrond<br>6. Verkort je pasfrequentie bij vermoeidheid<br>7. Doe krachtoefeningen op je rustdagen<br>8. Draag de juiste schoenen voor jouw voet<br>9. Zorg voor voldoende voeding<br>10. Blijf voldoende gehydrateerd</div>
+        <div class="rc-tip"><b>✅ Klaar om terug te lopen na een blessure?</b>1. 30 min stevig doorwandelen? 2. 30s op 1 been balanceren? 3. 15-20 1-beens-kniebuigingen? 4. 20-30 kuitheffingen op 1 been? 5. Pijnvrij springen? Alle 5 gehaald? Dan is voorzichtig herstarten meestal veilig.</div>
+        <div class="rc-tip"><b>🧊 RICE-methode</b>Rest: bouw belasting af. Ice: koel 20 min., 4x/dag. Compression: elastisch verband. Elevation: hoger dan je hart.</div>
+      </details>
+
+      <details style="margin:16px 0 20px;">
+        <summary style="font-size:13px; font-weight:800; color:var(--cream); padding:8px 0; cursor:pointer;">🧘 Stretching — instructievideo's (YouTube)</summary>
+        <a href="https://www.youtube.com/watch?v=5cKxUUVeVVI" target="_blank" rel="noopener" class="rc-tip" style="display:block; text-decoration:none;">▶️ 5 Minute Warm Up Before Running</a>
+        <a href="https://www.youtube.com/watch?v=8dIHS_UVfQ4" target="_blank" rel="noopener" class="rc-tip" style="display:block; text-decoration:none;">▶️ The Best Dynamic Warm Up for Runners</a>
+        <a href="https://www.youtube.com/watch?v=MCf2QDOsy0E" target="_blank" rel="noopener" class="rc-tip" style="display:block; text-decoration:none;">▶️ 8 Min Post-Run Stretching</a>
+        <a href="https://www.youtube.com/watch?v=FbmLx-PahO4" target="_blank" rel="noopener" class="rc-tip" style="display:block; text-decoration:none;">▶️ 10 Min. Post-Run Stretch</a>
+        <a href="https://www.youtube.com/watch?v=dVwzwkSOuhs" target="_blank" rel="noopener" class="rc-tip" style="display:block; text-decoration:none;">▶️ Do These Stretches After Every Run</a>
+        <a href="https://www.youtube.com/watch?v=zGLD19PC_Jg" target="_blank" rel="noopener" class="rc-tip" style="display:block; text-decoration:none;">▶️ Calf Stretch for Runners</a>
+      </details>
+
       <div class="bike-setup-title" style="text-align:left; font-size:14px; margin:18px 0 8px;">🧍 Pijn-check</div>
       <p style="font-size:11.5px; color:rgba(246,244,238,0.55); text-align:left; margin-bottom:10px;">Tik een lichaamszone aan om te registreren waar je iets voelt — puur voor je eigen overzicht, geen diagnose.</p>
       <div id="painBodyMapWrap" style="display:flex; gap:14px; align-items:flex-start;">
@@ -2578,6 +2681,7 @@
 
     <div class="rc-botnav">
       <button class="rc-navbtn active" data-panel="rcHomePanel"><span class="ic">🏠</span>Home</button>
+      <button class="rc-navbtn" data-panel="rcSessiePanel"><span class="ic">⏱️</span>Sessie</button>
       <button class="rc-navbtn" data-panel="rcStatsPanel"><span class="ic">📊</span>Stats</button>
       <button class="rc-navbtn" data-panel="rcSchemaPanel"><span class="ic">📋</span>Schema</button>
       <button class="rc-navbtn" data-panel="rcPijnPanel"><span class="ic">💊</span>Pijn/Tips</button>
@@ -2585,6 +2689,8 @@
   </div>
 </div>
 <audio id="runMusicPlayer" preload="auto"></audio>
+<audio id="zombieMusicPlayer" preload="auto" loop></audio>
+<audio id="zombieEffectsPlayer" preload="auto"></audio>
 
 <div id="runSessionScreen" class="hidden">
   <button id="rsMinimizeBtn" aria-label="Minimaliseren" data-i18n-aria="rsMinimizeAria" title="Naar andere tabbladen — de sessie blijft gewoon lopen" data-i18n-title="rsMinimizeTitle">
@@ -6450,6 +6556,15 @@ const DEV_NOTES_CONTENT = {
       <h3>🔐 API-sleutels &amp; inloggen</h3>
       <p>Alle API-sleutels die je invult (routing, Pl@ntNet, Gemini, Spotify, Strava, weer) blijven enkel op je eigen toestel — nooit ergens anders naartoe dan rechtstreeks naar die dienst zelf. Spotify gebruikt een veilige inlogmethode (PKCE) zonder geheime sleutel. Strava's inlogmethode vereist wél dat de Client Secret in de broncode van deze pagina zelf staat, want Strava heeft geen PKCE-alternatief — voor persoonlijk gebruik geen probleem, maar wees je ervan bewust dat die technisch zichtbaar is voor wie de pagina inspecteert.</p>
     </section>
+    <section>
+      <h3>🧟 Zombie Run — mappenstructuur</h3>
+      <p>Zelf te uploaden naast <code>index.html</code>, exact deze paden en namen (hoofdlettergevoelig):<br>
+      <code>audio/zombierun/verhaal1/deel1.mp3</code>, <code>deel2.mp3</code>, ... (verhaallijn 1, evt. tot verhaal5)<br>
+      <code>audio/zombierun/alarm/alarm1.mp3</code> t.e.m. <code>alarm3.mp3</code> (kort "zombies komen eraan"-geluid)<br>
+      <code>audio/zombierun/chase/chase1.mp3</code> t.e.m. <code>chase3.mp3</code> (achtervolgingsgeluid)<br>
+      <code>audio/zombierun/music/music1.mp3</code> t.e.m. <code>music3.mp3</code> (doorlopende achtergrondmuziek, speelt gemixt naast al de rest)<br>
+      <code>audio/zombierun/effects/effect1.mp3</code> t.e.m. <code>effect5.mp3</code> (losse sfeergeluiden)</p>
+    </section>
   `,
   en: `
     <section>
@@ -6507,6 +6622,15 @@ const DEV_NOTES_CONTENT = {
     <section>
       <h3>🔐 API keys &amp; login</h3>
       <p>All API keys you fill in (routing, Pl@ntNet, Gemini, Spotify, Strava, weather) stay only on your own device — never sent anywhere except straight to that service itself. Spotify uses a secure login flow (PKCE) with no secret exposed. Strava's login method does require its Client Secret to be present in this page's own source code, since Strava has no PKCE alternative — fine for personal use, just be aware it is technically visible to anyone who inspects the page.</p>
+    </section>
+    <section>
+      <h3>🧟 Zombie Run — folder structure</h3>
+      <p>Upload these yourself next to <code>index.html</code>, exact paths and names (case-sensitive):<br>
+      <code>audio/zombierun/verhaal1/deel1.mp3</code>, <code>deel2.mp3</code>, ... (storyline 1, up to verhaal5)<br>
+      <code>audio/zombierun/alarm/alarm1.mp3</code> to <code>alarm3.mp3</code> (short "zombies incoming" cue)<br>
+      <code>audio/zombierun/chase/chase1.mp3</code> to <code>chase3.mp3</code> (chase sound)<br>
+      <code>audio/zombierun/music/music1.mp3</code> to <code>music3.mp3</code> (continuous background music, mixed alongside everything else)<br>
+      <code>audio/zombierun/effects/effect1.mp3</code> to <code>effect5.mp3</code> (one-off atmosphere sounds)</p>
     </section>
   `
 };
@@ -6589,14 +6713,6 @@ function showHubScreen(){
   const garmin = (appSettings.theme === 'garmin');
   $('modeSelectScreen').classList.toggle('hidden', garmin);
   $('modeSelectScreenGarmin').classList.toggle('hidden', !garmin);
-  if (!garmin && !hubIntroPlayed){
-    hubIntroPlayed = true;
-    const div = document.createElement('div');
-    div.className = 'glassFillIntro';
-    $('modeSelectScreen').appendChild(div);
-    setTimeout(() => div.remove(), 2500);
-  }
-  if (garmin) hubIntroPlayed = true; // Tailwind-stijl speelt zijn eigen intro al af binnen het iframe zelf
   if (garmin){
     try{
       if (!garminHubFrameLoaded){
@@ -6724,7 +6840,7 @@ async function openRunCoachScreenOnTab(tab){
   rcSwitchTopTab(tab);
 }
 async function openRunCoachScreenOnPanel(panel){
-  const map = { sessie:'rcHomePanel', stats:'rcStatsPanel', schema:'rcSchemaPanel', pijn:'rcPijnPanel' };
+  const map = { sessie:'rcSessiePanel', stats:'rcStatsPanel', schema:'rcSchemaPanel', pijn:'rcPijnPanel' };
   const panelId = map[panel] || 'rcHomePanel';
   $('garminRunCoachScreen').classList.add('hidden');
   $('runCoachScreen').classList.remove('hidden');
@@ -6746,6 +6862,13 @@ async function renderRunCoachScreen(){
   $('runCoachWeekDesc').textContent = w.desc;
   $('runCoachProgressLine').textContent = (p.sessionsDone || 0) + ' sessies afgerond tot nu toe';
   $('runCoachPlanName').textContent = plan.name;
+  const activePlanId = plan.id === 'builtin' ? 'builtin_5k' : plan.id;
+  document.querySelectorAll('.rc-dist-btn').forEach(b => {
+    const active = b.dataset.plan === activePlanId;
+    b.style.borderColor = active ? 'var(--amber)' : 'rgba(255,255,255,0.1)';
+    b.style.background = active ? 'rgba(226,161,60,0.12)' : 'rgba(255,255,255,0.04)';
+  });
+  await renderEvyProgressStd();
   populateRunVoiceSelect();
 }
 function populateRunVoiceSelect(){
@@ -6832,36 +6955,314 @@ function switchAudioForIntervalType(type, opts){
   if (pool !== rsCurrentAudioPool) playNextTrackFromPool(pool, opts);
 }
 function handleRunTrackEnded(){
+  if (rsState && rsState.zombie){ handleZombieTrackEnded(); return; }
   if (rsCurrentAudioPool) playNextTrackFromPool(rsCurrentAudioPool);
+}
+
+// ---------- Zombie Run: verhaal-gestuurde looptocht met achtervolgingen ----------
+// Bestandsconventie (zelf te uploaden, net als bij EVY): audio/zombierun/verhaalN/deelM.mp3 voor de
+// verhaal-segmenten (N = verhaallijn 1-5, M = deel 1,2,3...), audio/zombierun/alarm/alarmN.mp3 (N=1-3)
+// voor het korte "zombies komen eraan"-geluid, audio/zombierun/chase/chaseN.mp3 (N=1-3) voor het
+// achtervolgingsgeluid zelf, audio/zombierun/music/musicN.mp3 (N=1-3, doorlopende achtergrondmuziek,
+// speelt gelijktijdig gemixt naast al de rest), en audio/zombierun/effects/effectN.mp3 (N=1-5, losse
+// sfeergeluiden — willekeurig elke 20-40s tijdens het verhaal, én telkens extra vlak vóór een
+// achtervolging start). Ontbreekt een volgend deel-bestand (verhaallijn op), dan ronden we netjes af.
+const ZOMBIE_STORYLINE_COUNT = 5;
+const ZOMBIE_PROGRESS_KEY = 'zombie_progress_v1';
+async function getZombieProgress(storylineId){
+  try{
+    const all = await storageGet(ZOMBIE_PROGRESS_KEY).then(v => v ? JSON.parse(v) : {});
+    return (all && all[storylineId]) || { part: 1 };
+  }catch(e){ return { part: 1 }; }
+}
+async function saveZombiePart(storylineId, part){
+  try{
+    const all = await storageGet(ZOMBIE_PROGRESS_KEY).then(v => v ? JSON.parse(v) : {}) || {};
+    all[storylineId] = { part };
+    await storageSet(ZOMBIE_PROGRESS_KEY, JSON.stringify(all));
+  }catch(e){}
+}
+async function resetZombieProgress(storylineId){ await saveZombiePart(storylineId, 1); }
+function zombieStoryFile(storylineId, part){ return `audio/zombierun/verhaal${storylineId}/deel${part}.mp3`; }
+function zombieRandomFile(kind){
+  const count = kind === 'effects' ? 5 : 3;
+  return `audio/zombierun/${kind}/${kind}${1 + Math.floor(Math.random()*count)}.mp3`;
+}
+
+async function startZombieRun(opts){
+  const storylineId = opts.storylineId;
+  const p = await getZombieProgress(storylineId);
+  await startRunSession({
+    mode:'free', targetKm: null,
+    zombieConfig: {
+      storylineId, part: p.part,
+      thresholdKmh: opts.thresholdKmh, chaseDurationSec: opts.chaseDurationSec,
+      interludeDurationSec: opts.interludeDurationSec, consequence: opts.consequence
+    }
+  });
+}
+// Wordt vanuit startRunSession aangeroepen zodra rsState bestaat, ná de normale opbouw.
+function initZombieState(zombieConfig){
+  rsState.zombie = {
+    storylineId: zombieConfig.storylineId, part: zombieConfig.part,
+    thresholdKmh: zombieConfig.thresholdKmh, chaseDurationSec: zombieConfig.chaseDurationSec,
+    interludeDurationSec: zombieConfig.interludeDurationSec || 0, consequence: zombieConfig.consequence,
+    phase: 'story', // 'story' | 'interlude' | 'alarm' | 'chase'
+    interludeNext: null, interludeTimeoutId: null,
+    score: 0, escapedCount: 0, caughtCount: 0,
+    chaseEndAt: 0, belowThresholdStreak: 0, finished: false
+  };
+  startZombieBackgroundMusic();
+  scheduleZombieEffect();
+  playZombieStoryPart();
+}
+// Doorlopende achtergrondmuziek — een aparte, gelijktijdig spelende audiolaag naast het verhaal/de
+// achtervolgingsgeluiden zelf (die spelen op runMusicPlayer). Zachter volume, blijft de hele sessie lopen.
+const ZOMBIE_MUSIC_BASE_VOL = 0.22;
+const ZOMBIE_MUSIC_DUCK_VOL = 0.07; // zachter tijdens alarm/achtervolging, zodat die geluiden goed hoorbaar blijven
+function fadeAudioVolume(player, targetVol, durationMs){
+  clearInterval(player._fadeInterval);
+  const startVol = player.volume, steps = 20, stepMs = durationMs / steps;
+  let i = 0;
+  player._fadeInterval = setInterval(() => {
+    i++;
+    player.volume = Math.max(0, Math.min(1, startVol + (targetVol - startVol) * (i/steps)));
+    if (i >= steps){ clearInterval(player._fadeInterval); player.volume = targetVol; }
+  }, stepMs);
+}
+function duckZombieMusic(down){
+  fadeAudioVolume($('zombieMusicPlayer'), down ? ZOMBIE_MUSIC_DUCK_VOL : ZOMBIE_MUSIC_BASE_VOL, 800);
+}
+function startZombieBackgroundMusic(){
+  const player = $('zombieMusicPlayer');
+  player.src = zombieRandomFile('music');
+  player.volume = 0;
+  player.play().catch(() => {});
+  fadeAudioVolume(player, ZOMBIE_MUSIC_BASE_VOL, 1500); // rustig inrijden i.p.v. abrupt starten
+}
+function stopZombieBackgroundMusic(){
+  const player = $('zombieMusicPlayer');
+  fadeAudioVolume(player, 0, 1200);
+  setTimeout(() => { player.pause(); player.currentTime = 0; }, 1300);
+}
+// Losse sfeergeluiden: willekeurig elke 20-40s tijdens het verhaal, plus telkens één extra vlak vóór
+// een achtervolging start (samen met het alarm) — zie handleZombieTrackEnded().
+let zombieEffectTimeoutId = null;
+function scheduleZombieEffect(){
+  clearTimeout(zombieEffectTimeoutId);
+  if (!rsState || !rsState.zombie || rsState.zombie.finished) return;
+  const delayMs = (20 + Math.random()*20) * 1000;
+  zombieEffectTimeoutId = setTimeout(() => {
+    if (rsState && rsState.zombie && !rsState.zombie.finished && rsState.zombie.phase === 'story') playZombieEffect();
+    scheduleZombieEffect(); // zichzelf telkens opnieuw inplannen zolang de sessie loopt
+  }, delayMs);
+}
+function playZombieEffect(){
+  const player = $('zombieEffectsPlayer');
+  player.src = zombieRandomFile('effects');
+  player.volume = 0.6;
+  player.play().catch(() => {});
+}
+function playZombieStoryPart(){
+  const z = rsState.zombie;
+  z.phase = 'story';
+  const player = $('runMusicPlayer');
+  player.src = zombieStoryFile(z.storylineId, z.part);
+  player.volume = 0.9;
+  rsCurrentAudioPool = null;
+  player.play().catch(() => {});
+  duckZombieMusic(false); // achtergrondmuziek terug op normaal volume tijdens het verhaal
+  updateZombieBanner();
+}
+function handleZombieTrackEnded(){
+  const z = rsState.zombie;
+  if (z.finished) return;
+  if (z.phase === 'story'){
+    // Verhaaldeel afgelopen — geen volgend bestand meer? Dan is de verhaallijn hier uit, sessie loopt gewoon door als vrije run.
+    startZombieInterlude('alarm');
+  } else if (z.phase === 'alarm'){
+    z.phase = 'chase';
+    z.chaseEndAt = Date.now() + z.chaseDurationSec*1000;
+    z.belowThresholdStreak = 0;
+    const player = $('runMusicPlayer');
+    player.src = zombieRandomFile('chase');
+    player.volume = 1;
+    player.play().catch(() => {});
+    updateZombieBanner();
+    speakForRun(curLang()==='en' ? 'Zombies! Run!' : 'Zombies! Lopen!');
+  } else if (z.phase === 'chase'){
+    // Achtervolgingsgeluid was korter dan de resterende tijd — gewoon opnieuw laten spelen tot de tijd om is.
+    if (Date.now() < z.chaseEndAt){ $('runMusicPlayer').play().catch(() => {}); }
+  }
+}
+// Rustig lopen op enkel de achtergrondmuziek, geen verhaal/alarm/achtervolging — instelbare duur (0 = overslaan).
+// nextPhase: 'alarm' (na een verhaaldeel) of 'story' (na een afgeronde achtervolging).
+function startZombieInterlude(nextPhase){
+  const z = rsState.zombie;
+  clearTimeout(z.interludeTimeoutId);
+  if (!z.interludeDurationSec){ finishZombieInterlude(nextPhase); return; } // uitgeschakeld: meteen doorgaan
+  z.phase = 'interlude';
+  z.interludeNext = nextPhase;
+  z.interludeEndAt = Date.now() + z.interludeDurationSec*1000;
+  $('runMusicPlayer').pause(); // geen verhaal/alarm-geluid tijdens het rustige stuk, enkel de achtergrondmuziek
+  updateZombieBanner();
+  z.interludeTimeoutId = setTimeout(() => finishZombieInterlude(nextPhase), z.interludeDurationSec*1000);
+}
+function finishZombieInterlude(nextPhase){
+  const z = rsState.zombie;
+  if (!z || z.finished) return;
+  if (nextPhase === 'alarm'){
+    z.phase = 'alarm';
+    const player = $('runMusicPlayer');
+    player.src = zombieRandomFile('alarm');
+    player.volume = 1;
+    player.play().catch(() => {});
+    duckZombieMusic(true); // muziek zachter zodra het alarm start, blijft zacht tot het volgende verhaaldeel
+    playZombieEffect(); // extra sfeergeluid vlak vóór de achtervolging, samen met het alarm
+    updateZombieBanner();
+  } else {
+    advanceZombieStory();
+  }
+}
+// Elke seconde aangeroepen vanuit de bestaande tick-loop (tickRunSession) — bewaakt de achtervolgingsfase.
+function tickZombieState(){
+  const z = rsState.zombie;
+  if (!z || z.finished) return;
+  if (z.phase === 'interlude'){ updateZombieBanner(); return; } // aftellen gebeurt via setTimeout, hier enkel de banner verversen
+  if (z.phase !== 'chase') return;
+  const kmh = (rsState.currentSpeedKmh != null) ? rsState.currentSpeedKmh : 0;
+  if (kmh < z.thresholdKmh) z.belowThresholdStreak++; else z.belowThresholdStreak = 0;
+  const caughtNow = z.belowThresholdStreak >= 4; // 4 opeenvolgende seconden te traag = ingehaald
+  const timeUp = Date.now() >= z.chaseEndAt;
+  if (caughtNow){
+    resolveZombieChase(false);
+  } else if (timeUp){
+    resolveZombieChase(true);
+  } else {
+    updateZombieBanner();
+  }
+}
+function resolveZombieChase(escaped){
+  const z = rsState.zombie;
+  duckZombieMusic(false); // achtervolging voorbij, muziek terug omhoog (ook tijdens het interlude-stuk hierna)
+  if (escaped){
+    z.score += 10; z.escapedCount++;
+    speakForRun(curLang()==='en' ? 'You escaped!' : 'Ontsnapt!');
+    startZombieInterlude('story');
+  } else {
+    z.caughtCount++;
+    if (z.consequence === 'points'){
+      z.score -= 10;
+      speakForRun(curLang()==='en' ? 'Caught! Keep going.' : 'Ingehaald! Loop door.');
+      startZombieInterlude('story');
+    } else if (z.consequence === 'extend'){
+      z.score -= 5;
+      speakForRun(curLang()==='en' ? "Caught! They're still after you!" : 'Ingehaald! Ze zitten nog achter je aan!');
+      duckZombieMusic(true); // achtervolging gaat gewoon door, muziek blijft dus zacht
+      z.chaseEndAt = Date.now() + z.chaseDurationSec*1000; // extra kans, zelfde drempel
+      z.belowThresholdStreak = 0;
+      const player = $('runMusicPlayer');
+      player.src = zombieRandomFile('chase'); player.play().catch(() => {});
+    } else { // 'fail'
+      z.score -= 20;
+      z.finished = true;
+      speakForRun(curLang()==='en' ? 'They got you. Mission failed.' : 'Ze hebben je te pakken. Missie mislukt.');
+    }
+  }
+  updateZombieBanner();
+}
+function advanceZombieStory(){
+  const z = rsState.zombie;
+  z.part += 1;
+  saveZombiePart(z.storylineId, z.part);
+  playZombieStoryPart();
+}
+function updateZombieBanner(){
+  if (!rsState || !rsState.zombie) return;
+  const z = rsState.zombie;
+  const label = $('rsIntervalLabel');
+  if (!label) return;
+  if (z.finished){
+    label.textContent = curLang()==='en' ? `💀 Mission failed · Score ${z.score}` : `💀 Missie mislukt · Score ${z.score}`;
+  } else if (z.phase === 'chase'){
+    const secLeft = Math.max(0, Math.ceil((z.chaseEndAt - Date.now())/1000));
+    label.textContent = curLang()==='en' ? `🧟 RUN! ${secLeft}s · min. ${z.thresholdKmh} km/h` : `🧟 RENNEN! ${secLeft}s · min. ${z.thresholdKmh} km/u`;
+    label.className = 'type-run';
+  } else if (z.phase === 'alarm'){
+    label.textContent = curLang()==='en' ? '🚨 Zombies incoming...' : '🚨 Zombies komen eraan...';
+  } else if (z.phase === 'interlude'){
+    const secLeft = Math.max(0, Math.ceil((z.interludeEndAt - Date.now())/1000));
+    label.textContent = curLang()==='en' ? `🎧 Running on music · ${secLeft}s` : `🎧 Rustig lopen op muziek · ${secLeft}s`;
+  } else {
+    label.textContent = curLang()==='en' ? `📖 Part ${z.part} · Score ${z.score}` : `📖 Deel ${z.part} · Score ${z.score}`;
+  }
 }
 let rcActiveMode = 'learn'; // 'learn' | 'free' | 'builder'
 function rcSwitchTopTab(mode){
-  rcActiveMode = mode;
+  rcActiveMode = mode === 'evy' ? 'learn' : mode; // 'evy' is geen sessie-modus op zich, enkel een tabblad
   $('rcTabLearnBtn').classList.toggle('active', mode==='learn');
+  $('rcTabEvyBtn').classList.toggle('active', mode==='evy');
   $('rcTabFreeBtn').classList.toggle('active', mode==='free');
-  $('rcTabBuilderBtn').classList.toggle('active', mode==='builder');
   $('rcLearnContent').style.display = mode==='learn' ? 'block' : 'none';
+  $('rcEvyContent').style.display = mode==='evy' ? 'block' : 'none';
   $('rcFreeContent').style.display = mode==='free' ? 'block' : 'none';
-  $('rcBuilderContent').style.display = mode==='builder' ? 'block' : 'none';
-  $('runCoachStartBtn').style.display = mode==='builder' ? 'none' : 'block';
 }
 $('rcTabLearnBtn').addEventListener('click', () => rcSwitchTopTab('learn'));
+$('rcTabEvyBtn').addEventListener('click', () => rcSwitchTopTab('evy'));
 $('rcTabFreeBtn').addEventListener('click', () => rcSwitchTopTab('free'));
-$('rcTabBuilderBtn').addEventListener('click', () => rcSwitchTopTab('builder'));
 $('rcBuilderStartBtn').addEventListener('click', () => {
   const reps = Math.max(1, parseInt($('rcBuildReps').value) || 1);
   const runSec = Math.max(10, parseInt($('rcBuildRun').value) || 60);
   const walkSec = Math.max(10, parseInt($('rcBuildWalk').value) || 60);
   startRunSession({ custom: buildRunWalkIntervals(reps, runSec, walkSec, 300, 300) });
 });
+// ---------- AI Coach: afstandskiezer (5/7,5/10 km) ----------
+document.querySelectorAll('.rc-dist-btn').forEach(btn => {
+  btn.addEventListener('click', async () => {
+    await setActivePlanId(btn.dataset.plan);
+    document.querySelectorAll('.rc-dist-btn').forEach(b => {
+      const active = b === btn;
+      b.style.borderColor = active ? 'var(--amber)' : 'rgba(255,255,255,0.1)';
+      b.style.background = active ? 'rgba(226,161,60,0.12)' : 'rgba(255,255,255,0.04)';
+    });
+    await renderRunCoachScreen();
+  });
+});
+// ---------- EVY: starten en herstarten ----------
+$('rcEvyStart5Std').addEventListener('click', () => startRunSession({ mode:'evy', targetKm:5, evyDist:5 }));
+$('rcEvyStart10Std').addEventListener('click', () => startRunSession({ mode:'evy', targetKm:10, evyDist:10 }));
+$('rcEvyReset5Std').addEventListener('click', async () => {
+  if (confirm('De 5K-reeks terugzetten naar Week 1 · Sessie 1?')){ await resetEvyProgress(5); await renderEvyProgressStd(); }
+});
+$('rcEvyReset10Std').addEventListener('click', async () => {
+  if (confirm('De 10K-reeks terugzetten naar Week 1 · Sessie 1?')){ await resetEvyProgress(10); await renderEvyProgressStd(); }
+});
+async function renderEvyProgressStd(){
+  const p5 = await getEvyProgress(5), p10 = await getEvyProgress(10);
+  $('rcEvyProg5Std').textContent = `Week ${p5.week} · Sessie ${p5.session}/3`;
+  $('rcEvyProg10Std').textContent = `Week ${p10.week} · Sessie ${p10.session}/3`;
+}
+// ---------- Vrij/Doel: Vrije Run-kaart en Target-knoppen starten meteen ----------
+$('rcFreeRunCardStd').addEventListener('click', () => startRunSession({ mode:'free' }));
+$('rcZombieBtnStd').addEventListener('click', openZombieSetupModal);
+$('rcTarget5BtnStd').addEventListener('click', () => startRunSession({ mode:'free', targetKm:5 }));
+$('rcTarget10BtnStd').addEventListener('click', () => startRunSession({ mode:'free', targetKm:10 }));
+// ---------- Sessie-tab: live sessie hervatten ----------
+$('rcResumeSessionBtnStd').addEventListener('click', resumeRunSessionView);
+function renderSessiePanelStd(){
+  const active = !!rsState;
+  $('rcSessieInactiveStd').classList.toggle('hidden', active);
+  $('rcSessieActiveStd').classList.toggle('hidden', !active);
+}
 
-// ---------- Onderste tabbladen: Home / Stats / Schema / Pijn ----------
+// ---------- Onderste tabbladen: Home / Sessie / Stats / Schema / Pijn ----------
 document.querySelectorAll('.rc-navbtn').forEach(btn => {
   btn.addEventListener('click', async () => {
     document.querySelectorAll('.rc-navbtn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     document.querySelectorAll('.rc-panel').forEach(p => p.classList.remove('active'));
     $(btn.dataset.panel).classList.add('active');
+    if (btn.dataset.panel === 'rcSessiePanel') renderSessiePanelStd();
     if (btn.dataset.panel === 'rcStatsPanel') await renderRunStatsPanel();
     if (btn.dataset.panel === 'rcSchemaPanel') await renderRunSchemaPanel();
   });
@@ -6901,8 +7302,9 @@ async function renderRunStatsPanel(){
     const dateLabel = d.toLocaleDateString('nl-BE', { day:'2-digit', month:'short' });
     const moodIcon = r.mood === 'happy' ? ' 😄' : r.mood === 'sad' ? ' 😔' : '';
     const painIcon = (r.painAreas && r.painAreas.length) ? ` 🩹${r.painAreas.length>1 ? ' ('+r.painAreas.length+'x)' : ''}` : '';
+    const zombieIcon = r.zombie ? ` 🧟${r.zombie.score >= 0 ? '+' : ''}${r.zombie.score}` : '';
     return `<div style="display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid rgba(255,255,255,0.06); font-size:12.5px;">
-      <span style="color:var(--cream);">${dateLabel} — ${r.km.toFixed(2)} km${moodIcon}${painIcon}</span>
+      <span style="color:var(--cream);">${dateLabel} — ${r.km.toFixed(2)} km${moodIcon}${painIcon}${zombieIcon}</span>
       <span style="color:rgba(246,244,238,0.55);">${fmtMMSS(r.durationSec)}${r.completed ? ' ✅' : ''}</span>
     </div>`;
   }).join('') : `<div style="color:rgba(246,244,238,0.5); font-size:12.5px; text-align:center; padding:20px 0;">Nog geen trainingen afgerond.</div>`;
@@ -7022,6 +7424,7 @@ $('runPlanSaveBtn').addEventListener('click', async () => {
 });
 
 $('runCoachBackBtn').addEventListener('click', closeRunCoachScreen);
+$('runCoachSpotifyBtn').addEventListener('click', openSpotifyModal);
 $('runCoachAudioHeaderBtn').addEventListener('click', () => {
   document.querySelectorAll('.rc-navbtn').forEach(b => b.classList.remove('active'));
   document.querySelector('.rc-navbtn[data-panel="rcHomePanel"]').classList.add('active');
@@ -7327,7 +7730,8 @@ async function startRunSession(opts){
     else if (weatherSunCache.code != null && [51,53,55,61,63,65,80,81,82].includes(weatherSunCache.code)) startMsg += ' ' + pickWeatherWarningLine('rain');
   }
   speakForRun(startMsg);
-  if (opts.evyDist) playEvyTrack(opts.evyDist).then(nr => { rsState.evyEpisodeNr = nr; updateRunSessionUI(); });
+  if (opts.zombieConfig) initZombieState(opts.zombieConfig);
+  else if (opts.evyDist) playEvyTrack(opts.evyDist).then(nr => { rsState.evyEpisodeNr = nr; updateRunSessionUI(); });
   else switchAudioForIntervalType(intervals[0].type);
   $('runMusicPlayer').addEventListener('ended', handleRunTrackEnded);
   rsState.tickId = setInterval(tickRunSession, 1000);
@@ -7399,6 +7803,7 @@ function handleRunGpsUpdate(pos){
     rsMap.panTo([pos.coords.latitude, pos.coords.longitude], { animate:true });
   }
   $('rsMapBadgeText').textContent = `${Math.round(rsState.distanceM)}m @ ${speedKmh.toFixed(1)} km/u`;
+  rsState.currentSpeedKmh = speedKmh;
   rsState.lastPos = pos;
   const km = rsState.distanceM / 1000;
   if (Math.floor(km) > rsState.lastAnnouncedKm){
@@ -7461,7 +7866,7 @@ function tickRunSession(){
   if (!rsState || rsState.paused) return;
   if (rsState.freeform){
     // Vrije run/doelrun: geen vaste intervallen, dus geen halverwege-punt — wel af en toe aanmoediging
-    maybeSpeakEncouragement();
+    if (rsState.zombie) tickZombieState(); else maybeSpeakEncouragement();
     updateRunSessionUI();
     return;
   }
@@ -7534,10 +7939,14 @@ function updateRunSessionUI(){
   const label = $('rsIntervalLabel');
   const elapsedSec = (Date.now() - rsState.startedAt - rsState.pausedMs) / 1000;
   if (rsState.freeform){
-    label.textContent = rsState.evyDist
-      ? `EVY · ${rsState.evyDist} km · Aflevering ${rsState.evyEpisodeNr || '–'}`
-      : rsState.targetKm ? (en ? `Target ${rsState.targetKm} km` : `Doel ${rsState.targetKm} km`) : (en ? 'Free run' : 'Vrij lopen');
-    label.className = 'type-run';
+    if (rsState.zombie){
+      updateZombieBanner();
+    } else {
+      label.textContent = rsState.evyDist
+        ? `EVY · ${rsState.evyDist} km · Aflevering ${rsState.evyEpisodeNr || '–'}`
+        : rsState.targetKm ? (en ? `Target ${rsState.targetKm} km` : `Doel ${rsState.targetKm} km`) : (en ? 'Free run' : 'Vrij lopen');
+      label.className = 'type-run';
+    }
     $('rsCountdown').textContent = fmtMMSS(elapsedSec);
     const km = rsState.distanceM / 1000;
     $('rsNextLabel').textContent = rsState.targetKm
@@ -7616,6 +8025,11 @@ function minimizeRunSession(){
   } else {
     $('runCoachScreen').classList.remove('hidden');
     renderRunCoachScreen();
+    document.querySelectorAll('.rc-navbtn').forEach(b => b.classList.remove('active'));
+    document.querySelector('.rc-navbtn[data-panel="rcSessiePanel"]').classList.add('active');
+    document.querySelectorAll('.rc-panel').forEach(p => p.classList.remove('active'));
+    $('rcSessiePanel').classList.add('active');
+    renderSessiePanelStd();
   }
 }
 function resumeRunSessionView(){
@@ -7653,7 +8067,8 @@ async function finishRunSession(completed){
     history.unshift({
       date:historyEntryDate, week:rsState.week, day:rsState.day,
       km:Math.round(km*100)/100, durationSec:Math.round(elapsedSec),
-      completed, freeform:rsState.freeform, custom:rsState.isCustom, avgBpm: avgHrSamples()
+      completed, freeform:rsState.freeform, custom:rsState.isCustom, avgBpm: avgHrSamples(),
+      zombie: rsState.zombie ? { score:rsState.zombie.score, escaped:rsState.zombie.escapedCount, caught:rsState.zombie.caughtCount, storylineId:rsState.zombie.storylineId } : null
     });
     await storageSet('run_history', JSON.stringify(history.slice(0, 200)));
   }catch(e){ /* geschiedenis opslaan mislukt, sessie zelf blijft wel gewoon geldig afgerond */ }
@@ -7661,6 +8076,7 @@ async function finishRunSession(completed){
     ? `Session ${completed ? 'completed' : 'stopped'}: ${km.toFixed(2)} km in ${fmtMMSS(elapsedSec)}.`
     : `Sessie ${completed ? 'afgerond' : 'gestopt'}: ${km.toFixed(2)} km in ${fmtMMSS(elapsedSec)}.`);
   const rsBreadcrumbsSnapshot = rsState.breadcrumbs || [];
+  if (rsState.zombie){ stopZombieBackgroundMusic(); clearTimeout(zombieEffectTimeoutId); clearTimeout(rsState.zombie.interludeTimeoutId); }
   rsState = null;
   lastFinishedRunBreadcrumbs = rsBreadcrumbsSnapshot;
   $('runSessionScreen').classList.add('hidden');
@@ -7742,6 +8158,34 @@ $('rideStravaUploadBtn').addEventListener('click', async () => {
   const ok = await uploadActivityToStrava(navBreadcrumbs, name, sportType);
   btn.disabled = false; btn.textContent = '🟠 Uploaden';
   if (ok) closeModal('rideStravaModal');
+});
+
+// ---------- Zombie Run: instelscherm ----------
+async function openZombieSetupModal(){
+  openModal('zombieSetupModal');
+  await refreshZombieStorylineProgress();
+}
+async function refreshZombieStorylineProgress(){
+  const id = $('zombieStorylineSelect').value;
+  const p = await getZombieProgress(id);
+  $('zombieStorylineProgress').textContent = curLang()==='en' ? `Part ${p.part}` : `Deel ${p.part}`;
+}
+$('zombieStorylineSelect').addEventListener('change', refreshZombieStorylineProgress);
+$('zombieResetStorylineBtn').addEventListener('click', async () => {
+  const id = $('zombieStorylineSelect').value;
+  if (confirm(curLang()==='en' ? 'Restart this storyline from part 1?' : 'Deze verhaallijn terugzetten naar deel 1?')){
+    await resetZombieProgress(id);
+    await refreshZombieStorylineProgress();
+  }
+});
+$('zombieStartBtn').addEventListener('click', () => {
+  const storylineId = $('zombieStorylineSelect').value;
+  const thresholdKmh = Math.max(1, parseFloat($('zombieThresholdInput').value) || 8);
+  const chaseDurationSec = Math.max(10, parseInt($('zombieChaseDurationInput').value) || 45);
+  const interludeDurationSec = Math.max(0, parseInt($('zombieInterludeDurationInput').value) || 0);
+  const consequence = document.querySelector('input[name="zombieConsequence"]:checked').value;
+  closeModal('zombieSetupModal');
+  startZombieRun({ storylineId, thresholdKmh, chaseDurationSec, interludeDurationSec, consequence });
 });
 
 // ---------- Garmin-stijl Kompas (letterlijk Gemini's Compas.html) ----------
@@ -7876,6 +8320,7 @@ window.addEventListener('message', (ev) => {
     case 'findobservations': garminFindObservations(); break;
     case 'openwiki': openWikiInfoModal(data.sciName, data.commonName); break;
     case 'openspotify': openSpotifyModal(); break;
+    case 'openzombiesetup': openZombieSetupModal(); break;
   }
 });
 async function garminIdentifyAnimal(file){
@@ -9275,7 +9720,6 @@ function buildGarminHubHtml(){
 </head>
 <body class="bg-slate-950 min-h-screen flex items-center justify-center p-0 overflow-x-hidden">
   <div class="w-full bg-slate-950 text-slate-100 min-h-screen p-6 flex flex-col justify-between overflow-hidden relative">
-    <div class="glassFillIntro"></div>
     <div class="absolute inset-0 w-full h-full bg-cover bg-center opacity-40 pointer-events-none z-0" style="background-image:url('achtergrond-home.jpg');"></div>
     <div class="absolute inset-0 w-full h-full pointer-events-none z-0 overflow-hidden">
       <div class="glass-ribbon absolute top-[-20%] left-[-10%] w-[120%] h-[140%]"></div>
@@ -9534,6 +9978,11 @@ function buildGarminRunCoachHtml(){
             <p class="text-[9px] text-slate-400 mt-0.5">30s Sprint / 30s Herstel</p>
           </button>
         </div>
+        <button id="rcZombieBtnTw" class="w-full bg-gradient-to-br from-red-950 to-black border border-red-500/40 p-3.5 rounded-2xl text-left mb-3.5">
+          <span class="text-2xl block mb-1">🧟</span>
+          <h3 class="text-xs font-bold text-rose-300">Zombie Run</h3>
+          <p class="text-[9px] text-slate-400 mt-0.5">Verhaal + achtervolgingen — loop sneller dan de zombies of verlies punten.</p>
+        </button>
       </div>
 
       <details id="rcBuilderDetails" class="bg-slate-900/60 rounded-2xl border border-slate-800 text-xs overflow-hidden mb-3.5">
@@ -9762,6 +10211,9 @@ ${GARMIN_MENU_BTN_JS}
     });
     document.getElementById('rcSpotifyBtn').addEventListener('click', () => {
       parent.postMessage({ source:'garminSetup', action:'openspotify' }, '*');
+    });
+    document.getElementById('rcZombieBtnTw').addEventListener('click', () => {
+      parent.postMessage({ source:'garminSetup', action:'openzombiesetup' }, '*');
     });
 
     // ---- Lokale tabwissel AI Coach / EVY / Volleerde Loper ----
