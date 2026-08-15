@@ -733,31 +733,32 @@
      (huidige stijl verdwijnt), dan — ná de omwisseling zelf — weer wegvloeit (nieuwe stijl verschijnt). */
   #themeDissolveOverlay{
     position:fixed; top:0; left:0; right:0; bottom:0; z-index:9999; background:#050914;
-    opacity:0; pointer-events:none; transition:opacity 0.45s ease;
+    opacity:0; pointer-events:none; transition:opacity 0.95s ease;
   }
   #themeDissolveOverlay.show{ opacity:1; }
   /* 'Glas dat zich vult'-intro: een vaag/wazig glaspaneel dat bij het opstarten van onder naar boven
      wegtrekt en de content onthult, gecombineerd met een subtiele lichtglans die er doorheen glijdt. */
   .glassFillIntro{
     position:absolute; inset:0; z-index:50; pointer-events:none; overflow:hidden;
-    background:linear-gradient(180deg, rgba(148,197,255,0.16), rgba(148,197,255,0.05));
-    backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
-    animation: glassFillReveal 1.3s cubic-bezier(0.65,0,0.35,1) forwards;
+    background:linear-gradient(180deg, rgba(148,197,255,0.30), rgba(148,197,255,0.12));
+    backdrop-filter:blur(22px); -webkit-backdrop-filter:blur(22px);
+    animation: glassFillReveal 2.4s cubic-bezier(0.65,0,0.35,1) forwards;
   }
   .glassFillIntro::after{
     content:''; position:absolute; inset:0;
-    background:linear-gradient(115deg, transparent 40%, rgba(255,255,255,0.35) 50%, transparent 60%);
+    background:linear-gradient(115deg, transparent 35%, rgba(255,255,255,0.55) 50%, transparent 65%);
     background-size:250% 250%; background-position:120% 0;
-    animation: glassFillShimmer 1.3s ease-out forwards;
+    animation: glassFillShimmer 2.4s ease-out forwards;
   }
   @keyframes glassFillReveal{
     0%{ clip-path:inset(0% 0% 0% 0%); opacity:1; }
-    75%{ clip-path:inset(0% 0% 100% 0%); opacity:1; }
+    80%{ clip-path:inset(0% 0% 100% 0%); opacity:1; }
     100%{ clip-path:inset(0% 0% 100% 0%); opacity:0; }
   }
   @keyframes glassFillShimmer{
     0%{ background-position:120% 0; } 100%{ background-position:-20% 0; }
   }
+  #modeSelectScreen{
     position:fixed; top:0;left:0;right:0;bottom:0; z-index:3000; background:var(--green-900);
     display:flex; flex-direction:column; align-items:center; justify-content:space-between;
     padding:calc(40px + env(safe-area-inset-top,0px) + var(--extra-top-inset)) 20px calc(24px + env(safe-area-inset-bottom,0px) + var(--extra-bottom-inset));
@@ -6566,7 +6567,7 @@ async function applyTheme(theme){
   const overlay = $('themeDissolveOverlay');
   if (changed && overlay){
     overlay.classList.add('show');
-    await new Promise(r => setTimeout(r, 450)); // wachten tot de laag volledig ondoorzichtig is
+    await new Promise(r => setTimeout(r, 950)); // wachten tot de laag volledig ondoorzichtig is
   }
   document.body.classList.remove('theme-garmin');
   if (theme === 'garmin') document.body.classList.add('theme-garmin');
@@ -6575,7 +6576,7 @@ async function applyTheme(theme){
   // op dat een thema-wissel soms niet live doorkwam terwijl je al op de hub stond.
   if (appMode === null) showHubScreen();
   if (changed && overlay){
-    await new Promise(r => setTimeout(r, 80)); // heel even laten "zetten" vóór het wegvloeit, anders zie je de wissel zelf nog flitsen
+    await new Promise(r => setTimeout(r, 200)); // heel even laten "zetten" vóór het wegvloeit, anders zie je de wissel zelf nog flitsen
     overlay.classList.remove('show');
   }
 }
@@ -6593,7 +6594,7 @@ function showHubScreen(){
     const div = document.createElement('div');
     div.className = 'glassFillIntro';
     $('modeSelectScreen').appendChild(div);
-    setTimeout(() => div.remove(), 1400);
+    setTimeout(() => div.remove(), 2500);
   }
   if (garmin) hubIntroPlayed = true; // Tailwind-stijl speelt zijn eigen intro al af binnen het iframe zelf
   if (garmin){
