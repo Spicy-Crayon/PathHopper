@@ -48,18 +48,14 @@
     </div>
 
     <script>
-        // Mappenstructuur configuratie voor lokale MP3 bestanden
-        const AUDIO_PATHS = {
-            intro: "audio/ZombieRun/Zombie-intro/",
-            alarm: "audio/ZombieRun/Zombie-fx/alarm/",
-            zombieFx: "audio/ZombieRun/Zombie-fx/zombieGeluiden/",
-            story: "audio/ZombieRun/Zombie-storie/",
-            startRun: "audio/ZombieRun/Zombie-startRun/",
-            stopRun: "audio/ZombieRun/Zombie-StopRun/",
-            musicLower: "audio/ZombieRun/Zombie-music-LowerPace/",
-            musicHigher: "audio/ZombieRun/Zombie-music-HigherPace/",
-            winner: "audio/ZombieRun/Zombie-Winner/",
-            looser: "audio/ZombieRun/Zombie-Looser/"
+        // Mappenstructuur configuratie met correcte bestandsverwijzingen
+        const AUDIO_FILES = {
+            intro: "audio/ZombieRun/Zombie-intro/intro1.mp3",
+            alarm: "audio/ZombieRun/Zombie-fx/alarm/alarm.mp3",
+            startRun: "audio/ZombieRun/Zombie-startRun/start_run.mp3",
+            stopRun: "audio/ZombieRun/Zombie-StopRun/stop_run.mp3",
+            winner: "audio/ZombieRun/Zombie-Winner/winner.mp3",
+            looser: "audio/ZombieRun/Zombie-Looser/looser.mp3"
         };
 
         let gameState = {
@@ -68,27 +64,20 @@
             watchId: null,
             minChaseSpeed: 10,
             goalType: 'time',
-            goalValue: 15,
-            elapsedSeconds: 0,
-            timerInterval: null
+            goalValue: 15
         };
 
-        let bgMusic = new Audio();
-        let sfxAudio = new Audio();
+        let activeAudio = null;
 
-        function playRandomAudio(folderPath, volume = 1.0) {
-            console.log("Audio afspelen uit: " + folderPath);
-            
-            // Voor nu pakken we het bestand dat klaarstaat in de mappenstructuur
-            let filePath = folderPath;
-            if (!filePath.endsWith('.mp3')) {
-                filePath += 'intro1.mp3'; // Of pas dit aan naar het gewenste bestand per map
+        function playRandomAudio(filePath, volume = 1.0) {
+            console.log("Audio afspelen: " + filePath);
+            if (activeAudio) {
+                activeAudio.pause();
             }
-
-            let audio = new Audio(filePath);
-            audio.volume = volume;
-            audio.play().catch(error => {
-                console.warn("Kon audio niet afspelen: ", error);
+            activeAudio = new Audio(filePath);
+            activeAudio.volume = volume;
+            activeAudio.play().catch(error => {
+                console.warn("Kon audio niet afspelen (bestand mist mogelijk): ", error);
             });
         }
 
@@ -101,20 +90,20 @@
             document.getElementById('setup-screen').classList.add('hidden');
             document.getElementById('game-screen').classList.remove('hidden');
 
-            // Fase 1: Start & Intro + Lower Pace Music
-            playRandomAudio(AUDIO_PATHS.intro);
+            // Fase 1: Start & Intro afspelen
+            playRandomAudio(AUDIO_FILES.intro);
             
             // Start GPS tracking
             if (navigator.geolocation) {
                 gameState.watchId = navigator.geolocation.watchPosition(updatePosition, handleGeoError, { enableHighAccuracy: true });
             }
 
-            // Start willekeurige timer voor Zombie-aanvallen (elke 30 tot 60 seconden een kans)
+            // Start timer voor eerste zombie-aanval
             scheduleNextChase();
         }
 
         function scheduleNextChase() {
-            const randomInterval = Math.floor(Math.random() * (60000 - 30000 + 1)) + 30000;
+            const randomInterval = Math.floor(Math.random() * (30000 - 15000 + 1)) + 15000;
             setTimeout(() => {
                 if (document.getElementById('game-screen').classList.contains('hidden')) return;
                 triggerZombieChase();
@@ -125,29 +114,22 @@
             gameState.isChasing = true;
             document.getElementById('alert-box').innerText = "⚠️ ZOMBIE AANVAL! VERSNEL!";
             
-            // Fase 3: Alarm, StartRun audio en Muziek switch
-            playRandomAudio(AUDIO_PATHS.alarm);
-            playRandomAudio(AUDIO_PATHS.startRun);
-
-            // Proximity Audio simulatie (volume stijgt naarmate de tijd vordert)
-            let zombieVolume = 0.2;
-            let proximityInterval = setInterval(() => {
-                zombieVolume += 0.2;
-                if (zombieVolume > 1.0) zombieVolume = 1.0;
-                console.log("Zombie nabijheid volume: " + zombieVolume);
-            }, 2000);
-
-            // Duur van de achtervolging: 20 seconden
+            // Fase 3: Alarm en StartRun audio
+            playRandomAudio(AUDIO_FILES.alarm);
             setTimeout(() => {
-                clearInterval(proximityInterval);
+                playRandomAudio(AUDIO_FILES.startRun);
+            }, 1000);
+
+            // Duur van de achtervolging: 15 seconden
+            setTimeout(() => {
                 endZombieChase();
-            }, 20000);
+            }, 15000);
         }
 
         function endZombieChase() {
             gameState.isChasing = false;
             document.getElementById('alert-box').innerText = "Status: Veilig (Verhaalfase)";
-            playRandomAudio(AUDIO_PATHS.stopRun);
+            playRandomAudio(AUDIO_FILES.stopRun);
 
             // Snelheids- en puntencontrole
             let currentSpeed = parseFloat(document.getElementById('speed-display').innerText);
@@ -166,7 +148,7 @@
         }
 
         function updatePosition(position) {
-            let speedMs = position.coords.speed || 0; // meters per seconde
+            let speedMs = position.coords.speed || 0;
             let speedKmh = (speedMs * 3.6).toFixed(1);
             document.getElementById('speed-display').innerText = speedKmh;
         }
@@ -181,7 +163,7 @@
             document.getElementById('result-screen').classList.remove('hidden');
             document.getElementById('result-title').innerText = "YOU LOSE 🧟";
             document.getElementById('result-message').innerText = "Je levenspunten zijn opgeslokt door de horde!";
-            playRandomAudio(AUDIO_PATHS.looser);
+            playRandomAudio(AUDIO_FILES.looser);
         }
 
         function endGameManually() {
@@ -190,12 +172,12 @@
             document.getElementById('result-screen').classList.remove('hidden');
             
             let medal = "🥉 Bronzen Medaille";
-            if (gameState.points === 3) medal = "🥇 Gouden Medaille (Confetti!)";
+            if (gameState.points === 3) medal = "🥇 Gouden Medaille";
             else if (gameState.points === 2) medal = "🥈 Zilveren Medaille";
 
             document.getElementById('result-title').innerText = "GEFELICITEERD!";
-            document.getElementById('result-message').innerText = "Je hebt de missie overleefd met behoud van je punten! Behaalde prestatie: " + medal;
-            playRandomAudio(AUDIO_PATHS.winner);
+            document.getElementById('result-message').innerText = "Je hebt de missie overleefd! Behaalde prestatie: " + medal;
+            playRandomAudio(AUDIO_FILES.winner);
         }
     </script>
 </body>
