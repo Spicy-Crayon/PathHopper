@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <title>Zombies! Run - Ultimate Edition</title>
+    <style>
+        body { background: #0f172a; color: #f8fafc; font-family: sans-serif; text-align: center; padding: 20px; }
+        .card { background: #1e293b; padding: 20px; border-radius: 12px; max-width: 500px; margin: 0 auto; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        button { background: #dc2626; color: white; border: none; padding: 12px 24px; font-size: 16px; border-radius: 8px; cursor: pointer; margin-top: 15px; font-weight: bold; }
+        button:hover { background: #b91c1c; }
+        .hidden { display: none; }
+        #alert-box { font-size: 24px; font-weight: bold; color: #ef4444; margin: 20px 0; }
+    </style>
+</head>
+<body>
+
+    <div class="card" id="setup-screen">
+        <h2>🧟 Zombies! Run - Instellingen</h2>
+        <p>Bereid je voor op de horde.</p>
+        
+        <label>Doel Type:</label><br>
+        <select id="goalType" style="padding: 8px; margin: 10px; width: 80%;">
+            <option value="time">Doel op Tijd (minuten)</option>
+            <option value="distance">Doel op Afstand (km)</option>
+        </select><br>
+
+        <label>Doel Waarde (bijv. 15 min of 3 km):</label><br>
+        <input type="number" id="goalValue" value="15" style="padding: 8px; margin: 10px; width: 80%;"><br>
+
+        <label>Minimale Snelheid tijdens Chase (km/u):</label><br>
+        <input type="number" id="minChaseSpeed" value="10" style="padding: 8px; margin: 10px; width: 80%;"><br>
+
+        <button onclick="startZombieGame()">START ZOMBIE RUN</button>
+    </div>
+
+    <div class="card hidden" id="game-screen">
+        <h2>🏃‍♂️ RUNNING IN PROGRESS</h2>
+        <div id="alert-box">Status: Veilig (Verhaalfase)</div>
+        <p>Levenspunten: <span id="points-display">3</span> 💖</p>
+        <p>Huidige Snelheid: <span id="speed-display">0.0</span> km/u</p>
+        <button onclick="endGameManually()" style="background: #475569;">Stop Run</button>
+    </div>
+
+    <div class="card hidden" id="result-screen">
+        <h2 id="result-title">EINDE RUN</h2>
+        <p id="result-message"></p>
+        <button onclick="location.reload()">Opnieuw Instellen</button>
+    </div>
+
+    <script>
+        // Mappenstructuur configuratie voor lokale MP3 bestanden
+        const AUDIO_PATHS = {
+            intro: "audio/ZombieRun/Zombie-intro/",
+            alarm: "audio/ZombieRun/Zombie-fx/alarm/",
+            zombieFx: "audio/ZombieRun/Zombie-fx/zombieGeluiden/",
+            story: "audio/ZombieRun/Zombie-storie/",
+            startRun: "audio/ZombieRun/Zombie-startRun/",
+            stopRun: "audio/ZombieRun/Zombie-StopRun/",
+            musicLower: "audio/ZombieRun/Zombie-music-LowerPace/",
+            musicHigher: "audio/ZombieRun/Zombie-music-HigherPace/",
+            winner: "audio/ZombieRun/Zombie-Winner/",
+            looser: "audio/ZombieRun/Zombie-Looser/"
+        };
+
+        let gameState = {
+            points: 3,
+            isChasing: false,
+            watchId: null,
+            minChaseSpeed: 10,
+            goalType: 'time',
+            goalValue: 15,
+            elapsedSeconds: 0,
+            timerInterval: null
+        };
+
+        let bgMusic = new Audio();
+        let sfxAudio = new Audio();
+
+        function playRandomAudio(folderPath, volume = 1.0) {
+            // In een echte implementatie kies je hier willekeurig uit een lijst van bestanden in de map
+            // Voorbeeld simulatie:
+            console.p ("Audio afspelen uit: " + folderPath);
+        }
+
+        function startZombieGame() {
+            gameState.goalType = document.getElementById('goalType').value;
+            gameState.goalValue = parseFloat(document.getElementById('goalValue').value);
+            gameState.minChaseSpeed = parseFloat(document.getElementById('minChaseSpeed').value);
+            gameState.points = 3;
+
+            document.getElementById('setup-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+
+            // Fase 1: Start & Intro + Lower Pace Music
+            playRandomAudio(AUDIO_PATHS.intro);
+            
+            // Start GPS tracking
+            if (navigator.geolocation) {
+                gameState.watchId = navigator.geolocation.watchPosition(updatePosition, handleGeoError, { enableHighAccuracy: true });
+            }
+
+            // Start willekeurige timer voor Zombie-aanvallen (elke 30 tot 60 seconden een kans)
+            scheduleNextChase();
+        }
+
+        function scheduleNextChase() {
+            const randomInterval = Math.floor(Math.random() * (60000 - 30000 + 1)) + 30000;
+            setTimeout(() => {
+                if (document.getElementById('game-screen').classList.contains('hidden')) return;
+                triggerZombieChase();
+            }, randomInterval);
+        }
+
+        function triggerZombieChase() {
+            gameState.isChasing = true;
+            document.getElementById('alert-box').innerText = "⚠️ ZOMBIE AANVAL! VERSNEL!";
+            
+            // Fase 3: Alarm, StartRun audio en Muziek switch
+            playRandomAudio(AUDIO_PATHS.alarm);
+            playRandomAudio(AUDIO_PATHS.startRun);
+
+            // Proximity Audio simulatie (volume stijgt naarmate de tijd vordert)
+            let zombieVolume = 0.2;
+            let proximityInterval = setInterval(() => {
+                zombieVolume += 0.2;
+                if (zombieVolume > 1.0) zombieVolume = 1.0;
+                console.log("Zombie nabijheid volume: " + zombieVolume);
+            }, 2000);
+
+            // Duur van de achtervolging: 20 seconden
+            setTimeout(() => {
+                clearInterval(proximityInterval);
+                endZombieChase();
+            }, 20000);
+        }
+
+        function endZombieChase() {
+            gameState.isChasing = false;
+            document.getElementById('alert-box').innerText = "Status: Veilig (Verhaalfase)";
+            playRandomAudio(AUDIO_PATHS.stopRun);
+
+            // Snelheids- en puntencontrole
+            let currentSpeed = parseFloat(document.getElementById('speed-display').innerText);
+            if (currentSpeed < gameState.minChaseSpeed) {
+                gameState.points--;
+                document.getElementById('points-display').innerText = gameState.points;
+                
+                if (gameState.points <= 0) {
+                    handleGameOver();
+                    return;
+                }
+            }
+
+            // Plan de volgende aanval in
+            scheduleNextChase();
+        }
+
+        function updatePosition(position) {
+            let speedMs = position.coords.speed || 0; // meters per seconde
+            let speedKmh = (speedMs * 3.6).toFixed(1);
+            document.getElementById('speed-display').innerText = speedKmh;
+        }
+
+        function handleGeoError(error) {
+            console.warn("GPS waarschuwing: " + error.message);
+        }
+
+        function handleGameOver() {
+            navigator.geolocation.clearWatch(gameState.watchId);
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+            document.getElementById('result-title').innerText = "YOU LOSE 🧟";
+            document.getElementById('result-message').innerText = "Je levenspunten zijn opgeslokt door de horde!";
+            playRandomAudio(AUDIO_PATHS.looser);
+        }
+
+        function endGameManually() {
+            navigator.geolocation.clearWatch(gameState.watchId);
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+            
+            let medal = "🥉 Bronzen Medaille";
+            if (gameState.points === 3) medal = "🥇 Gouden Medaille (Confetti!)";
+            else if (gameState.points === 2) medal = "🥈 Zilveren Medaille";
+
+            document.getElementById('result-title').innerText = "GEFELICITEERD!";
+            document.getElementById('result-message').innerText = "Je hebt de missie overleefd met behoud van je punten! Behaalde prestatie: " + medal;
+            playRandomAudio(AUDIO_PATHS.winner);
+        }
+    </script>
+</body>
+</html>
