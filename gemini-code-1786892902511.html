@@ -48,7 +48,7 @@
     </div>
 
     <script>
-        // Mappenstructuur configuratie met correcte bestandsverwijzingen
+        // Mappenstructuur configuratie voor lokale MP3 bestanden
         const AUDIO_FILES = {
             intro: "audio/ZombieRun/Zombie-intro/intro1.mp3",
             alarm: "audio/ZombieRun/Zombie-fx/alarm/alarm.mp3",
@@ -77,7 +77,7 @@
             activeAudio = new Audio(filePath);
             activeAudio.volume = volume;
             activeAudio.play().catch(error => {
-                console.warn("Kon audio niet afspelen (bestand mist mogelijk): ", error);
+                console.warn("Kon audio niet afspelen (controleer of het bestand bestaat): ", error);
             });
         }
 
@@ -90,7 +90,7 @@
             document.getElementById('setup-screen').classList.add('hidden');
             document.getElementById('game-screen').classList.remove('hidden');
 
-            // Fase 1: Start & Intro afspelen
+            // Speel intro af
             playRandomAudio(AUDIO_FILES.intro);
             
             // Start GPS tracking
@@ -114,7 +114,6 @@
             gameState.isChasing = true;
             document.getElementById('alert-box').innerText = "⚠️ ZOMBIE AANVAL! VERSNEL!";
             
-            // Fase 3: Alarm en StartRun audio
             playRandomAudio(AUDIO_FILES.alarm);
             setTimeout(() => {
                 playRandomAudio(AUDIO_FILES.startRun);
@@ -131,7 +130,6 @@
             document.getElementById('alert-box').innerText = "Status: Veilig (Verhaalfase)";
             playRandomAudio(AUDIO_FILES.stopRun);
 
-            // Snelheids- en puntencontrole
             let currentSpeed = parseFloat(document.getElementById('speed-display').innerText);
             if (currentSpeed < gameState.minChaseSpeed) {
                 gameState.points--;
@@ -143,7 +141,6 @@
                 }
             }
 
-            // Plan de volgende aanval in
             scheduleNextChase();
         }
 
