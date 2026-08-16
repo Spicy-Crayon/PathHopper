@@ -67,38 +67,51 @@
             isChasing: false,
             watchId: null,
             minChaseSpeed: 10,
-            zombieDelayMs: 60000 // Wordt overschreven door instelling
+            zombieDelayMs: 60000
         };
 
         let bgMusic = new Audio();
+        let targetBgVolume = 0.4;
         let activeSfx = null;
 
-        // Achtergrondmuziek afspelen (blijft loopen op de achtergrond)
-        function playBackgroundMusic(filePath, volume = 0.4) {
-            if (!bgMusic.paused) {
-                bgMusic.pause();
+        // Achtergrondmuziek afspelen of wisselen
+        function playBackgroundMusic(filePath, baseVolume = 0.4) {
+            targetBgVolume = baseVolume;
+            // Als exact dezelfde muziek al speelt, hoeven we hem niet te herstarten
+            if (bgMusic.src && bgMusic.src.includes(filePath) && !bgMusic.paused) {
+                bgMusic.volume = targetBgVolume;
+                return;
             }
+            bgMusic.pause();
             bgMusic = new Audio(filePath);
             bgMusic.loop = true;
-            bgMusic.volume = volume;
+            bgMusic.volume = targetBgVolume;
             bgMusic.play().catch(error => {
                 console.warn("Muziek kon niet starten: ", error);
             });
         }
 
-        // Los geluid of stemfragment afspelen over de muziek heen
+        // Sound effect afspelen + automatische volume-verlaging van de achtergrondmuziek (ducking)
         function playSoundEffect(filePath, volume = 1.0, onEndedCallback = null) {
             if (activeSfx) {
                 activeSfx.pause();
             }
+
+            // Achtergrondmuziek tijdelijk 50% zachter tijdens stem/alarm
+            bgMusic.volume = targetBgVolume * 0.5;
+
             activeSfx = new Audio(filePath);
             activeSfx.volume = volume;
+            
             activeSfx.play().then(() => {
-                if (onEndedCallback) {
-                    activeSfx.onended = onEndedCallback;
-                }
+                activeSfx.onended = () => {
+                    // Zet muziekvolume weer terug naar het normale niveau
+                    bgMusic.volume = targetBgVolume;
+                    if (onEndedCallback) onEndedCallback();
+                };
             }).catch(error => {
                 console.warn("SFX kon niet afspelen: ", error);
+                bgMusic.volume = targetBgVolume;
                 if (onEndedCallback) onEndedCallback();
             });
         }
@@ -106,22 +119,21 @@
         function startZombieGame() {
             gameState.minChaseSpeed = parseFloat(document.getElementById('minChaseSpeed').value);
             let delayMins = parseFloat(document.getElementById('zombieDelayMinutes').value) || 1;
-            gameState.zombieDelayMs = delayMins * 60 * 1000; // Omzetten naar milliseconden
+            gameState.zombieDelayMs = delayMins * 60 * 1000;
             gameState.points = 3;
 
             document.getElementById('setup-screen').classList.add('hidden');
             document.getElementById('game-screen').classList.remove('hidden');
 
-            // 1. Start rustige achtergrondmuziek
-            playBackgroundMusic(AUDIO_FILES.musicLower, 0.3);
+            // 1. Start de rustige achtergrondmuziek (LowerPace)
+            playBackgroundMusic(AUDIO_FILES.musicLower, 0.4);
 
-            // 2. Speel eerst de volledige intro af. Pas als deze klaar is, start de wachttijd voor de zombies.
+            // 2. Speel intro af (muziek zakt automatisch weg tijdens de stem)
             playSoundEffect(AUDIO_FILES.intro, 1.0, () => {
                 console.log("Intro afgelopen. Wachten tot eerste zombie-aanval...");
                 setTimeout(triggerZombieChase, gameState.zombieDelayMs);
             });
             
-            // Start GPS tracking
             if (navigator.geolocation) {
                 gameState.watchId = navigator.geolocation.watchPosition(updatePosition, handleGeoError, { enableHighAccuracy: true });
             }
@@ -133,14 +145,12 @@
             gameState.isChasing = true;
             document.getElementById('alert-box').innerText = "⚠️ ZOMBIE AANVAL! VERSNEL!";
             
-            // Schakel over naar snelle actiemuziek
+            // Schakel direct over naar de snelle HigherPace actiemuziek!
             playBackgroundMusic(AUDIO_FILES.musicHigher, 0.6);
 
-            // Speel alarm en start-run geluid over de muziek heen
-            playSoundEffect(AUDIO_FILES.alarm, 1.0);
-            setTimeout(() => {
+            playSoundEffect(AUDIO_FILES.alarm, 1.0, () => {
                 playSoundEffect(AUDIO_FILES.startRun, 1.0);
-            }, 1500);
+            });
 
             // Duur van de achtervolging: 15 seconden
             setTimeout(() => {
@@ -154,11 +164,10 @@
             gameState.isChasing = false;
             document.getElementById('alert-box').innerText = "Status: Veilig (Verhaalfase)";
             
-            // Schakel terug naar rustige achtergrondmuziek
-            playBackgroundMusic(AUDIO_FILES.musicLower, 0.3);
+            // Schakel weer terug naar de rustige LowerPace achtergrondmuziek
+            playBackgroundMusic(AUDIO_FILES.musicLower, 0.4);
             playSoundEffect(AUDIO_FILES.stopRun, 1.0);
 
-            // Snelheids- en puntencontrole
             let currentSpeed = parseFloat(document.getElementById('speed-display').innerText);
             if (currentSpeed < gameState.minChaseSpeed) {
                 gameState.points--;
@@ -170,7 +179,6 @@
                 }
             }
 
-            // Plan de volgende willekeurige aanval in (bijv. na 30 tot 60 seconden)
             const nextInterval = Math.floor(Math.random() * (60000 - 30000 + 1)) + 30000;
             setTimeout(triggerZombieChase, nextInterval);
         }
