@@ -77,9 +77,19 @@
         let sfxAudio = new Audio();
 
         function playRandomAudio(folderPath, volume = 1.0) {
-            // In een echte implementatie kies je hier willekeurig uit een lijst van bestanden in de map
-            // Voorbeeld simulatie:
-            console.log ("Audio afspelen uit: " + folderPath);
+            console.log("Audio afspelen uit: " + folderPath);
+            
+            // Voor nu pakken we het bestand dat klaarstaat in de mappenstructuur
+            let filePath = folderPath;
+            if (!filePath.endsWith('.mp3')) {
+                filePath += 'intro1.mp3'; // Of pas dit aan naar het gewenste bestand per map
+            }
+
+            let audio = new Audio(filePath);
+            audio.volume = volume;
+            audio.play().catch(error => {
+                console.warn("Kon audio niet afspelen: ", error);
+            });
         }
 
         function startZombieGame() {
