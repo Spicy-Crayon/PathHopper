@@ -1081,6 +1081,7 @@
   #spotifyModal.show{ z-index:3500; }
   #rideStravaModal.show{ z-index:3500; }
   #zombieSetupModal.show{ z-index:3500; }
+  #welcomeNameModal.show{ z-index:9998; }
   .simple-modal-card{
     background:var(--cream); border-radius:18px; padding:18px; width:100%; max-width:380px;
     max-height:80vh; overflow-y:auto; box-shadow:var(--shadow);
@@ -1403,6 +1404,15 @@
 </script>
 
 <div id="themeDissolveOverlay"></div>
+
+<div id="welcomeNameModal" class="simple-modal">
+  <div class="simple-modal-card" style="max-width:320px; text-align:center;">
+    <div class="simple-modal-head" style="justify-content:center;"><b>👋 Welkom!</b></div>
+    <p class="simple-modal-text">Hoe mogen we je noemen? Enkel gebruikt om je persoonlijk aan te spreken in de app — blijft op je eigen toestel, wordt nergens naartoe verstuurd.</p>
+    <input type="text" id="welcomeNameInput" placeholder="Je voornaam…" class="settings-text-input" style="text-align:center; margin-bottom:12px;" maxlength="30">
+    <button id="welcomeNameSaveBtn" class="simple-modal-btn primary" style="width:100%;">Start de app</button>
+  </div>
+</div>
 
 <div id="modeSelectScreen">
   <button id="modeSelectSettingsBtn" aria-label="Instellingen"><span class="waffle-grid"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></button>
@@ -2214,12 +2224,23 @@
 
     <details class="settings-accordion"><summary data-i18n="settingsGroupPersonal">👤 Persoonlijk</summary>
     <div class="settings-section">
-      <h4 data-i18n="settingsWeightHeading">Lichaamsgewicht</h4>
+      <p class="settings-note">Alles hieronder blijft uitsluitend op je eigen toestel (in de opslag van je browser) — er wordt niets naar een server verstuurd, met niemand gedeeld, en je kan het op elk moment hier weer wissen of aanpassen.</p>
+      <h4 style="margin-top:10px;">Naam</h4>
+      <p class="settings-note">Enkel om je persoonlijk aan te spreken in de app.</p>
+      <input type="text" id="settingUserName" placeholder="Je voornaam…" class="settings-text-input" maxlength="30">
+
+      <h4 style="margin-top:16px;" data-i18n="settingsWeightHeading">Lichaamsgewicht</h4>
       <p class="settings-note" data-i18n="settingsWeightNote">Optioneel — enkel gebruikt voor de ruwe calorie-schatting bij je rit-statistieken.</p>
       <div style="font-size:13.5px; color:#33473c;">
         <span data-i18n="settingsWeightLabel">⚖️ Lichaamsgewicht (voor calorie-schatting, optioneel)</span>
         <div style="margin-top:6px;">
           <input type="number" id="settingBodyWeight" placeholder="75" min="20" max="250" style="width:80px; padding:7px 9px; border:1px solid var(--line); border-radius:9px; font-size:13.5px;"> kg
+        </div>
+      </div>
+      <div style="font-size:13.5px; color:#33473c; margin-top:14px;">
+        <span>📏 Lichaamslengte (optioneel)</span>
+        <div style="margin-top:6px;">
+          <input type="number" id="settingBodyHeight" placeholder="175" min="100" max="230" style="width:80px; padding:7px 9px; border:1px solid var(--line); border-radius:9px; font-size:13.5px;"> cm
         </div>
       </div>
       <p class="settings-note" style="margin-top:14px;">Leeftijd en geslacht zijn optioneel, maar maken de calorie-schatting nauwkeuriger zodra je een hartslagband verbindt (die formule heeft dit nodig, gewicht alleen volstaat niet).</p>
@@ -5531,7 +5552,7 @@ let appSettings = {
   dashTextSize:'normal', dashBold:true, largeNodesAccessibility:false, offRouteDist:35, autoReroute:false, silentReroute:false,
   overlays:{ cycling:false, hiking:false, mtb:false },
   poiLayers:{ cafe:false, restaurant:false, bakery:false, supermarket:false, pharmacy:false, bike:false, water:false, toilet:false, money:false, camping:false, charging:false, playground:false, parking:false, hotel:false }, showPoiDetails:false,
-  showWindDirection:true, autoPause:false, redNavDot:false, topOffsetPx:0, tabGapPx:0, bodyWeightKg:null, bodyAge:null, bodyGender:'', spotifyClientId:'', stravaClientId:'', stravaClientSecret:'', voiceOnlyMode:false, routeColorMode:'off', showWindInNav:false, eatReminderOn:false, eatIntervalMin:45, drinkReminderOn:false, drinkIntervalMin:20, segmentPrOn:true, darkArrivalWarning:true, quietRoutingMode:false, historyAudioOn:false, shakeToSurpriseOn:false, shakeKm:30, vertrekFromGps:false, avoidBufferM:18, maxOverlapPct:8, lowerGpsAccuracy:false, disableMapRotation:false, posUpdateIntervalSec:1, mapRecenterDelaySec:6, overpassSurfaceTimeoutSec:15, routingWeighting:'off', navType:'active', fallDetectionOn:false, sosContactNumber:'', sosContactName:'', routePreference:'balanced', routeLineColor:'#e2a13c', language:'en',
+  showWindDirection:true, autoPause:false, redNavDot:false, topOffsetPx:0, tabGapPx:0, userName:'', bodyWeightKg:null, bodyHeightCm:null, bodyAge:null, bodyGender:'', spotifyClientId:'', stravaClientId:'', stravaClientSecret:'', voiceOnlyMode:false, routeColorMode:'off', showWindInNav:false, eatReminderOn:false, eatIntervalMin:45, drinkReminderOn:false, drinkIntervalMin:20, segmentPrOn:true, darkArrivalWarning:true, quietRoutingMode:false, historyAudioOn:false, shakeToSurpriseOn:false, shakeKm:30, vertrekFromGps:false, avoidBufferM:18, maxOverlapPct:8, lowerGpsAccuracy:false, disableMapRotation:false, posUpdateIntervalSec:1, mapRecenterDelaySec:6, overpassSurfaceTimeoutSec:15, routingWeighting:'off', navType:'active', fallDetectionOn:false, sosContactNumber:'', sosContactName:'', routePreference:'balanced', routeLineColor:'#e2a13c', language:'en',
   bundledCountries:{ be:true, nl:false }, routingEngine:'brouter',
   coachCats:{ start:true, countdown:true, toRun:true, toWalk:true, breathingTip:true, midpoint:true, kmSplit:true, encouragement:true, tempoWarning:true, personalRecord:true, slowdownSupport:true, lastInterval:true, progressPercent:true, sessionStreak:true, didYouKnow:true, weatherWarning:true, liveMedal:true }
 };
@@ -7706,11 +7727,13 @@ function speakForRun(text){
       const v = window.speechSynthesis.getVoices().find(v => v.voiceURI === uri);
       if (v) u.voice = v;
     }
-    // Muziek-ducking: zachter tijdens de aankondiging, terug normaal zodra uitgesproken.
+    // Muziek-ducking: 50% zachter tijdens de aankondiging, geleidelijk terug naar het volume van
+    // vóór het dempen zodra uitgesproken (i.p.v. abrupt naar een vaste waarde springen).
     const player = $('runMusicPlayer');
     if (player && !player.paused){
-      u.onstart = () => { player.volume = 0.12; };
-      u.onend = () => { player.volume = 0.55; };
+      const normalVol = player.volume;
+      u.onstart = () => { fadeAudioVolume(player, normalVol * 0.5, 300); };
+      u.onend = () => { fadeAudioVolume(player, normalVol, 1200); };
     }
     if (window.speechSynthesis.getVoices().length === 0){
       window.speechSynthesis.addEventListener('voiceschanged', () => window.speechSynthesis.speak(u), { once:true });
@@ -8452,6 +8475,9 @@ function openGarminRunCoachScreen(){
   } else {
     sendRunCoachDataToFrame();
   }
+  // Browserstemmen laden asynchroon — bij het eerste bezoek is de lijst vaak nog leeg. Zodra ze echt
+  // klaar zijn (voiceschanged), sturen we de data nog eens door zodat de echte stemmen alsnog verschijnen.
+  if ('speechSynthesis' in window) window.speechSynthesis.addEventListener('voiceschanged', () => sendRunCoachDataToFrame(), { once:true });
 }
 function closeGarminRunCoachScreen(){
   $('garminRunCoachScreen').classList.add('hidden');
@@ -9744,7 +9770,7 @@ ${GARMIN_MENU_BTN_JS}
 </body>
 </html>`;
 }
-const APP_VERSION_TEXT = 'v2.300 · 13 aug';
+const APP_VERSION_TEXT = 'v2.302 · 19 aug';
 function buildGarminHubHtml(){
   // Dit is Gemini's keuzescherm.html, ongewijzigd qua opbouw/stijl — enkel: (1) een derde grote tegel
   // "Hardlopen" toegevoegd, (2) de <a href> vervangen door postMessage-oproepen naar de echte app.
@@ -10575,6 +10601,8 @@ async function loadSettings(){
   $('settingEatReminder').checked = !!appSettings.eatReminderOn;
   $('settingEatInterval').value = appSettings.eatIntervalMin || 45;
   $('settingBodyWeight').value = appSettings.bodyWeightKg || '';
+  $('settingUserName').value = appSettings.userName || '';
+  $('settingBodyHeight').value = appSettings.bodyHeightCm || '';
   $('settingAge').value = appSettings.bodyAge || '';
   $('settingGender').value = appSettings.bodyGender || '';
   $('spotifyClientIdInput').value = appSettings.spotifyClientId || '';
@@ -10900,6 +10928,8 @@ $('settingDrinkInterval').addEventListener('change', (e) => { appSettings.drinkI
 $('settingEatReminder').addEventListener('change', (e) => { appSettings.eatReminderOn = e.target.checked; saveSettings(); if (navActive) setupFuelReminders(); });
 $('settingEatInterval').addEventListener('change', (e) => { appSettings.eatIntervalMin = parseInt(e.target.value, 10) || 45; saveSettings(); if (navActive) setupFuelReminders(); });
 $('settingBodyWeight').addEventListener('change', (e) => { appSettings.bodyWeightKg = parseInt(e.target.value, 10) || null; saveSettings(); });
+$('settingUserName').addEventListener('change', (e) => { appSettings.userName = e.target.value.trim(); saveSettings(); });
+$('settingBodyHeight').addEventListener('change', (e) => { appSettings.bodyHeightCm = parseInt(e.target.value, 10) || null; saveSettings(); });
 $('settingAge').addEventListener('change', (e) => { appSettings.bodyAge = parseInt(e.target.value, 10) || null; saveSettings(); });
 $('settingGender').addEventListener('change', (e) => { appSettings.bodyGender = e.target.value || ''; saveSettings(); });
 $('spotifyClientIdInput').addEventListener('change', (e) => { appSettings.spotifyClientId = e.target.value.trim(); saveSettings(); });
@@ -10946,7 +10976,7 @@ $('settingsResetBtn').addEventListener('click', () => {
     dashTextSize:'normal', dashBold:true, largeNodesAccessibility:false, offRouteDist:35, autoReroute:false, silentReroute:false,
     overlays:{ cycling:false, hiking:false, mtb:false },
     poiLayers:{ cafe:false, restaurant:false, bakery:false, supermarket:false, pharmacy:false, bike:false, water:false, toilet:false, money:false, camping:false, charging:false, playground:false, parking:false, hotel:false }, showPoiDetails:false,
-    showWindDirection:true, autoPause:false, redNavDot:false, topOffsetPx:0, tabGapPx:0, bodyWeightKg:null, bodyAge:null, bodyGender:'', spotifyClientId:'', stravaClientId:'', stravaClientSecret:'', voiceOnlyMode:false, routeColorMode:'off', showWindInNav:false, eatReminderOn:false, eatIntervalMin:45, drinkReminderOn:false, drinkIntervalMin:20, segmentPrOn:true, darkArrivalWarning:true, quietRoutingMode:false, historyAudioOn:false, shakeToSurpriseOn:false, shakeKm:30, vertrekFromGps:false, avoidBufferM:18, maxOverlapPct:8, lowerGpsAccuracy:false, disableMapRotation:false, posUpdateIntervalSec:1, mapRecenterDelaySec:6, overpassSurfaceTimeoutSec:15, routingWeighting:'off', navType:'active', fallDetectionOn:false, sosContactNumber:'', sosContactName:'', routePreference:'balanced', routeLineColor:'#e2a13c', language:'en',
+    showWindDirection:true, autoPause:false, redNavDot:false, topOffsetPx:0, tabGapPx:0, userName:'', bodyWeightKg:null, bodyHeightCm:null, bodyAge:null, bodyGender:'', spotifyClientId:'', stravaClientId:'', stravaClientSecret:'', voiceOnlyMode:false, routeColorMode:'off', showWindInNav:false, eatReminderOn:false, eatIntervalMin:45, drinkReminderOn:false, drinkIntervalMin:20, segmentPrOn:true, darkArrivalWarning:true, quietRoutingMode:false, historyAudioOn:false, shakeToSurpriseOn:false, shakeKm:30, vertrekFromGps:false, avoidBufferM:18, maxOverlapPct:8, lowerGpsAccuracy:false, disableMapRotation:false, posUpdateIntervalSec:1, mapRecenterDelaySec:6, overpassSurfaceTimeoutSec:15, routingWeighting:'off', navType:'active', fallDetectionOn:false, sosContactNumber:'', sosContactName:'', routePreference:'balanced', routeLineColor:'#e2a13c', language:'en',
     bundledCountries:{ be:true, nl:false }, routingEngine:'brouter'
   };
   saveSettings();
@@ -10997,6 +11027,8 @@ $('settingsResetBtn').addEventListener('click', () => {
   $('settingEatReminder').checked = false;
   $('settingEatInterval').value = 45;
   $('settingBodyWeight').value = '';
+  $('settingUserName').value = '';
+  $('settingBodyHeight').value = '';
   $('settingAge').value = '';
   $('settingGender').value = '';
   $('thunderforestKeyInput').value = '';
@@ -11013,7 +11045,15 @@ $('settingsResetBtn').addEventListener('click', () => {
   ['poiCafe','poiRestaurant','poiBakery','poiSupermarket','poiPharmacy','poiBike','poiWater','poiToilet','poiMoney','poiCamping','poiCharging','poiPlayground','poiParking','poiHotel'].forEach(id => { $(id).checked = false; });
   toast(tr('toastDefaultsRestored'), 2500);
 });
-loadSettings();
+loadSettings().then(() => {
+  if (!appSettings.userName){ openModal('welcomeNameModal'); }
+});
+$('welcomeNameSaveBtn').addEventListener('click', () => {
+  const name = $('welcomeNameInput').value.trim();
+  appSettings.userName = name || (curLang()==='en' ? 'there' : 'daar'); // lege naam toch opslaan zodat de vraag niet blijft terugkomen
+  saveSettings();
+  closeModal('welcomeNameModal');
+});
 handleSpotifyCallbackIfPresent();
 handleStravaCallbackIfPresent();
 storageGet('appEventLog').then(saved => { try{ if (saved) appEventLog = JSON.parse(saved); }catch(e){ appEventLog = []; } }).catch(() => {});
