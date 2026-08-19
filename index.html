@@ -37,7 +37,9 @@
   #map{position:absolute; top:0;left:0;right:0;bottom:0;}
 
   .num-marker{
-    background:var(--green-600);
+    background:#1b7a4f; /* letterlijke groene kleur i.p.v. var(--green-600) — die variabele wordt in het
+      Garmin/Tailwind-thema hergebruikt voor algemene donkere UI-elementen, waardoor knooppunten daar
+      per ongeluk bijna zwart werden i.p.v. groen */
     border:2.5px solid var(--cream);
     border-radius:50%;
     color:#ffffff;
@@ -315,7 +317,7 @@
   #weatherPanel{
     position:absolute; top:0;left:0;right:0;bottom:0; z-index:500; background:linear-gradient(180deg, #1a3a5c 0%, #0a1410 100%);
     display:none; flex-direction:column;
-    padding-top:calc(env(safe-area-inset-top,0px) + var(--extra-top-inset) + 104px); padding-bottom:20px;
+    padding-top:calc(env(safe-area-inset-top,0px) + var(--extra-top-inset) + 84px); padding-bottom:20px;
   }
   #weatherPanel.show{ display:flex; }
   #weatherScroller{
@@ -339,16 +341,16 @@
   #wMinMax{ font-size:15px; color:var(--cream); font-weight:700; margin-top:6px; }
   #wWind{ font-size:13px; color:rgba(246,244,238,0.7); }
 
-  #weatherScreen1{ justify-content:flex-start; padding-top:36px; overflow-y:auto; }
+  #weatherScreen1{ justify-content:flex-start; padding-top:16px; overflow-y:auto; }
   #wCondition{ font-size:14px; color:rgba(246,244,238,0.85); font-weight:700; margin-top:-4px; }
-  #wHourlyStrip{ display:flex; flex-wrap:wrap; justify-content:center; gap:14px 16px; width:100%; padding:16px 6px 4px; margin-top:14px; }
+  #wHourlyStrip{ display:flex; flex-wrap:wrap; justify-content:center; gap:14px 16px; width:100%; padding:10px 6px 4px; margin-top:6px; }
   .whour{ display:flex; flex-direction:column; align-items:center; gap:5px; flex-shrink:0; }
   .whour small{ font-size:10.5px; color:rgba(246,244,238,0.55); }
   .whour .whour-ic{ font-size:19px; }
   .whour b{ font-size:12.5px; color:var(--cream); font-weight:700; }
-  #wIllustration{ position:relative; width:100%; max-width:340px; height:80px; margin:10px 0 4px; border-radius:14px; overflow:hidden; }
+  #wIllustration{ position:relative; width:100%; max-width:340px; height:88px; margin:6px 0 4px; border-radius:14px; overflow:hidden; }
   #wIllustrationBg{ position:absolute; top:0;left:0;right:0;bottom:0; width:100%; height:100%; display:block; }
-  #wIllustrationIcon{ position:absolute; top:2px; right:12px; width:76px; height:76px; object-fit:contain; display:none; }
+  #wIllustrationIcon{ position:absolute; top:4px; right:12px; width:80px; height:80px; object-fit:contain; display:none; }
   #wIllustrationIcon.show{ display:block; }
   #wDailyStrip{ display:flex; flex-wrap:nowrap; justify-content:center; gap:5px; width:100%; padding:10px 4px 4px; }
   .wday{ display:flex; flex-direction:column; align-items:center; gap:2px; flex-shrink:1; min-width:0; background:rgba(255,255,255,0.06); border-radius:10px; padding:7px 4px; }
@@ -6461,6 +6463,7 @@ const TRANSLATIONS = {
   compassSensorNote: { nl:'Kompas gebruikt de magnetische sensor van je toestel — kan een beetje afwijken van echt noorden.', en:"Compass uses your device's magnetic sensor — may deviate slightly from true north." },
   emptyMsgInitial: { nl:'Tik op een groen knooppunt op de kaart om je route samen te stellen.', en:'Tap a green node on the map to build your route.' },
   emptyMsgWithLoop: { nl:'Tik op een groen knooppunt op de kaart om je route samen te stellen. Tik het beginpunt nogmaals aan om een lus te sluiten.', en:'Tap a green node on the map to build your route. Tap the starting point again to close a loop.' },
+  emptyMsgWithLoopWalk: { nl:'Tik op een blauw knooppunt op de kaart om je route samen te stellen. Tik het beginpunt nogmaals aan om een lus te sluiten.', en:'Tap a blue node on the map to build your route. Tap the starting point again to close a loop.' },
   sunDataFetchFail: { nl:'Kon zonnegegevens niet ophalen — check je internetverbinding.', en:'Could not fetch sun data — check your internet connection.' },
   pinRouteDirect: { nl:'🚴 Route hierheen', en:'🚴 Route here' },
   pinRouteViaNode: { nl:'🔗 Via dichtstbijzijnd knooppunt', en:'🔗 Via nearest node' },
@@ -6979,6 +6982,8 @@ function translatePage(){
     const entry = TRANSLATIONS[key];
     if (entry) el.textContent = entry[lang];
   });
+  const emptyMsgEl = $('emptyMsg');
+  if (emptyMsgEl) emptyMsgEl.textContent = tr(appMode === 'wandel' ? 'emptyMsgWithLoopWalk' : 'emptyMsgWithLoop'); // overschrijft de generieke (groene) data-i18n-tekst hierboven met de juiste kleur voor de huidige modus
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
     const key = el.getAttribute('data-i18n-placeholder');
     const entry = TRANSLATIONS[key];
@@ -9109,7 +9114,9 @@ function openGarminWeerScreen(){
   hideHubScreen();
   $('garminWeerScreen').classList.remove('hidden');
   if (!garminWeerFrameLoaded){
-    $('garminWeerFrame').srcdoc = translateGarminHtmlIfEnglish(buildGarminWeerHtml());
+    const frame = $('garminWeerFrame');
+    frame.addEventListener('load', () => fetchGarminWeerData(), { once:true }); // eerste keer: data pas ophalen zodra de iframe echt geladen is, anders komt de postMessage te vroeg aan
+    frame.srcdoc = translateGarminHtmlIfEnglish(buildGarminWeerHtml());
     garminWeerFrameLoaded = true;
   } else {
     fetchGarminWeerData();
@@ -9792,6 +9799,11 @@ async function fetchGarminWeerData(forceLocation){
         hourly: (data.hourly||[]).map(h => ({ hourLabel: h.hour === now.getHours() ? (curLang()==='en'?'Now':'Nu') : (String(h.hour).padStart(2,'0') + (curLang()==='en'?'h':'u')), temp:h.temp, icon: WEATHER_ICONS[h.code] || '🌡️' })),
         daily: (data.daily||[]).map(d => ({ dayLabel: d.date.toDateString()===now.toDateString() ? (curLang()==='en'?'Today':'Vandaag') : d.date.toLocaleDateString(curLang()==='en'?'en-GB':'nl-BE', { weekday:'short' }), max:d.max, min:d.min, icon: WEATHER_ICONS[d.code] || '🌡️' })),
         placeName: placeName || (curLang()==='en' ? 'Unknown location' : 'Locatie onbekend'),
+        // Neerslag-tijdlijn (radar + model) — zelfde grafiek als de Standaard-weerpagina, hier als kant-en-klare
+        // SVG-string meegestuurd zodat de iframe 'm gewoon kan tonen zonder de berekening te moeten overdoen.
+        precipTimelineSvg: buildPrecipTimelineSvgString(data.precipTimeline, 0, data.radarTimelineEndsAt),
+        precipLegendRadar: curLang()==='en' ? 'radar (certain)' : 'radar (zeker)',
+        precipLegendModel: curLang()==='en' ? 'model (further ahead)' : 'model (verder vooruit)',
         updatedLabel: (curLang()==='en' ? 'Updated ' : 'Bijgewerkt ') + now.toLocaleTimeString(curLang()==='en'?'en-GB':'nl-BE', { hour:'2-digit', minute:'2-digit' })
       });
     } catch(e){
@@ -10220,6 +10232,13 @@ function buildGarminWeerHtml(){
           <div id="radarTimeLabel" class="absolute top-2.5 left-2.5 bg-black/60 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg" style="position:absolute; z-index:500;">Laden…</div>
         </div>
         <p class="text-[10px] text-slate-500 text-center">Neerslagradar via RainViewer — publieke, gratis databron, geen account nodig.</p>
+        <div class="bg-[#0b1426] rounded-xl p-3 border border-slate-800/80">
+          <svg id="precipTimelineSvgTw" viewBox="0 0 320 90" style="width:100%; height:80px; display:block;"></svg>
+          <div class="flex items-center justify-center gap-4 mt-1.5">
+            <span class="flex items-center gap-1.5 text-[10px] text-slate-400"><span style="width:8px; height:8px; border-radius:50%; background:#2f9e5c; display:inline-block;"></span><span id="precipLegendRadarTw">radar (zeker)</span></span>
+            <span class="flex items-center gap-1.5 text-[10px] text-slate-400"><span style="width:8px; height:8px; border-radius:50%; background:#3b6fd6; display:inline-block;"></span><span id="precipLegendModelTw">model (verder vooruit)</span></span>
+          </div>
+        </div>
         <div class="bg-[#0b1426] rounded-xl p-3 border border-slate-800/80 text-center">
           <span class="text-[10px] font-bold text-amber-400 block mb-1">🔍 Bronnen vergeleken</span>
           <p id="rainSourceNote" class="text-[11px] text-slate-300">–</p>
@@ -10455,6 +10474,12 @@ ${GARMIN_MENU_BTN_JS}
       document.getElementById('main-weather-source').textContent = d.weatherSourceNote || '';
       const rainNoteEl = document.getElementById('rainSourceNote');
       if (rainNoteEl) rainNoteEl.textContent = d.rainSourceNote || '–';
+      const precipSvgEl = document.getElementById('precipTimelineSvgTw');
+      if (precipSvgEl && d.precipTimelineSvg) precipSvgEl.innerHTML = d.precipTimelineSvg;
+      const legendRadarEl = document.getElementById('precipLegendRadarTw');
+      if (legendRadarEl && d.precipLegendRadar) legendRadarEl.textContent = d.precipLegendRadar;
+      const legendModelEl = document.getElementById('precipLegendModelTw');
+      if (legendModelEl && d.precipLegendModel) legendModelEl.textContent = d.precipLegendModel;
       document.getElementById('main-weather-icon-container').textContent = d.icon || '🌡️';
       document.getElementById('location-name-display').textContent = (d.placeName || '').toUpperCase();
 
@@ -12623,7 +12648,7 @@ function renderRoute(){
     btn.addEventListener('click', (e) => { e.stopPropagation(); removeFromRoute(+e.target.dataset.i); });
   });
   updateSheetMetaText();
-  $('emptyMsg').textContent = tr('emptyMsgWithLoop');
+  $('emptyMsg').textContent = tr(appMode === 'wandel' ? 'emptyMsgWithLoopWalk' : 'emptyMsgWithLoop');
   $('navBtn').disabled = route.length < 1 || routeLine.getLatLngs().length === 0;
 }
 
@@ -17585,6 +17610,46 @@ $('radarPlayPauseBtn').addEventListener('click', () => {
 });
 
 // ---------- Neerslag-tijdlijn: verticale lijn die vanzelf over de komende uren "scant" (zoals het KMI-buienradarscherm) ----------
+// Puur SVG-string-opbouw, los van de DOM — zo kan zowel de Standaard-pagina (rechtstreeks in de SVG) als
+// de Tailwind-weerpagina (via een postMessage naar de iframe) exact dezelfde grafiek tonen.
+function buildPrecipTimelineSvgString(pts, scanIdx, radarEndsAt){
+  if (!pts || !pts.length) return '';
+  const W = 320, H = 90, padL = 10, padR = 10, padT = 10, padB = 18;
+  const plotW = W - padL - padR, plotH = H - padT - padB;
+  const maxMm = Math.max(1, ...pts.map(p => p.mm));
+  const barW = plotW / pts.length;
+  let svgStr = '';
+  pts.forEach((p, i) => {
+    const h = (p.mm / maxMm) * plotH;
+    const x = padL + i * barW;
+    const y = padT + (plotH - h);
+    const color = p.isRadar
+      ? (p.mm > 2 ? '#2f9e5c' : (p.mm > 0 ? '#6fc98f' : 'rgba(255,255,255,0.15)'))
+      : (p.mm > 2 ? '#3b6fd6' : (p.mm > 0 ? '#7fa8e8' : 'rgba(255,255,255,0.15)'));
+    svgStr += `<rect x="${(x+1).toFixed(1)}" y="${y.toFixed(1)}" width="${(barW-2).toFixed(1)}" height="${Math.max(1,h).toFixed(1)}" rx="1.5" fill="${color}"/>`;
+  });
+  if (radarEndsAt){
+    const boundaryIdx = pts.findIndex(p => p.time > radarEndsAt);
+    if (boundaryIdx > 0){
+      const bx = padL + boundaryIdx * barW;
+      svgStr += `<line x1="${bx.toFixed(1)}" y1="${padT-4}" x2="${bx.toFixed(1)}" y2="${padT+plotH}" stroke="rgba(246,244,238,0.5)" stroke-width="1" stroke-dasharray="2,2"/>`;
+    }
+  }
+  pts.forEach((p, i) => {
+    if (p.time.getMinutes() === 0){
+      const x = padL + i * barW;
+      svgStr += `<line x1="${x.toFixed(1)}" y1="${padT}" x2="${x.toFixed(1)}" y2="${padT+plotH+4}" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>`;
+      svgStr += `<text x="${x.toFixed(1)}" y="${H-4}" font-size="8" fill="rgba(246,244,238,0.55)" text-anchor="middle">${String(p.time.getHours()).padStart(2,'0')}u</text>`;
+    }
+  });
+  if (scanIdx != null){
+    const idx = scanIdx % pts.length;
+    const scanX = padL + idx * barW + barW / 2;
+    svgStr += `<line x1="${scanX.toFixed(1)}" y1="${padT-2}" x2="${scanX.toFixed(1)}" y2="${padT+plotH+2}" stroke="#e2a13c" stroke-width="2" stroke-linecap="round"/>`;
+    svgStr += `<circle cx="${scanX.toFixed(1)}" cy="${padT-2}" r="3" fill="#e2a13c"/>`;
+  }
+  return svgStr;
+}
 let precipTimelineTimer = null;
 let precipTimelineFrame = 0;
 function drawPrecipTimeline(){
@@ -17593,47 +17658,8 @@ function drawPrecipTimeline(){
   const svg = $('precipTimelineSvg');
   if (!pts.length){ svg.innerHTML = ''; $('precipTimelineTime').textContent = '–'; $('precipTimelineVal').textContent = '–'; return; }
 
-  const W = 320, H = 90, padL = 10, padR = 10, padT = 10, padB = 18;
-  const plotW = W - padL - padR, plotH = H - padT - padB;
-  const maxMm = Math.max(1, ...pts.map(p => p.mm));
-  const barW = plotW / pts.length;
-
-  let svgStr = '';
-  pts.forEach((p, i) => {
-    const h = (p.mm / maxMm) * plotH;
-    const x = padL + i * barW;
-    const y = padT + (plotH - h);
-    // Radar-afgeleide staafjes krijgen een iets fellere, groenige tint — zo zie je meteen welk stuk van de
-    // grafiek rechtstreeks van de radar zelf komt (dus gegarandeerd overeenkomt met wat je erboven ziet)
-    // en welk stuk verder in de tijd nog uit het model komt.
-    const color = p.isRadar
-      ? (p.mm > 2 ? '#2f9e5c' : (p.mm > 0 ? '#6fc98f' : 'rgba(255,255,255,0.15)'))
-      : (p.mm > 2 ? '#3b6fd6' : (p.mm > 0 ? '#7fa8e8' : 'rgba(255,255,255,0.15)'));
-    svgStr += `<rect x="${(x+1).toFixed(1)}" y="${y.toFixed(1)}" width="${(barW-2).toFixed(1)}" height="${Math.max(1,h).toFixed(1)}" rx="1.5" fill="${color}"/>`;
-  });
-  // Duidelijke, gestippelde scheidingslijn waar de radar-data ophoudt en het model overneemt.
-  const radarEndsAt = weatherSunCache && weatherSunCache.radarTimelineEndsAt;
-  if (radarEndsAt){
-    const boundaryIdx = pts.findIndex(p => p.time > radarEndsAt);
-    if (boundaryIdx > 0){
-      const bx = padL + boundaryIdx * barW;
-      svgStr += `<line x1="${bx.toFixed(1)}" y1="${padT-4}" x2="${bx.toFixed(1)}" y2="${padT+plotH}" stroke="rgba(246,244,238,0.5)" stroke-width="1" stroke-dasharray="2,2"/>`;
-    }
-  }
-  // uurmarkeringen onderaan (elke 4 kwartier = elk uur)
-  pts.forEach((p, i) => {
-    if (p.time.getMinutes() === 0){
-      const x = padL + i * barW;
-      svgStr += `<line x1="${x.toFixed(1)}" y1="${padT}" x2="${x.toFixed(1)}" y2="${padT+plotH+4}" stroke="rgba(255,255,255,0.25)" stroke-width="1"/>`;
-      svgStr += `<text x="${x.toFixed(1)}" y="${H-4}" font-size="8" fill="rgba(246,244,238,0.55)" text-anchor="middle">${String(p.time.getHours()).padStart(2,'0')}u</text>`;
-    }
-  });
-  // de bewegende scanlijn
   const scanIdx = precipTimelineFrame % pts.length;
-  const scanX = padL + scanIdx * barW + barW / 2;
-  svgStr += `<line x1="${scanX.toFixed(1)}" y1="${padT-2}" x2="${scanX.toFixed(1)}" y2="${padT+plotH+2}" stroke="#e2a13c" stroke-width="2" stroke-linecap="round"/>`;
-  svgStr += `<circle cx="${scanX.toFixed(1)}" cy="${padT-2}" r="3" fill="#e2a13c"/>`;
-  svg.innerHTML = svgStr;
+  svg.innerHTML = buildPrecipTimelineSvgString(pts, scanIdx, weatherSunCache && weatherSunCache.radarTimelineEndsAt);
 
   const cur = pts[scanIdx];
   $('precipTimelineTime').textContent = String(cur.time.getHours()).padStart(2,'0') + ':' + String(cur.time.getMinutes()).padStart(2,'0');
