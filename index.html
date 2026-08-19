@@ -1093,7 +1093,91 @@
   #spotifyModal.show{ z-index:3500; }
   #rideStravaModal.show{ z-index:3500; }
   #zombieSetupModal.show{ z-index:3500; }
+  #zombieTombstoneModal.show{ z-index:4200; }
   #welcomeNameModal.show{ z-index:9998; }
+  /* ---------- Zombie Run: sliders ---------- */
+  .zr-slider-wrap{ margin-bottom:16px; }
+  .zr-slider-label{ font-size:12px; font-weight:800; color:var(--cream); display:flex; justify-content:space-between; align-items:baseline; margin-bottom:2px; }
+  .zr-slider-label b{ color:#ff8a7a; font-weight:800; }
+  .zr-slider-note{ font-size:10.5px; color:rgba(246,244,238,0.5); margin:2px 0 6px; }
+  input[type=range].zr-range{
+    -webkit-appearance:none; appearance:none; width:100%; height:4px; border-radius:3px;
+    background:rgba(246,244,238,0.18); outline:none; margin:8px 0 2px; display:block;
+  }
+  input[type=range].zr-range::-webkit-slider-thumb{
+    -webkit-appearance:none; width:20px; height:20px; border-radius:50%; background:#dc3b2b;
+    border:2px solid #fff; cursor:pointer; box-shadow:0 1px 3px rgba(0,0,0,0.4); margin-top:0;
+  }
+  input[type=range].zr-range::-moz-range-thumb{
+    width:20px; height:20px; border-radius:50%; background:#dc3b2b; border:2px solid #fff; cursor:pointer;
+  }
+  .zr-dual-wrap{ position:relative; height:30px; margin:10px 0 2px; }
+  .zr-dual-track{ position:absolute; top:13px; left:0; right:0; height:4px; border-radius:3px; background:rgba(246,244,238,0.18); }
+  .zr-dual-fill{ position:absolute; top:13px; height:4px; border-radius:3px; background:#dc3b2b; }
+  .zr-dual-wrap input[type=range]{
+    position:absolute; top:10px; left:0; width:100%; height:4px; margin:0; background:none;
+    -webkit-appearance:none; appearance:none; pointer-events:none;
+  }
+  .zr-dual-wrap input[type=range]::-webkit-slider-thumb{
+    pointer-events:auto; -webkit-appearance:none; width:20px; height:20px; border-radius:50%;
+    background:#dc3b2b; border:2px solid #fff; cursor:pointer; box-shadow:0 1px 3px rgba(0,0,0,0.4);
+  }
+  .zr-dual-wrap input[type=range]::-moz-range-thumb{
+    pointer-events:auto; width:20px; height:20px; border-radius:50%; background:#dc3b2b; border:2px solid #fff; cursor:pointer;
+  }
+  /* ---------- Zombie Run: grafsteen (game over) ---------- */
+  #zombieTombstoneModal .simple-modal-card{
+    max-width:340px; background:#0d0d0d; border:1px solid rgba(220,60,60,0.35); text-align:center;
+  }
+  .zr-tombstone{
+    width:150px; height:170px; margin:6px auto 14px; background:linear-gradient(160deg,#6b6b6b,#3a3a3a);
+    border-radius:75px 75px 8px 8px; border:3px solid #262626; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; padding:14px 10px; box-shadow:inset 0 0 20px rgba(0,0,0,0.5);
+  }
+  .zr-tombstone-rip{ font-size:13px; font-weight:900; letter-spacing:2px; color:#1a1a1a; }
+  .zr-tombstone-name{ font-size:15px; font-weight:800; color:#1a1a1a; margin-top:8px; word-break:break-word; }
+  .zr-tombstone-sub{ font-size:9px; color:#3a3a3a; margin-top:6px; }
+  .zr-tombstone-epitaph{ font-size:12.5px; color:rgba(246,244,238,0.75); font-style:italic; margin-bottom:12px; }
+  .zr-tombstone-stats{ font-size:12px; color:var(--cream); background:rgba(255,255,255,0.05); border-radius:10px; padding:10px; margin-bottom:14px; text-align:left; }
+  .zr-tombstone-stats div{ display:flex; justify-content:space-between; padding:2px 0; }
+  /* ---------- Zombie Run: mini-radar + bonus + flitsanimaties ---------- */
+  #zrRadarWrap{ display:flex; flex-direction:column; align-items:center; margin:6px 0 2px; }
+  #zrRadarContainer{
+    width:96px; height:96px; background:#090d16; border:2px solid rgba(220,60,60,0.4); border-radius:50%;
+    position:relative; overflow:hidden; box-shadow:inset 0 0 14px rgba(0,0,0,0.6);
+  }
+  .zr-radar-blip{ width:11px; height:11px; border-radius:50%; position:absolute; transform:translate(-50%,-50%); transition:top 0.9s linear, left 0.9s linear; }
+  .zr-radar-player{ background:#22c55e; top:50%; left:50%; box-shadow:0 0 6px #22c55e; }
+  .zr-radar-zombie{ background:#ef4444; top:15%; left:50%; box-shadow:0 0 8px #ef4444; }
+  #zrBonusLine{ font-size:11.5px; font-weight:800; color:#facc15; margin-top:6px; }
+  @keyframes zrFlashRed{ 0%{ background:transparent; } 40%{ background:rgba(220,40,30,0.35); } 100%{ background:transparent; } }
+  @keyframes zrFlashGreen{ 0%{ background:transparent; } 40%{ background:rgba(30,180,90,0.3); } 100%{ background:transparent; } }
+  .zr-bite-flash{ animation:zrFlashRed 0.6s ease; }
+  .zr-reward-flash{ animation:zrFlashGreen 0.6s ease; }
+  /* ---------- Zombie Run: vignet (pulseert met de nabijheid van de zombies) ---------- */
+  #zrVignette{
+    position:fixed; inset:0; z-index:2600; pointer-events:none; opacity:0;
+    box-shadow:inset 0 0 90px 20px rgba(180,20,20,0.9);
+    animation:zrVignettePulse 1.6s ease-in-out infinite;
+  }
+  @keyframes zrVignettePulse{ 0%,100%{ filter:brightness(1); } 50%{ filter:brightness(1.4); } }
+  .zr-heartbeat-hit{ animation:zrHeartbeatHit 0.5s ease-out !important; opacity:0.85 !important; }
+  @keyframes zrHeartbeatHit{ 0%{ filter:brightness(2.2); } 100%{ filter:brightness(1); } }
+  /* ---------- Zombie Run: bijt-popup (3 willekeurige horrorvarianten) ---------- */
+  .zr-bitepopup{
+    position:fixed; inset:0; z-index:5000; display:flex; align-items:center; justify-content:center;
+    pointer-events:none; opacity:1; transition:opacity 0.45s ease;
+  }
+  .zr-bitepopup-out{ opacity:0; }
+  .zr-bitepopup-1{ background:radial-gradient(circle, rgba(80,15,15,0.65) 0%, rgba(20,3,3,0.55) 100%); }
+  .zr-bitepopup-2{ background:rgba(5,5,5,0.65); background-image:repeating-linear-gradient(0deg, rgba(255,255,255,0.03) 0px, rgba(255,255,255,0.03) 1px, transparent 1px, transparent 3px); }
+  .zr-bitepopup-3{ background:rgba(20,5,5,0.55); }
+  .zr-bitepopup-inner{ text-align:center; padding:0 24px; }
+  .zr-bp-title{ font-size:32px; font-weight:800; }
+  .zr-bp-blood{ color:#f5b8b8; text-shadow:0 0 16px rgba(163,31,31,0.7); font-family:var(--font-serif, serif); }
+  .zr-bp-static{ color:#e0413f; font-family:monospace; letter-spacing:3px; font-size:26px; }
+  .zr-bp-claw{ color:#f0d9d9; font-size:26px; }
+  .zr-bp-sub{ text-align:center; font-size:14px; color:rgba(255,255,255,0.75); margin-top:8px; }
   .simple-modal-card{
     background:var(--cream); border-radius:18px; padding:18px; width:100%; max-width:380px;
     max-height:80vh; overflow-y:auto; box-shadow:var(--shadow);
@@ -1749,36 +1833,90 @@
 <div id="zombieSetupModal" class="simple-modal">
   <div class="simple-modal-card" style="max-width:360px;">
     <div class="simple-modal-head"><b>🧟 Zombie Run</b><button class="simple-modal-close" data-close="zombieSetupModal">✕</button></div>
-    <div id="zombieCycleStatus" style="font-size:11px; color:rgba(246,244,238,0.55); margin-bottom:4px; text-align:center;">Bestanden zoeken…</div>
-    <button id="zombieResetCycleBtn" style="display:block; margin:0 auto 14px; background:none; border:none; color:rgba(246,244,238,0.5); font-size:10.5px; text-decoration:underline;">🔄 Cyclus herstarten (verhaalfragmenten opnieuw schudden)</button>
+    <div id="zombieCycleStatus" style="font-size:11px; color:rgba(246,244,238,0.55); margin-bottom:14px; text-align:center;">Bestanden zoeken…</div>
 
-    <label style="font-size:12px; font-weight:800; color:var(--cream); display:block; margin-bottom:4px;">Drempelsnelheid om te ontsnappen</label>
-    <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
-      <input type="number" id="zombieThresholdInput" value="8" min="4" max="20" step="0.5" style="width:70px; padding:8px; border:1px solid var(--line); border-radius:9px;"> <span style="font-size:12px; color:var(--cream);">km/u</span>
+    <label style="font-size:12px; font-weight:800; color:var(--cream); display:block; margin-bottom:6px;">🎚️ Moeilijkheidsgraad</label>
+    <div id="zombieDifficultyRow" style="display:flex; gap:6px; margin-bottom:16px;">
+      <button type="button" class="zr-diff-btn" data-diff="easy" style="flex:1; padding:8px 4px; border-radius:10px; border:1.5px solid rgba(246,244,238,0.15); background:rgba(255,255,255,0.04); color:var(--cream); font-size:11px; font-weight:700;">🟢 Wandelaar</button>
+      <button type="button" class="zr-diff-btn" data-diff="normal" style="flex:1; padding:8px 4px; border-radius:10px; border:1.5px solid var(--amber); background:rgba(226,161,60,0.15); color:var(--cream); font-size:11px; font-weight:700;">🟡 Survivor</button>
+      <button type="button" class="zr-diff-btn" data-diff="hard" style="flex:1; padding:8px 4px; border-radius:10px; border:1.5px solid rgba(246,244,238,0.15); background:rgba(255,255,255,0.04); color:var(--cream); font-size:11px; font-weight:700;">🔴 Hardcore</button>
+    </div>
+    <div class="zr-slider-note" style="margin-top:-10px; margin-bottom:14px;">Vult de instellingen hieronder automatisch in — daarna nog vrij aan te passen via de sliders.</div>
+
+    <label style="font-size:12px; font-weight:800; color:var(--cream); display:block; margin-bottom:6px;">🎯 Doel</label>
+    <label class="settings-radio"><input type="radio" name="zombieGoalType" value="free" checked> <span>Vrij lopen (geen doel)</span></label>
+    <label class="settings-radio"><input type="radio" name="zombieGoalType" value="distance"> <span>Doel op afstand</span></label>
+    <label class="settings-radio"><input type="radio" name="zombieGoalType" value="time"> <span>Doel op tijd</span></label>
+
+    <div class="zr-slider-wrap hidden" id="zombieGoalDistanceWrap" style="margin-top:10px;">
+      <div class="zr-slider-label"><span>📏 Afstand</span><b id="zombieGoalDistanceVal">5.0 km</b></div>
+      <input type="range" class="zr-range" id="zombieGoalDistanceInput" min="1" max="30" step="0.5" value="5">
+    </div>
+    <div class="zr-slider-wrap hidden" id="zombieGoalTimeWrap" style="margin-top:10px;">
+      <div class="zr-slider-label"><span>⏰ Tijd</span><b id="zombieGoalTimeVal">20 min</b></div>
+      <input type="range" class="zr-range" id="zombieGoalTimeInput" min="5" max="90" step="5" value="20">
+    </div>
+    <div style="margin-bottom:6px;"></div>
+
+    <div class="zr-slider-wrap">
+      <div class="zr-slider-label"><span>❤️ Levenspunten</span><b id="zombieLivesVal">3</b></div>
+      <input type="range" class="zr-range" id="zombieLivesInput" min="1" max="8" step="1" value="3">
     </div>
 
-    <label style="font-size:12px; font-weight:800; color:var(--cream); display:block; margin-bottom:4px;">Duur van een achtervolging</label>
-    <div style="display:flex; align-items:center; gap:6px; margin-bottom:14px;">
-      <input type="number" id="zombieChaseMinInput" value="30" min="10" max="600" step="5" style="width:64px; padding:8px; border:1px solid var(--line); border-radius:9px;">
-      <span style="font-size:11px; color:rgba(246,244,238,0.55);">tot</span>
-      <input type="number" id="zombieChaseMaxInput" value="60" min="10" max="600" step="5" style="width:64px; padding:8px; border:1px solid var(--line); border-radius:9px;">
-      <span style="font-size:12px; color:var(--cream);">sec</span>
+    <div class="zr-slider-wrap">
+      <div class="zr-slider-label"><span>🐌 Basissnelheid zombies</span><b id="zombieBaseSpeedVal">8.0 km/u</b></div>
+      <input type="range" class="zr-range" id="zombieBaseSpeedInput" min="3" max="20" step="0.5" value="8">
+      <div class="zr-slider-note" id="zombieBaseSpeedNote">Gebaseerd op jouw gemiddelde looptempo — pas gerust aan.</div>
     </div>
 
-    <label style="font-size:12px; font-weight:800; color:var(--cream); display:block; margin-bottom:4px;">Rustig lopen (enkel muziek) tussen verhaal en achtervolging</label>
-    <div style="display:flex; align-items:center; gap:6px; margin-bottom:14px;">
-      <input type="number" id="zombieInterludeMinInput" value="15" min="0" max="300" step="5" style="width:64px; padding:8px; border:1px solid var(--line); border-radius:9px;">
-      <span style="font-size:11px; color:rgba(246,244,238,0.55);">tot</span>
-      <input type="number" id="zombieInterludeMaxInput" value="35" min="0" max="300" step="5" style="width:64px; padding:8px; border:1px solid var(--line); border-radius:9px;">
-      <span style="font-size:12px; color:var(--cream);">sec (beide 0 = uit)</span>
+    <div class="zr-slider-wrap">
+      <div class="zr-slider-label"><span>📈 Opdrijving per interval</span><b id="zombieRampVal">+0.3 km/u</b></div>
+      <input type="range" class="zr-range" id="zombieRampInput" min="0" max="3" step="0.1" value="0.3">
+      <div class="zr-slider-note">De zombies worden geleidelijk sneller naarmate de run vordert (0 = blijven gelijk).</div>
+    </div>
+
+    <div class="zr-slider-wrap">
+      <div class="zr-slider-label"><span>⏱️ Interval van opdrijving</span><b id="zombieRampIntervalVal">5 min</b></div>
+      <input type="range" class="zr-range" id="zombieRampIntervalInput" min="1" max="15" step="1" value="5">
+    </div>
+
+    <div class="zr-slider-wrap">
+      <div class="zr-slider-label"><span>⏳ Duur van een achtervolging</span><b id="zombieChaseVal">30 tot 60 sec</b></div>
+      <div class="zr-dual-wrap">
+        <div class="zr-dual-track"></div><div class="zr-dual-fill" id="zombieChaseFill"></div>
+        <input type="range" id="zombieChaseMinInput" min="10" max="600" step="5" value="30">
+        <input type="range" id="zombieChaseMaxInput" min="10" max="600" step="5" value="60">
+      </div>
+    </div>
+
+    <div class="zr-slider-wrap">
+      <div class="zr-slider-label"><span>🎧 Rustig lopen tussen verhaal en achtervolging</span><b id="zombieInterludeVal">15 tot 35 sec</b></div>
+      <div class="zr-dual-wrap">
+        <div class="zr-dual-track"></div><div class="zr-dual-fill" id="zombieInterludeFill"></div>
+        <input type="range" id="zombieInterludeMinInput" min="0" max="300" step="5" value="15">
+        <input type="range" id="zombieInterludeMaxInput" min="0" max="300" step="5" value="35">
+      </div>
+      <div class="zr-slider-note">Beide op 0 = uitgeschakeld, meteen door naar de volgende fase.</div>
     </div>
 
     <label style="font-size:12px; font-weight:800; color:var(--cream); display:block; margin-bottom:6px;">Als je ingehaald wordt...</label>
-    <label class="settings-radio"><input type="radio" name="zombieConsequence" value="points" checked> <span>Punten verliezen, verhaal loopt door</span></label>
-    <label class="settings-radio"><input type="radio" name="zombieConsequence" value="extend"> <span>Punten verliezen + verlengde achtervolging</span></label>
-    <label class="settings-radio"><input type="radio" name="zombieConsequence" value="fail"> <span>Missie-onderdeel telt als mislukt</span></label>
+    <label class="settings-radio"><input type="radio" name="zombieConsequence" value="points" checked> <span>Een leven verliezen, verhaal loopt door</span></label>
+    <label class="settings-radio"><input type="radio" name="zombieConsequence" value="extend"> <span>Een leven verliezen + verlengde achtervolging</span></label>
 
     <button id="zombieStartBtn" class="simple-modal-btn primary" style="width:100%; margin-top:14px; background:#7a1f16;">🧟 Start Zombie Run</button>
+  </div>
+</div>
+
+<div id="zombieTombstoneModal" class="simple-modal">
+  <div class="simple-modal-card">
+    <div class="zr-tombstone">
+      <div class="zr-tombstone-rip">R.I.P.</div>
+      <div class="zr-tombstone-name" id="zrTombstoneName">Speler</div>
+      <div class="zr-tombstone-sub" id="zrTombstoneDate">2026</div>
+    </div>
+    <div class="zr-tombstone-epitaph" id="zrTombstoneEpitaph">Met droefheid nemen we afscheid van...</div>
+    <div class="zr-tombstone-stats" id="zrTombstoneStats"></div>
+    <button id="zombieTombstoneCloseBtn" class="simple-modal-btn primary" style="width:100%; background:#7a1f16;">Doorgaan</button>
   </div>
 </div>
 
@@ -2603,7 +2741,7 @@
         <button id="rcZombieBtnStd" class="run-week-card" style="width:100%; text-align:left; background:linear-gradient(160deg,#3a1a1a,#1a0a0a); border:1.5px solid rgba(220,60,60,0.4); cursor:pointer; margin-bottom:10px;">
           <div style="color:#ff8a8a; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.6px;">🧟 ZOMBIE RUN</div>
           <div style="color:#fff; font-size:17px; font-weight:900; margin:4px 0 6px;">Verhaal + achtervolgingen</div>
-          <div style="color:rgba(255,255,255,0.75); font-size:12px;">Loop sneller dan de zombies of verlies punten. Tik hier voor instellingen.</div>
+          <div style="color:rgba(255,255,255,0.75); font-size:12px;">Loop sneller dan de zombies of verlies een leven. Tik hier voor instellingen.</div>
         </button>
         <details id="rcBuilderDetailsStd" style="margin-bottom:14px;">
           <summary style="font-size:12px; font-weight:800; color:var(--cream); padding:10px 0; cursor:pointer;">🛠️ Eigen Schema Builder (1 sessie)</summary>
@@ -2740,6 +2878,14 @@
       <div id="rsNextLabel">–</div>
       <div id="rsElapsedLine">Totaal: <span id="rsElapsed">0:00</span></div>
     </div>
+  </div>
+  <div id="zrVignette"></div>
+  <div id="zrRadarWrap" class="hidden">
+    <div id="zrRadarContainer">
+      <div id="zrRadarPlayerBlip" class="zr-radar-blip zr-radar-player"></div>
+      <div id="zrRadarZombieBlip" class="zr-radar-blip zr-radar-zombie hidden"></div>
+    </div>
+    <div id="zrBonusLine" class="hidden">✨ Bonus: <b id="zrBonusVal">0</b></div>
   </div>
   <div id="rsProgressRail"></div>
   <div id="rsStatsRow">
@@ -6660,12 +6806,18 @@ const DEV_NOTES_CONTENT = {
     </section>
     <section>
       <h3>🧟 Zombie Run — mappenstructuur</h3>
-      <p>Zelf te uploaden naast <code>index.html</code>, exact deze paden en namen (hoofdlettergevoelig). Je hoeft nergens een aantal in te typen — de app telt zelf hoeveel bestanden er in elke map staan (1, 2, 3... tot er eentje ontbreekt), dus gewoon bestanden toevoegen of verwijderen volstaat:</p>
-      <p><code>audio/zombierun/teksten/tekst1.mp3</code>, <code>tekst2.mp3</code>, ... — je verhaalfragmenten. Geen vaste volgorde/verhaallijnen: de app schudt zelf een willekeurige cyclus, elk fragment komt 1x aan bod, en herschudt vanzelf een nieuwe cyclus zodra alles gehoord is. Dus hoe meer bestanden, hoe gevarieerder.</p>
-      <p><code>audio/zombierun/achtervolgingen/achtervolging1.mp3</code>, ... — het achtervolgingsgeluid. Mogen best <b>lang</b> zijn (tot een uur, bv. losgeknipte audio van een YouTube-zombie-video) — de app start telkens op een willekeurig moment ergens middenin, speelt precies de ingestelde duur, en stopt daar gewoon weer. Zo hoor je bij elke achtervolging een ander stuk, ook met maar 1-2 bestanden.</p>
-      <p><code>audio/zombierun/muziek/muziek1.mp3</code>, ... — doorlopende achtergrondmuziek, speelt gemixt onder alles (zachter tijdens alarm/achtervolging, automatisch fade in/uit).</p>
-      <p><code>audio/zombierun/fx/fx1.mp3</code>, ... — losse sfeergeluiden, willekeurig getimed tijdens het verhaal + telkens 1 extra bij elk alarm.</p>
-      <p><code>audio/zombierun/alarm/alarm1.mp3</code>, ... — kort "zombies komen eraan"-geluid.</p>
+      <p>Zelf te uploaden naast <code>index.html</code>, allemaal onder <code>audio/ZombieRun/</code>, exact deze paden en namen (hoofdlettergevoelig). Je hoeft nergens een aantal in te typen — de app telt zelf hoeveel bestanden er in elke map staan (1, 2, 3... tot er eentje ontbreekt), dus gewoon bestanden toevoegen of verwijderen volstaat:</p>
+      <p><code>Zombie-intro/1.mp3</code>, ... — willekeurig gekozen bij de start van de run.</p>
+      <p><code>Zombie-storie/1/deel1.mp3</code>, <code>deel2.mp3</code>, ... t/m <code>Zombie-storie/5/</code> — 5 verhaallijnen. Bij de start van elke run wordt er willekeurig één gekozen en in volgorde afgespeeld (dus niet geshuffeld, dat zou het verhaal doorelkaar gooien). Heeft een verhaallijn geen bestanden, dan kiest de app gewoon een andere die wel bestanden heeft.</p>
+      <p><code>Zombie-startRun/1.mp3</code>, ... — de "Ren voor je leven!"-cue net voor een achtervolging begint.</p>
+      <p><code>Zombie-StopRun/1.mp3</code>, ... — cue dat je mag vertragen, achtervolging voorbij.</p>
+      <p><code>Zombie-music-LowerPace/1.mp3</code>, ... — rustige achtergrondmuziek tijdens het verhaal.</p>
+      <p><code>Zombie-music-HigherPace/1.mp3</code>, ... — opzwepende achtergrondmuziek tijdens de achtervolging. De app wisselt met een korte kruisfade tussen beide.</p>
+      <p><code>Zombie-Winner/1.mp3</code>, ... — speelt bij het stoppen van een run zonder dood te gaan.</p>
+      <p><code>Zombie-Looser/1.mp3</code>, ... — speelt zodra je levenspunten op zijn (game over).</p>
+      <p><code>Zombie-fx/alarm/1.mp3</code>, ... — kort "zombies komen eraan"-geluid.</p>
+      <p><code>Zombie-fx/zombieGeluiden/1.mp3</code>, ... — de "enge geluiden in je nek"-laag tijdens de achtervolging. Mogen best <b>lang</b> zijn (tot een uur) — de app start elk fragment op een willekeurig moment ergens middenin en het volume schaalt live mee met hoe dicht de zombies zitten (zacht veraf, luid vlak voor je gepakt wordt). Zelf opknippen is dus niet nodig.</p>
+      <p>Verder instelbaar (via sliders in het instelscherm, zelf ook op te slaan als moeilijkheids-preset): levenspunten, basissnelheid van de zombies (standaard voorgesteld op basis van je eigen loopgeschiedenis, opdrijvend naarmate de run vordert), duur van een achtervolging, duur van rustperiodes, en een optioneel doel (afstand of tijd). Tijdens het rustige verhaaldeel én tijdens de achtervolging zelf kan een aanhoudende sprint bonuspunten (Supply Drop-items) opleveren die verloren levens terugwinnen; een krappe ontsnapping levert een extra "op het nippertje"-bonus op via hetzelfde systeem.</p>
     </section>
   `,
   en: `
@@ -6731,12 +6883,18 @@ const DEV_NOTES_CONTENT = {
     </section>
     <section>
       <h3>🧟 Zombie Run — folder structure</h3>
-      <p>Upload these yourself next to <code>index.html</code>, exact paths and names (case-sensitive). No need to type a file count anywhere — the app counts how many files are in each folder itself (1, 2, 3... until one's missing), so just add or remove files as you like:</p>
-      <p><code>audio/zombierun/teksten/tekst1.mp3</code>, <code>tekst2.mp3</code>, ... — your story fragments. No fixed order/storylines: the app shuffles its own random cycle, each fragment plays once, then reshuffles a new cycle once everything's been heard. More files = more variety.</p>
-      <p><code>audio/zombierun/achtervolgingen/achtervolging1.mp3</code>, ... — the chase sound. Can be long (up to an hour, e.g. audio ripped from a YouTube zombie-chase video) — the app starts at a random point each time, plays exactly the configured duration, then stops. So every chase sounds different, even with just 1-2 files.</p>
-      <p><code>audio/zombierun/muziek/muziek1.mp3</code>, ... — continuous background music, mixed under everything else (ducks quieter during alarm/chase, auto fade in/out).</p>
-      <p><code>audio/zombierun/fx/fx1.mp3</code>, ... — one-off atmosphere sounds, randomly timed during the story + one extra with every alarm.</p>
-      <p><code>audio/zombierun/alarm/alarm1.mp3</code>, ... — short "zombies incoming" cue.</p>
+      <p>Upload these yourself next to <code>index.html</code>, all under <code>audio/ZombieRun/</code>, exact paths and names (case-sensitive). No need to type a file count anywhere — the app counts how many files are in each folder itself (1, 2, 3... until one's missing), so just add or remove files as you like:</p>
+      <p><code>Zombie-intro/1.mp3</code>, ... — picked at random at the start of the run.</p>
+      <p><code>Zombie-storie/1/deel1.mp3</code>, <code>deel2.mp3</code>, ... through <code>Zombie-storie/5/</code> — 5 storylines. One is picked at random at the start of each run and played in order (not shuffled — that would scramble the story). If a storyline has no files, the app just picks another one that does.</p>
+      <p><code>Zombie-startRun/1.mp3</code>, ... — the "Run for your life!" cue right before a chase begins.</p>
+      <p><code>Zombie-StopRun/1.mp3</code>, ... — cue that you can slow down, chase over.</p>
+      <p><code>Zombie-music-LowerPace/1.mp3</code>, ... — calm background music during the story.</p>
+      <p><code>Zombie-music-HigherPace/1.mp3</code>, ... — upbeat background music during the chase. The app crossfades between the two.</p>
+      <p><code>Zombie-Winner/1.mp3</code>, ... — plays when you stop a run without dying.</p>
+      <p><code>Zombie-Looser/1.mp3</code>, ... — plays once your lives run out (game over).</p>
+      <p><code>Zombie-fx/alarm/1.mp3</code>, ... — short "zombies incoming" cue.</p>
+      <p><code>Zombie-fx/zombieGeluiden/1.mp3</code>, ... — the "breathing down your neck" proximity layer during the chase. Can be long (up to an hour) — the app starts each clip at a random point, and the volume scales live with how close the zombies are (soft when far, loud right before you're caught). No need to cut these up yourself.</p>
+      <p>Also configurable (via sliders in the setup screen, savable as a difficulty preset): lives, base zombie speed (defaults to your own running history, ramping up as the run progresses), chase duration, calm-period duration, and an optional goal (distance or time). During both the calm story part and the chase itself, a sustained sprint can earn bonus points (Supply Drop items) that regain lost lives; a close escape earns an extra "by the skin of your teeth" bonus through the same system.</p>
     </section>
   `
 };
@@ -7066,81 +7224,91 @@ function handleRunTrackEnded(){
 }
 
 // ---------- Zombie Run: verhaal-gestuurde looptocht met achtervolgingen ----------
-// Bestandsconventie (zelf te uploaden, net als bij EVY): audio/zombierun/verhaalN/deelM.mp3 voor de
-// verhaal-segmenten (N = verhaallijn 1-5, M = deel 1,2,3...), audio/zombierun/alarm/alarmN.mp3 (N=1-3)
-// voor het korte "zombies komen eraan"-geluid, audio/zombierun/chase/chaseN.mp3 (N=1-3) voor het
-// achtervolgingsgeluid zelf, audio/zombierun/music/musicN.mp3 (N=1-3, doorlopende achtergrondmuziek,
-// speelt gelijktijdig gemixt naast al de rest), en audio/zombierun/effects/effectN.mp3 (N=1-5, losse
-// sfeergeluiden — willekeurig elke 20-40s tijdens het verhaal, én telkens extra vlak vóór een
-// achtervolging start). Ontbreekt een volgend deel-bestand (verhaallijn op), dan ronden we netjes af.
-// Bestandsmappen (zelf te uploaden naast index.html — exacte structuur staat in 🛠️ Technische werking):
-//   audio/zombierun/teksten/tekst1.mp3, tekst2.mp3, ... (verhaalfragmenten — willekeurige volgorde, elke
-//   fragment komt 1x aan bod per cyclus, dan herschudt de app automatisch een nieuwe cyclus — dus altijd
-//   een andere volgorde, geen vaste "verhaallijnen" meer nodig)
-//   audio/zombierun/achtervolgingen/achtervolging1.mp3, ... (mogen best lang zijn, tot 1 uur — de app
-//   start telkens op een willekeurig moment ergens middenin, speelt exact de ingestelde duur, en stopt)
-//   audio/zombierun/muziek/muziek1.mp3, ... (doorlopende achtergrondmuziek, gemixt onder alles)
-//   audio/zombierun/fx/fx1.mp3, ... (losse sfeergeluiden)
-//   audio/zombierun/alarm/alarm1.mp3, ... (kort "zombies komen eraan"-geluid)
-// De app weet zelf hoeveel bestanden er in elke map staan door gewoon 1,2,3... te proberen tot een
-// bestand niet bestaat (HEAD-request) — dus gewoon bestanden toevoegen/verwijderen, geen aantal instellen.
+// Mappenstructuur (zelf te uploaden naast index.html, exact zoals in de analyse):
+//   audio/ZombieRun/Zombie-intro/1.mp3, 2.mp3, ...        (at random gekozen bij de start)
+//   audio/ZombieRun/Zombie-storie/1/deel1.mp3, deel2.mp3, ...   (verhaallijn 1, submappen 1 t/m 5)
+//   audio/ZombieRun/Zombie-storie/2/deel1.mp3, ...              (idem voor 2, 3, 4, 5)
+//   audio/ZombieRun/Zombie-startRun/1.mp3, ...             ("Ren voor je leven!"-achtige cue)
+//   audio/ZombieRun/Zombie-StopRun/1.mp3, ...               (cue om te vertragen, achtervolging voorbij)
+//   audio/ZombieRun/Zombie-music-LowerPace/1.mp3, ...       (rustige achtergrondmuziek)
+//   audio/ZombieRun/Zombie-music-HigherPace/1.mp3, ...      (opzwepende achtergrondmuziek tijdens de jacht)
+//   audio/ZombieRun/Zombie-Winner/1.mp3, ...                 (bij een overleefde run)
+//   audio/ZombieRun/Zombie-Looser/1.mp3, ...                 (bij het einde/game over)
+//   audio/ZombieRun/Zombie-fx/alarm/1.mp3, ...               (kort "zombies komen eraan"-geluid)
+//   audio/ZombieRun/Zombie-fx/zombieGeluiden/1.mp3, ...      (het "enge geluiden in je nek"-laag —
+//     mogen gerust lange bestanden zijn, tot een uur: de app start telkens op een willekeurig punt
+//     ergens middenin, dus je hoeft ze zelf nergens op te knippen)
+// De app telt zelf hoeveel bestanden er in elke map staan (probeert gewoon 1, 2, 3... tot er eentje
+// niet bestaat via een HEAD-request) — dus gewoon bestanden toevoegen/verwijderen, geen aantal instellen.
+const ZOMBIE_AUDIO_BASE = 'audio/ZombieRun';
+const ZOMBIE_FOLDERS = {
+  intro:'Zombie-intro', startRun:'Zombie-startRun', stopRun:'Zombie-StopRun',
+  musicLow:'Zombie-music-LowerPace', musicHigh:'Zombie-music-HigherPace',
+  winner:'Zombie-Winner', looser:'Zombie-Looser',
+  alarm:'Zombie-fx/alarm', creepy:'Zombie-fx/zombieGeluiden'
+};
 const zombiePoolSizeCache = {};
-async function zombiePoolSize(kind){
-  if (zombiePoolSizeCache[kind] != null) return zombiePoolSizeCache[kind];
+async function zombiePoolSize(folder){
+  if (zombiePoolSizeCache[folder] != null) return zombiePoolSizeCache[folder];
   let count = 0;
   for (let i = 1; i <= 300; i++){
     try{
-      const res = await fetch(`audio/zombierun/${kind}/${zombieKindFileBase(kind)}${i}.mp3`, { method:'HEAD' });
+      const res = await fetch(`${ZOMBIE_AUDIO_BASE}/${folder}/${i}.mp3`, { method:'HEAD' });
       if (!res.ok) break;
       count = i;
     }catch(e){ break; }
   }
-  zombiePoolSizeCache[kind] = count;
+  zombiePoolSizeCache[folder] = count;
   return count;
 }
-function zombieKindFileBase(kind){
-  return { teksten:'tekst', achtervolgingen:'achtervolging', muziek:'muziek', fx:'fx', alarm:'alarm' }[kind] || kind;
-}
-function zombieFilePath(kind, n){ return `audio/zombierun/${kind}/${zombieKindFileBase(kind)}${n}.mp3`; }
-async function zombieRandomFile(kind){
-  const size = await zombiePoolSize(kind);
+function zombieFilePath(folder, n){ return `${ZOMBIE_AUDIO_BASE}/${folder}/${n}.mp3`; }
+async function zombieRandomFile(kindKey){
+  const folder = ZOMBIE_FOLDERS[kindKey];
+  const size = await zombiePoolSize(folder);
   if (!size) return null;
-  return zombieFilePath(kind, 1 + Math.floor(Math.random()*size));
+  return zombieFilePath(folder, 1 + Math.floor(Math.random()*size));
 }
-// Tekst-cyclus: een geshuffelde volgorde van alle beschikbare tekstfragmenten, zodat je binnen 1 cyclus
-// nooit hetzelfde 2x hoort — is de cyclus op, dan herschudt de app vanzelf een nieuwe.
-const ZOMBIE_QUEUE_KEY = 'zombie_text_queue_v1';
-async function popZombieTextIndex(){
-  const poolSize = await zombiePoolSize('teksten');
-  if (!poolSize) return null;
-  let state = await storageGet(ZOMBIE_QUEUE_KEY).then(v => v ? JSON.parse(v) : null).catch(() => null);
-  if (!state || state.poolSize !== poolSize || !state.queue || !state.queue.length){
-    const arr = Array.from({ length: poolSize }, (_, i) => i+1);
-    for (let i = arr.length-1; i > 0; i--){ const j = Math.floor(Math.random()*(i+1)); [arr[i],arr[j]] = [arr[j],arr[i]]; }
-    state = { queue: arr, poolSize };
+// Verhaallijnen: Zombie-storie/1/ t/m /5/, met sequentiële delen (deel1.mp3, deel2.mp3, ...) — één
+// verhaallijn wordt bij de start van de run willekeurig gekozen en in volgorde afgespeeld (geen shuffle
+// binnen de lijn zelf, dat zou het verhaal doorelkaar gooien).
+function zombieStoryFolder(storyline){ return `Zombie-storie/${storyline}`; }
+const zombieStoryPoolCache = {};
+async function zombieStoryPoolSize(storyline){
+  const folder = zombieStoryFolder(storyline);
+  if (zombieStoryPoolCache[folder] != null) return zombieStoryPoolCache[folder];
+  let count = 0;
+  for (let i = 1; i <= 100; i++){
+    try{
+      const res = await fetch(`${ZOMBIE_AUDIO_BASE}/${folder}/deel${i}.mp3`, { method:'HEAD' });
+      if (!res.ok) break;
+      count = i;
+    }catch(e){ break; }
   }
-  const idx = state.queue.shift();
-  await storageSet(ZOMBIE_QUEUE_KEY, JSON.stringify(state));
-  return idx;
+  zombieStoryPoolCache[folder] = count;
+  return count;
 }
-async function resetZombieTextCycle(){ await storageSet(ZOMBIE_QUEUE_KEY, JSON.stringify({ queue:[], poolSize:0 })); }
-async function zombieCycleStatusText(){
-  const poolSize = await zombiePoolSize('teksten');
-  if (!poolSize) return curLang()==='en' ? 'No story files found yet (audio/zombierun/teksten/).' : 'Nog geen verhaalfragmenten gevonden (audio/zombierun/teksten/).';
-  const state = await storageGet(ZOMBIE_QUEUE_KEY).then(v => v ? JSON.parse(v) : null).catch(() => null);
-  const left = (state && state.poolSize === poolSize && state.queue) ? state.queue.length : poolSize;
-  return curLang()==='en' ? `${poolSize} fragments found · ${left} left this cycle` : `${poolSize} fragmenten gevonden · nog ${left} deze cyclus`;
+function zombieStoryFilePath(storyline, n){ return `${ZOMBIE_AUDIO_BASE}/${zombieStoryFolder(storyline)}/deel${n}.mp3`; }
+async function pickZombieStoryline(){
+  const candidates = [1,2,3,4,5];
+  for (let i = candidates.length - 1; i > 0; i--){ const j = Math.floor(Math.random()*(i+1)); [candidates[i],candidates[j]] = [candidates[j],candidates[i]]; }
+  for (const c of candidates){ if (await zombieStoryPoolSize(c) > 0) return c; }
+  return 1; // geen enkele verhaallijn heeft bestanden — sessie loopt gewoon door zonder verhaal
 }
-// Speelt een lang achtervolgingsbestand af, gestart op een willekeurig punt (nooit vanaf het begin —
-// zo hoor je bij elke achtervolging een ander stuk, ook al zijn er maar 1 of 2 bestanden van een uur).
-function playZombieChaseAtRandomOffset(file, durationSec){
-  const player = $('runMusicPlayer');
+async function zombieStorylineStatusText(){
+  const sizes = await Promise.all([1,2,3,4,5].map(zombieStoryPoolSize));
+  const available = sizes.filter(s => s > 0).length;
+  if (!available) return curLang()==='en' ? 'No storyline files found yet (Zombie-storie/1../5/).' : 'Nog geen verhaallijn-bestanden gevonden (Zombie-storie/1../5/).';
+  return curLang()==='en' ? `${available}/5 storylines have content — one is picked at random each run.` : `${available}/5 verhaallijnen hebben inhoud — per run wordt er willekeurig één gekozen.`;
+}
+// Speelt een (mogelijk zeer lang) bestand af, gestart op een willekeurig punt in plaats van vanaf het
+// begin — zo hoor je elke keer een ander stuk, ook met maar 1-2 bestanden van een uur. Geen harde
+// stoptimer: het volgende geplande geluid overschrijft de bron gewoon vanzelf wanneer het zover is.
+function playAudioRandomOffset(player, file, minPlaySec){
   player.src = file;
-  player.volume = 1;
   const onMeta = () => {
     player.removeEventListener('loadedmetadata', onMeta);
-    if (player.duration && player.duration > durationSec + 5){
-      player.currentTime = Math.random() * (player.duration - durationSec - 2);
+    if (player.duration && player.duration > minPlaySec + 5){
+      player.currentTime = Math.random() * (player.duration - minPlaySec - 2);
     }
     player.play().catch(() => {});
   };
@@ -7148,37 +7316,271 @@ function playZombieChaseAtRandomOffset(file, durationSec){
 }
 function randRange(min, max){ return min >= max ? min : min + Math.random()*(max-min); }
 
+// Schat je eigen gemiddelde looptempo (km/u) op basis van je loopgeschiedenis (zelfde bron als de
+// referentiepace bij een doelrun) — dient als standaard-startsnelheid van de zombies: hoe beter jij
+// gemiddeld loopt, hoe pittiger de horde start. Altijd nog vrij aan te passen via de slider zelf.
+async function estimateZombieBaseSpeedKmh(){
+  try{
+    const hist = await storageGet('run_history').then(v => v ? JSON.parse(v) : []).catch(() => []);
+    const usable = hist.filter(r => r.km > 0.5 && r.durationSec > 60).slice(0, 10);
+    if (usable.length >= 2){
+      const avgPaceSecPerKm = usable.reduce((s,r) => s + (r.durationSec / r.km), 0) / usable.length;
+      return Math.round((3600 / avgPaceSecPerKm) * 10) / 10;
+    }
+  }catch(e){ /* val terug op standaardwaarde */ }
+  return 8;
+}
+// Lichte dual-range slider: twee overlappende <input type=range>, houdt min<=max af en tekent de
+// gekleurde balk + het label. Geen externe library nodig, enkel voor dit ene schermpje in de app.
+function setupZombieDualSlider(minInput, maxInput, fillEl, labelEl, unitLabel, formatFn){
+  const fmt = formatFn || (v => v);
+  function render(){
+    let lo = parseFloat(minInput.value), hi = parseFloat(maxInput.value);
+    if (lo > hi){ [lo, hi] = [hi, lo]; minInput.value = lo; maxInput.value = hi; }
+    const range = parseFloat(minInput.max) - parseFloat(minInput.min) || 1;
+    const pctLo = ((lo - parseFloat(minInput.min)) / range) * 100;
+    const pctHi = ((hi - parseFloat(minInput.min)) / range) * 100;
+    fillEl.style.left = pctLo + '%';
+    fillEl.style.width = Math.max(0, pctHi - pctLo) + '%';
+    labelEl.textContent = `${fmt(lo)} tot ${fmt(hi)} ${unitLabel}`;
+  }
+  minInput.addEventListener('input', render);
+  maxInput.addEventListener('input', render);
+  render();
+  return render;
+}
+
 async function startZombieRun(opts){
   await startRunSession({
-    mode:'free', targetKm: null,
+    mode:'free', targetKm: opts.targetKm || null, // "Doel op afstand" hergebruikt het bestaande targetKm-mechanisme (melding + voortgang)
     zombieConfig: {
-      thresholdKmh: opts.thresholdKmh,
+      lives: opts.lives, baseSpeedKmh: opts.baseSpeedKmh, rampKmh: opts.rampKmh, rampIntervalMin: opts.rampIntervalMin,
       chaseMin: opts.chaseMin, chaseMax: opts.chaseMax,
       interludeMin: opts.interludeMin, interludeMax: opts.interludeMax,
-      consequence: opts.consequence
+      consequence: opts.consequence, targetMinutes: opts.targetMinutes || null, difficulty: opts.difficulty || 'normal'
     }
   });
 }
 // Wordt vanuit startRunSession aangeroepen zodra rsState bestaat, ná de normale opbouw.
 async function initZombieState(zombieConfig){
   rsState.zombie = {
-    thresholdKmh: zombieConfig.thresholdKmh,
+    livesStart: zombieConfig.lives, lives: zombieConfig.lives,
+    baseSpeedKmh: zombieConfig.baseSpeedKmh, rampKmh: zombieConfig.rampKmh, rampIntervalMin: zombieConfig.rampIntervalMin,
+    currentThresholdKmh: zombieConfig.baseSpeedKmh,
     chaseMin: zombieConfig.chaseMin, chaseMax: zombieConfig.chaseMax,
     interludeMin: zombieConfig.interludeMin, interludeMax: zombieConfig.interludeMax,
-    consequence: zombieConfig.consequence,
-    phase: 'story', // 'story' | 'interlude' | 'alarm' | 'chase'
+    consequence: zombieConfig.consequence, targetMinutes: zombieConfig.targetMinutes || null, targetTimeReached: false, difficulty: zombieConfig.difficulty || 'normal',
+    phase: 'intro', // 'intro'|'story'|'interlude'|'alarm'|'startcue'|'chase'|'stopcue'
     interludeNext: null, interludeTimeoutId: null, chaseDurationSec: 0,
     score: 0, escapedCount: 0, caughtCount: 0,
-    chaseEndAt: 0, belowThresholdStreak: 0, finished: false
+    chaseEndAt: 0, belowThresholdStreak: 0, finished: false, died: false,
+    storyline: 1, storyPartIndex: 1, currentMusicPace: null,
+    // Beloningssysteem (Supply Drop): een aanhoudende sprint — zowel tijdens het rustige verhaaldeel als
+    // tijdens de achtervolging zelf — levert bonuspunten op, die (per volle punt) automatisch een
+    // verloren leven kunnen terugwinnen. Zie tickZombieSprintReward().
+    sprintActive: false, sprintPhase: null, sprintStartAt: 0, sprintPeakRatio: 0, bonusAccum: 0, totalBonusEarned: 0,
+    // "Op het nippertje": kleinste snelheidsmarge waarmee je ooit aan een achtervolging ontsnapte deze run.
+    chaseMinMarginKmh: Infinity, bestMarginKmh: Infinity, nipperCount: 0, lastHeartbeatFired: false
   };
-  await startZombieBackgroundMusic();
-  scheduleZombieEffect();
-  await playZombieStoryPart();
+  $('zrRadarWrap').classList.remove('hidden');
+  rsState.zombie.storyline = await pickZombieStoryline();
+  await switchZombieMusic('low');
+  const introFile = await zombieRandomFile('intro');
+  if (introFile){
+    const player = $('runMusicPlayer');
+    player.src = introFile; player.volume = 1; rsCurrentAudioPool = null;
+    player.play().catch(() => {});
+    updateZombieBanner();
+  } else {
+    await playZombieStoryPart(); // geen intro-bestand gevonden — meteen door naar het verhaal
+  }
+}
+// Zombiesnelheid drijft geleidelijk op naarmate de run vordert: elke `rampIntervalMin` minuten sinds de
+// start van de sessie komt er `rampKmh` km/u bij (rampKmh = 0 → blijft gelijk aan de basissnelheid).
+function updateZombieCurrentSpeed(){
+  const z = rsState.zombie;
+  if (!z || !rsState.startedAt) return;
+  const elapsedMin = (Date.now() - rsState.startedAt - (rsState.pausedMs||0)) / 60000;
+  const steps = z.rampIntervalMin > 0 ? Math.floor(elapsedMin / z.rampIntervalMin) : 0;
+  z.currentThresholdKmh = Math.round((z.baseSpeedKmh + steps * z.rampKmh) * 10) / 10;
+}
+// ---------- Zombie Run: beloningssysteem (Supply Drop) ----------
+// Een aanhoudende sprint boven je tempo levert bonuspunten op — zowel tijdens het rustige verhaaldeel
+// (t.o.v. je basistempo) als tijdens de achtervolging zelf (t.o.v. de vereiste ontsnappingssnelheid,
+// met kortere drempels want een achtervolging duurt an sich al niet lang). Elk vol bonuspunt wordt
+// automatisch omgezet in een teruggewonnen leven (tot het startaantal): "zo kan je op 0 eindigen, maar
+// toch een punt verdiend hebben en blijf je leven" — zoals in de analyse.
+function tickZombieSprintReward(){
+  const z = rsState.zombie;
+  if (!z) return;
+  const activePhase = (z.phase === 'story' || z.phase === 'chase') ? z.phase : null;
+  if (!activePhase){
+    if (z.sprintActive) cancelZombieSprint();
+    return;
+  }
+  const kmh = rsState.currentSpeedKmh != null ? rsState.currentSpeedKmh : 0;
+  const base = activePhase === 'story' ? (z.baseSpeedKmh || 8) : (z.currentThresholdKmh || z.baseSpeedKmh || 8);
+  const ratio = base > 0 ? kmh / base : 0;
+  if (ratio >= 1.2){
+    if (!z.sprintActive || z.sprintPhase !== activePhase){
+      z.sprintActive = true; z.sprintPhase = activePhase; z.sprintStartAt = Date.now(); z.sprintPeakRatio = ratio;
+      if (activePhase === 'story') speakForRun(curLang()==='en' ? 'Supplies nearby — sprint to reach them!' : 'Voorraad in de buurt — sprint ernaartoe!');
+    } else {
+      z.sprintPeakRatio = Math.max(z.sprintPeakRatio, ratio);
+    }
+  } else if (z.sprintActive){
+    endZombieSprint();
+  }
+}
+function cancelZombieSprint(){
+  const z = rsState.zombie;
+  z.sprintActive = false; z.sprintPhase = null; z.sprintStartAt = 0; z.sprintPeakRatio = 0;
+}
+const ZOMBIE_REWARD_TIERS = {
+  story: [ { ratio:1.5, dur:15, icon:'☣️', pts:2.0, key:'serum' }, { ratio:1.35, dur:30, icon:'🎒', pts:1.0, key:'crate' }, { ratio:1.2, dur:15, icon:'💊', pts:0.5, key:'antidote' } ],
+  chase: [ { ratio:1.5, dur:6,  icon:'☣️', pts:2.0, key:'serum' }, { ratio:1.35, dur:10, icon:'🎒', pts:1.0, key:'crate' }, { ratio:1.2, dur:5,  icon:'💊', pts:0.5, key:'antidote' } ]
+};
+const ZOMBIE_REWARD_LABELS = {
+  serum: { nl:'Bio-Hazard Serum', en:'Bio-Hazard Serum' },
+  crate: { nl:'Voorraadkist', en:'Supply crate' },
+  antidote: { nl:'Antidote', en:'Antidote' }
+};
+function endZombieSprint(){
+  const z = rsState.zombie;
+  const durationSec = (Date.now() - z.sprintStartAt) / 1000;
+  const peak = z.sprintPeakRatio;
+  const phase = z.sprintPhase;
+  cancelZombieSprint();
+  const tiers = ZOMBIE_REWARD_TIERS[phase] || ZOMBIE_REWARD_TIERS.story;
+  const hit = tiers.find(t => peak >= t.ratio && durationSec >= t.dur);
+  if (hit) awardZombieBonus({ icon:hit.icon, pts:hit.pts, label: ZOMBIE_REWARD_LABELS[hit.key][curLang()==='en' ? 'en' : 'nl'] });
+}
+function awardZombieBonus(reward){
+  const z = rsState.zombie;
+  z.bonusAccum = (z.bonusAccum||0) + reward.pts;
+  z.totalBonusEarned = Math.round(((z.totalBonusEarned||0) + reward.pts) * 10) / 10;
+  z.score += reward.pts;
+  toast(`${reward.icon} ${reward.label}! +${reward.pts}`, 3500);
+  speakForRun(curLang()==='en' ? `${reward.label} secured!` : `${reward.label} veiliggesteld!`);
+  triggerZombieFlash('reward');
+  while (z.bonusAccum >= 1 && z.lives < z.livesStart){
+    z.bonusAccum -= 1; z.lives += 1;
+    toast(curLang()==='en' ? '❤️ Extra life regained!' : '❤️ Extra leven teruggewonnen!', 3000);
+  }
+  updateZombieBanner();
+}
+// "Op het nippertje": hoe krapper je aan een achtervolging ontsnapt (kleinste snelheidsmarge tijdens die
+// jacht), hoe meer bonuspunten — beloont risico's nemen, werkt via hetzelfde bonussysteem als de
+// Supply Drop-items (dus ook die punten kunnen weer een verloren leven terugwinnen).
+const ZOMBIE_NIPPER_TIERS = [
+  { max:0,   pts:1.5, icon:'⚡', nl:'Op het nippertje!', en:'By the skin of your teeth!' },
+  { max:1.0, pts:1.0, icon:'🔥', nl:'Nipper-ontsnapping', en:'Close escape' },
+  { max:2.5, pts:0.5, icon:'💨', nl:'Krappe ontsnapping', en:'Narrow escape' }
+];
+function awardZombieNipperBonus(minMarginKmh){
+  if (!isFinite(minMarginKmh)) return;
+  const z = rsState.zombie;
+  const tier = ZOMBIE_NIPPER_TIERS.find(t => minMarginKmh <= t.max);
+  if (!tier) return; // ruim ontsnapt — geen extra bonus nodig, de gewone +10 volstaat
+  z.nipperCount = (z.nipperCount||0) + 1;
+  awardZombieBonus({ icon:tier.icon, pts:tier.pts, label: curLang()==='en' ? tier.en : tier.nl });
+}
+function triggerZombieFlash(type){
+  const screen = $('runSessionScreen');
+  if (!screen) return;
+  const cls = type === 'bite' ? 'zr-bite-flash' : 'zr-reward-flash';
+  screen.classList.add(cls);
+  setTimeout(() => screen.classList.remove(cls), 650);
+}
+// ---------- Zombie Run: horrorpopup bij een beet — 3 varianten, willekeurig afgewisseld ----------
+function zombieBitePopupContent(variant, livesLeft){
+  const en = curLang()==='en';
+  if (variant === 1) return `<div class="zr-bp-title zr-bp-blood">${en?'Bitten':'Gebeten'}</div><div class="zr-bp-sub">${en?'-1 life':'-1 leven'}</div>`;
+  if (variant === 2) return `<div class="zr-bp-title zr-bp-static"><i class="ti ti-alert-triangle" aria-hidden="true"></i> ${en?'CAUGHT':'INGEHAALD'}</div><div class="zr-bp-sub">${en?'life point lost':'levenspunt verloren'}</div>`;
+  return `<div class="zr-bp-title zr-bp-claw">${en?'They got you':'Ze hebben je te pakken'}</div><div class="zr-bp-sub">${en?'-1 life':'-1 leven'} · ${Math.max(0,livesLeft)} ${en?'left':'over'}</div>`;
+}
+function showZombieBitePopup(){
+  const z = rsState.zombie;
+  const variant = 1 + Math.floor(Math.random()*3);
+  const el = document.createElement('div');
+  el.className = `zr-bitepopup zr-bitepopup-${variant}`;
+  el.innerHTML = `<div class="zr-bitepopup-inner">${zombieBitePopupContent(variant, z.lives)}</div>`;
+  document.body.appendChild(el);
+  setTimeout(() => el.classList.add('zr-bitepopup-out'), 1100);
+  setTimeout(() => el.remove(), 1600);
+}
+// Mini-radar: groene stip = jij (altijd centraal), rode stip = de zombies, die dichterbij komen
+// naarmate je trager loopt dan de vereiste snelheid (of langer onder de drempel blijft hangen).
+// Gedeelde nabijheidsberekening (0 = ver weg, 1 = bijna ingehaald) — gebruikt voor zowel de radar-stip
+// als het live opschalen van de "enge geluiden"-laag (Proximity & Volume Systeem uit de analyse).
+function computeZombieChaseProximity(){
+  const z = rsState.zombie;
+  const kmh = rsState.currentSpeedKmh != null ? rsState.currentSpeedKmh : 0;
+  const ratio = z.currentThresholdKmh > 0 ? kmh / z.currentThresholdKmh : 1;
+  const danger = Math.max(0, 1 - ratio); // >0 zodra je trager loopt dan nodig
+  const streakFactor = (z.belowThresholdStreak||0) / 4;
+  return Math.min(0.95, Math.max(0.08, danger*0.5 + streakFactor*0.6));
+}
+// Volume van de "enge geluiden"-laag (zombiegeluiden) schaalt live mee met de nabijheid: zacht
+// gefluister/gekreun veraf, tot bijna maximaal (hijgen in je nek) zodra ze je bijna te pakken hebben.
+const ZOMBIE_CREEPY_VOL_MIN = 0.35, ZOMBIE_CREEPY_VOL_MAX = 1.0;
+function updateZombieChaseProximityVolume(){
+  const z = rsState.zombie;
+  if (!z || z.phase !== 'chase') return;
+  const player = $('zombieEffectsPlayer');
+  if (!player || !player.src) return;
+  const proximity = computeZombieChaseProximity();
+  player.volume = ZOMBIE_CREEPY_VOL_MIN + proximity * (ZOMBIE_CREEPY_VOL_MAX - ZOMBIE_CREEPY_VOL_MIN);
+  updateZombieVignette(proximity);
+}
+// Licht rood vignet dat sneller/heviger pulseert naarmate de zombies dichterbij komen — puur visueel,
+// bovenop de radar en de audio, voor dat "ze zitten je op de hielen"-gevoel.
+function updateZombieVignette(proximity){
+  const el = $('zrVignette');
+  if (!el) return;
+  el.style.opacity = Math.min(0.6, 0.1 + proximity*0.5);
+  el.style.animationDuration = (1.6 - proximity*1.1) + 's';
+}
+// "Laatste hartslag": één krachtige, korte waarschuwing (trilling + felle flits) net vóór je effectief
+// gepakt wordt — los van het doorlopende vignet, dat blijft de geleidelijke opbouw tonen.
+function triggerZombieLastHeartbeat(){
+  if (navigator.vibrate) navigator.vibrate([90, 60, 140]);
+  const el = $('zrVignette');
+  if (el){
+    el.classList.add('zr-heartbeat-hit');
+    setTimeout(() => el.classList.remove('zr-heartbeat-hit'), 500);
+  }
+  speakForRun(curLang()==='en' ? "They're right behind you!" : 'Ze zitten vlak achter je!');
+}
+function updateZombieRadar(){
+  const z = rsState && rsState.zombie;
+  if (!z) return;
+  const zBlip = $('zrRadarZombieBlip');
+  const showBlip = z.phase === 'chase' || z.phase === 'alarm' || z.phase === 'startcue';
+  if (showBlip){
+    zBlip.classList.remove('hidden');
+    if (z.phase === 'chase'){
+      const proximity = computeZombieChaseProximity();
+      zBlip.style.top = (50 - (1-proximity)*35) + '%';
+    } else {
+      zBlip.style.top = '15%';
+    }
+  } else {
+    zBlip.classList.add('hidden');
+  }
+  const vignette = $('zrVignette');
+  if (vignette && z.phase !== 'chase'){ vignette.style.opacity = 0; }
+  const bonusLine = $('zrBonusLine');
+  if ((z.totalBonusEarned||0) > 0){
+    bonusLine.classList.remove('hidden');
+    $('zrBonusVal').textContent = z.totalBonusEarned.toFixed(1);
+  }
 }
 // Doorlopende achtergrondmuziek — een aparte, gelijktijdig spelende audiolaag naast het verhaal/de
-// achtervolgingsgeluiden zelf (die spelen op runMusicPlayer). Zachter volume, blijft de hele sessie lopen.
+// cues (die spelen op runMusicPlayer). Wisselt tussen Zombie-music-LowerPace en -HigherPace afhankelijk
+// van de fase, met een korte kruisfade.
 const ZOMBIE_MUSIC_BASE_VOL = 0.22;
-const ZOMBIE_MUSIC_DUCK_VOL = 0.07; // zachter tijdens alarm/achtervolging, zodat die geluiden goed hoorbaar blijven
+const ZOMBIE_MUSIC_DUCK_VOL = 0.10; // lichtjes naar beneden zodra het alarm/de achtervolging start
 function fadeAudioVolume(player, targetVol, durationMs){
   clearInterval(player._fadeInterval);
   const startVol = player.volume, steps = 20, stepMs = durationMs / steps;
@@ -7192,78 +7594,95 @@ function fadeAudioVolume(player, targetVol, durationMs){
 function duckZombieMusic(down){
   fadeAudioVolume($('zombieMusicPlayer'), down ? ZOMBIE_MUSIC_DUCK_VOL : ZOMBIE_MUSIC_BASE_VOL, 800);
 }
-async function startZombieBackgroundMusic(){
+// Wisselt de doorlopende achtergrondmuziek tussen 'low' (Zombie-music-LowerPace) en 'high'
+// (Zombie-music-HigherPace) met een korte kruisfade — enkel als de fase écht wijzigt.
+async function switchZombieMusic(pace){
+  const z = rsState.zombie;
+  if (z && z.currentMusicPace === pace) return;
+  if (z) z.currentMusicPace = pace;
+  const file = await zombieRandomFile(pace === 'high' ? 'musicHigh' : 'musicLow');
   const player = $('zombieMusicPlayer');
-  const file = await zombieRandomFile('muziek');
-  if (!file) return; // geen muziekbestanden gevonden — sessie loopt gewoon door zonder achtergrondmuziek
-  player.src = file;
-  player.volume = 0;
-  player.play().catch(() => {});
-  fadeAudioVolume(player, ZOMBIE_MUSIC_BASE_VOL, 1500); // rustig inrijden i.p.v. abrupt starten
+  if (!file) return; // geen muziekbestanden in die map — sessie loopt gewoon door zonder achtergrondmuziek
+  if (!player.src){
+    player.src = file; player.volume = 0; player.play().catch(() => {});
+    fadeAudioVolume(player, ZOMBIE_MUSIC_BASE_VOL, 1500);
+    return;
+  }
+  fadeAudioVolume(player, 0, 700);
+  setTimeout(() => {
+    player.src = file; player.currentTime = 0;
+    player.play().catch(() => {});
+    fadeAudioVolume(player, ZOMBIE_MUSIC_BASE_VOL, 900);
+  }, 750);
 }
 function stopZombieBackgroundMusic(){
   const player = $('zombieMusicPlayer');
   fadeAudioVolume(player, 0, 1200);
   setTimeout(() => { player.pause(); player.currentTime = 0; }, 1300);
 }
-// Losse sfeergeluiden: willekeurig elke 20-40s tijdens het verhaal, plus telkens één extra vlak vóór
-// een achtervolging start (samen met het alarm) — zie handleZombieTrackEnded().
-let zombieEffectTimeoutId = null;
-function scheduleZombieEffect(){
-  clearTimeout(zombieEffectTimeoutId);
-  if (!rsState || !rsState.zombie || rsState.zombie.finished) return;
-  const delayMs = (20 + Math.random()*20) * 1000;
-  zombieEffectTimeoutId = setTimeout(() => {
-    if (rsState && rsState.zombie && !rsState.zombie.finished && rsState.zombie.phase === 'story') playZombieEffect();
-    scheduleZombieEffect(); // zichzelf telkens opnieuw inplannen zolang de sessie loopt
+// "Enge geluiden in je nek" — de creepy proximity-laag tijdens de achtervolging. Elke 4-10 seconden een
+// nieuw fragment uit Zombie-fx/zombieGeluiden/, gestart op een willekeurig punt (playAudioRandomOffset)
+// zodat lange bosgeluiden-bestanden van een uur probleemloos werken — zelf opknippen is niet nodig.
+let zombieCreepyTimeoutId = null;
+function scheduleZombieCreepyFx(){
+  clearTimeout(zombieCreepyTimeoutId);
+  const z = rsState && rsState.zombie;
+  if (!z || z.finished || z.phase !== 'chase') return;
+  const delayMs = (4 + Math.random()*6) * 1000;
+  zombieCreepyTimeoutId = setTimeout(async () => {
+    if (rsState && rsState.zombie && !rsState.zombie.finished && rsState.zombie.phase === 'chase') await playZombieCreepyFx();
+    scheduleZombieCreepyFx();
   }, delayMs);
 }
-async function playZombieEffect(){
-  const file = await zombieRandomFile('fx');
+async function playZombieCreepyFx(){
+  const file = await zombieRandomFile('creepy');
   if (!file) return;
   const player = $('zombieEffectsPlayer');
-  player.src = file;
-  player.volume = 0.6;
-  player.play().catch(() => {});
+  playAudioRandomOffset(player, file, 4 + Math.random()*6);
+  player.volume = ZOMBIE_CREEPY_VOL_MIN + computeZombieChaseProximity() * (ZOMBIE_CREEPY_VOL_MAX - ZOMBIE_CREEPY_VOL_MIN);
+}
+async function playZombieOutcomeAudio(kindKey){
+  const file = await zombieRandomFile(kindKey);
+  if (!file) return;
+  const player = $('zombieEffectsPlayer');
+  player.src = file; player.volume = 1; player.play().catch(() => {});
 }
 async function playZombieStoryPart(){
   const z = rsState.zombie;
   z.phase = 'story';
-  const idx = await popZombieTextIndex();
-  if (idx == null){
-    // Geen tekstbestanden gevonden — kan niet verdergaan met een verhaal, maar de sessie (en muziek/fx) blijft actief.
+  const poolSize = await zombieStoryPoolSize(z.storyline);
+  if (!poolSize || z.storyPartIndex > poolSize){
+    // Verhaallijn is op (of geen bestanden gevonden) — de sessie (en muziek) blijft gewoon actief.
     updateZombieBanner();
     return;
   }
   const player = $('runMusicPlayer');
-  player.src = zombieFilePath('teksten', idx);
+  player.src = zombieStoryFilePath(z.storyline, z.storyPartIndex);
+  z.storyPartIndex++;
   player.volume = 0.9;
   rsCurrentAudioPool = null;
   player.play().catch(() => {});
-  duckZombieMusic(false); // achtergrondmuziek terug op normaal volume tijdens het verhaal
+  await switchZombieMusic('low');
+  duckZombieMusic(false);
   updateZombieBanner();
 }
 function handleZombieTrackEnded(){
   const z = rsState.zombie;
-  if (z.finished) return;
-  if (z.phase === 'story'){
-    // Verhaaldeel afgelopen — geen volgend bestand meer? Dan is de verhaallijn hier uit, sessie loopt gewoon door als vrije run.
+  if (!z || z.finished) return;
+  if (z.phase === 'intro'){
+    playZombieStoryPart();
+  } else if (z.phase === 'story'){
     startZombieInterlude('alarm');
   } else if (z.phase === 'alarm'){
-    z.phase = 'chase';
-    z.chaseDurationSec = Math.round(randRange(z.chaseMin, z.chaseMax));
-    z.chaseEndAt = Date.now() + z.chaseDurationSec*1000;
-    z.belowThresholdStreak = 0;
-    zombieRandomFile('achtervolgingen').then(file => { if (file) playZombieChaseAtRandomOffset(file, z.chaseDurationSec); });
-    updateZombieBanner();
-    speakForRun(curLang()==='en' ? 'Zombies! Run!' : 'Zombies! Lopen!');
-  } else if (z.phase === 'chase'){
-    // Achtervolgingsgeluid was korter dan de resterende tijd — gewoon opnieuw laten spelen tot de tijd om is.
-    if (Date.now() < z.chaseEndAt){ $('runMusicPlayer').play().catch(() => {}); }
+    playZombieStartCue();
+  } else if (z.phase === 'startcue'){
+    beginZombieChase();
+  } else if (z.phase === 'stopcue'){
+    startZombieInterlude('story');
   }
 }
-// Rustig lopen op enkel de achtergrondmuziek, geen verhaal/alarm/achtervolging — instelbaar min/max-bereik
-// (beide op 0 = overslaan). nextPhase: 'alarm' (na een verhaaldeel) of 'story' (na een afgeronde achtervolging).
+// Rustig lopen op enkel de achtergrondmuziek, geen verhaal/alarm/cue — instelbaar min/max-bereik (beide
+// op 0 = overslaan). nextPhase: 'alarm' (na een verhaaldeel) of 'story' (na een veilig afgeronde jacht).
 function startZombieInterlude(nextPhase){
   const z = rsState.zombie;
   clearTimeout(z.interludeTimeoutId);
@@ -7272,7 +7691,7 @@ function startZombieInterlude(nextPhase){
   z.phase = 'interlude';
   z.interludeNext = nextPhase;
   z.interludeEndAt = Date.now() + durationSec*1000;
-  $('runMusicPlayer').pause(); // geen verhaal/alarm-geluid tijdens het rustige stuk, enkel de achtergrondmuziek
+  $('runMusicPlayer').pause(); // geen verhaal/alarm/cue-geluid tijdens het rustige stuk, enkel de achtergrondmuziek
   updateZombieBanner();
   z.interludeTimeoutId = setTimeout(() => finishZombieInterlude(nextPhase), durationSec*1000);
 }
@@ -7283,22 +7702,76 @@ async function finishZombieInterlude(nextPhase){
     z.phase = 'alarm';
     const file = await zombieRandomFile('alarm');
     if (file){ const player = $('runMusicPlayer'); player.src = file; player.volume = 1; player.play().catch(() => {}); }
-    else { handleZombieTrackEnded(); return; } // geen alarmbestand gevonden — meteen door naar de achtervolging zelf
-    duckZombieMusic(true); // muziek zachter zodra het alarm start, blijft zacht tot het volgende verhaaldeel
-    playZombieEffect(); // extra sfeergeluid vlak vóór de achtervolging, samen met het alarm
+    else { playZombieStartCue(); return; } // geen alarmbestand gevonden — meteen door naar de startcue
+    duckZombieMusic(true); // muziek lichtjes zachter zodra het alarm start
     updateZombieBanner();
   } else {
     advanceZombieStory();
   }
 }
+// Cue dat de achtervolging begint ("Ren voor je leven!") + omschakelen naar de opzwepende muziek.
+async function playZombieStartCue(){
+  const z = rsState.zombie;
+  z.phase = 'startcue';
+  await switchZombieMusic('high');
+  const file = await zombieRandomFile('startRun');
+  if (file){ const player = $('runMusicPlayer'); player.src = file; player.volume = 1; player.play().catch(() => {}); }
+  else { beginZombieChase(); return; } // geen startRun-bestand — meteen de achtervolging in
+  updateZombieBanner();
+}
+function beginZombieChase(){
+  const z = rsState.zombie;
+  z.phase = 'chase';
+  z.chaseDurationSec = Math.round(randRange(z.chaseMin, z.chaseMax));
+  z.chaseEndAt = Date.now() + z.chaseDurationSec*1000;
+  z.belowThresholdStreak = 0;
+  z.chaseMinMarginKmh = Infinity; // kleinste snelheidsmarge deze achtervolging — voor de "op het nippertje"-bonus
+  z.lastHeartbeatFired = false; // "laatste hartslag"-effect: 1x per opbouwende streak, zie tickZombieState
+  scheduleZombieCreepyFx();
+  updateZombieBanner();
+}
+// Achtervolging veilig afgerond: StopRun-cue + terug naar de rustige muziek, dan het verhaal verder.
+async function endZombieChaseSafely(){
+  const z = rsState.zombie;
+  clearTimeout(zombieCreepyTimeoutId);
+  await switchZombieMusic('low');
+  z.phase = 'stopcue';
+  const file = await zombieRandomFile('stopRun');
+  if (file){ const player = $('runMusicPlayer'); player.src = file; player.volume = 1; player.play().catch(() => {}); }
+  else { startZombieInterlude('story'); return; }
+  updateZombieBanner();
+}
 // Elke seconde aangeroepen vanuit de bestaande tick-loop (tickRunSession) — bewaakt de achtervolgingsfase.
 function tickZombieState(){
   const z = rsState.zombie;
   if (!z || z.finished) return;
+  updateZombieCurrentSpeed(); // zombiesnelheid kan intussen zijn opgedreven, ook buiten een achtervolging
+  tickZombieSprintReward(); // beloningssysteem: sprint-detectie tijdens verhaal én achtervolging
+  // "Doel op tijd": zelfde soort melding als het bestaande "Doel op afstand" (targetKm) — stopt niets
+  // automatisch, laat je gewoon weten dat je doel bereikt is, net als bij een gewone doelrun.
+  if (z.targetMinutes && !z.targetTimeReached){
+    const elapsedMin = (Date.now() - rsState.startedAt - (rsState.pausedMs||0)) / 60000;
+    if (elapsedMin >= z.targetMinutes){
+      z.targetTimeReached = true;
+      speakForRun(curLang()==='en'
+        ? `Time goal of ${z.targetMinutes} minutes reached. Keep going or stop whenever you like.`
+        : `Tijdsdoel van ${z.targetMinutes} minuten bereikt. Loop verder of stop wanneer je wil.`);
+    }
+  }
   if (z.phase === 'interlude'){ updateZombieBanner(); return; } // aftellen gebeurt via setTimeout, hier enkel de banner verversen
   if (z.phase !== 'chase') return;
+  updateZombieChaseProximityVolume(); // enge-geluiden-laag wordt luider naarmate de zombies dichterbij komen
   const kmh = (rsState.currentSpeedKmh != null) ? rsState.currentSpeedKmh : 0;
-  if (kmh < z.thresholdKmh) z.belowThresholdStreak++; else z.belowThresholdStreak = 0;
+  if (kmh < z.currentThresholdKmh) z.belowThresholdStreak++; else z.belowThresholdStreak = 0;
+  z.chaseMinMarginKmh = Math.min(z.chaseMinMarginKmh, kmh - z.currentThresholdKmh); // voor "op het nippertje"
+  // "Laatste hartslag": één keer per opbouwende streak, net vóór de effectieve vangst (streak 4) — een
+  // laatste dramatische waarschuwing dat je op het punt staat gepakt te worden.
+  if (z.belowThresholdStreak === 3 && !z.lastHeartbeatFired){
+    z.lastHeartbeatFired = true;
+    triggerZombieLastHeartbeat();
+  } else if (z.belowThresholdStreak < 3){
+    z.lastHeartbeatFired = false;
+  }
   const caughtNow = z.belowThresholdStreak >= 4; // 4 opeenvolgende seconden te traag = ingehaald
   const timeUp = Date.now() >= z.chaseEndAt;
   if (caughtNow){
@@ -7311,32 +7784,57 @@ function tickZombieState(){
 }
 function resolveZombieChase(escaped){
   const z = rsState.zombie;
-  duckZombieMusic(false); // achtervolging voorbij, muziek terug omhoog (ook tijdens het interlude-stuk hierna)
   if (escaped){
     z.score += 10; z.escapedCount++;
     speakForRun(curLang()==='en' ? 'You escaped!' : 'Ontsnapt!');
-    startZombieInterlude('story');
-  } else {
-    z.caughtCount++;
-    if (z.consequence === 'points'){
-      z.score -= 10;
-      speakForRun(curLang()==='en' ? 'Caught! Keep going.' : 'Ingehaald! Loop door.');
-      startZombieInterlude('story');
-    } else if (z.consequence === 'extend'){
-      z.score -= 5;
-      speakForRun(curLang()==='en' ? "Caught! They're still after you!" : 'Ingehaald! Ze zitten nog achter je aan!');
-      duckZombieMusic(true); // achtervolging gaat gewoon door, muziek blijft dus zacht
-      z.chaseDurationSec = Math.round(randRange(z.chaseMin, z.chaseMax));
-      z.chaseEndAt = Date.now() + z.chaseDurationSec*1000; // extra kans, zelfde drempel
-      z.belowThresholdStreak = 0;
-      zombieRandomFile('achtervolgingen').then(file => { if (file) playZombieChaseAtRandomOffset(file, z.chaseDurationSec); });
-    } else { // 'fail'
-      z.score -= 20;
-      z.finished = true;
-      speakForRun(curLang()==='en' ? 'They got you. Mission failed.' : 'Ze hebben je te pakken. Missie mislukt.');
-    }
+    z.bestMarginKmh = Math.min(z.bestMarginKmh, z.chaseMinMarginKmh);
+    awardZombieNipperBonus(z.chaseMinMarginKmh);
+    endZombieChaseSafely();
+    updateZombieBanner();
+    return;
+  }
+  z.caughtCount++;
+  z.lives--;
+  triggerZombieFlash('bite');
+  showZombieBitePopup();
+  if (z.lives <= 0){
+    handleZombieDeath();
+    return;
+  }
+  if (z.consequence === 'points'){
+    z.score -= 10;
+    speakForRun(curLang()==='en' ? 'Caught! Keep going.' : 'Ingehaald! Loop door.');
+    endZombieChaseSafely();
+  } else { // 'extend'
+    z.score -= 5;
+    speakForRun(curLang()==='en' ? "Caught! They're still after you!" : 'Ingehaald! Ze zitten nog achter je aan!');
+    z.chaseDurationSec = Math.round(randRange(z.chaseMin, z.chaseMax));
+    z.chaseEndAt = Date.now() + z.chaseDurationSec*1000; // extra kans, zelfde drempel — de jacht gaat gewoon door
+    z.belowThresholdStreak = 0;
+    z.chaseMinMarginKmh = Infinity; // nieuwe kans, dus ook een verse meting voor "op het nippertje"
   }
   updateZombieBanner();
+}
+// Levenspunten op 0: de run stopt hier, met een grafsteen ter ere van de gevallen speler.
+function handleZombieDeath(){
+  const z = rsState.zombie;
+  z.finished = true; z.died = true;
+  clearTimeout(z.interludeTimeoutId); clearTimeout(zombieCreepyTimeoutId);
+  updateZombieBanner();
+  playZombieOutcomeAudio('looser');
+  speakForRun(curLang()==='en' ? 'They got you...' : 'Ze hebben je te pakken...');
+  const name = (appSettings.userName && appSettings.userName.trim()) || (curLang()==='en' ? 'Runner' : 'Loper');
+  $('zrTombstoneName').textContent = name;
+  $('zrTombstoneDate').textContent = new Date().toLocaleDateString(curLang()==='en' ? 'en-GB' : 'nl-BE', { day:'numeric', month:'long', year:'numeric' });
+  $('zrTombstoneEpitaph').textContent = curLang()==='en'
+    ? `With sadness we say goodbye to ${name}... consumed by the horde.`
+    : `Met droefheid nemen we afscheid van ${name}... verzwolgen door de horde.`;
+  const km = (rsState.distanceM/1000).toFixed(2);
+  const nipperLine = isFinite(z.bestMarginKmh) ? `<div><span>${curLang()==='en'?'Closest call':'Op het nippertje'}</span><b>${z.bestMarginKmh.toFixed(1)} km/u</b></div>` : '';
+  $('zrTombstoneStats').innerHTML = curLang()==='en'
+    ? `<div><span>Distance</span><b>${km} km</b></div><div><span>Score</span><b>${z.score}</b></div><div><span>Bonus earned</span><b>${(z.totalBonusEarned||0).toFixed(1)}</b></div><div><span>Escaped</span><b>${z.escapedCount}×</b></div><div><span>Caught</span><b>${z.caughtCount}×</b></div>${nipperLine}<div><span>Storyline</span><b>#${z.storyline}</b></div>`
+    : `<div><span>Afstand</span><b>${km} km</b></div><div><span>Score</span><b>${z.score}</b></div><div><span>Bonus verdiend</span><b>${(z.totalBonusEarned||0).toFixed(1)}</b></div><div><span>Ontsnapt</span><b>${z.escapedCount}×</b></div><div><span>Gepakt</span><b>${z.caughtCount}×</b></div>${nipperLine}<div><span>Verhaallijn</span><b>#${z.storyline}</b></div>`;
+  openModal('zombieTombstoneModal');
 }
 function advanceZombieStory(){
   playZombieStoryPart();
@@ -7346,20 +7844,28 @@ function updateZombieBanner(){
   const z = rsState.zombie;
   const label = $('rsIntervalLabel');
   if (!label) return;
+  const hearts = '❤️'.repeat(Math.max(0, z.lives)) + '🖤'.repeat(Math.max(0, z.livesStart - z.lives));
   if (z.finished){
-    label.textContent = curLang()==='en' ? `💀 Mission failed · Score ${z.score}` : `💀 Missie mislukt · Score ${z.score}`;
+    label.textContent = curLang()==='en' ? `💀 Caught · Score ${z.score}` : `💀 Ingehaald · Score ${z.score}`;
   } else if (z.phase === 'chase'){
     const secLeft = Math.max(0, Math.ceil((z.chaseEndAt - Date.now())/1000));
-    label.textContent = curLang()==='en' ? `🧟 RUN! ${secLeft}s · min. ${z.thresholdKmh} km/h` : `🧟 RENNEN! ${secLeft}s · min. ${z.thresholdKmh} km/u`;
+    label.textContent = curLang()==='en' ? `🧟 RUN! ${secLeft}s · min. ${z.currentThresholdKmh} km/h · ${hearts}` : `🧟 RENNEN! ${secLeft}s · min. ${z.currentThresholdKmh} km/u · ${hearts}`;
     label.className = 'type-run';
   } else if (z.phase === 'alarm'){
     label.textContent = curLang()==='en' ? '🚨 Zombies incoming...' : '🚨 Zombies komen eraan...';
+  } else if (z.phase === 'startcue'){
+    label.textContent = curLang()==='en' ? '🏃 Run for your life!' : '🏃 Ren voor je leven!';
+  } else if (z.phase === 'stopcue'){
+    label.textContent = curLang()==='en' ? '😮\u200d💨 Safe... for now' : '😮\u200d💨 Veilig... voorlopig';
+  } else if (z.phase === 'intro'){
+    label.textContent = curLang()==='en' ? '🧟 Zombie Run starting...' : '🧟 Zombie Run start...';
   } else if (z.phase === 'interlude'){
     const secLeft = Math.max(0, Math.ceil((z.interludeEndAt - Date.now())/1000));
     label.textContent = curLang()==='en' ? `🎧 Running on music · ${secLeft}s` : `🎧 Rustig lopen op muziek · ${secLeft}s`;
   } else {
-    label.textContent = curLang()==='en' ? `📖 Story · Score ${z.score}` : `📖 Verhaal · Score ${z.score}`;
+    label.textContent = curLang()==='en' ? `📖 Story · Score ${z.score} · ${hearts}` : `📖 Verhaal · Score ${z.score} · ${hearts}`;
   }
+  updateZombieRadar();
 }
 let rcActiveMode = 'learn'; // 'learn' | 'free' | 'builder'
 function rcSwitchTopTab(mode){
@@ -7467,7 +7973,7 @@ async function renderRunStatsPanel(){
     const timeLabel = d.toLocaleTimeString('nl-BE', { hour:'2-digit', minute:'2-digit' });
     const moodIcon = r.mood === 'happy' ? ' 😄' : r.mood === 'sad' ? ' 😔' : '';
     const painIcon = (r.painAreas && r.painAreas.length) ? ` 🩹${r.painAreas.length>1 ? ' ('+r.painAreas.length+'x)' : ''}` : '';
-    const zombieIcon = r.zombie ? ` 🧟${r.zombie.score >= 0 ? '+' : ''}${r.zombie.score}` : '';
+    const zombieIcon = r.zombie ? ` ${r.zombie.died ? '💀' : '🧟'}${r.zombie.score >= 0 ? '+' : ''}${r.zombie.score}` : '';
     const cal = caloriesForEntry(r, (r.durationSec||0)/60, 'hardlopen');
     const painLabel = (r.painAreas && r.painAreas.length) ? r.painAreas.join(', ') : (curLang()==='en' ? 'None' : 'Geen');
     const moodLabel = r.mood === 'happy' ? '😄 Goed gevoel' : r.mood === 'sad' ? '😔 Zwaar gevoel' : '– Niet ingevuld';
@@ -7911,6 +8417,10 @@ async function startRunSession(opts){
   $('runCoachScreen').classList.add('hidden');
   $('runSessionScreen').classList.remove('hidden');
   $('rsGpsWarning').style.display = 'none';
+  $('zrRadarWrap').classList.add('hidden'); // enkel getoond bij een Zombie Run — hieronder evt. weer zichtbaar gemaakt via initZombieState
+  $('zrRadarZombieBlip').classList.add('hidden');
+  $('zrBonusLine').classList.add('hidden');
+  $('zrVignette').style.opacity = 0;
   initRunSessionMap();
   renderRunProgressRail();
   updateRunSessionUI();
@@ -8261,6 +8771,10 @@ $('stopTrainingConfirmBtn').addEventListener('click', () => {
   const reachedTarget = !!(rsState && rsState.targetKm && rsState.targetReached);
   finishRunSession(reachedTarget);
 });
+$('zombieTombstoneCloseBtn').addEventListener('click', () => {
+  closeModal('zombieTombstoneModal');
+  finishRunSession(false);
+});
 // Minimaliseren: de sessie (timers, GPS-tracking, muziek) blijft gewoon actief op de achtergrond —
 // enkel het scherm wisselt, zodat je tijdens het lopen ook nog Stats/Schema/Pijn-Tips kan bekijken.
 function minimizeRunSession(){
@@ -8289,6 +8803,14 @@ $('rsMinimizeBtn').addEventListener('click', minimizeRunSession);
 $('rsHrLine').addEventListener('click', () => { if (!hrDevice) connectHeartRateMonitor(); });
 $('dashHrTile').addEventListener('click', () => { if (!hrDevice) connectHeartRateMonitor(); });
 
+// Medaillesysteem specifiek voor Zombie Run — gebaseerd op hoeveel levenspunten je nog over had bij het
+// einde (zoals in de analyse: max behouden = goud, max-1 = zilver, max-2 = brons, minder = geen medaille).
+function zombieMedalForLives(livesLeft, livesStart){
+  if (livesLeft >= livesStart) return { icon:'🥇', label: curLang()==='en' ? 'Gold medal' : 'Gouden medaille' };
+  if (livesLeft === livesStart - 1) return { icon:'🥈', label: curLang()==='en' ? 'Silver medal' : 'Zilveren medaille' };
+  if (livesLeft === livesStart - 2) return { icon:'🥉', label: curLang()==='en' ? 'Bronze medal' : 'Bronzen medaille' };
+  return null;
+}
 async function finishRunSession(completed){
   if (!rsState) return;
   clearInterval(rsState.tickId);
@@ -8301,6 +8823,9 @@ async function finishRunSession(completed){
   const elapsedSec = (Date.now() - rsState.startedAt - rsState.pausedMs) / 1000;
   const km = rsState.distanceM / 1000;
   const isStructured = !rsState.isCustom && !rsState.freeform;
+  const zombieMedal = (rsState.zombie && !rsState.zombie.died) ? zombieMedalForLives(rsState.zombie.lives, rsState.zombie.livesStart) : null;
+  if (rsState.zombie && !rsState.zombie.died) playZombieOutcomeAudio('winner');
+  let historyEntryDate = null;
   if (completed){
     speakForRun(pickCoachLine('finishCompleted'));
     if (isStructured) await advanceRunProgress();
@@ -8310,12 +8835,12 @@ async function finishRunSession(completed){
   }
   try{
     const history = await storageGet('run_history').then(v => v ? JSON.parse(v) : []).catch(() => []);
-    var historyEntryDate = new Date().toISOString();
+    historyEntryDate = new Date().toISOString();
     history.unshift({
       date:historyEntryDate, week:rsState.week, day:rsState.day,
       km:Math.round(km*100)/100, durationSec:Math.round(elapsedSec),
       completed, freeform:rsState.freeform, custom:rsState.isCustom, avgBpm: avgHrSamples(),
-      zombie: rsState.zombie ? { score:rsState.zombie.score, escaped:rsState.zombie.escapedCount, caught:rsState.zombie.caughtCount, storylineId:rsState.zombie.storylineId } : null,
+      zombie: rsState.zombie ? { score:rsState.zombie.score, escaped:rsState.zombie.escapedCount, caught:rsState.zombie.caughtCount, died:!!rsState.zombie.died, livesLeft:rsState.zombie.lives, livesStart:rsState.zombie.livesStart, baseSpeedKmh:rsState.zombie.baseSpeedKmh, finalSpeedKmh:rsState.zombie.currentThresholdKmh, bonusEarned:rsState.zombie.totalBonusEarned||0, medal: zombieMedal ? zombieMedal.label : null, difficulty: rsState.zombie.difficulty, storyline: rsState.zombie.storyline, bestMarginKmh: isFinite(rsState.zombie.bestMarginKmh) ? Math.round(rsState.zombie.bestMarginKmh*10)/10 : null, nipperCount: rsState.zombie.nipperCount||0 } : null,
       hrZoneSeconds: hrSamples.length ? hrZoneSeconds : null, maxBpm: hrSamples.length ? hrMaxThisSession : null,
       runType: rsState.zombie ? 'Zombie Run' : rsState.evyDist ? `EVY ${rsState.evyDist}K` : rsState.isCustom ? 'Eigen schema' : rsState.freeform ? (rsState.targetKm ? `Doel ${rsState.targetKm}K` : 'Vrije Run') : 'AI Coach'
     });
@@ -8325,7 +8850,7 @@ async function finishRunSession(completed){
     ? `Session ${completed ? 'completed' : 'stopped'}: ${km.toFixed(2)} km in ${fmtMMSS(elapsedSec)}.`
     : `Sessie ${completed ? 'afgerond' : 'gestopt'}: ${km.toFixed(2)} km in ${fmtMMSS(elapsedSec)}.`);
   const rsBreadcrumbsSnapshot = rsState.breadcrumbs || [];
-  if (rsState.zombie){ stopZombieBackgroundMusic(); clearTimeout(zombieEffectTimeoutId); clearTimeout(rsState.zombie.interludeTimeoutId); }
+  if (rsState.zombie){ stopZombieBackgroundMusic(); clearTimeout(zombieCreepyTimeoutId); clearTimeout(rsState.zombie.interludeTimeoutId); $('zrRadarWrap').classList.add('hidden'); $('zrVignette').style.opacity = 0; }
   rsState = null;
   lastFinishedRunBreadcrumbs = rsBreadcrumbsSnapshot;
   $('runSessionScreen').classList.add('hidden');
@@ -8338,12 +8863,14 @@ async function finishRunSession(completed){
     await renderRunCoachScreen();
   }
   toast(summaryMsg, 4000);
+  // Zombie Run: medaille tonen (indien behaald) met confetti, los van het algemene km-medaillesysteem hieronder.
+  if (zombieMedal) setTimeout(() => { fireConfetti(); toast(`${zombieMedal.icon} ${zombieMedal.label}!`, 4000); }, 1600);
   // Achievements: baseer op de langste run ooit (niet enkel deze sessie), pas ná het opslaan controleren
   const overallMaxKm = await getMaxRunKm();
   const newMedals = await checkNewlyUnlockedMedals(overallMaxKm);
-  if (newMedals.length) setTimeout(() => celebrateNewMedals(newMedals), 1600);
+  if (newMedals.length) setTimeout(() => celebrateNewMedals(newMedals), zombieMedal ? 3400 : 1600);
   // Stemming/pijn-feedback: enkel vragen bij een sessie met echte afstand (geen per-ongeluk-getikte start/stop).
-  if (km > 0.05 && historyEntryDate) setTimeout(() => openRunFeedbackModal(historyEntryDate), newMedals.length ? 2200 : 400);
+  if (km > 0.05 && historyEntryDate) setTimeout(() => openRunFeedbackModal(historyEntryDate), newMedals.length ? (zombieMedal ? 4000 : 2200) : (zombieMedal ? 2200 : 400));
 }
 
 // ---------- Na-sessie feedback: stemming + eventuele pijnlocatie, per sessie bewaard in de geschiedenis ----------
@@ -8410,26 +8937,76 @@ $('rideStravaUploadBtn').addEventListener('click', async () => {
 });
 
 // ---------- Zombie Run: instelscherm ----------
+// Dual-sliders eenmalig opzetten (labels/vulling worden bij elke input-beweging herberekend).
+const renderZombieChaseSlider = setupZombieDualSlider($('zombieChaseMinInput'), $('zombieChaseMaxInput'), $('zombieChaseFill'), $('zombieChaseVal'), 'sec', v => Math.round(v));
+const renderZombieInterludeSlider = setupZombieDualSlider($('zombieInterludeMinInput'), $('zombieInterludeMaxInput'), $('zombieInterludeFill'), $('zombieInterludeVal'), 'sec', v => Math.round(v));
+$('zombieLivesInput').addEventListener('input', e => { $('zombieLivesVal').textContent = e.target.value; });
+$('zombieBaseSpeedInput').addEventListener('input', e => { $('zombieBaseSpeedVal').textContent = parseFloat(e.target.value).toFixed(1) + ' km/u'; });
+$('zombieRampInput').addEventListener('input', e => { $('zombieRampVal').textContent = '+' + parseFloat(e.target.value).toFixed(1) + ' km/u'; });
+$('zombieRampIntervalInput').addEventListener('input', e => { $('zombieRampIntervalVal').textContent = e.target.value + ' min'; });
+$('zombieGoalDistanceInput').addEventListener('input', e => { $('zombieGoalDistanceVal').textContent = parseFloat(e.target.value).toFixed(1) + ' km'; });
+$('zombieGoalTimeInput').addEventListener('input', e => { $('zombieGoalTimeVal').textContent = e.target.value + ' min'; });
+document.querySelectorAll('input[name="zombieGoalType"]').forEach(radio => {
+  radio.addEventListener('change', () => {
+    $('zombieGoalDistanceWrap').classList.toggle('hidden', radio.value !== 'distance' || !radio.checked);
+    if (radio.checked){
+      $('zombieGoalDistanceWrap').classList.toggle('hidden', radio.value !== 'distance');
+      $('zombieGoalTimeWrap').classList.toggle('hidden', radio.value !== 'time');
+    }
+  });
+});
+// Moeilijkheidsgraad-presets: vullen de sliders vooraf in (blijven daarna gewoon vrij aanpasbaar).
+const ZOMBIE_DIFFICULTY_PRESETS = {
+  easy:   { lives:5, chaseMin:30, chaseMax:60,  interludeMin:40, interludeMax:90,  speedFactor:0.85 },
+  normal: { lives:3, chaseMin:20, chaseMax:45,  interludeMin:20, interludeMax:60,  speedFactor:1.0  },
+  hard:   { lives:2, chaseMin:15, chaseMax:30,  interludeMin:10, interludeMax:40,  speedFactor:1.2  }
+};
+let zombieSelectedDifficulty = 'normal';
+async function applyZombieDifficultyPreset(diff){
+  zombieSelectedDifficulty = diff;
+  document.querySelectorAll('.zr-diff-btn').forEach(btn => {
+    const active = btn.dataset.diff === diff;
+    btn.style.borderColor = active ? 'var(--amber)' : 'rgba(246,244,238,0.15)';
+    btn.style.background = active ? 'rgba(226,161,60,0.15)' : 'rgba(255,255,255,0.04)';
+  });
+  const p = ZOMBIE_DIFFICULTY_PRESETS[diff];
+  $('zombieLivesInput').value = p.lives; $('zombieLivesVal').textContent = p.lives;
+  $('zombieChaseMinInput').value = p.chaseMin; $('zombieChaseMaxInput').value = p.chaseMax; renderZombieChaseSlider();
+  $('zombieInterludeMinInput').value = p.interludeMin; $('zombieInterludeMaxInput').value = p.interludeMax; renderZombieInterludeSlider();
+  const avgSpeed = await estimateZombieBaseSpeedKmh();
+  const speed = Math.round(avgSpeed * p.speedFactor * 10) / 10;
+  $('zombieBaseSpeedInput').value = speed; $('zombieBaseSpeedVal').textContent = speed.toFixed(1) + ' km/u';
+}
+document.querySelectorAll('.zr-diff-btn').forEach(btn => btn.addEventListener('click', () => applyZombieDifficultyPreset(btn.dataset.diff)));
+
 async function openZombieSetupModal(){
   openModal('zombieSetupModal');
   $('zombieCycleStatus').textContent = curLang()==='en' ? 'Checking files…' : 'Bestanden zoeken…';
-  $('zombieCycleStatus').textContent = await zombieCycleStatusText();
+  $('zombieCycleStatus').textContent = await zombieStorylineStatusText();
+  // Basissnelheid vooraf invullen met je eigen historische gemiddelde — blijft een vrij aanpasbare slider.
+  const avgSpeed = await estimateZombieBaseSpeedKmh();
+  $('zombieBaseSpeedInput').value = avgSpeed;
+  $('zombieBaseSpeedVal').textContent = avgSpeed.toFixed(1) + ' km/u';
+  $('zombieBaseSpeedNote').textContent = curLang()==='en'
+    ? `Based on your average pace from past runs (${avgSpeed.toFixed(1)} km/h) — feel free to adjust.`
+    : `Gebaseerd op jouw gemiddelde tempo uit vorige runs (${avgSpeed.toFixed(1)} km/u) — pas gerust aan.`;
+  await applyZombieDifficultyPreset('normal');
 }
-$('zombieResetCycleBtn').addEventListener('click', async () => {
-  if (confirm(curLang()==='en' ? 'Reshuffle the story cycle now?' : 'De verhaal-cyclus nu opnieuw schudden?')){
-    await resetZombieTextCycle();
-    $('zombieCycleStatus').textContent = await zombieCycleStatusText();
-  }
-});
 $('zombieStartBtn').addEventListener('click', () => {
-  const thresholdKmh = Math.max(1, parseFloat($('zombieThresholdInput').value) || 8);
+  const lives = Math.max(1, parseInt($('zombieLivesInput').value) || 3);
+  const baseSpeedKmh = Math.max(1, parseFloat($('zombieBaseSpeedInput').value) || 8);
+  const rampKmh = Math.max(0, parseFloat($('zombieRampInput').value) || 0);
+  const rampIntervalMin = Math.max(1, parseFloat($('zombieRampIntervalInput').value) || 5);
   let chaseMin = Math.max(5, parseInt($('zombieChaseMinInput').value) || 30);
   let chaseMax = Math.max(chaseMin, parseInt($('zombieChaseMaxInput').value) || chaseMin);
   let interludeMin = Math.max(0, parseInt($('zombieInterludeMinInput').value) || 0);
   let interludeMax = Math.max(interludeMin, parseInt($('zombieInterludeMaxInput').value) || interludeMin);
   const consequence = document.querySelector('input[name="zombieConsequence"]:checked').value;
+  const goalType = document.querySelector('input[name="zombieGoalType"]:checked').value;
+  const targetKm = goalType === 'distance' ? Math.max(0.5, parseFloat($('zombieGoalDistanceInput').value) || 5) : null;
+  const targetMinutes = goalType === 'time' ? Math.max(1, parseFloat($('zombieGoalTimeInput').value) || 20) : null;
   closeModal('zombieSetupModal');
-  startZombieRun({ thresholdKmh, chaseMin, chaseMax, interludeMin, interludeMax, consequence });
+  startZombieRun({ lives, baseSpeedKmh, rampKmh, rampIntervalMin, chaseMin, chaseMax, interludeMin, interludeMax, consequence, targetKm, targetMinutes, difficulty: zombieSelectedDifficulty });
 });
 
 // ---------- Garmin-stijl Kompas (letterlijk Gemini's Compas.html) ----------
@@ -10232,7 +10809,7 @@ function buildGarminRunCoachHtml(){
         <button id="rcZombieBtnTw" class="w-full bg-gradient-to-br from-red-950 to-black border border-red-500/40 p-3.5 rounded-2xl text-left mb-3.5">
           <span class="text-2xl block mb-1">🧟</span>
           <h3 class="text-xs font-bold text-rose-300">Zombie Run</h3>
-          <p class="text-[9px] text-slate-400 mt-0.5">Verhaal + achtervolgingen — loop sneller dan de zombies of verlies punten.</p>
+          <p class="text-[9px] text-slate-400 mt-0.5">Verhaal + achtervolgingen — loop sneller dan de zombies of verlies een leven.</p>
         </button>
       </div>
 
