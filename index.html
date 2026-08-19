@@ -470,11 +470,6 @@
   /* ---------- Garmin-stijl navigatiescherm (optioneel, via Instellingen) ---------- */
   #garminSpeedGauge{ display:none; }
   body.theme-garmin #dashboardPanel{ background:#0f172a; }
-  body.theme-garmin #dashSummary,
-  body.theme-garmin #dashSummary2,
-  body.theme-garmin #dashSummary3{
-    display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px;
-  }
   body.theme-garmin .dash-stat{
     background:linear-gradient(160deg, rgba(255,255,255,0.07), rgba(255,255,255,0.02));
     border:1px solid rgba(255,255,255,0.08); border-radius:18px; padding:14px 8px;
@@ -588,7 +583,7 @@
   #sheet.collapsed{ transform:translateY(calc(100% - 54px)); }
   #sheetHandle{ width:40px; height:5px; background:var(--line); border-radius:3px; margin:2px auto 8px; cursor:pointer; touch-action:none; }
   #sheetHead{ display:flex; align-items:center; justify-content:space-between; padding:4px 0; cursor:pointer; touch-action:none; }
-  #altRoutesBtn{ border:none; background:var(--green-100,#e4ede4); border-radius:8px; padding:4px 8px; font-size:15px; margin:0 8px; flex-shrink:0; }
+  #altRoutesBtn{ border:none; background:var(--green-100,#e4ede4); border-radius:8px; padding:2px 6px; font-size:11px; margin:0 8px; flex-shrink:0; }
   #altRoutesBtn:active{ filter:brightness(0.95); }
   #sheetTitle{ font-weight:800; font-size:14px; color:var(--green-900); }
   #sheetMeta{ font-size:12.5px; color:#4b5f54; }
@@ -1079,6 +1074,8 @@
   #wikiInfoModal.show{ z-index:3500; }
   #stopTrainingModal.show{ z-index:3500; }
   #themeSwitchModal.show{ z-index:3500; }
+  #resetLoopModal.show{ z-index:3500; }
+  #resetFietsWandelModal.show{ z-index:3500; }
   #runPlansModal.show{ z-index:3500; }
   #runFeedbackModal.show{ z-index:3500; }
   #spotifyModal.show{ z-index:3500; }
@@ -1157,9 +1154,13 @@
   .loopgen-card{ background:rgba(0,0,0,0.04); border-radius:12px; padding:12px; margin-bottom:10px; }
   .loopgen-card-title{ font-weight:800; font-size:14px; color:var(--green-900); margin-bottom:4px; }
   .loopgen-card-meta{ font-size:12px; color:#5a6f63; margin-bottom:8px; }
-  .loopgen-card-actions{ display:flex; gap:6px; }
+  .loopgen-card-actions{ display:flex; gap:6px; align-items:stretch; }
+  .loopgen-card-actions .poi-popup-google{ display:flex; align-items:center; justify-content:center; margin-top:0; width:auto; flex:1; }
   .loopgen-card-actions button{ flex:1; border:none; border-radius:8px; padding:7px 4px; font-size:11.5px; font-weight:700; }
-  .loopgen-use-btn{ background:var(--amber); color:#0f3d29; }
+  .loopgen-use-btn{ background:var(--amber); color:#0f3d29; flex:1; }
+  body.theme-garmin .loopgen-card-title{ color:#f1f5f9; }
+  body.theme-garmin .loopgen-card-meta{ color:rgba(241,245,249,0.6); }
+  body.theme-garmin .loopgen-card{ background:rgba(255,255,255,0.06); }
   .loopgen-save-btn{ background:rgba(0,0,0,0.08); color:#33473c; }
   .settings-btn:active{ filter:brightness(0.94); }
 
@@ -1177,6 +1178,7 @@
   /* Gedempte/secundaire teksten in het onderste paneel (routesamenvatting, verwachte tijdstippen,
      sleepgreep, lege-routelijst-melding) hadden nog hun donkere-op-licht-kleur uit Standaard-stijl,
      wat op de donkere Garmin-achtergrond bijna onleesbaar werd — nu een lichte slate-tint. */
+  body.theme-garmin #sheetTitle{ color:#f1f5f9; }
   body.theme-garmin #sheetMeta,
   body.theme-garmin .simple-modal-text,
   body.theme-garmin #emptyMsg{ color:#94a3b8; }
@@ -1221,7 +1223,7 @@
     background:linear-gradient(180deg, rgba(15,23,42,0.92), rgba(15,23,42,0.85) 40%, rgba(15,23,42,0));
   }
   body.theme-garmin .top-tile{
-    background:rgba(15,23,42,0.94); border:2px solid rgba(255,255,255,0.16); box-shadow:0 4px 14px rgba(0,0,0,0.4);
+    background:var(--green-600); border:2px solid rgba(255,255,255,0.16); box-shadow:0 4px 14px rgba(0,0,0,0.4);
   }
   body.theme-garmin .top-tile.active{
     background:var(--amber); border-color:transparent; box-shadow:0 4px 14px rgba(226,161,60,0.3);
@@ -1989,14 +1991,14 @@
     <p class="settings-note" data-i18n="detourKmNote">Hoeveel km mag de omweg ongeveer zijn? Je route sluit daarna vanzelf weer aan op je oorspronkelijke pad.</p>
     <input type="number" id="detourKmInput" value="2" min="0.5" max="30" step="0.5" class="settings-text-input" style="max-width:140px; font-size:20px; text-align:center;">
     <button id="detourKmConfirmBtn" class="settings-btn" style="margin-top:14px;" data-i18n="detourKmConfirmBtn">🚧 Automatisch zoeken</button>
-    <button id="detourKmManualBtn" class="settings-btn" style="margin-top:8px; background:rgba(255,255,255,0.08); color:var(--green-900); display:none;" data-i18n="detourKmManualBtn">📍 Zelf een punt kiezen</button>
+    <button id="detourKmManualBtn" class="settings-btn" style="margin-top:8px; background:rgba(255,255,255,0.08); display:none;" data-i18n="detourKmManualBtn">📍 Zelf een punt kiezen</button>
   </div>
 </div>
 
 <div id="preNavModal" class="simple-modal">
   <div class="simple-modal-card">
     <div class="simple-modal-head"><b id="preNavTitle">🚴 Klaar om te starten?</b></div>
-    <div id="preNavSummary" style="margin:6px 0 14px; font-size:14px; line-height:1.7; color:var(--green-900);">
+    <div id="preNavSummary" style="margin:6px 0 14px; font-size:14px; line-height:1.7;">
       <div id="preNavDistLine">–</div>
       <div id="preNavWeatherLine">–</div>
       <div id="preNavCalorieLine" style="display:none;"></div>
@@ -2017,7 +2019,7 @@
       <button id="reverseTripYesBtn" class="reverse-trip-yes" data-i18n="reverseTripYes">↩️ Ja, breng me terug</button>
       <button id="reverseTripNoBtn" class="reverse-trip-no" data-i18n="reverseTripNo">Nee, bedankt</button>
     </div>
-    <button id="reverseTripAnalyseBtn" style="width:100%; margin-top:10px; border:none; border-radius:12px; padding:11px; background:rgba(255,255,255,0.08); color:var(--green-900); font-weight:700;" data-i18n="reverseTripAnalyseBtn">📊 Bekijk rit-analyse</button>
+    <button id="reverseTripAnalyseBtn" style="width:100%; margin-top:10px; border:none; border-radius:12px; padding:11px; background:rgba(255,255,255,0.08); font-weight:700;" data-i18n="reverseTripAnalyseBtn">📊 Bekijk rit-analyse</button>
   </div>
 </div>
 
@@ -2527,7 +2529,7 @@
           <div id="runCoachWeekDesc">–</div>
           <div id="runCoachProgressLine">–</div>
         </div>
-        <button id="runCoachPlansBtn" style="width:100%; border:1.5px solid var(--line); background:rgba(255,255,255,0.04); border-radius:12px; padding:10px; font-size:12px; font-weight:700; color:var(--cream); margin:10px 0 4px; display:flex; justify-content:space-between; align-items:center;">
+        <button id="runCoachPlansBtn" style="width:100%; border:1.5px solid var(--line); background:rgba(255,255,255,0.04); border-radius:12px; padding:10px; font-size:12px; font-weight:700; color:var(--cream); margin:10px 0 16px; display:flex; justify-content:space-between; align-items:center;">
           <span>📚 Schema: <b id="runCoachPlanName">5K Start to Run</b></span><span style="opacity:0.6; font-size:11px;">wissel/bouw ›</span>
         </button>
         <button id="runCoachStartBtn">▶ Start training</button>
@@ -3158,7 +3160,7 @@ function useTileProvider(index){
   // van 256px) i.p.v. een vast getal — de eerdere ondergrens (6) bleek op een telefoon zelf tóch nog groene
   // randen te geven, dus die ondergrens (en de bovengrens voor een groot scherm) staan nu allebei hoger.
   const viewportPx = Math.max(window.innerWidth, window.innerHeight);
-  const dynamicKeepBuffer = Math.min(12, Math.max(8, Math.ceil((viewportPx / 256) * 0.9)));
+  const dynamicKeepBuffer = Math.min(14, Math.max(10, Math.ceil((viewportPx / 256) * 0.9)));
   currentTileLayer = L.tileLayer(p.url, { ...p.options, keepBuffer: dynamicKeepBuffer }).addTo(map);
   document.getElementById('mapAttribution').textContent = p.options.attribution;
 
@@ -8250,7 +8252,7 @@ function openGarminKompasScreen(){
 }
 function closeGarminKompasScreen(){
   $('garminKompasScreen').classList.add('hidden');
-  showHubScreen();
+  if (appMode === null) showHubScreen(); // enkel naar Home als je er ook vandaan kwam, anders gewoon terug naar de kaart
 }
 window.addEventListener('message', (ev) => {
   const data = ev.data;
@@ -8272,7 +8274,7 @@ function openGarminWeerScreen(){
 }
 function closeGarminWeerScreen(){
   $('garminWeerScreen').classList.add('hidden');
-  showHubScreen();
+  if (appMode === null) showHubScreen();
 }
 window.addEventListener('message', (ev) => {
   const data = ev.data;
@@ -8911,7 +8913,8 @@ async function fetchGarminWeerData(forceLocation){
     post({ error: curLang()==='en' ? 'No GPS available' : 'Geen GPS beschikbaar' });
     return;
   }
-  navigator.geolocation.getCurrentPosition(async (pos) => {
+  getBestKnownPosition().then(async (pos) => {
+    if (!pos){ post({ error: curLang()==='en' ? 'Location unavailable' : 'Locatie niet beschikbaar' }); return; }
     try{
       weatherLocationOverride = { lat: pos.coords.latitude, lng: pos.coords.longitude };
       const data = await loadWeatherAndSun();
@@ -8943,9 +8946,7 @@ async function fetchGarminWeerData(forceLocation){
     } catch(e){
       post({ error: curLang()==='en' ? 'Weather unavailable' : 'Weer niet beschikbaar' });
     }
-  }, () => {
-    post({ error: curLang()==='en' ? 'No location access' : 'Geen locatietoegang' });
-  }, { timeout:10000 });
+  });
 }
 
 function buildGarminKompasHtml(){
@@ -13257,6 +13258,25 @@ async function buildSearchSuggestions(q){
     });
   }catch(e){ /* geen pinpoints beschikbaar, geen probleem */ }
 
+  // Live plaatsnaam-zoeken (Nominatim, gratis) — enkel als de lokale data nog ruimte overlaat, en
+  // enkel vanaf 3 tekens (korte zoektermen geven bij Nominatim vaak te veel ruis).
+  if (results.length < 8 && q.length >= 3){
+    try{
+      const cc = Object.entries({ be:'be', nl:'nl', du:'de' })
+        .filter(([k]) => appSettings.bundledCountries && appSettings.bundledCountries[k])
+        .map(([,v]) => v).join(',') || 'be';
+      const res = await fetchWithTimeout(`https://nominatim.openstreetmap.org/search?format=json&limit=3&countrycodes=${cc}&q=${encodeURIComponent(q)}`, {}, 4000);
+      const data = await res.json();
+      data.forEach(d => {
+        if (results.length >= 8) return;
+        results.push({
+          icon:'🌍', label: (d.display_name || q).split(',')[0], sub: d.display_name || '',
+          action:() => { map.setView([+d.lat, +d.lon], 15); hint(curLang()==='en' ? 'Tap "Load nodes" to load this area' : 'Tik op "Laad knooppunten" om dit gebied in te laden'); }
+        });
+      });
+    }catch(e){ /* live plaatsnaam-zoeken mislukt, lokale suggesties blijven gewoon staan */ }
+  }
+
   renderSearchSuggestions(results.slice(0, 8));
 }
 
@@ -16870,8 +16890,12 @@ async function setActiveTab(tab){
 }
 $('tabMapBtn').addEventListener('click', () => setActiveTab('map'));
 $('tabDashBtn').addEventListener('click', () => setActiveTab('dash'));
-$('tabSunBtn').addEventListener('click', () => setActiveTab('sun'));
-$('tabWeatherBtn').addEventListener('click', () => setActiveTab('weather'));
+$('tabSunBtn').addEventListener('click', () => {
+  if (appSettings.theme === 'garmin') openGarminKompasScreen(); else setActiveTab('sun');
+});
+$('tabWeatherBtn').addEventListener('click', () => {
+  if (appSettings.theme === 'garmin') openGarminWeerScreen(); else setActiveTab('weather');
+});
 
 // ---------- Kompas + Zon (samengevoegd) ----------
 const CARDINALS_NL = ['N','NNO','NO','ONO','O','OZO','ZO','ZZO','Z','ZZW','ZW','WZW','W','WNW','NW','NNW'];
@@ -17616,11 +17640,19 @@ const REST_POINT_TYPES = {
   picnic_table: { emoji:'🧺', nl:'Picknicktafel', en:'Picnic table' },
   drinking_water:{ emoji:'🚰', nl:'Drinkwaterpunt', en:'Drinking water' }
 };
+// Hergebruikt de locatie die de app mogelijk al heeft (bv. van live navigatie), i.p.v. altijd een
+// volledig nieuwe opvraging te doen — die kan om allerlei redenen falen/timeouten terwijl de app
+// elders allang een prima locatie heeft. Enkel als er niets bruikbaars is, vragen we vers op.
+async function getBestKnownPosition(maxAgeMs){
+  if (lastPosition && (Date.now() - lastPosition.timestamp) < (maxAgeMs || 120000)) return lastPosition;
+  if (!navigator.geolocation) return null;
+  return await new Promise((resolve) => {
+    navigator.geolocation.getCurrentPosition(p => resolve(p), () => resolve(null), { timeout:10000, enableHighAccuracy:true });
+  });
+}
 async function findNearbyRestPoints(){
   if (!navigator.geolocation) return { ok:false, reason:'no-geo' };
-  const pos = await new Promise((resolve) => {
-    navigator.geolocation.getCurrentPosition(p => resolve(p), () => resolve(null), { timeout:10000 });
-  });
+  const pos = await getBestKnownPosition();
   if (!pos) return { ok:false, reason:'no-location' };
   const lat = pos.coords.latitude, lon = pos.coords.longitude;
   const query = `[out:json][timeout:15];(
@@ -17685,9 +17717,7 @@ const ICONIC_TAXON_EMOJI = {
 };
 async function findNearbyObservations(){
   if (!navigator.geolocation) return { ok:false, reason:'no-geo' };
-  const pos = await new Promise((resolve) => {
-    navigator.geolocation.getCurrentPosition(p => resolve(p), () => resolve(null), { timeout:10000 });
-  });
+  const pos = await getBestKnownPosition();
   if (!pos) return { ok:false, reason:'no-location' };
   const lat = pos.coords.latitude, lon = pos.coords.longitude;
   try{
