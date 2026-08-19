@@ -1101,12 +1101,18 @@
   .zr-slider-label b{ color:#ff8a7a; font-weight:800; }
   .zr-slider-note{ font-size:10.5px; color:rgba(246,244,238,0.5); margin:2px 0 6px; }
   input[type=range].zr-range{
-    -webkit-appearance:none; appearance:none; width:100%; height:4px; border-radius:3px;
-    background:rgba(246,244,238,0.18); outline:none; margin:8px 0 2px; display:block;
+    -webkit-appearance:none; appearance:none; width:100%; height:20px; margin:6px 0 10px;
+    background:transparent; outline:none; display:block;
+  }
+  input[type=range].zr-range::-webkit-slider-runnable-track{
+    width:100%; height:4px; border-radius:3px; background:rgba(246,244,238,0.18);
   }
   input[type=range].zr-range::-webkit-slider-thumb{
     -webkit-appearance:none; width:20px; height:20px; border-radius:50%; background:#dc3b2b;
-    border:2px solid #fff; cursor:pointer; box-shadow:0 1px 3px rgba(0,0,0,0.4); margin-top:0;
+    border:2px solid #fff; cursor:pointer; box-shadow:0 1px 3px rgba(0,0,0,0.4); margin-top:-8px;
+  }
+  input[type=range].zr-range::-moz-range-track{
+    width:100%; height:4px; border-radius:3px; background:rgba(246,244,238,0.18);
   }
   input[type=range].zr-range::-moz-range-thumb{
     width:20px; height:20px; border-radius:50%; background:#dc3b2b; border:2px solid #fff; cursor:pointer;
@@ -1140,6 +1146,32 @@
   .zr-tombstone-epitaph{ font-size:12.5px; color:rgba(246,244,238,0.75); font-style:italic; margin-bottom:12px; }
   .zr-tombstone-stats{ font-size:12px; color:var(--cream); background:rgba(255,255,255,0.05); border-radius:10px; padding:10px; margin-bottom:14px; text-align:left; }
   .zr-tombstone-stats div{ display:flex; justify-content:space-between; padding:2px 0; }
+  /* ---------- Zombie Run: sfeervolle bosachtergrond voor de modals (geïnspireerd op de referentie: */
+  /* wortels/klimop in de hoek, mistige heuvels, kale bomen) ---------- */
+  .zr-modal-card.simple-modal-card{
+    position:relative; overflow:hidden;
+    background:radial-gradient(ellipse 140% 90% at 15% 0%, #1b3226 0%, #0f1d15 42%, #070c08 100%);
+    border:1px solid rgba(140,190,150,0.18);
+  }
+  .zr-modal-card > *:not(.zr-modal-deco){ position:relative; z-index:1; }
+  .zr-modal-card .settings-radio{ color:rgba(246,244,238,0.9) !important; }
+  .zr-modal-card .simple-modal-head b{ color:var(--cream); }
+  .zr-modal-card .simple-modal-close{ background:rgba(255,255,255,0.1); color:var(--cream); }
+  .zr-modal-card .zr-slider-label, .zr-modal-card .zr-slider-note, .zr-modal-card .settings-radio,
+  .zr-modal-card label{ text-shadow:0 1px 3px rgba(0,0,0,0.7); }
+  .zr-modal-deco{
+    position:absolute; inset:0; z-index:0; pointer-events:none; opacity:0.5;
+    background-image:url('images/zombie-bg-tree.png');
+    background-repeat:no-repeat; background-position:left bottom; background-size:150px auto;
+  }
+  .zr-modal-deco::after{
+    content:''; position:absolute; inset:0;
+    background:linear-gradient(100deg, rgba(7,14,10,0.55) 0%, rgba(7,14,10,0.15) 45%, transparent 65%);
+  }
+  .zr-modal-deco .zr-deco-mist{
+    position:absolute; left:0; right:0; bottom:0; height:30%;
+    background:linear-gradient(0deg, rgba(7,12,8,0.65) 0%, transparent 100%);
+  }
   /* ---------- Zombie Run: mini-radar + bonus + flitsanimaties ---------- */
   #zrRadarWrap{ display:flex; flex-direction:column; align-items:center; margin:6px 0 2px; }
   #zrRadarContainer{
@@ -1831,57 +1863,60 @@
 </div>
 
 <div id="zombieSetupModal" class="simple-modal">
-  <div class="simple-modal-card" style="max-width:360px;">
-    <div class="simple-modal-head"><b>🧟 Zombie Run</b><button class="simple-modal-close" data-close="zombieSetupModal">✕</button></div>
-    <div id="zombieCycleStatus" style="font-size:11px; color:rgba(246,244,238,0.55); margin-bottom:14px; text-align:center;">Bestanden zoeken…</div>
-
-    <label style="font-size:12px; font-weight:800; color:var(--cream); display:block; margin-bottom:6px;">🎚️ Moeilijkheidsgraad</label>
-    <div id="zombieDifficultyRow" style="display:flex; gap:6px; margin-bottom:16px;">
-      <button type="button" class="zr-diff-btn" data-diff="easy" style="flex:1; padding:8px 4px; border-radius:10px; border:1.5px solid rgba(246,244,238,0.15); background:rgba(255,255,255,0.04); color:var(--cream); font-size:11px; font-weight:700;">🟢 Wandelaar</button>
-      <button type="button" class="zr-diff-btn" data-diff="normal" style="flex:1; padding:8px 4px; border-radius:10px; border:1.5px solid var(--amber); background:rgba(226,161,60,0.15); color:var(--cream); font-size:11px; font-weight:700;">🟡 Survivor</button>
-      <button type="button" class="zr-diff-btn" data-diff="hard" style="flex:1; padding:8px 4px; border-radius:10px; border:1.5px solid rgba(246,244,238,0.15); background:rgba(255,255,255,0.04); color:var(--cream); font-size:11px; font-weight:700;">🔴 Hardcore</button>
+  <div class="simple-modal-card zr-modal-card" style="max-width:360px;">
+    <div class="zr-modal-deco" aria-hidden="true">
+      <div class="zr-deco-mist"></div>
     </div>
-    <div class="zr-slider-note" style="margin-top:-10px; margin-bottom:14px;">Vult de instellingen hieronder automatisch in — daarna nog vrij aan te passen via de sliders.</div>
+    <div class="simple-modal-head"><b>🧟 Zombie Run</b><button class="simple-modal-close" data-close="zombieSetupModal">✕</button></div>
+    <div id="zombieCycleStatus" style="font-size:11px; color:rgba(246,244,238,0.55); margin-bottom:14px; text-align:center;" data-i18n="zrSearchingFiles">Bestanden zoeken…</div>
 
-    <label style="font-size:12px; font-weight:800; color:var(--cream); display:block; margin-bottom:6px;">🎯 Doel</label>
-    <label class="settings-radio"><input type="radio" name="zombieGoalType" value="free" checked> <span>Vrij lopen (geen doel)</span></label>
-    <label class="settings-radio"><input type="radio" name="zombieGoalType" value="distance"> <span>Doel op afstand</span></label>
-    <label class="settings-radio"><input type="radio" name="zombieGoalType" value="time"> <span>Doel op tijd</span></label>
+    <label style="font-size:12px; font-weight:800; color:var(--cream); display:block; margin-bottom:6px;" data-i18n="zrDifficultyLabel">🎚️ Moeilijkheidsgraad</label>
+    <div id="zombieDifficultyRow" style="display:flex; gap:6px; margin-bottom:16px;">
+      <button type="button" class="zr-diff-btn" data-diff="easy" style="flex:1; padding:8px 4px; border-radius:10px; border:1.5px solid rgba(246,244,238,0.15); background:rgba(255,255,255,0.04); color:var(--cream); font-size:11px; font-weight:700;" data-i18n="zrDiffEasy">🟢 Wandelaar</button>
+      <button type="button" class="zr-diff-btn" data-diff="normal" style="flex:1; padding:8px 4px; border-radius:10px; border:1.5px solid var(--amber); background:rgba(226,161,60,0.15); color:var(--cream); font-size:11px; font-weight:700;" data-i18n="zrDiffNormal">🟡 Survivor</button>
+      <button type="button" class="zr-diff-btn" data-diff="hard" style="flex:1; padding:8px 4px; border-radius:10px; border:1.5px solid rgba(246,244,238,0.15); background:rgba(255,255,255,0.04); color:var(--cream); font-size:11px; font-weight:700;" data-i18n="zrDiffHard">🔴 Hardcore</button>
+    </div>
+    <div class="zr-slider-note" style="margin-top:-10px; margin-bottom:14px;" data-i18n="zrDiffNote">Vult de instellingen hieronder automatisch in — daarna nog vrij aan te passen via de sliders.</div>
+
+    <label style="font-size:12px; font-weight:800; color:var(--cream); display:block; margin-bottom:6px;" data-i18n="zrGoalLabel">🎯 Doel</label>
+    <label class="settings-radio"><input type="radio" name="zombieGoalType" value="free" checked> <span data-i18n="zrGoalFree">Vrij lopen (geen doel)</span></label>
+    <label class="settings-radio"><input type="radio" name="zombieGoalType" value="distance"> <span data-i18n="zrGoalDistance">Doel op afstand</span></label>
+    <label class="settings-radio"><input type="radio" name="zombieGoalType" value="time"> <span data-i18n="zrGoalTime">Doel op tijd</span></label>
 
     <div class="zr-slider-wrap hidden" id="zombieGoalDistanceWrap" style="margin-top:10px;">
-      <div class="zr-slider-label"><span>📏 Afstand</span><b id="zombieGoalDistanceVal">5.0 km</b></div>
+      <div class="zr-slider-label"><span data-i18n="zrDistanceLabel">📏 Afstand</span><b id="zombieGoalDistanceVal">5.0 km</b></div>
       <input type="range" class="zr-range" id="zombieGoalDistanceInput" min="1" max="30" step="0.5" value="5">
     </div>
     <div class="zr-slider-wrap hidden" id="zombieGoalTimeWrap" style="margin-top:10px;">
-      <div class="zr-slider-label"><span>⏰ Tijd</span><b id="zombieGoalTimeVal">20 min</b></div>
+      <div class="zr-slider-label"><span data-i18n="zrTimeLabel">⏰ Tijd</span><b id="zombieGoalTimeVal">20 min</b></div>
       <input type="range" class="zr-range" id="zombieGoalTimeInput" min="5" max="90" step="5" value="20">
     </div>
     <div style="margin-bottom:6px;"></div>
 
     <div class="zr-slider-wrap">
-      <div class="zr-slider-label"><span>❤️ Levenspunten</span><b id="zombieLivesVal">3</b></div>
+      <div class="zr-slider-label"><span data-i18n="zrLivesLabel">❤️ Levenspunten</span><b id="zombieLivesVal">3</b></div>
       <input type="range" class="zr-range" id="zombieLivesInput" min="1" max="8" step="1" value="3">
     </div>
 
     <div class="zr-slider-wrap">
-      <div class="zr-slider-label"><span>🐌 Basissnelheid zombies</span><b id="zombieBaseSpeedVal">8.0 km/u</b></div>
+      <div class="zr-slider-label"><span data-i18n="zrBaseSpeedLabel">🐌 Basissnelheid zombies</span><b id="zombieBaseSpeedVal">8.0 km/u</b></div>
       <input type="range" class="zr-range" id="zombieBaseSpeedInput" min="3" max="20" step="0.5" value="8">
-      <div class="zr-slider-note" id="zombieBaseSpeedNote">Gebaseerd op jouw gemiddelde looptempo — pas gerust aan.</div>
+      <div class="zr-slider-note" id="zombieBaseSpeedNote" data-i18n="zrBaseSpeedDefaultNote">Gebaseerd op jouw gemiddelde looptempo — pas gerust aan.</div>
     </div>
 
     <div class="zr-slider-wrap">
-      <div class="zr-slider-label"><span>📈 Opdrijving per interval</span><b id="zombieRampVal">+0.3 km/u</b></div>
+      <div class="zr-slider-label"><span data-i18n="zrRampLabel">📈 Opdrijving per interval</span><b id="zombieRampVal">+0.3 km/u</b></div>
       <input type="range" class="zr-range" id="zombieRampInput" min="0" max="3" step="0.1" value="0.3">
-      <div class="zr-slider-note">De zombies worden geleidelijk sneller naarmate de run vordert (0 = blijven gelijk).</div>
+      <div class="zr-slider-note" data-i18n="zrRampNote">De zombies worden geleidelijk sneller naarmate de run vordert (0 = blijven gelijk).</div>
     </div>
 
     <div class="zr-slider-wrap">
-      <div class="zr-slider-label"><span>⏱️ Interval van opdrijving</span><b id="zombieRampIntervalVal">5 min</b></div>
+      <div class="zr-slider-label"><span data-i18n="zrRampIntervalLabel">⏱️ Interval van opdrijving</span><b id="zombieRampIntervalVal">5 min</b></div>
       <input type="range" class="zr-range" id="zombieRampIntervalInput" min="1" max="15" step="1" value="5">
     </div>
 
     <div class="zr-slider-wrap">
-      <div class="zr-slider-label"><span>⏳ Duur van een achtervolging</span><b id="zombieChaseVal">30 tot 60 sec</b></div>
+      <div class="zr-slider-label"><span data-i18n="zrChaseDurationLabel">⏳ Duur van een achtervolging</span><b id="zombieChaseVal">30 tot 60 sec</b></div>
       <div class="zr-dual-wrap">
         <div class="zr-dual-track"></div><div class="zr-dual-fill" id="zombieChaseFill"></div>
         <input type="range" id="zombieChaseMinInput" min="10" max="600" step="5" value="30">
@@ -1890,33 +1925,36 @@
     </div>
 
     <div class="zr-slider-wrap">
-      <div class="zr-slider-label"><span>🎧 Rustig lopen tussen verhaal en achtervolging</span><b id="zombieInterludeVal">15 tot 35 sec</b></div>
+      <div class="zr-slider-label"><span data-i18n="zrInterludeLabel">🎧 Rustig lopen tussen verhaal en achtervolging</span><b id="zombieInterludeVal">15 tot 35 sec</b></div>
       <div class="zr-dual-wrap">
         <div class="zr-dual-track"></div><div class="zr-dual-fill" id="zombieInterludeFill"></div>
         <input type="range" id="zombieInterludeMinInput" min="0" max="300" step="5" value="15">
         <input type="range" id="zombieInterludeMaxInput" min="0" max="300" step="5" value="35">
       </div>
-      <div class="zr-slider-note">Beide op 0 = uitgeschakeld, meteen door naar de volgende fase.</div>
+      <div class="zr-slider-note" data-i18n="zrInterludeNote">Beide op 0 = uitgeschakeld, meteen door naar de volgende fase.</div>
     </div>
 
-    <label style="font-size:12px; font-weight:800; color:var(--cream); display:block; margin-bottom:6px;">Als je ingehaald wordt...</label>
-    <label class="settings-radio"><input type="radio" name="zombieConsequence" value="points" checked> <span>Een leven verliezen, verhaal loopt door</span></label>
-    <label class="settings-radio"><input type="radio" name="zombieConsequence" value="extend"> <span>Een leven verliezen + verlengde achtervolging</span></label>
+    <label style="font-size:12px; font-weight:800; color:var(--cream); display:block; margin-bottom:6px;" data-i18n="zrConsequenceLabel">Als je ingehaald wordt...</label>
+    <label class="settings-radio"><input type="radio" name="zombieConsequence" value="points" checked> <span data-i18n="zrConsequencePoints">Een leven verliezen, verhaal loopt door</span></label>
+    <label class="settings-radio"><input type="radio" name="zombieConsequence" value="extend"> <span data-i18n="zrConsequenceExtend">Een leven verliezen + verlengde achtervolging</span></label>
 
-    <button id="zombieStartBtn" class="simple-modal-btn primary" style="width:100%; margin-top:14px; background:#7a1f16;">🧟 Start Zombie Run</button>
+    <button id="zombieStartBtn" class="simple-modal-btn primary" style="width:100%; margin-top:14px; background:#7a1f16;" data-i18n="zrStartBtn">🧟 Start Zombie Run</button>
   </div>
 </div>
 
 <div id="zombieTombstoneModal" class="simple-modal">
-  <div class="simple-modal-card">
+  <div class="simple-modal-card zr-modal-card">
+    <div class="zr-modal-deco" aria-hidden="true">
+      <div class="zr-deco-mist"></div>
+    </div>
     <div class="zr-tombstone">
       <div class="zr-tombstone-rip">R.I.P.</div>
-      <div class="zr-tombstone-name" id="zrTombstoneName">Speler</div>
+      <div class="zr-tombstone-name" id="zrTombstoneName" data-i18n="zrTombstonePlaceholderName">Speler</div>
       <div class="zr-tombstone-sub" id="zrTombstoneDate">2026</div>
     </div>
-    <div class="zr-tombstone-epitaph" id="zrTombstoneEpitaph">Met droefheid nemen we afscheid van...</div>
+    <div class="zr-tombstone-epitaph" id="zrTombstoneEpitaph" data-i18n="zrTombstonePlaceholderEpitaph">Met droefheid nemen we afscheid van...</div>
     <div class="zr-tombstone-stats" id="zrTombstoneStats"></div>
-    <button id="zombieTombstoneCloseBtn" class="simple-modal-btn primary" style="width:100%; background:#7a1f16;">Doorgaan</button>
+    <button id="zombieTombstoneCloseBtn" class="simple-modal-btn primary" style="width:100%; background:#7a1f16;" data-i18n="zrTombstoneContinueBtn">Doorgaan</button>
   </div>
 </div>
 
@@ -2740,8 +2778,8 @@
         </div>
         <button id="rcZombieBtnStd" class="run-week-card" style="width:100%; text-align:left; background:linear-gradient(160deg,#3a1a1a,#1a0a0a); border:1.5px solid rgba(220,60,60,0.4); cursor:pointer; margin-bottom:10px;">
           <div style="color:#ff8a8a; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.6px;">🧟 ZOMBIE RUN</div>
-          <div style="color:#fff; font-size:17px; font-weight:900; margin:4px 0 6px;">Verhaal + achtervolgingen</div>
-          <div style="color:rgba(255,255,255,0.75); font-size:12px;">Loop sneller dan de zombies of verlies een leven. Tik hier voor instellingen.</div>
+          <div style="color:#fff; font-size:17px; font-weight:900; margin:4px 0 6px;" data-i18n="zrCardTitle">Verhaal + achtervolgingen</div>
+          <div style="color:rgba(255,255,255,0.75); font-size:12px;" data-i18n="zrCardSub">Loop sneller dan de zombies of verlies een leven. Tik hier voor instellingen.</div>
         </button>
         <details id="rcBuilderDetailsStd" style="margin-bottom:14px;">
           <summary style="font-size:12px; font-weight:800; color:var(--cream); padding:10px 0; cursor:pointer;">🛠️ Eigen Schema Builder (1 sessie)</summary>
@@ -6445,6 +6483,36 @@ const TRANSLATIONS = {
   compassNoSensor: { nl:'geen sensor', en:'no sensor' },
   departurePoint: { nl:'vertrekpunt', en:'starting point' },
   wFeelsLike: { nl:'Voelt als ', en:'Feels like ' },
+  zrCardTitle: { nl:'Verhaal + achtervolgingen', en:'Story + chases' },
+  zrCardSub: { nl:'Loop sneller dan de zombies of verlies een leven. Tik hier voor instellingen.', en:'Outrun the zombies or lose a life. Tap here for settings.' },
+  zrSearchingFiles: { nl:'Bestanden zoeken…', en:'Checking files…' },
+  zrDifficultyLabel: { nl:'🎚️ Moeilijkheidsgraad', en:'🎚️ Difficulty' },
+  zrDiffEasy: { nl:'🟢 Wandelaar', en:'🟢 Walker' },
+  zrDiffNormal: { nl:'🟡 Survivor', en:'🟡 Survivor' },
+  zrDiffHard: { nl:'🔴 Hardcore', en:'🔴 Hardcore' },
+  zrDiffNote: { nl:'Vult de instellingen hieronder automatisch in — daarna nog vrij aan te passen via de sliders.', en:'Fills in the settings below automatically — still freely adjustable via the sliders afterwards.' },
+  zrGoalLabel: { nl:'🎯 Doel', en:'🎯 Goal' },
+  zrGoalFree: { nl:'Vrij lopen (geen doel)', en:'Free run (no goal)' },
+  zrGoalDistance: { nl:'Doel op afstand', en:'Distance goal' },
+  zrGoalTime: { nl:'Doel op tijd', en:'Time goal' },
+  zrDistanceLabel: { nl:'📏 Afstand', en:'📏 Distance' },
+  zrTimeLabel: { nl:'⏰ Tijd', en:'⏰ Time' },
+  zrLivesLabel: { nl:'❤️ Levenspunten', en:'❤️ Lives' },
+  zrBaseSpeedLabel: { nl:'🐌 Basissnelheid zombies', en:'🐌 Base zombie speed' },
+  zrBaseSpeedDefaultNote: { nl:'Gebaseerd op jouw gemiddelde looptempo — pas gerust aan.', en:'Based on your average pace — feel free to adjust.' },
+  zrRampLabel: { nl:'📈 Opdrijving per interval', en:'📈 Ramp per interval' },
+  zrRampNote: { nl:'De zombies worden geleidelijk sneller naarmate de run vordert (0 = blijven gelijk).', en:'The zombies gradually get faster as the run progresses (0 = stay the same).' },
+  zrRampIntervalLabel: { nl:'⏱️ Interval van opdrijving', en:'⏱️ Ramp interval' },
+  zrChaseDurationLabel: { nl:'⏳ Duur van een achtervolging', en:'⏳ Chase duration' },
+  zrInterludeLabel: { nl:'🎧 Rustig lopen tussen verhaal en achtervolging', en:'🎧 Calm running between story and chase' },
+  zrInterludeNote: { nl:'Beide op 0 = uitgeschakeld, meteen door naar de volgende fase.', en:'Both at 0 = disabled, straight to the next phase.' },
+  zrConsequenceLabel: { nl:'Als je ingehaald wordt...', en:'If you get caught...' },
+  zrConsequencePoints: { nl:'Een leven verliezen, verhaal loopt door', en:'Lose a life, story continues' },
+  zrConsequenceExtend: { nl:'Een leven verliezen + verlengde achtervolging', en:'Lose a life + extended chase' },
+  zrStartBtn: { nl:'🧟 Start Zombie Run', en:'🧟 Start Zombie Run' },
+  zrTombstonePlaceholderName: { nl:'Speler', en:'Runner' },
+  zrTombstonePlaceholderEpitaph: { nl:'Met droefheid nemen we afscheid van...', en:'With sadness we say goodbye to...' },
+  zrTombstoneContinueBtn: { nl:'Doorgaan', en:'Continue' },
 };
 const HELP_CONTENT = {
   nl: `
@@ -7332,6 +7400,7 @@ async function estimateZombieBaseSpeedKmh(){
 }
 // Lichte dual-range slider: twee overlappende <input type=range>, houdt min<=max af en tekent de
 // gekleurde balk + het label. Geen externe library nodig, enkel voor dit ene schermpje in de app.
+function zrKmhUnit(){ return curLang()==='en' ? 'km/h' : 'km/u'; }
 function setupZombieDualSlider(minInput, maxInput, fillEl, labelEl, unitLabel, formatFn){
   const fmt = formatFn || (v => v);
   function render(){
@@ -7342,7 +7411,7 @@ function setupZombieDualSlider(minInput, maxInput, fillEl, labelEl, unitLabel, f
     const pctHi = ((hi - parseFloat(minInput.min)) / range) * 100;
     fillEl.style.left = pctLo + '%';
     fillEl.style.width = Math.max(0, pctHi - pctLo) + '%';
-    labelEl.textContent = `${fmt(lo)} tot ${fmt(hi)} ${unitLabel}`;
+    labelEl.textContent = `${fmt(lo)} ${curLang()==='en' ? 'to' : 'tot'} ${fmt(hi)} ${unitLabel}`;
   }
   minInput.addEventListener('input', render);
   maxInput.addEventListener('input', render);
@@ -7830,7 +7899,7 @@ function handleZombieDeath(){
     ? `With sadness we say goodbye to ${name}... consumed by the horde.`
     : `Met droefheid nemen we afscheid van ${name}... verzwolgen door de horde.`;
   const km = (rsState.distanceM/1000).toFixed(2);
-  const nipperLine = isFinite(z.bestMarginKmh) ? `<div><span>${curLang()==='en'?'Closest call':'Op het nippertje'}</span><b>${z.bestMarginKmh.toFixed(1)} km/u</b></div>` : '';
+  const nipperLine = isFinite(z.bestMarginKmh) ? `<div><span>${curLang()==='en'?'Closest call':'Op het nippertje'}</span><b>${z.bestMarginKmh.toFixed(1)} ${zrKmhUnit()}</b></div>` : '';
   $('zrTombstoneStats').innerHTML = curLang()==='en'
     ? `<div><span>Distance</span><b>${km} km</b></div><div><span>Score</span><b>${z.score}</b></div><div><span>Bonus earned</span><b>${(z.totalBonusEarned||0).toFixed(1)}</b></div><div><span>Escaped</span><b>${z.escapedCount}×</b></div><div><span>Caught</span><b>${z.caughtCount}×</b></div>${nipperLine}<div><span>Storyline</span><b>#${z.storyline}</b></div>`
     : `<div><span>Afstand</span><b>${km} km</b></div><div><span>Score</span><b>${z.score}</b></div><div><span>Bonus verdiend</span><b>${(z.totalBonusEarned||0).toFixed(1)}</b></div><div><span>Ontsnapt</span><b>${z.escapedCount}×</b></div><div><span>Gepakt</span><b>${z.caughtCount}×</b></div>${nipperLine}<div><span>Verhaallijn</span><b>#${z.storyline}</b></div>`;
@@ -8941,8 +9010,8 @@ $('rideStravaUploadBtn').addEventListener('click', async () => {
 const renderZombieChaseSlider = setupZombieDualSlider($('zombieChaseMinInput'), $('zombieChaseMaxInput'), $('zombieChaseFill'), $('zombieChaseVal'), 'sec', v => Math.round(v));
 const renderZombieInterludeSlider = setupZombieDualSlider($('zombieInterludeMinInput'), $('zombieInterludeMaxInput'), $('zombieInterludeFill'), $('zombieInterludeVal'), 'sec', v => Math.round(v));
 $('zombieLivesInput').addEventListener('input', e => { $('zombieLivesVal').textContent = e.target.value; });
-$('zombieBaseSpeedInput').addEventListener('input', e => { $('zombieBaseSpeedVal').textContent = parseFloat(e.target.value).toFixed(1) + ' km/u'; });
-$('zombieRampInput').addEventListener('input', e => { $('zombieRampVal').textContent = '+' + parseFloat(e.target.value).toFixed(1) + ' km/u'; });
+$('zombieBaseSpeedInput').addEventListener('input', e => { $('zombieBaseSpeedVal').textContent = parseFloat(e.target.value).toFixed(1) + ' ' + zrKmhUnit(); });
+$('zombieRampInput').addEventListener('input', e => { $('zombieRampVal').textContent = '+' + parseFloat(e.target.value).toFixed(1) + ' ' + zrKmhUnit(); });
 $('zombieRampIntervalInput').addEventListener('input', e => { $('zombieRampIntervalVal').textContent = e.target.value + ' min'; });
 $('zombieGoalDistanceInput').addEventListener('input', e => { $('zombieGoalDistanceVal').textContent = parseFloat(e.target.value).toFixed(1) + ' km'; });
 $('zombieGoalTimeInput').addEventListener('input', e => { $('zombieGoalTimeVal').textContent = e.target.value + ' min'; });
@@ -8975,7 +9044,7 @@ async function applyZombieDifficultyPreset(diff){
   $('zombieInterludeMinInput').value = p.interludeMin; $('zombieInterludeMaxInput').value = p.interludeMax; renderZombieInterludeSlider();
   const avgSpeed = await estimateZombieBaseSpeedKmh();
   const speed = Math.round(avgSpeed * p.speedFactor * 10) / 10;
-  $('zombieBaseSpeedInput').value = speed; $('zombieBaseSpeedVal').textContent = speed.toFixed(1) + ' km/u';
+  $('zombieBaseSpeedInput').value = speed; $('zombieBaseSpeedVal').textContent = speed.toFixed(1) + ' ' + zrKmhUnit();
 }
 document.querySelectorAll('.zr-diff-btn').forEach(btn => btn.addEventListener('click', () => applyZombieDifficultyPreset(btn.dataset.diff)));
 
@@ -8986,10 +9055,15 @@ async function openZombieSetupModal(){
   // Basissnelheid vooraf invullen met je eigen historische gemiddelde — blijft een vrij aanpasbare slider.
   const avgSpeed = await estimateZombieBaseSpeedKmh();
   $('zombieBaseSpeedInput').value = avgSpeed;
-  $('zombieBaseSpeedVal').textContent = avgSpeed.toFixed(1) + ' km/u';
+  $('zombieBaseSpeedVal').textContent = avgSpeed.toFixed(1) + ' ' + zrKmhUnit();
   $('zombieBaseSpeedNote').textContent = curLang()==='en'
     ? `Based on your average pace from past runs (${avgSpeed.toFixed(1)} km/h) — feel free to adjust.`
     : `Gebaseerd op jouw gemiddelde tempo uit vorige runs (${avgSpeed.toFixed(1)} km/u) — pas gerust aan.`;
+  // Overige eenheid-labels ook meteen verversen (anders blijven ze op hun HTML-standaardwaarde staan
+  // tot de gebruiker de betreffende slider zelf een keer beweegt).
+  $('zombieRampVal').textContent = '+' + parseFloat($('zombieRampInput').value).toFixed(1) + ' ' + zrKmhUnit();
+  renderZombieChaseSlider();
+  renderZombieInterludeSlider();
   await applyZombieDifficultyPreset('normal');
 }
 $('zombieStartBtn').addEventListener('click', () => {
@@ -10521,7 +10595,7 @@ ${GARMIN_MENU_BTN_JS}
 </body>
 </html>`;
 }
-const APP_VERSION_TEXT = 'v2.307 · 19 aug';
+const APP_VERSION_TEXT = 'v2.308 · 19 aug';
 function buildGarminHubHtml(){
   // Dit is Gemini's keuzescherm.html, ongewijzigd qua opbouw/stijl — enkel: (1) een derde grote tegel
   // "Hardlopen" toegevoegd, (2) de <a href> vervangen door postMessage-oproepen naar de echte app.
@@ -16172,7 +16246,8 @@ const GARMIN_NL_EN_DICT = {
   '8 Min Post-Run Stretching — cool down': '8 Min Post-Run Stretching — cool down',
   '10 Min. Post-Run Stretch — rustige cooldown': '10 Min. Post-Run Stretch — gentle cooldown',
   'Do These Stretches After Every Run': 'Do These Stretches After Every Run',
-  'Calf Stretch for Runners — wandstretch': 'Calf Stretch for Runners — wall stretch'
+  'Calf Stretch for Runners — wandstretch': 'Calf Stretch for Runners — wall stretch',
+  'Verhaal + achtervolgingen — loop sneller dan de zombies of verlies een leven.': 'Story + chases — outrun the zombies or lose a life.'
 };
 function translateGarminHtmlIfEnglish(html){
   if (curLang() !== 'en') return html;
