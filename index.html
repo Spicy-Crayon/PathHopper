@@ -365,6 +365,10 @@
   .wgauge-card{ width:100%; max-width:280px; background:rgba(255,255,255,0.06); border-radius:14px; padding:12px 16px; box-sizing:border-box; }
   .wsunmoon-card{ width:100%; max-width:280px; background:rgba(255,255,255,0.06); border-radius:14px; padding:14px 16px 10px; box-sizing:border-box; margin-bottom:10px; }
   .wsunmoon-arc{ width:100%; height:60px; display:block; }
+  .wsuncurve-title{ font-size:13px; font-weight:800; color:var(--cream); display:flex; align-items:center; gap:6px; margin-bottom:6px; }
+  .wsuncurve-svg{ width:100%; height:90px; display:block; }
+  .wsuncurve-labels{ display:flex; justify-content:space-between; align-items:center; font-size:11px; color:rgba(246,244,238,0.6); margin-top:4px; }
+  .wsuncurve-now{ color:var(--amber); font-weight:800; }
   .wgauge-label{ font-size:12px; font-weight:700; color:rgba(246,244,238,0.7); text-transform:uppercase; letter-spacing:.4px; }
   .wgauge-bar-wrap{ margin:10px 0 6px; position:relative; height:6px; }
   .wgauge-bar{ height:6px; border-radius:3px; background:linear-gradient(90deg,#3aa0e8,#e2a13c,#e8503f); position:relative; }
@@ -814,7 +818,7 @@
   #runCoachScreen{
     position:fixed; top:0;left:0;right:0;bottom:0; z-index:3000; background:var(--green-900); color:var(--cream);
     display:flex; align-items:center; justify-content:center; overflow-y:auto;
-    padding:calc(env(safe-area-inset-top,0px) + var(--extra-top-inset)) 20px calc(24px + env(safe-area-inset-bottom,0px) + var(--extra-bottom-inset));
+    padding:calc(env(safe-area-inset-top,0px) + var(--extra-top-inset)) 20px calc(90px + env(safe-area-inset-bottom,0px) + var(--extra-bottom-inset));
   }
   #runCoachScreen.hidden{ display:none; }
   #spotifyPlayingView.hidden, #spotifyNothingPlaying.hidden, #runCoachVoiceList.hidden, #runPlanBuilderView.hidden, #rcSessieActiveStd.hidden, #rcSessieInactiveStd.hidden, #themeSwitchResetSection.hidden, .rh-row-detail-std.hidden{ display:none; }
@@ -845,7 +849,12 @@
   .rc-toptabs{ display:flex; gap:8px; background:rgba(255,255,255,0.05); border-radius:14px; padding:5px; margin-bottom:16px; }
   .rc-toptabs button{ flex:1; border:none; background:none; padding:10px 4px; border-radius:10px; font-size:12px; font-weight:800; color:rgba(246,244,238,0.55); }
   .rc-toptabs button.active{ background:var(--amber); color:var(--green-900); }
-  .rc-botnav{ display:flex; justify-content:space-around; width:100%; max-width:360px; margin:18px auto 0; padding-top:12px; border-top:1px solid rgba(255,255,255,0.08); }
+  .rc-botnav{
+    position:fixed; left:0; right:0; bottom:0; z-index:3010; background:var(--green-900);
+    display:flex; justify-content:space-around; width:100%; max-width:420px; margin:0 auto;
+    padding:10px 6px calc(10px + env(safe-area-inset-bottom,0px) + var(--extra-bottom-inset));
+    border-top:1px solid rgba(255,255,255,0.08);
+  }
   .rc-botnav button{ border:none; background:none; display:flex; flex-direction:column; align-items:center; gap:2px; color:rgba(246,244,238,0.5); font-size:9.5px; font-weight:700; }
   .rc-botnav button.active{ color:var(--amber); }
   .rc-botnav button .ic{ font-size:17px; }
@@ -976,6 +985,13 @@
     width:42px; height:36px; border-radius:16px; display:flex; align-items:center; justify-content:center;
   }
   #rsMinimizeBtn:active{ background:rgba(226,161,60,0.22); }
+  #rsSettingsBtn{
+    position:absolute; right:16px; top:calc(14px + env(safe-area-inset-top,0px) + var(--extra-top-inset));
+    z-index:30; border:none; background:rgba(226,161,60,0.12); color:var(--amber);
+    width:42px; height:36px; border-radius:16px; display:flex; align-items:center; justify-content:center;
+    font-size:18px;
+  }
+  #rsSettingsBtn:active{ background:rgba(226,161,60,0.22); }
 
   /* Garmin-thema: zelfde scherm/logica, enkel de kleuren/vormen omgezet naar de donkere navy/amber-look. */
   body.theme-garmin #runSessionScreen{ background:#050914; }
@@ -1176,6 +1192,7 @@
   }
   /* ---------- Zombie Run: mini-radar + bonus + flitsanimaties ---------- */
   #zrRadarWrap{ display:flex; flex-direction:column; align-items:center; margin:6px 0 2px; }
+  #zrRadarWrap.hidden{ display:none; } /* een kale #id-regel wint anders altijd van de algemene .hidden-klasse (hogere specificiteit) */
   #zrRadarContainer{
     width:96px; height:96px; background:#090d16; border:2px solid rgba(220,60,60,0.4); border-radius:50%;
     position:relative; overflow:hidden; box-shadow:inset 0 0 14px rgba(0,0,0,0.6);
@@ -2753,13 +2770,15 @@
           <div style="color:rgba(255,255,255,0.85); font-size:12px;">Tik je afstand aan om je volgende sessie te starten — de app onthoudt zelf bij welke week/sessie je zit.</div>
         </div>
         <div style="display:flex; gap:8px; margin:10px 0;">
-          <button id="rcEvyStart5Std" style="flex:1; border:2px solid rgba(226,161,60,0.4); background:rgba(255,255,255,0.04); border-radius:14px; padding:14px 6px; color:var(--cream);">
-            <div style="font-size:15px; margin-bottom:2px;">🏁 5 KM</div>
-            <div id="rcEvyProg5Std" style="font-size:10.5px; color:var(--amber); font-weight:700;">Week – · Sessie –</div>
+          <button id="rcEvyStart5Std" style="flex:1; border:2px solid rgba(226,161,60,0.4); background:rgba(255,255,255,0.04); border-radius:16px; padding:20px 8px; color:var(--cream);">
+            <div style="font-size:19px; margin-bottom:4px;">🏁 5 KM</div>
+            <div id="rcEvyProg5Std" style="font-size:12px; color:var(--amber); font-weight:700;">Week – · Sessie –</div>
+            <div id="rcEvyDone5Std" class="rcEvyMarkDoneStd" data-dist="5" data-i18n="evyMarkDone" style="font-size:10.5px; color:rgba(246,244,238,0.5); text-decoration:underline; margin-top:6px;">✅ Deze sessie al gedaan → volgende</div>
           </button>
-          <button id="rcEvyStart10Std" style="flex:1; border:2px solid rgba(226,161,60,0.4); background:rgba(255,255,255,0.04); border-radius:14px; padding:14px 6px; color:var(--cream);">
-            <div style="font-size:15px; margin-bottom:2px;">🔥 10 KM</div>
-            <div id="rcEvyProg10Std" style="font-size:10.5px; color:var(--amber); font-weight:700;">Week – · Sessie –</div>
+          <button id="rcEvyStart10Std" style="flex:1; border:2px solid rgba(226,161,60,0.4); background:rgba(255,255,255,0.04); border-radius:16px; padding:20px 8px; color:var(--cream);">
+            <div style="font-size:19px; margin-bottom:4px;">🔥 10 KM</div>
+            <div id="rcEvyProg10Std" style="font-size:12px; color:var(--amber); font-weight:700;">Week – · Sessie –</div>
+            <div id="rcEvyDone10Std" class="rcEvyMarkDoneStd" data-dist="10" data-i18n="evyMarkDone" style="font-size:10.5px; color:rgba(246,244,238,0.5); text-decoration:underline; margin-top:6px;">✅ Deze sessie al gedaan → volgende</div>
           </button>
         </div>
         <div style="display:flex; justify-content:center; gap:18px; margin-bottom:14px;">
@@ -2906,6 +2925,7 @@
   <button id="rsMinimizeBtn" aria-label="Minimaliseren" data-i18n-aria="rsMinimizeAria" title="Naar andere tabbladen — de sessie blijft gewoon lopen" data-i18n-title="rsMinimizeTitle">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
   </button>
+  <button id="rsSettingsBtn" title="Instellingen" data-i18n-title="titleMoreOptions">☰</button>
   <div id="rsMapWrap">
     <div id="rsMapBadge"><span id="rsMapBadgeText">0m @ 0.0 km/u</span></div>
     <div id="rsLiveBadge">● LIVE RUN</div>
@@ -3183,10 +3203,13 @@
       <div class="weather-title" data-i18n="wDetailsTitle">Meer details</div>
 
       <div class="wsunmoon-card">
-        <svg class="wsunmoon-arc" viewBox="0 0 320 90">
-          <path d="M10,80 Q160,6 310,80" fill="none" stroke="rgba(246,244,238,0.22)" stroke-width="1.5"/>
-          <circle id="wSunArcDot" cx="10" cy="80" r="6" fill="#fff"/>
-        </svg>
+        <div class="wsuncurve-title">☀️ <span data-i18n="wSunPositionToday">Zonnestand vandaag</span></div>
+        <svg id="wSunCurveSvg" class="wsuncurve-svg" viewBox="0 0 300 90"></svg>
+        <div class="wsuncurve-labels">
+          <span id="wSunCurveRiseLabel">🌅 –:–</span>
+          <span id="wSunCurveNowLabel" class="wsuncurve-now">–</span>
+          <span id="wSunCurveSetLabel">🌇 –:–</span>
+        </div>
         <div class="weather-row2" style="margin-top:6px;">
           <div class="weather-col"><small data-i18n="wSunriseLabel">Zonsopgang</small><b id="wSunriseVal">–</b></div>
           <div class="sun-divider"></div>
@@ -5901,6 +5924,8 @@ const TRANSLATIONS = {
   wColdLabel: { nl:'Koude', en:'Cold' },
   wMosquitoLabel: { nl:'Muggenactiviteit', en:'Mosquito activity' },
   wSunriseLabel: { nl:'Zonsopgang', en:'Sunrise' },
+  wSunPositionToday: { nl:'Zonnestand vandaag', en:'Sun position today' },
+  evyMarkDone: { nl:'✅ Deze sessie al gedaan → volgende', en:'✅ This session already done → next' },
   wSunsetLabel: { nl:'Zonsondergang', en:'Sunset' },
   wMoonriseLabel: { nl:'Maanopgang', en:'Moonrise' },
   wMoonsetLabel: { nl:'Maanondergang', en:'Moonset' },
@@ -7981,6 +8006,16 @@ $('rcEvyReset5Std').addEventListener('click', async () => {
 $('rcEvyReset10Std').addEventListener('click', async () => {
   if (confirm('De 10K-reeks terugzetten naar Week 1 · Sessie 1?')){ await resetEvyProgress(10); await renderEvyProgressStd(); }
 });
+document.querySelectorAll('.rcEvyMarkDoneStd').forEach(el => {
+  el.addEventListener('click', async (e) => {
+    e.stopPropagation(); // anders start het klikken hier ook meteen een nieuwe sessie (zit binnen dezelfde knop)
+    const dist = Number(el.dataset.dist);
+    if (confirm((curLang()==='en' ? `Mark this session (${dist} km) as already done and advance to the next?` : `Deze sessie (${dist} km) markeren als al gedaan en doorschuiven naar de volgende?`))){
+      await advanceEvyProgress(dist);
+      await renderEvyProgressStd();
+    }
+  });
+});
 async function renderEvyProgressStd(){
   const p5 = await getEvyProgress(5), p10 = await getEvyProgress(10);
   $('rcEvyProg5Std').textContent = `Week ${p5.week} · Sessie ${p5.session}/3`;
@@ -8874,6 +8909,7 @@ function resumeRunSessionView(){
   $('runSessionScreen').classList.remove('hidden');
 }
 $('rsMinimizeBtn').addEventListener('click', minimizeRunSession);
+$('rsSettingsBtn').addEventListener('click', openActionMenu); // zelfde volledige instellingenmenu als op de fiets/wandel-pagina (waffleBtn)
 $('rsHrLine').addEventListener('click', () => { if (!hrDevice) connectHeartRateMonitor(); });
 $('dashHrTile').addEventListener('click', () => { if (!hrDevice) connectHeartRateMonitor(); });
 
@@ -17172,7 +17208,7 @@ function renderWeatherDetailsScreen(data){
   $('wSunsetVal').textContent = data.sunsetText || '–';
   $('wMoonriseVal').textContent = data.moonriseText || tr('wNoneToday');
   $('wMoonsetVal').textContent = data.moonsetText || tr('wNoneToday');
-  positionSunArcDot(data);
+  renderSunCurveStandaard(data);
   renderPollen(data);
   renderBestTimeToLeave(data);
 
@@ -17261,27 +17297,45 @@ function renderBestTimeToLeave(data){
 // Plaatst het bolletje op de dag/nacht-boog: overdag tussen zonsopgang en -ondergang op de gewone
 // boog, 's nachts op dezelfde boogvorm maar dan voorstellend het deel tussen ondergang en de volgende
 // opgang — een eenvoudige, benaderende visualisatie (geen exacte astronomische positie).
-function positionSunArcDot(data){
-  const dot = $('wSunArcDot');
-  if (!dot || data.sunriseMin == null || data.sunsetMin == null) return;
-  const nowMin = new Date().getHours()*60 + new Date().getMinutes();
-  let progress; // 0..1 doorheen het huidige dag- of nachtstuk
-  const isNight = nowMin < data.sunriseMin || nowMin > data.sunsetMin;
-  if (!isNight){
-    progress = (nowMin - data.sunriseMin) / (data.sunsetMin - data.sunriseMin);
-  } else if (nowMin > data.sunsetMin){
-    progress = (nowMin - data.sunsetMin) / ((1440 - data.sunsetMin) + data.sunriseMin);
-  } else {
-    progress = (nowMin + (1440 - data.sunsetMin)) / ((1440 - data.sunsetMin) + data.sunriseMin);
+// Echte zonnestand-curve (declinatie + uurhoek) — dezelfde berekening/tekenlogica als de Tailwind-weerpagina,
+// hier rechtstreeks op de Standaard-pagina getekend i.p.v. via een postMessage naar een iframe.
+function renderSunCurveStandaard(data){
+  const svg = $('wSunCurveSvg');
+  if (!svg || data.lat == null) return;
+  const now = new Date();
+  const dayOfYear = Math.floor((now - new Date(now.getFullYear(),0,0)) / 86400000);
+  const nowHour = now.getHours() + now.getMinutes()/60;
+  const sunCurve = [];
+  for (let h = 0; h <= 24; h += 0.5) sunCurve.push({ h, elev: solarElevationDeg(data.lat, h, dayOfYear) });
+
+  const W = 300, H = 90, pad = 6;
+  const elevs = sunCurve.map(p => p.elev);
+  const maxE = Math.max(...elevs, 5), minE = Math.min(...elevs, -5);
+  const range = maxE - minE || 1;
+  const xFor = h => pad + (h/24) * (W - pad*2);
+  const yFor = e => H - pad - ((e - minE)/range) * (H - pad*2);
+  const pathD = sunCurve.map((p,i) => (i===0?'M':'L') + xFor(p.h).toFixed(1) + ',' + yFor(p.elev).toFixed(1)).join(' ');
+  const horizonY = yFor(0).toFixed(1);
+  const nowX = xFor(nowHour).toFixed(1);
+  let nowElev = 0;
+  for (let i=0; i<sunCurve.length-1; i++){
+    if (nowHour >= sunCurve[i].h && nowHour <= sunCurve[i+1].h){
+      const t = (nowHour - sunCurve[i].h) / (sunCurve[i+1].h - sunCurve[i].h);
+      nowElev = sunCurve[i].elev + t * (sunCurve[i+1].elev - sunCurve[i].elev);
+      break;
+    }
   }
-  progress = Math.max(0, Math.min(1, progress));
-  // Benadering van het punt op het kwadratische Bézier-pad M10,80 Q160,6 310,80
-  const t = progress, mt = 1 - t;
-  const x = mt*mt*10 + 2*mt*t*160 + t*t*310;
-  const y = mt*mt*80 + 2*mt*t*6 + t*t*80;
-  dot.setAttribute('cx', x.toFixed(1));
-  dot.setAttribute('cy', y.toFixed(1));
-  dot.setAttribute('fill', isNight ? '#c9d4e8' : '#ffcf4d');
+  const nowY = yFor(nowElev).toFixed(1);
+  svg.innerHTML = `
+    <line x1="${pad}" y1="${horizonY}" x2="${W-pad}" y2="${horizonY}" stroke="rgba(246,244,238,0.25)" stroke-width="1" stroke-dasharray="3,3"/>
+    <path d="${pathD} L ${xFor(24)},${horizonY} L ${xFor(0)},${horizonY} Z" fill="url(#wSunGrad)" opacity="0.3"/>
+    <path d="${pathD}" fill="none" stroke="#e2a13c" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="${nowX}" cy="${nowY}" r="5" fill="#e2a13c" stroke="#12241b" stroke-width="2"/>
+    <defs><linearGradient id="wSunGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#e2a13c"/><stop offset="100%" stop-color="#e2a13c" stop-opacity="0"/></linearGradient></defs>
+  `;
+  $('wSunCurveRiseLabel').textContent = '🌅 ' + (data.sunriseText || '–:–');
+  $('wSunCurveSetLabel').textContent = '🌇 ' + (data.sunsetText || '–:–');
+  $('wSunCurveNowLabel').textContent = (curLang()==='en' ? 'Now: ' : 'Nu: ') + Math.round(nowElev) + '° ' + (curLang()==='en' ? 'above horizon' : 'boven horizon');
 }
 
 // Zet windsnelheid (km/u) om naar de Beaufort-windkrachtschaal (0-12)
@@ -18124,6 +18178,8 @@ function selectMode(mode){
   $('bikeRoutingProAnalyseBtn').style.display = 'block'; // altijd beschikbaar, zowel bij fiets als wandelen
   $('toStartBtn').disabled = false;
   document.body.classList.toggle('mode-wandel', mode === 'wandel');
+  const emptyMsgElNow = $('emptyMsg');
+  if (emptyMsgElNow) emptyMsgElNow.textContent = tr(mode === 'wandel' ? 'emptyMsgWithLoopWalk' : 'emptyMsgWithLoop'); // anders blijft bij een lege route de statische (groene) standaardtekst staan tot renderRoute() voor het eerst draait
   hideHubScreen();
   const lang = appSettings.language === 'en' ? 'en' : 'nl';
   const placeholders = {
