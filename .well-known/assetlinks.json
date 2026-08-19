@@ -1,1 +1,8 @@
-
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "io.github.spicy_crayon.twa",
+        "sha256_cert_fingerprints": ["67:52:E1:D6:4B:2E:46:A9:2D:9F:8C:A5:D3:A7:09:2B:BB:12:23:12:32:31:87:37:D5:9C:62:96:61:DE:84:A3"]
+      }
+    }]
