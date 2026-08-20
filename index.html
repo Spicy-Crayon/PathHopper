@@ -192,14 +192,15 @@
   }
   .waffle-grid{ display:grid; grid-template-columns:repeat(3,5px); grid-template-rows:repeat(3,5px); gap:3px; }
   .waffle-grid span{ width:5px; height:5px; border-radius:50%; background:var(--cream); }
+  #runCoachSettingsBtn .waffle-grid span{ background:var(--amber); }
 
   #menuBackdrop{
-    position:absolute; top:0;left:0;right:0;bottom:0; z-index:1600; background:rgba(0,0,0,0.35);
+    position:absolute; top:0;left:0;right:0;bottom:0; z-index:3550; background:rgba(0,0,0,0.35);
     display:none;
   }
   #menuBackdrop.show{ display:block; }
   #actionMenu{
-    position:absolute; right:12px; top:calc(env(safe-area-inset-top,0px) + var(--extra-top-inset) + 60px); z-index:1700;
+    position:absolute; right:12px; top:calc(env(safe-area-inset-top,0px) + var(--extra-top-inset) + 60px); z-index:3600;
     background:var(--cream); border-radius:18px; box-shadow:var(--shadow);
     width:min(340px, 88vw); padding:10px; display:none; flex-direction:column;
     max-height:75vh; overflow-y:auto;
@@ -806,6 +807,10 @@
     opacity:0.28; z-index:1; filter:drop-shadow(0 4px 6px rgba(0,0,0,0.25));
   }
   #modeSelectHint{ color:rgba(246,244,238,0.6); font-size:12.5px; max-width:280px; flex-shrink:0; }
+  #homeVersionFooter{
+    position:absolute; right:12px; bottom:calc(6px + env(safe-area-inset-bottom,0px) + var(--extra-bottom-inset));
+    font-size:9.5px; color:rgba(246,244,238,0.28); pointer-events:none;
+  }
   #modeSelectSettingsBtn{
     position:absolute; top:calc(18px + env(safe-area-inset-top,0px) + var(--extra-top-inset)); left:18px; z-index:10;
     width:38px; height:38px; border-radius:50%; border:1.5px solid rgba(226,161,60,0.4);
@@ -817,13 +822,13 @@
 
   #bikeSetupScreen{
     position:fixed; top:0;left:0;right:0;bottom:0; z-index:3000; background:var(--green-900);
-    display:flex; align-items:center; justify-content:center; overflow-y:auto;
+    display:flex; align-items:flex-start; justify-content:center; overflow-y:auto;
     padding:calc(env(safe-area-inset-top,0px) + var(--extra-top-inset)) 20px calc(24px + env(safe-area-inset-bottom,0px) + var(--extra-bottom-inset));
   }
   #bikeSetupScreen.hidden{ display:none; }
   #runCoachScreen{
     position:fixed; top:0;left:0;right:0;bottom:0; z-index:3000; background:var(--green-900); color:var(--cream);
-    display:flex; align-items:center; justify-content:center; overflow-y:auto;
+    display:flex; align-items:flex-start; justify-content:center; overflow-y:auto;
     padding:calc(env(safe-area-inset-top,0px) + var(--extra-top-inset)) 20px calc(90px + env(safe-area-inset-bottom,0px) + var(--extra-bottom-inset));
   }
   #runCoachScreen.hidden{ display:none; }
@@ -1023,6 +1028,7 @@
   }
   #bikeSetupBackBtn:active{ background:rgba(226,161,60,0.22); }
   .bike-setup-inner{ width:100%; max-width:380px; text-align:center; margin-top:-25px; }
+  #bikeSetupScreen .bike-setup-inner{ margin-top:54px; } /* overschrijft de -25px hierboven (die was afgestemd op de oude verticale centrering) — geeft nu genoeg vrije ruimte onder de terugknop */
   .bike-setup-title{ color:var(--cream); font-size:16px; font-weight:800; margin-bottom:16px; }
 
   .bike-type-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; }
@@ -1087,7 +1093,7 @@
   /* Hoogteprofiel */
   /* Eenvoudige modals: URL-import, opgeslagen links */
   .simple-modal{
-    position:fixed; top:0;left:0;right:0;bottom:0; z-index:1900; background:rgba(0,0,0,0.5);
+    position:fixed; top:0;left:0;right:0;bottom:0; z-index:3200; background:rgba(0,0,0,0.5);
     display:none; align-items:center; justify-content:center; padding:20px;
   }
   .simple-modal.show{ display:flex; }
@@ -1277,6 +1283,12 @@
     font-size:13px; font-weight:800; letter-spacing:.3px; color:var(--amber-dark);
     cursor:pointer; padding:4px 0 10px; list-style:none; display:flex; align-items:center; justify-content:space-between;
   }
+  .settings-scope-tag{
+    font-size:9.5px; font-weight:700; letter-spacing:0; color:rgba(51,71,60,0.55);
+    background:rgba(0,0,0,0.06); border-radius:8px; padding:2px 7px; margin-left:8px; white-space:nowrap;
+  }
+  body.theme-garmin .settings-scope-tag{ color:rgba(241,245,249,0.5); background:rgba(255,255,255,0.06); }
+  .settings-summary-row{ display:flex; align-items:center; flex-wrap:wrap; }
   .settings-accordion summary::-webkit-details-marker{ display:none; }
   .settings-accordion summary::after{ content:'▸'; font-size:12px; color:#a9b8ae; transition:transform .2s; }
   .settings-accordion[open] summary::after{ transform:rotate(90deg); }
@@ -1593,6 +1605,7 @@
     </button>
   </div>
   <div id="modeSelectHint" data-i18n="modeSelectHint">Knooppunten, navigatie, GPX, offline-gebruik — alles werkt voor beide.</div>
+  <div id="homeVersionFooter"></div>
 </div>
 
 <!-- Garmin-stijl hub: letterlijk Gemini's keuzescherm.html-ontwerp, geïsoleerd in een iframe zodat
@@ -2269,7 +2282,7 @@
     </div>
     </details>
 
-    <details class="settings-accordion"><summary>🏃 Hardloop-coaching</summary>
+    <details class="settings-accordion"><summary><span class="settings-summary-row">🏃 Hardloop-coaching<span class="settings-scope-tag" data-i18n="scopeRun"></span></span></summary>
     <div class="settings-section">
       <h4>Welke coach-berichten wil je horen?</h4>
       <p class="settings-note">Elke categorie kan je apart aan- of uitzetten. Standaard staat alles aan.</p>
@@ -2293,7 +2306,7 @@
     </div>
     </details>
 
-    <details class="settings-accordion"><summary>🏃 Lopen — handleiding</summary>
+    <details class="settings-accordion"><summary><span class="settings-summary-row">🏃 Lopen — handleiding<span class="settings-scope-tag" data-i18n="scopeRun"></span></span></summary>
     <div class="settings-section">
       <h4>AI Coach</h4>
       <p class="settings-note">3 ingebouwde opbouwschema's (5K/7,5K/10K), gebaseerd op resp. het officiële NHS Couch to 5K en Hal Higdon's Novice 10K-programma. Kies je afstand bovenaan, tik daarna op een weekkaartje om er handmatig naartoe te springen (met bevestiging), of bouw via "Schema wisselen of zelf opbouwen" je eigen schema.</p>
@@ -2314,7 +2327,7 @@
     </div>
     </details>
 
-    <details class="settings-accordion"><summary>💾 Back-up</summary>
+    <details class="settings-accordion"><summary><span class="settings-summary-row">💾 Back-up<span class="settings-scope-tag" data-i18n="scopeAll"></span></span></summary>
     <div class="settings-section">
       <h4>Al je gegevens bewaren of terugzetten</h4>
       <p class="settings-note">Ritten, hardloopgeschiedenis, medailles, pinpoints, eigen schema's en instellingen — alles in één bestand. Handig vóór je je browsergeschiedenis wist of van toestel wisselt.</p>
@@ -2325,7 +2338,7 @@
     </div>
     </details>
 
-    <details class="settings-accordion"><summary data-i18n="settingsGroupMap">🗺️ Kaart & knooppunten</summary>
+    <details class="settings-accordion"><summary><span class="settings-summary-row"><span data-i18n="settingsGroupMap">🗺️ Kaart & knooppunten</span><span class="settings-scope-tag" data-i18n="scopeBikeWalk"></span></span></summary>
     <div class="settings-section">
       <h4><span data-i18n="settingsBundledFiles">Meegeleverde knooppuntenbestanden</span></h4>
       <p class="settings-note"><span data-i18n="settingsBundledNote">Knooppunten laden altijd live, waar je ook rondkijkt. Deze bestanden zijn enkel een snelheids-/offline-bonus voor het gekozen land — vink aan welke je automatisch wil laden bij het opstarten.</span> <span data-i18n="settingsBundledPoiNote">Dezelfde vinkjes bepalen ook of het meegeleverde POI-bestand voor dat land (indien aanwezig) gebruikt wordt.</span></p>
@@ -2374,7 +2387,7 @@
 
     </details>
 
-    <details class="settings-accordion"><summary data-i18n="settingsGroupNav">🧭 Onderweg & navigatie</summary>
+    <details class="settings-accordion"><summary><span class="settings-summary-row"><span data-i18n="settingsGroupNav">🧭 Onderweg & navigatie</span><span class="settings-scope-tag" data-i18n="scopeBikeWalk"></span></span></summary>
     <div class="settings-section" style="display:none;">
       <h4 data-i18n="settingsRouteColorHeading">Route inkleuren op de kaart</h4>
       <p class="settings-note" data-i18n="settingsRouteColorNote">Kleurt je getekende route op de kaart zelf — handig om in één oogopslag te zien waar het zwaar wordt.</p>
@@ -2449,7 +2462,7 @@
 
     </details>
 
-    <details class="settings-accordion"><summary data-i18n="settingsGroupPersonal">👤 Persoonlijk</summary>
+    <details class="settings-accordion"><summary><span class="settings-summary-row"><span data-i18n="settingsGroupPersonal">👤 Persoonlijk</span><span class="settings-scope-tag" data-i18n="scopeAll"></span></span></summary>
     <div class="settings-section">
       <p class="settings-note">Alles hieronder blijft uitsluitend op je eigen toestel (in de opslag van je browser) — er wordt niets naar een server verstuurd, met niemand gedeeld, en je kan het op elk moment hier weer wissen of aanpassen.</p>
       <h4 style="margin-top:10px;">Naam</h4>
@@ -2491,7 +2504,7 @@
 
     </details>
 
-    <details class="settings-accordion"><summary data-i18n="settingsGroupApk">📱 Weergave in geïnstalleerde app (APK)</summary>
+    <details class="settings-accordion"><summary><span class="settings-summary-row"><span data-i18n="settingsGroupApk">📱 Weergave in geïnstalleerde app (APK)</span><span class="settings-scope-tag" data-i18n="scopeAll"></span></span></summary>
     <div class="settings-section">
       <h4 data-i18n="settingsApkHeading">Positionering</h4>
       <p class="settings-note" data-i18n="settingsApkNote">Enkel relevant als je de app via een geïnstalleerd app-icoon gebruikt (niet in de browser) en de knoppen bovenaan niet goed staan. Laat op 0 voor normaal browsergebruik.</p>
@@ -2512,7 +2525,7 @@
 
     </details>
 
-    <details class="settings-accordion"><summary data-i18n="settingsGroupRouting">🚴 Routering</summary>
+    <details class="settings-accordion"><summary><span class="settings-summary-row"><span data-i18n="settingsGroupRouting">🚴 Routering</span><span class="settings-scope-tag" data-i18n="scopeBikeWalk"></span></span></summary>
 
     <div class="settings-section">
       <h4 data-i18n="settingsRoutePrefHeading">Kortste of snelste route</h4>
@@ -2588,7 +2601,7 @@
 
     </details>
 
-    <details class="settings-accordion"><summary data-i18n="settingsGroupDash">📊 Dashboard</summary>
+    <details class="settings-accordion"><summary><span class="settings-summary-row"><span data-i18n="settingsGroupDash">📊 Dashboard</span><span class="settings-scope-tag" data-i18n="scopeBikeWalk"></span></span></summary>
     <div class="settings-section">
       <h4><span data-i18n="settingsDashTextSize">Dashboard — tekstgrootte</span></h4>
       <label class="settings-radio"><input type="radio" name="dashTextSize" value="normal" checked> <span><span data-i18n="settingsTextNormal">🔤 Normaal</span></span></label>
@@ -2611,7 +2624,7 @@
 
     </details>
 
-    <details class="settings-accordion"><summary data-i18n="settingsGroupLoopAdvanced">🧪 Geavanceerd: rondrit &amp; omweg</summary>
+    <details class="settings-accordion"><summary><span class="settings-summary-row"><span data-i18n="settingsGroupLoopAdvanced">🧪 Geavanceerd: rondrit &amp; omweg</span><span class="settings-scope-tag" data-i18n="scopeBikeWalk"></span></span></summary>
     <div class="settings-section">
       <p class="settings-note" data-i18n="loopAdvancedNote">Fijnafstelling van hoe streng de rondrit-generator en de omweg-functie een heen-en-terug via dezelfde weg proberen te vermijden. Standaardwaarden werken meestal goed — enkel aanpassen als je zelf wil experimenteren.</p>
 
@@ -2628,7 +2641,7 @@
 
     </details>
 
-    <details class="settings-accordion"><summary data-i18n="settingsGroupBattery">🔋 Batterij</summary>
+    <details class="settings-accordion"><summary><span class="settings-summary-row"><span data-i18n="settingsGroupBattery">🔋 Batterij</span><span class="settings-scope-tag" data-i18n="scopeAll"></span></span></summary>
     <div class="settings-section">
       <p class="settings-note" data-i18n="batterySectionNote">Op de meeste moderne smartphones (4000+ mAh) haal je met scherm aan gewoon al 4 tot 6+ uur navigatie zonder deze extra's — vooral nuttig bij een oudere batterij, hoge schermhelderheid, of een erg lange rit. Standaard staat niets hiervan aan.</p>
 
@@ -2651,7 +2664,7 @@
 
     </details>
 
-    <details class="settings-accordion"><summary data-i18n="settingsGroupDiag">🔧 Diagnose</summary>
+    <details class="settings-accordion"><summary><span class="settings-summary-row"><span data-i18n="settingsGroupDiag">🔧 Diagnose</span><span class="settings-scope-tag" data-i18n="scopeAll"></span></span></summary>
     <div class="settings-section">
       <h4><span data-i18n="diagTitle">Offline-diagnose</span></h4>
       <p class="settings-note" data-i18n="diagNote">Controleer hier of offline-opslag (service worker) werkt in jouw browser/app — vooral nuttig als je de app als geïnstalleerde APK gebruikt.</p>
@@ -2690,7 +2703,7 @@
     </div>
     </details>
 
-    <details class="settings-accordion"><summary data-i18n="settingsGroupSos">🆘 Valdetectie &amp; SOS</summary>
+    <details class="settings-accordion"><summary><span class="settings-summary-row"><span data-i18n="settingsGroupSos">🆘 Valdetectie &amp; SOS</span><span class="settings-scope-tag" data-i18n="scopeAll"></span></span></summary>
     <div class="settings-section">
       <h4 data-i18n="sosTitle">Valdetectie</h4>
       <p class="settings-note" data-i18n="sosNote">Detecteert een plotse harde schok gevolgd door stilte (zoals bij een val) en toont dan een groot SOS-scherm met een aftel-timer. Gebeurt er niets binnen die tijd, dan wordt automatisch het noodnummer gebeld. Werkt op basis van de bewegingssensor — geen garantie, enkel een extra vangnet. Staat standaard uit.</p>
@@ -2732,7 +2745,9 @@
 
 <div id="runCoachScreen" class="hidden">
   <button id="runCoachBackBtn" aria-label="Terug"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg></button>
-  <button id="runCoachSettingsBtn" title="Instellingen" data-i18n-title="titleMoreOptions" aria-label="Instellingen" style="position:absolute; top:16px; right:104px; z-index:10; width:38px; height:38px; border-radius:50%; border:1.5px solid rgba(226,161,60,0.4); background:rgba(0,0,0,0.25); color:var(--amber); font-size:16px; display:flex; align-items:center; justify-content:center;">☰</button>
+  <button id="runCoachSettingsBtn" title="Instellingen" data-i18n-title="titleMoreOptions" aria-label="Instellingen" style="position:absolute; top:16px; right:104px; z-index:10; width:38px; height:38px; border-radius:50%; border:1.5px solid rgba(226,161,60,0.4); background:rgba(0,0,0,0.25); display:flex; align-items:center; justify-content:center;">
+    <span class="waffle-grid" style="--waffle-color:var(--amber);"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span>
+  </button>
   <button id="runCoachAudioHeaderBtn" aria-label="Muziek &amp; podcast" style="position:absolute; top:16px; right:60px; z-index:10; width:38px; height:38px; border-radius:50%; border:1.5px solid rgba(226,161,60,0.4); background:rgba(0,0,0,0.25); color:var(--amber); font-size:16px; display:flex; align-items:center; justify-content:center;">🎵</button>
   <button id="runCoachSpotifyBtn" aria-label="Spotify" style="position:absolute; top:16px; right:16px; z-index:10; width:38px; height:38px; border-radius:50%; border:1.5px solid rgba(29,185,84,0.4); background:rgba(0,0,0,0.25); color:#1DB954; font-size:16px; display:flex; align-items:center; justify-content:center;">🎧</button>
   <div class="bike-setup-inner">
@@ -2769,13 +2784,13 @@
           <div style="color:#fff; font-size:17px; font-weight:900; margin:4px 0 6px;">Jouw 10-weken audioprogramma</div>
           <div style="color:rgba(255,255,255,0.85); font-size:12px;">Tik je afstand aan om je volgende sessie te starten — de app onthoudt zelf bij welke week/sessie je zit.</div>
         </div>
-        <div style="display:flex; gap:8px; margin:10px 0;">
-          <button id="rcEvyStart5Std" style="flex:1; border:2px solid rgba(226,161,60,0.4); background:rgba(255,255,255,0.04); border-radius:16px; padding:20px 8px; color:var(--cream);">
+        <div style="display:flex; flex-direction:column; gap:10px; margin:10px 0;">
+          <button id="rcEvyStart5Std" style="width:100%; border:2px solid rgba(226,161,60,0.4); background:rgba(255,255,255,0.04); border-radius:18px; padding:18px 20px; color:var(--cream); text-align:left;">
             <div style="font-size:19px; margin-bottom:4px;">🏁 5 KM</div>
             <div id="rcEvyProg5Std" style="font-size:12px; color:var(--amber); font-weight:700;">Week – · Sessie –</div>
             <div id="rcEvyDone5Std" class="rcEvyMarkDoneStd" data-dist="5" data-i18n="evyMarkDone" style="font-size:10.5px; color:rgba(246,244,238,0.5); text-decoration:underline; margin-top:6px;">✅ Volgende sessie</div>
           </button>
-          <button id="rcEvyStart10Std" style="flex:1; border:2px solid rgba(226,161,60,0.4); background:rgba(255,255,255,0.04); border-radius:16px; padding:20px 8px; color:var(--cream);">
+          <button id="rcEvyStart10Std" style="width:100%; border:2px solid rgba(226,161,60,0.4); background:rgba(255,255,255,0.04); border-radius:18px; padding:18px 20px; color:var(--cream); text-align:left;">
             <div style="font-size:19px; margin-bottom:4px;">🔥 10 KM</div>
             <div id="rcEvyProg10Std" style="font-size:12px; color:var(--amber); font-weight:700;">Week – · Sessie –</div>
             <div id="rcEvyDone10Std" class="rcEvyMarkDoneStd" data-dist="10" data-i18n="evyMarkDone" style="font-size:10.5px; color:rgba(246,244,238,0.5); text-decoration:underline; margin-top:6px;">✅ Volgende sessie</div>
@@ -2788,14 +2803,31 @@
       </div>
 
       <div id="rcFreeContent" style="display:none;">
-        <div class="run-week-card" style="background:linear-gradient(160deg,#2a5f8f,#173a5c); cursor:pointer;" id="rcFreeRunCardStd">
-          <div style="color:rgba(255,255,255,0.75); font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.6px;">VRIJE RUN</div>
-          <div style="color:#fff; font-size:19px; font-weight:900; margin:4px 0 6px;">Los lopen, geen schema</div>
-          <div style="color:rgba(255,255,255,0.85); font-size:13px;">Enkel GPS-afstand, tempo en tijd — stop zelf wanneer je wil. Tik hier om te starten.</div>
+        <div style="background:rgba(255,255,255,0.04); border:1.5px solid rgba(226,161,60,0.3); border-radius:16px; padding:14px; text-align:center; margin-bottom:14px;">
+          <span style="color:var(--amber); font-size:10px; font-weight:900; text-transform:uppercase; letter-spacing:1px; display:block; margin-bottom:3px;" data-i18n="rcAdvancedRunnersLabel">Volleerde Lopers</span>
+          <h2 style="color:var(--cream); font-size:16px; font-weight:900; margin:0;" data-i18n="rcAdvancedRunnersTitle">Vrije & Doelgerichte Runs</h2>
         </div>
-        <div style="display:flex; gap:8px; margin:10px 0;">
-          <button id="rcTarget5BtnStd" style="flex:1; border:1.5px solid var(--line); background:rgba(255,255,255,0.04); border-radius:12px; padding:10px 4px; color:var(--cream); font-size:11.5px; font-weight:700;">🏁 5 KM Target Run</button>
-          <button id="rcTarget10BtnStd" style="flex:1; border:1.5px solid var(--line); background:rgba(255,255,255,0.04); border-radius:12px; padding:10px 4px; color:var(--cream); font-size:11.5px; font-weight:700;">🔥 10 KM Target Run</button>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;">
+          <button id="rcFreeRunCardStd" style="border:1.5px solid var(--line); background:rgba(255,255,255,0.04); border-radius:16px; padding:14px; text-align:left; color:var(--cream);">
+            <div style="font-size:22px; margin-bottom:4px;">⏱️</div>
+            <div style="font-size:12.5px; font-weight:800;" data-i18n="rcFreeRunTitle">Vrije Run</div>
+            <div style="font-size:10px; color:rgba(246,244,238,0.55); margin-top:2px;" data-i18n="rcFreeRunSub">Geen limiet. Gewoon lekker lopen!</div>
+          </button>
+          <button id="rcTarget5BtnStd" style="border:1.5px solid rgba(226,161,60,0.25); background:rgba(255,255,255,0.04); border-radius:16px; padding:14px; text-align:left; color:var(--cream);">
+            <div style="font-size:22px; margin-bottom:4px;">🏁</div>
+            <div style="font-size:12.5px; font-weight:800;" data-i18n="rcTarget5Title">5 KM Target Run</div>
+            <div style="font-size:10px; color:rgba(246,244,238,0.55); margin-top:2px;" data-i18n="rcTarget5Sub">Target run op tijd en km-splits.</div>
+          </button>
+          <button id="rcTarget10BtnStd" style="border:1.5px solid rgba(226,161,60,0.25); background:rgba(255,255,255,0.04); border-radius:16px; padding:14px; text-align:left; color:var(--cream);">
+            <div style="font-size:22px; margin-bottom:4px;">🔥</div>
+            <div style="font-size:12.5px; font-weight:800;" data-i18n="rcTarget10Title">10 KM Target Run</div>
+            <div style="font-size:10px; color:rgba(246,244,238,0.55); margin-top:2px;" data-i18n="rcTarget10Sub">Gevorderde duurloop op tempo.</div>
+          </button>
+          <button id="rcHiitBtnStd" style="border:1.5px solid var(--line); background:rgba(255,255,255,0.04); border-radius:16px; padding:14px; text-align:left; color:var(--cream);">
+            <div style="font-size:22px; margin-bottom:4px;">⚡</div>
+            <div style="font-size:12.5px; font-weight:800;" data-i18n="rcHiitTitle">HIIT Sprint Run</div>
+            <div style="font-size:10px; color:rgba(246,244,238,0.55); margin-top:2px;" data-i18n="rcHiitSub">30s Sprint / 30s Herstel</div>
+          </button>
         </div>
         <button id="rcZombieBtnStd" class="run-week-card" style="width:100%; text-align:left; background:linear-gradient(160deg,#3a1a1a,#1a0a0a); border:1.5px solid rgba(220,60,60,0.4); cursor:pointer; margin-bottom:10px;">
           <div style="color:#ff8a8a; font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:0.6px;">🧟 ZOMBIE RUN</div>
@@ -5982,6 +6014,19 @@ const TRANSLATIONS = {
   rcTipReadyBody: { nl:'1. 30 min stevig doorwandelen? 2. 30s op 1 been balanceren? 3. 15-20 1-beens-kniebuigingen? 4. 20-30 kuitheffingen op 1 been? 5. Pijnvrij springen? Alle 5 gehaald? Dan is voorzichtig herstarten meestal veilig.', en:'1. Brisk 30-min walk? 2. Balance 30s on one leg? 3. 15-20 single-leg squats? 4. 20-30 single-leg calf raises? 5. Pain-free jumping? All 5 checked? Then a careful restart is usually safe.' },
   rcTipRiceTitle: { nl:'🧊 RICE-methode', en:'🧊 RICE method' },
   rcTipRiceBody: { nl:'Rest: bouw belasting af. Ice: koel 20 min., 4x/dag. Compression: elastisch verband. Elevation: hoger dan je hart.', en:'Rest: reduce load. Ice: cool 20 min, 4x/day. Compression: elastic bandage. Elevation: higher than your heart.' },
+  scopeRun: { nl:'🏃 alleen hardlopen', en:'🏃 running only' },
+  scopeBikeWalk: { nl:'🚴🚶 fietsen & wandelen', en:'🚴🚶 cycling & walking' },
+  scopeAll: { nl:'🌐 alles', en:'🌐 everything' },
+  rcAdvancedRunnersLabel: { nl:'Volleerde Lopers', en:'Advanced Runners' },
+  rcAdvancedRunnersTitle: { nl:'Vrije & Doelgerichte Runs', en:'Free & Target Runs' },
+  rcFreeRunTitle: { nl:'Vrije Run', en:'Free Run' },
+  rcFreeRunSub: { nl:'Geen limiet. Gewoon lekker lopen!', en:'No limit. Just enjoy your run!' },
+  rcTarget5Title: { nl:'5 KM Target Run', en:'5 KM Target Run' },
+  rcTarget5Sub: { nl:'Target run op tijd en km-splits.', en:'Target run on time and km splits.' },
+  rcTarget10Title: { nl:'10 KM Target Run', en:'10 KM Target Run' },
+  rcTarget10Sub: { nl:'Gevorderde duurloop op tempo.', en:'Advanced tempo endurance run.' },
+  rcHiitTitle: { nl:'HIIT Sprint Run', en:'HIIT Sprint Run' },
+  rcHiitSub: { nl:'30s Sprint / 30s Herstel', en:'30s Sprint / 30s Recovery' },
   wSunsetLabel: { nl:'Zonsondergang', en:'Sunset' },
   wMoonriseLabel: { nl:'Maanopgang', en:'Moonrise' },
   wMoonsetLabel: { nl:'Maanondergang', en:'Moonset' },
@@ -8141,6 +8186,7 @@ $('rcFreeRunCardStd').addEventListener('click', () => startRunSession({ mode:'fr
 $('rcZombieBtnStd').addEventListener('click', openZombieSetupModal);
 $('rcTarget5BtnStd').addEventListener('click', () => startRunSession({ mode:'free', targetKm:5 }));
 $('rcTarget10BtnStd').addEventListener('click', () => startRunSession({ mode:'free', targetKm:10 }));
+$('rcHiitBtnStd').addEventListener('click', () => startRunSession({ custom: buildRunWalkIntervals(10, 30, 30, 300, 300) })); // zelfde 10x30s/30s als de Tailwind-versie
 // ---------- Sessie-tab: live sessie hervatten ----------
 $('rcResumeSessionBtnStd').addEventListener('click', resumeRunSessionView);
 function renderSessiePanelStd(){
@@ -9490,6 +9536,7 @@ window.addEventListener('message', (ev) => {
   if (!data || data.source !== 'garminRunCoach') return;
   switch (data.action){
     case 'back':        closeGarminRunCoachScreen(); break;
+    case 'opensettings': openActionMenu(); break;
     case 'starttraining':
       $('garminRunCoachScreen').classList.add('hidden');
       if (data.mode === 'custom'){
@@ -10771,7 +10818,8 @@ ${GARMIN_MENU_BTN_JS}
 </body>
 </html>`;
 }
-const APP_VERSION_TEXT = 'v2.308 · 19 aug';
+const APP_VERSION_TEXT = 'v2.309 · 20 aug';
+$('homeVersionFooter').textContent = APP_VERSION_TEXT;
 function buildGarminHubHtml(){
   // Dit is Gemini's keuzescherm.html, ongewijzigd qua opbouw/stijl — enkel: (1) een derde grote tegel
   // "Hardlopen" toegevoegd, (2) de <a href> vervangen door postMessage-oproepen naar de echte app.
@@ -10902,6 +10950,7 @@ ${GARMIN_MENU_BTN_JS}
       subEl.textContent = 'Live';
     });
   <\/script>
+  <div style="position:fixed; right:12px; bottom:calc(6px + env(safe-area-inset-bottom,0px)); font-size:9.5px; color:rgba(255,255,255,0.25); pointer-events:none; z-index:50;">${APP_VERSION_TEXT}</div>
 </body>
 </html>`;
 }
@@ -10945,6 +10994,7 @@ function buildGarminRunCoachHtml(){
         </div>
       </div>
       <div class="flex items-center gap-2">
+        <button id="rcSettingsHeaderBtn" class="w-8 h-8 rounded-full bg-black/60 border border-amber-500/40 text-amber-400 flex items-center justify-center flex-shrink-0"><span style="display:grid; grid-template-columns:repeat(3,4px); grid-template-rows:repeat(3,4px); gap:2.5px;"><span style="width:4px;height:4px;border-radius:50%;background:#e2a13c;"></span><span style="width:4px;height:4px;border-radius:50%;background:#e2a13c;"></span><span style="width:4px;height:4px;border-radius:50%;background:#e2a13c;"></span><span style="width:4px;height:4px;border-radius:50%;background:#e2a13c;"></span><span style="width:4px;height:4px;border-radius:50%;background:#e2a13c;"></span><span style="width:4px;height:4px;border-radius:50%;background:#e2a13c;"></span><span style="width:4px;height:4px;border-radius:50%;background:#e2a13c;"></span><span style="width:4px;height:4px;border-radius:50%;background:#e2a13c;"></span><span style="width:4px;height:4px;border-radius:50%;background:#e2a13c;"></span></span></button>
         <button id="rcAudioHeaderBtn" class="w-8 h-8 rounded-full bg-black/60 border border-amber-500/40 text-amber-400 flex items-center justify-center text-base flex-shrink-0">🎵</button>
         <button id="rcSpotifyBtn" class="w-8 h-8 rounded-full bg-black/60 border flex items-center justify-center text-base flex-shrink-0" style="border-color:rgba(29,185,84,0.4); color:#1DB954;">🎧</button>
       </div>
@@ -11274,6 +11324,7 @@ function buildGarminRunCoachHtml(){
   <script>
 ${GARMIN_MENU_BTN_JS}
     document.getElementById('rcBackBtn').addEventListener('click', () => parent.postMessage({ source:'garminRunCoach', action:'back' }, '*'));
+    document.getElementById('rcSettingsHeaderBtn').addEventListener('click', () => parent.postMessage({ source:'garminRunCoach', action:'opensettings' }, '*'));
     document.getElementById('rcAudioHeaderBtn').addEventListener('click', () => {
       document.querySelectorAll('.rc-navbtn').forEach(b => { b.classList.remove('active'); b.style.color = ''; });
       document.querySelector('.rc-navbtn[data-panel="rcHomePanel"]').classList.add('active');
