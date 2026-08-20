@@ -427,6 +427,12 @@
     border:none; background:rgba(255,255,255,0.12); color:var(--cream); width:30px; height:30px; border-radius:50%;
     font-size:14px; display:flex; align-items:center; justify-content:center; flex-shrink:0;
   }
+  #weatherRefreshBtn{
+    border:none; background:rgba(255,255,255,0.12); color:var(--cream); width:30px; height:30px; border-radius:50%;
+    font-size:14px; display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  #weatherRefreshBtn:active{ filter:brightness(1.3); }
+  #weatherRefreshBtn.locating{ animation:spin 1s linear infinite; }
   #weatherLocateBtn:active{ filter:brightness(1.3); }
   #weatherLocateBtn.locating{ animation:spin 1s linear infinite; }
   @keyframes spin{ from{ transform:rotate(0deg);} to{ transform:rotate(360deg);} }
@@ -829,7 +835,7 @@
     display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:900; line-height:1;
   }
   #runCoachBackBtn:active{ background:rgba(226,161,60,0.22); }
-  #runCoachScreen .bike-setup-inner{ margin-top:38px; } /* overschrijft de -25px van .bike-setup-inner (bedoeld voor het fietsscherm) zodat de kaart niet meer onder de terugknop/header-knoppen schuift */
+  #runCoachScreen .bike-setup-inner{ margin-top:54px; } /* overschrijft de -25px van .bike-setup-inner (bedoeld voor het fietsscherm) zodat de titel niet meer onder de terugknop/header-knoppen schuift — 54px geeft genoeg vrije ruimte onder de 38px-hoge knoppenrij (16px top-offset + hoogte) */
   .run-week-card{
     background:linear-gradient(160deg,#c23b3b,#7a1f1f); border-radius:18px; padding:18px;
     text-align:left; box-shadow:0 8px 20px rgba(0,0,0,0.3); margin-bottom:16px;
@@ -933,7 +939,7 @@
   #rsIntervalLabel.type-run{ color:#4ade80; }
   #rsIntervalLabel.type-walk{ color:#60a5fa; }
   #rsIntervalLabel.type-warmup, #rsIntervalLabel.type-cooldown{ color:var(--amber); }
-  #rsCountdown{ font-size:66px; font-weight:900; line-height:1; margin:10px 0 5px; font-variant-numeric:tabular-nums; }
+  #rsCountdown{ font-size:48px; font-weight:900; line-height:1; margin:6px 0 4px; font-variant-numeric:tabular-nums; }
   #rsNextLabel{ color:rgba(246,244,238,0.55); font-size:12.5px; }
   #rsElapsedLine{ color:rgba(246,244,238,0.4); font-size:11px; margin-top:7px; }
   #rsCalorieLine{ color:rgba(246,244,238,0.55); font-size:12.5px; font-weight:700; margin-top:-4px; }
@@ -971,9 +977,9 @@
   }
   .rs-stat b{ font-size:21px; font-weight:900; }
   .rs-stat span{ font-size:10px; color:rgba(246,244,238,0.55); text-transform:uppercase; letter-spacing:0.4px; margin-top:2px; }
-  #rsControls{ display:flex; gap:9px; width:100%; max-width:440px; }
+  #rsControls{ display:flex; gap:8px; width:100%; max-width:440px; }
   #rsControls button{
-    flex:1; border:none; border-radius:16px; padding:16px 6px; font-weight:800; font-size:12.5px;
+    flex:1; border:none; border-radius:14px; padding:12px 6px; font-weight:800; font-size:12px;
   }
   #rsPauseBtn{ background:var(--amber); color:var(--green-900); }
   #rsSplitBtn{ background:#2a5a8f; color:#fff; }
@@ -985,13 +991,6 @@
     width:42px; height:36px; border-radius:16px; display:flex; align-items:center; justify-content:center;
   }
   #rsMinimizeBtn:active{ background:rgba(226,161,60,0.22); }
-  #rsSettingsBtn{
-    position:absolute; right:16px; top:calc(14px + env(safe-area-inset-top,0px) + var(--extra-top-inset));
-    z-index:30; border:none; background:rgba(226,161,60,0.12); color:var(--amber);
-    width:42px; height:36px; border-radius:16px; display:flex; align-items:center; justify-content:center;
-    font-size:18px;
-  }
-  #rsSettingsBtn:active{ background:rgba(226,161,60,0.22); }
 
   /* Garmin-thema: zelfde scherm/logica, enkel de kleuren/vormen omgezet naar de donkere navy/amber-look. */
   body.theme-garmin #runSessionScreen{ background:#050914; }
@@ -1167,7 +1166,7 @@
   /* ---------- Zombie Run: sfeervolle bosachtergrond voor de modals (geïnspireerd op de referentie: */
   /* wortels/klimop in de hoek, mistige heuvels, kale bomen) ---------- */
   .zr-modal-card.simple-modal-card{
-    position:relative; overflow:hidden;
+    position:relative; overflow-y:auto; overflow-x:hidden;
     background:radial-gradient(ellipse 140% 90% at 15% 0%, #1b3226 0%, #0f1d15 42%, #070c08 100%);
     border:1px solid rgba(140,190,150,0.18);
   }
@@ -2294,6 +2293,27 @@
     </div>
     </details>
 
+    <details class="settings-accordion"><summary>🏃 Lopen — handleiding</summary>
+    <div class="settings-section">
+      <h4>AI Coach</h4>
+      <p class="settings-note">3 ingebouwde opbouwschema's (5K/7,5K/10K), gebaseerd op resp. het officiële NHS Couch to 5K en Hal Higdon's Novice 10K-programma. Kies je afstand bovenaan, tik daarna op een weekkaartje om er handmatig naartoe te springen (met bevestiging), of bouw via "Schema wisselen of zelf opbouwen" je eigen schema.</p>
+      <h4 style="margin-top:14px;">EVY Podcast</h4>
+      <p class="settings-note">Jouw eigen 10-weken audioprogramma (5K en 10K, apart bijgehouden). De app onthoudt zelf bij welke week/sessie je zit en speelt automatisch het juiste mp3-bestand af. Een sessie al ergens anders gedaan? Tik "Deze sessie al gedaan → volgende" om handmatig door te schuiven, zonder een sessie te starten. Tijdens EVY blijft de app-stem stil — de podcast zelf is dan je coaching.</p>
+      <h4 style="margin-top:14px;">Vrij/Doel</h4>
+      <p class="settings-note">Vrije Run (geen limiet), Target Run op 5 of 10 km, of een HIIT-sprintschema — voor wie al comfortabel loopt en geen opbouwschema nodig heeft.</p>
+      <h4 style="margin-top:14px;">Tijdens het lopen</h4>
+      <p class="settings-note">Het gelopen spoor op de kaart kleurt live mee met je snelheid (groen = wandeltempo, tot rood = hard lopen). Het minimaliseer-knopje linksboven stuurt je naar andere tabbladen zonder de sessie te stoppen — timer en GPS blijven gewoon lopen. Na de sessie vraagt de app hoe het ging (stemming + eventuele pijnlocatie), bewaard per sessie in je stats.</p>
+      <h4 style="margin-top:14px;">Pijn/Tips-tabblad</h4>
+      <p class="settings-note">3 subpagina's: <b>Pijn</b> (veelvoorkomende blessures met oorzaak/symptoom), <b>Tips</b> (blessures vermijden, RICE-methode, terug-lopen-checklist) en <b>Stretching</b> (instructievideo's op YouTube, voor/na het lopen).</p>
+      <h4 style="margin-top:14px;">Hartslagband</h4>
+      <p class="settings-note">Tik op het ❤️-icoontje (bij lopen én bij fietsen/wandelen) om via Bluetooth te verbinden met een hartslagband/-horloge. Zodra je gewicht, leeftijd én geslacht zijn ingevuld (Instellingen → Persoonlijk), gebruikt de calorie-schatting automatisch de nauwkeurigere hartslag-gebaseerde formule i.p.v. enkel gewicht+tijd.</p>
+      <h4 style="margin-top:14px;">Spotify &amp; Strava</h4>
+      <p class="settings-note">Het 🎧-icoontje (bij fietsen/lopen) toont wat er nu speelt op Spotify, met bediening. Na een sessie kan je met 1 tik uploaden naar Strava. Beide vereisen een eenmalige, gratis registratie — zie de velden hieronder bij Persoonlijk.</p>
+      <h4 style="margin-top:14px;">Alles resetten</h4>
+      <p class="settings-note">Via "Stijl wisselen" (tandwiel-icoon) vind je aparte reset-knoppen: "Reset Lopen" (AI Coach-voortgang, EVY-voortgang, eigen schema's, loopgeschiedenis — apart aan te vinken) en "Reset Fiets &amp; Wandel" (voorkeuren zoals fietstype/kaartlagen).</p>
+    </div>
+    </details>
+
     <details class="settings-accordion"><summary>💾 Back-up</summary>
     <div class="settings-section">
       <h4>Al je gegevens bewaren of terugzetten</h4>
@@ -2670,27 +2690,6 @@
     </div>
     </details>
 
-    <details class="settings-accordion"><summary>🏃 Lopen — handleiding</summary>
-    <div class="settings-section">
-      <h4>AI Coach</h4>
-      <p class="settings-note">3 ingebouwde opbouwschema's (5K/7,5K/10K), gebaseerd op resp. het officiële NHS Couch to 5K en Hal Higdon's Novice 10K-programma. Kies je afstand bovenaan, tik daarna op een weekkaartje om er handmatig naartoe te springen (met bevestiging), of bouw via "Schema wisselen of zelf opbouwen" je eigen schema.</p>
-      <h4 style="margin-top:14px;">EVY Podcast</h4>
-      <p class="settings-note">Jouw eigen 10-weken audioprogramma (5K en 10K, apart bijgehouden). De app onthoudt zelf bij welke week/sessie je zit en speelt automatisch het juiste mp3-bestand af. Een sessie al ergens anders gedaan? Tik "Deze sessie al gedaan → volgende" om handmatig door te schuiven, zonder een sessie te starten. Tijdens EVY blijft de app-stem stil — de podcast zelf is dan je coaching.</p>
-      <h4 style="margin-top:14px;">Vrij/Doel</h4>
-      <p class="settings-note">Vrije Run (geen limiet), Target Run op 5 of 10 km, of een HIIT-sprintschema — voor wie al comfortabel loopt en geen opbouwschema nodig heeft.</p>
-      <h4 style="margin-top:14px;">Tijdens het lopen</h4>
-      <p class="settings-note">Het gelopen spoor op de kaart kleurt live mee met je snelheid (groen = wandeltempo, tot rood = hard lopen). Het minimaliseer-knopje linksboven stuurt je naar andere tabbladen zonder de sessie te stoppen — timer en GPS blijven gewoon lopen. Na de sessie vraagt de app hoe het ging (stemming + eventuele pijnlocatie), bewaard per sessie in je stats.</p>
-      <h4 style="margin-top:14px;">Pijn/Tips-tabblad</h4>
-      <p class="settings-note">3 subpagina's: <b>Pijn</b> (veelvoorkomende blessures met oorzaak/symptoom), <b>Tips</b> (blessures vermijden, RICE-methode, terug-lopen-checklist) en <b>Stretching</b> (instructievideo's op YouTube, voor/na het lopen).</p>
-      <h4 style="margin-top:14px;">Hartslagband</h4>
-      <p class="settings-note">Tik op het ❤️-icoontje (bij lopen én bij fietsen/wandelen) om via Bluetooth te verbinden met een hartslagband/-horloge. Zodra je gewicht, leeftijd én geslacht zijn ingevuld (Instellingen → Persoonlijk), gebruikt de calorie-schatting automatisch de nauwkeurigere hartslag-gebaseerde formule i.p.v. enkel gewicht+tijd.</p>
-      <h4 style="margin-top:14px;">Spotify &amp; Strava</h4>
-      <p class="settings-note">Het 🎧-icoontje (bij fietsen/lopen) toont wat er nu speelt op Spotify, met bediening. Na een sessie kan je met 1 tik uploaden naar Strava. Beide vereisen een eenmalige, gratis registratie — zie de velden hieronder bij Persoonlijk.</p>
-      <h4 style="margin-top:14px;">Alles resetten</h4>
-      <p class="settings-note">Via "Stijl wisselen" (tandwiel-icoon) vind je aparte reset-knoppen: "Reset Lopen" (AI Coach-voortgang, EVY-voortgang, eigen schema's, loopgeschiedenis — apart aan te vinken) en "Reset Fiets &amp; Wandel" (voorkeuren zoals fietstype/kaartlagen).</p>
-    </div>
-    </details>
-
     <details class="settings-accordion"><summary data-i18n="settingsGroupSos">🆘 Valdetectie &amp; SOS</summary>
     <div class="settings-section">
       <h4 data-i18n="sosTitle">Valdetectie</h4>
@@ -2733,6 +2732,7 @@
 
 <div id="runCoachScreen" class="hidden">
   <button id="runCoachBackBtn" aria-label="Terug"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg></button>
+  <button id="runCoachSettingsBtn" title="Instellingen" data-i18n-title="titleMoreOptions" aria-label="Instellingen" style="position:absolute; top:16px; right:104px; z-index:10; width:38px; height:38px; border-radius:50%; border:1.5px solid rgba(226,161,60,0.4); background:rgba(0,0,0,0.25); color:var(--amber); font-size:16px; display:flex; align-items:center; justify-content:center;">☰</button>
   <button id="runCoachAudioHeaderBtn" aria-label="Muziek &amp; podcast" style="position:absolute; top:16px; right:60px; z-index:10; width:38px; height:38px; border-radius:50%; border:1.5px solid rgba(226,161,60,0.4); background:rgba(0,0,0,0.25); color:var(--amber); font-size:16px; display:flex; align-items:center; justify-content:center;">🎵</button>
   <button id="runCoachSpotifyBtn" aria-label="Spotify" style="position:absolute; top:16px; right:16px; z-index:10; width:38px; height:38px; border-radius:50%; border:1.5px solid rgba(29,185,84,0.4); background:rgba(0,0,0,0.25); color:#1DB954; font-size:16px; display:flex; align-items:center; justify-content:center;">🎧</button>
   <div class="bike-setup-inner">
@@ -2773,17 +2773,17 @@
           <button id="rcEvyStart5Std" style="flex:1; border:2px solid rgba(226,161,60,0.4); background:rgba(255,255,255,0.04); border-radius:16px; padding:20px 8px; color:var(--cream);">
             <div style="font-size:19px; margin-bottom:4px;">🏁 5 KM</div>
             <div id="rcEvyProg5Std" style="font-size:12px; color:var(--amber); font-weight:700;">Week – · Sessie –</div>
-            <div id="rcEvyDone5Std" class="rcEvyMarkDoneStd" data-dist="5" data-i18n="evyMarkDone" style="font-size:10.5px; color:rgba(246,244,238,0.5); text-decoration:underline; margin-top:6px;">✅ Deze sessie al gedaan → volgende</div>
+            <div id="rcEvyDone5Std" class="rcEvyMarkDoneStd" data-dist="5" data-i18n="evyMarkDone" style="font-size:10.5px; color:rgba(246,244,238,0.5); text-decoration:underline; margin-top:6px;">✅ Volgende sessie</div>
           </button>
           <button id="rcEvyStart10Std" style="flex:1; border:2px solid rgba(226,161,60,0.4); background:rgba(255,255,255,0.04); border-radius:16px; padding:20px 8px; color:var(--cream);">
             <div style="font-size:19px; margin-bottom:4px;">🔥 10 KM</div>
             <div id="rcEvyProg10Std" style="font-size:12px; color:var(--amber); font-weight:700;">Week – · Sessie –</div>
-            <div id="rcEvyDone10Std" class="rcEvyMarkDoneStd" data-dist="10" data-i18n="evyMarkDone" style="font-size:10.5px; color:rgba(246,244,238,0.5); text-decoration:underline; margin-top:6px;">✅ Deze sessie al gedaan → volgende</div>
+            <div id="rcEvyDone10Std" class="rcEvyMarkDoneStd" data-dist="10" data-i18n="evyMarkDone" style="font-size:10.5px; color:rgba(246,244,238,0.5); text-decoration:underline; margin-top:6px;">✅ Volgende sessie</div>
           </button>
         </div>
         <div style="display:flex; justify-content:center; gap:18px; margin-bottom:14px;">
-          <button id="rcEvyReset5Std" style="background:none; border:none; color:rgba(246,244,238,0.5); font-size:11px; text-decoration:underline;">🔄 5K herstarten</button>
-          <button id="rcEvyReset10Std" style="background:none; border:none; color:rgba(246,244,238,0.5); font-size:11px; text-decoration:underline;">🔄 10K herstarten</button>
+          <button id="rcEvyReset5Std" data-i18n="evy5kRestart" style="background:none; border:none; color:rgba(246,244,238,0.5); font-size:11px; text-decoration:underline;">🔄 5K herstarten</button>
+          <button id="rcEvyReset10Std" data-i18n="evy10kRestart" style="background:none; border:none; color:rgba(246,244,238,0.5); font-size:11px; text-decoration:underline;">🔄 10K herstarten</button>
         </div>
       </div>
 
@@ -2812,17 +2812,17 @@
       </div>
 
       <div class="run-voice-section">
-        <label>🔊 Stem voor audio-coach</label>
+        <label data-i18n="voiceForCoachLabel">🔊 Stem voor audio-coach</label>
         <button id="runCoachVoiceBtn" type="button" style="width:100%; display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.06); border:2px solid rgba(255,255,255,0.08); border-radius:12px; padding:11px 12px; color:var(--cream); font-size:12.5px; text-align:left;">
           <span id="runCoachVoiceBtnLabel" style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Standaardstem van je toestel</span><span style="opacity:0.5; flex-shrink:0; margin-left:8px;">▾</span>
         </button>
         <div id="runCoachVoiceList" class="hidden" style="margin-top:6px; background:rgba(0,0,0,0.25); border:2px solid rgba(255,255,255,0.08); border-radius:12px; overflow:hidden; max-height:210px; overflow-y:auto;"></div>
       </div>
       <div class="run-voice-section" id="rcMusicSection">
-        <label>🎵 Eigen muziek tijdens de training</label>
+        <label data-i18n="ownMusicLabel">🎵 Eigen muziek tijdens de training</label>
         <label id="runMusicPickLabel" for="runMusicInput" style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.06); border:2px solid rgba(255,255,255,0.08); border-radius:12px; padding:11px 12px; cursor:pointer;">
           <span style="font-size:18px;">📂</span>
-          <span style="flex:1; text-align:left; font-size:12.5px; color:var(--cream);">Kies MP3-bestanden van je toestel…</span>
+          <span data-i18n="chooseMp3FilesLabel" style="flex:1; text-align:left; font-size:12.5px; color:var(--cream);">Kies MP3-bestanden van je toestel…</span>
           <input type="file" id="runMusicInput" accept="audio/*" multiple class="hidden" style="display:none;">
         </label>
         <div id="runMusicCount" style="font-size:11px; color:rgba(246,244,238,0.55); margin-top:6px;">Geen eigen muziek geladen — de gesproken coach blijft altijd hoorbaar.</div>
@@ -2884,9 +2884,9 @@
 
       <details style="margin:16px 0;">
         <summary style="font-size:13px; font-weight:800; color:var(--cream); padding:8px 0; cursor:pointer;">📋 10 manieren om blessures te vermijden</summary>
-        <div class="rc-tip" style="line-height:1.9;">1. Warm op met een korte wandeling vóór het stretchen<br>2. Stretch voor én na het lopen, vooral de hamstrings<br>3. Rond je run af met een korte wandeling<br>4. Loop niet elke dag<br>5. Loop op een vlakke ondergrond<br>6. Verkort je pasfrequentie bij vermoeidheid<br>7. Doe krachtoefeningen op je rustdagen<br>8. Draag de juiste schoenen voor jouw voet<br>9. Zorg voor voldoende voeding<br>10. Blijf voldoende gehydrateerd</div>
-        <div class="rc-tip"><b>✅ Klaar om terug te lopen na een blessure?</b>1. 30 min stevig doorwandelen? 2. 30s op 1 been balanceren? 3. 15-20 1-beens-kniebuigingen? 4. 20-30 kuitheffingen op 1 been? 5. Pijnvrij springen? Alle 5 gehaald? Dan is voorzichtig herstarten meestal veilig.</div>
-        <div class="rc-tip"><b>🧊 RICE-methode</b>Rest: bouw belasting af. Ice: koel 20 min., 4x/dag. Compression: elastisch verband. Elevation: hoger dan je hart.</div>
+        <div class="rc-tip" style="line-height:1.9;" data-i18n="rcTipPreventList">1. Warm op met een korte wandeling vóór het stretchen<br>2. Stretch voor én na het lopen, vooral de hamstrings<br>3. Rond je run af met een korte wandeling<br>4. Loop niet elke dag<br>5. Loop op een vlakke ondergrond<br>6. Verkort je pasfrequentie bij vermoeidheid<br>7. Doe krachtoefeningen op je rustdagen<br>8. Draag de juiste schoenen voor jouw voet<br>9. Zorg voor voldoende voeding<br>10. Blijf voldoende gehydrateerd</div>
+        <div class="rc-tip"><b data-i18n="rcTipReadyTitle">✅ Klaar om terug te lopen na een blessure?</b><span data-i18n="rcTipReadyBody">1. 30 min stevig doorwandelen? 2. 30s op 1 been balanceren? 3. 15-20 1-beens-kniebuigingen? 4. 20-30 kuitheffingen op 1 been? 5. Pijnvrij springen? Alle 5 gehaald? Dan is voorzichtig herstarten meestal veilig.</span></div>
+        <div class="rc-tip"><b data-i18n="rcTipRiceTitle">🧊 RICE-methode</b><span data-i18n="rcTipRiceBody">Rest: bouw belasting af. Ice: koel 20 min., 4x/dag. Compression: elastisch verband. Elevation: hoger dan je hart.</span></div>
       </details>
 
       <details style="margin:16px 0 20px;">
@@ -2925,7 +2925,6 @@
   <button id="rsMinimizeBtn" aria-label="Minimaliseren" data-i18n-aria="rsMinimizeAria" title="Naar andere tabbladen — de sessie blijft gewoon lopen" data-i18n-title="rsMinimizeTitle">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
   </button>
-  <button id="rsSettingsBtn" title="Instellingen" data-i18n-title="titleMoreOptions">☰</button>
   <div id="rsMapWrap">
     <div id="rsMapBadge"><span id="rsMapBadgeText">0m @ 0.0 km/u</span></div>
     <div id="rsLiveBadge">● LIVE RUN</div>
@@ -3148,6 +3147,7 @@
 <div id="weatherPanel">
   <div id="weatherLocationBar">
     <span id="weatherPlaceName">–</span>
+    <button id="weatherRefreshBtn" title="Weer vernieuwen" data-i18n-title="titleWeatherRefresh">🔄</button>
     <button id="weatherLocateBtn" title="Mijn locatie" data-i18n-title="titleMyLocation">🎯</button>
   </div>
   <div id="weatherGarminTabBar" style="display:none;">
@@ -5232,6 +5232,47 @@ const RUN_BUILTIN_PLANS = {
   builtin_7_5k: { name:'7,5K Opbouwschema',     weeks: RUN_7_5K_PROGRAM },
   builtin_10k:  { name:'10K Opbouwschema',      weeks: RUN_10K_PROGRAM }
 };
+// Extern, zelf aan te passen schema voor de 3 ingebouwde AI Coach-plannen — zelfde formaat/gedachte als
+// de EVY schema.json hierboven. audio/aicoach5k/schema.json, audio/aicoach7_5k/schema.json,
+// audio/aicoach10k/schema.json: een array van weken, elke week { title, desc, days:[sessie1,sessie2,sessie3] },
+// elke sessie een lijst [minuten, 'run'|'walk'] — precies zoals bij EVY, alleen nu met 3 sessies per week
+// i.p.v. 1. `desc` mag je weglaten (wordt dan automatisch afgeleid van de eerste sessie). Bestaat het
+// bestand niet of is het kapot, dan valt de app gewoon terug op het ingebouwde schema hierboven.
+const AI_PLAN_FILE_MAP = { builtin_5k:'aicoach5k', builtin_7_5k:'aicoach7_5k', builtin_10k:'aicoach10k' };
+const aiCoachScheduleCache = {};
+async function loadAiCoachSchedule(builtinId){
+  if (aiCoachScheduleCache[builtinId] !== undefined) return aiCoachScheduleCache[builtinId];
+  const folder = AI_PLAN_FILE_MAP[builtinId];
+  if (!folder) return (aiCoachScheduleCache[builtinId] = null);
+  try{
+    const res = await fetch(`audio/${folder}/schema.json`, { cache:'no-store' });
+    if (!res.ok) throw new Error('niet gevonden');
+    const data = await res.json();
+    if (!Array.isArray(data) || !data.length) throw new Error('leeg/ongeldig');
+    aiCoachScheduleCache[builtinId] = data;
+    return data;
+  }catch(e){
+    aiCoachScheduleCache[builtinId] = null; // geen eigen bestand (of kapot) — gewoon terugvallen op het ingebouwde schema
+    return null;
+  }
+}
+// Zet 1 week uit zo'n extern schema.json om naar hetzelfde { week, title, desc, build } formaat als de
+// ingebouwde RUN_5K_PROGRAM/RUN_7_5K_PROGRAM/RUN_10K_PROGRAM-arrays hierboven, zodat de rest van de app
+// (weekkaartjes, intervallenrail, voortgang) geen onderscheid hoeft te maken tussen ingebouwd en eigen schema.
+function aiScheduleWeekToPlanWeek(weekData, weekIndex){
+  const days = (weekData.days && weekData.days.length) ? weekData.days : [weekData.intervals || []];
+  const desc = weekData.desc || (days[0] || []).map(([min,type]) => `${min}min ${type === 'run' ? 'lopen' : 'wandelen'}`).join(' / ');
+  return {
+    week: weekIndex+1,
+    title: weekData.title || `Week ${weekIndex+1}`,
+    desc,
+    build: (day) => {
+      const idx = Math.min((day||1)-1, days.length-1);
+      const sess = days[idx] || days[0] || [];
+      return [{ type:'warmup', sec:300 }, ...sess.map(([min,type]) => ({ type, sec: min*60 })), { type:'cooldown', sec:300 }];
+    }
+  };
+}
 const RUN_PROGRESS_KEY = 'run_progress_v1'; // blijft de sleutel voor het ingebouwde 5K-schema (bestaande voortgang blijft dus gewoon geldig)
 const RUN_CUSTOM_PLANS_KEY = 'run_custom_plans_v1';
 const RUN_ACTIVE_PLAN_KEY = 'run_active_plan_v1';
@@ -5246,7 +5287,11 @@ async function setActivePlanId(id){ await storageSet(RUN_ACTIVE_PLAN_KEY, id); }
 async function getActivePlanMeta(){
   const activeId = await getActivePlanId();
   const builtinId = activeId === 'builtin' ? 'builtin_5k' : activeId; // oude opgeslagen waarde 'builtin' blijft werken, wijst gewoon naar 5K
-  if (RUN_BUILTIN_PLANS[builtinId]) return { id: activeId, name: RUN_BUILTIN_PLANS[builtinId].name, weeks: RUN_BUILTIN_PLANS[builtinId].weeks };
+  if (RUN_BUILTIN_PLANS[builtinId]){
+    const override = await loadAiCoachSchedule(builtinId); // eigen schema.json heeft voorrang, indien aanwezig en geldig
+    if (override) return { id: activeId, name: RUN_BUILTIN_PLANS[builtinId].name, weeks: override.map(aiScheduleWeekToPlanWeek) };
+    return { id: activeId, name: RUN_BUILTIN_PLANS[builtinId].name, weeks: RUN_BUILTIN_PLANS[builtinId].weeks };
+  }
   const plans = await getCustomPlans();
   const plan = plans.find(pl => pl.id === activeId);
   if (!plan) return { id:'builtin_5k', name:RUN_BUILTIN_PLANS.builtin_5k.name, weeks: RUN_5K_PROGRAM }; // schema verwijderd -> terugvallen op het ingebouwde 5K-schema
@@ -5925,7 +5970,18 @@ const TRANSLATIONS = {
   wMosquitoLabel: { nl:'Muggenactiviteit', en:'Mosquito activity' },
   wSunriseLabel: { nl:'Zonsopgang', en:'Sunrise' },
   wSunPositionToday: { nl:'Zonnestand vandaag', en:'Sun position today' },
-  evyMarkDone: { nl:'✅ Deze sessie al gedaan → volgende', en:'✅ This session already done → next' },
+  evyMarkDone: { nl:'✅ Volgende sessie', en:'✅ Next session' },
+  titleWeatherRefresh: { nl:'Weer vernieuwen', en:'Refresh weather' },
+  evy5kRestart: { nl:'🔄 5K herstarten', en:'🔄 Restart 5K' },
+  evy10kRestart: { nl:'🔄 10K herstarten', en:'🔄 Restart 10K' },
+  voiceForCoachLabel: { nl:'🔊 Stem voor audio-coach', en:'🔊 Voice for audio coach' },
+  ownMusicLabel: { nl:'🎵 Eigen muziek tijdens de training', en:'🎵 Your own music during training' },
+  chooseMp3FilesLabel: { nl:'Kies MP3-bestanden van je toestel…', en:'Choose MP3 files from your device…' },
+  rcTipPreventList: { nl:'1. Warm op met een korte wandeling vóór het stretchen<br>2. Stretch voor én na het lopen, vooral de hamstrings<br>3. Rond je run af met een korte wandeling<br>4. Loop niet elke dag<br>5. Loop op een vlakke ondergrond<br>6. Verkort je pasfrequentie bij vermoeidheid<br>7. Doe krachtoefeningen op je rustdagen<br>8. Draag de juiste schoenen voor jouw voet<br>9. Zorg voor voldoende voeding<br>10. Blijf voldoende gehydrateerd', en:'1. Warm up with a short walk before stretching<br>2. Stretch before and after running, especially the hamstrings<br>3. Finish your run with a short walk<br>4. Skip running every day<br>5. Run on flat ground<br>6. Shorten your stride when tired<br>7. Do strength exercises on your rest days<br>8. Wear the right shoes for your foot<br>9. Get enough nutrition<br>10. Stay well hydrated' },
+  rcTipReadyTitle: { nl:'✅ Klaar om terug te lopen na een blessure?', en:'✅ Ready to run again after an injury?' },
+  rcTipReadyBody: { nl:'1. 30 min stevig doorwandelen? 2. 30s op 1 been balanceren? 3. 15-20 1-beens-kniebuigingen? 4. 20-30 kuitheffingen op 1 been? 5. Pijnvrij springen? Alle 5 gehaald? Dan is voorzichtig herstarten meestal veilig.', en:'1. Brisk 30-min walk? 2. Balance 30s on one leg? 3. 15-20 single-leg squats? 4. 20-30 single-leg calf raises? 5. Pain-free jumping? All 5 checked? Then a careful restart is usually safe.' },
+  rcTipRiceTitle: { nl:'🧊 RICE-methode', en:'🧊 RICE method' },
+  rcTipRiceBody: { nl:'Rest: bouw belasting af. Ice: koel 20 min., 4x/dag. Compression: elastisch verband. Elevation: hoger dan je hart.', en:'Rest: reduce load. Ice: cool 20 min, 4x/day. Compression: elastic bandage. Elevation: higher than your heart.' },
   wSunsetLabel: { nl:'Zonsondergang', en:'Sunset' },
   wMoonriseLabel: { nl:'Maanopgang', en:'Moonrise' },
   wMoonsetLabel: { nl:'Maanondergang', en:'Moonset' },
@@ -6686,6 +6742,7 @@ const HELP_CONTENT = {
       <p><b>❤️ Hartslagband</b> — tik het hartje-icoontje om via Bluetooth te koppelen (lopen én fietsen/wandelen); met gewicht+leeftijd+geslacht ingevuld gebruikt de calorie-schatting dan de nauwkeurigere hartslag-formule.<br>
       <b>🎧 Spotify</b> — toont wat er nu speelt, met bediening.<br>
       <b>🟠 Strava</b> — upload je sessie met 1 tik. Beide vereisen een eenmalige, gratis registratie (Instellingen).</p>
+      <p><b>🧟 Zombie Run</b> — verhaal-gestuurde looptocht met achtervolgingen: loop sneller dan de vereiste snelheid of verlies een leven, met een beloningssysteem (sprint voor bonuspunten die levens terugwinnen), een mini-radar, en een moeilijkheidsgraad-keuze die alles vooraf instelt. Vereist zelf geüploade mp3-bestanden — zie "🛠️ Technische werking" voor de volledige mappenstructuur en een checklist als je niets hoort.</p>
     </section>
   `,
   en: `
@@ -6830,6 +6887,7 @@ const HELP_CONTENT = {
       <p><b>❤️ Heart rate monitor</b> — tap the heart icon to connect via Bluetooth (running as well as cycling/walking); with weight+age+gender filled in, calorie estimates then use the more accurate heart-rate formula.<br>
       <b>🎧 Spotify</b> — shows what's currently playing, with controls.<br>
       <b>🟠 Strava</b> — upload your session in one tap. Both require a one-time, free registration (Settings).</p>
+      <p><b>🧟 Zombie Run</b> — a story-driven run with chases: outrun the required speed or lose a life, with a reward system (sprint for bonus points that regain lives), a mini-radar, and a difficulty preset that fills in the settings for you. Requires your own uploaded mp3 files — see "🛠️ Technical details" for the full folder structure and a checklist if you hear nothing.</p>
     </section>
   `
 };
@@ -6901,6 +6959,10 @@ const DEV_NOTES_CONTENT = {
       <p>Zet zelf een bestand <code>schema.json</code> in <code>audio/evy5k/</code> (en/of <code>audio/evy10k/</code>) om het opbouwschema aan te passen — geen code nodig. Formaat: een lijst van weken, elke week 3 sessies, elke sessie een lijst <code>[minuten, "run"|"walk"]</code>-paren, bv. <code>[[1,"run"],[1,"walk"],[2,"run"]]</code> = 1 min lopen, 1 min wandelen, 2 min lopen. Bestaat het bestand niet (of is het kapot), dan valt 5K terug op het ingebouwde standaardschema; voor 10K is er geen ingebouwde terugval, dus zonder <code>schema.json</code> blijft de duur-weergave daar leeg (de audio zelf blijft wel gewoon werken).</p>
     </section>
     <section>
+      <h3>🤖 AI Coach — eigen schema aanpassen</h3>
+      <p>De ingebouwde 7,5K- en 10K-schema's bestaan (net als het echte Hal Higdon "Novice 10K"-programma waarop ze gebaseerd zijn) volledig uit ononderbroken duurlopen — geen enkel interval, enkel de afstand loopt wekelijks op. Wil je liever een schema met run/wandel-intervallen (zoals het 5K-schema dat wél heeft), zet dan zelf een bestand <code>schema.json</code> in <code>audio/aicoach5k/</code>, <code>audio/aicoach7_5k/</code> en/of <code>audio/aicoach10k/</code> — exact hetzelfde <code>[minuten, "run"|"walk"]</code>-formaat als bij EVY hierboven, maar dan met <b>3 sessies per week</b> i.p.v. 1: <code>[{"title":"Week 1","days":[[[1,"run"],[1,"walk"]], [[1,"run"],[1,"walk"]], [[2,"run"],[2,"walk"]]]}, ...]</code>. <code>title</code> en <code>desc</code> zijn optioneel (worden anders automatisch ingevuld). Bestaat het bestand niet of is het kapot, dan blijft gewoon het ingebouwde schema actief.</p>
+    </section>
+    <section>
       <h3>🧟 Zombie Run — mappenstructuur</h3>
       <p>Zelf te uploaden naast <code>index.html</code>, allemaal onder <code>audio/ZombieRun/</code>, exact deze paden en namen (hoofdlettergevoelig). Je hoeft nergens een aantal in te typen — de app telt zelf hoeveel bestanden er in elke map staan (1, 2, 3... tot er eentje ontbreekt), dus gewoon bestanden toevoegen of verwijderen volstaat:</p>
       <p><code>Zombie-intro/1.mp3</code>, ... — willekeurig gekozen bij de start van de run.</p>
@@ -6914,6 +6976,29 @@ const DEV_NOTES_CONTENT = {
       <p><code>Zombie-fx/alarm/1.mp3</code>, ... — kort "zombies komen eraan"-geluid.</p>
       <p><code>Zombie-fx/zombieGeluiden/1.mp3</code>, ... — de "enge geluiden in je nek"-laag tijdens de achtervolging. Mogen best <b>lang</b> zijn (tot een uur) — de app start elk fragment op een willekeurig moment ergens middenin en het volume schaalt live mee met hoe dicht de zombies zitten (zacht veraf, luid vlak voor je gepakt wordt). Zelf opknippen is dus niet nodig.</p>
       <p>Verder instelbaar (via sliders in het instelscherm, zelf ook op te slaan als moeilijkheids-preset): levenspunten, basissnelheid van de zombies (standaard voorgesteld op basis van je eigen loopgeschiedenis, opdrijvend naarmate de run vordert), duur van een achtervolging, duur van rustperiodes, en een optioneel doel (afstand of tijd). Tijdens het rustige verhaaldeel én tijdens de achtervolging zelf kan een aanhoudende sprint bonuspunten (Supply Drop-items) opleveren die verloren levens terugwinnen; een krappe ontsnapping levert een extra "op het nippertje"-bonus op via hetzelfde systeem.</p>
+      <h4>🔇 Bestanden staan er, maar je hoort niets? Checklist</h4>
+      <p>Dit is bijna altijd een naam- of padprobleem — de app faalt stil (geen foutmelding), hij vindt het bestand gewoon niet en speelt niets af. Loop deze punten na, in volgorde van meest naar minst voorkomend:</p>
+      <p><b>1. Hoofdletters exact kloppend?</b> GitHub Pages is hoofdlettergevoelig. <code>Zombie-Intro</code>, <code>zombie-intro</code> of <code>ZombieIntro</code> zijn allemaal <i>niet</i> hetzelfde als <code>Zombie-intro</code>. Kopieer de mapnamen letterlijk uit de tabel hieronder, typ ze niet zelf over.</p>
+      <p><b>2. Genummerd vanaf 1, zonder gaten?</b> De app probeert <code>1.mp3</code>, dan <code>2.mp3</code>, enz., en stopt bij het eerste ontbrekende nummer. Heb je enkel een bestand <code>2.mp3</code> in een map staan (zonder <code>1.mp3</code>), dan denkt de app dat die map helemaal leeg is — al staat er duidelijk een bestand in.</p>
+      <p><b>3. Extensie exact <code>.mp3</code> in kleine letters?</b> <code>.MP3</code> of <code>.Mp3</code> werkt niet op een hoofdlettergevoelige server.</p>
+      <p><b>4. Verhaallijnen: bestandsnaam is <code>deel1.mp3</code>, niet <code>1.mp3</code>.</b> Enkel binnen <code>Zombie-storie/1/</code> t/m <code>/5/</code> gebruikt de app het voorvoegsel "deel" (dus <code>deel1.mp3</code>, <code>deel2.mp3</code>, ...) — alle andere mappen gebruiken gewoon <code>1.mp3</code>, <code>2.mp3</code>, ...</p>
+      <p><b>5. Bestanden echt naast <code>index.html</code>?</b> De app zoekt op <code>audio/ZombieRun/...</code> relatief vanaf waar <code>index.html</code> zelf staat. Staan ze in een submap van je repo die niet overeenkomt met dat pad, dan vindt de app ze niet.</p>
+      <p><b>6. Test het rechtstreeks in de browser.</b> Plak de volledige URL van een bestand (bv. <code>https://jouwgebruikersnaam.github.io/audio/ZombieRun/Zombie-intro/1.mp3</code>) in de adresbalk. Speelt het daar niet af of krijg je een 404, dan weet je zeker dat het pad/de naam fout is — los dat eerst op vóór je verder test in de app.</p>
+      <p><b>7. Open het instelscherm opnieuw na het uploaden.</b> De app onthoudt tijdens 1 sessie hoeveel bestanden er per map gevonden zijn (om niet steeds opnieuw te moeten zoeken) — na een upload moet je de pagina dus even herladen (of het instelscherm sluiten en heropenen) zodat hij opnieuw telt.</p>
+      <table style="width:100%; border-collapse:collapse; font-size:11.5px; margin-top:10px;">
+        <tr style="border-bottom:1px solid rgba(0,0,0,0.15);"><th style="text-align:left; padding:4px 6px;">Map</th><th style="text-align:left; padding:4px 6px;">Bestandsnaam</th></tr>
+        <tr><td style="padding:4px 6px;"><code>Zombie-intro/</code></td><td style="padding:4px 6px;"><code>1.mp3</code>, <code>2.mp3</code>, ...</td></tr>
+        <tr><td style="padding:4px 6px;"><code>Zombie-storie/1/</code> t/m <code>/5/</code></td><td style="padding:4px 6px;"><code>deel1.mp3</code>, <code>deel2.mp3</code>, ...</td></tr>
+        <tr><td style="padding:4px 6px;"><code>Zombie-startRun/</code></td><td style="padding:4px 6px;"><code>1.mp3</code>, ...</td></tr>
+        <tr><td style="padding:4px 6px;"><code>Zombie-StopRun/</code></td><td style="padding:4px 6px;"><code>1.mp3</code>, ...</td></tr>
+        <tr><td style="padding:4px 6px;"><code>Zombie-music-LowerPace/</code></td><td style="padding:4px 6px;"><code>1.mp3</code>, ...</td></tr>
+        <tr><td style="padding:4px 6px;"><code>Zombie-music-HigherPace/</code></td><td style="padding:4px 6px;"><code>1.mp3</code>, ...</td></tr>
+        <tr><td style="padding:4px 6px;"><code>Zombie-Winner/</code></td><td style="padding:4px 6px;"><code>1.mp3</code>, ...</td></tr>
+        <tr><td style="padding:4px 6px;"><code>Zombie-Looser/</code></td><td style="padding:4px 6px;"><code>1.mp3</code>, ...</td></tr>
+        <tr><td style="padding:4px 6px;"><code>Zombie-fx/alarm/</code></td><td style="padding:4px 6px;"><code>1.mp3</code>, ...</td></tr>
+        <tr><td style="padding:4px 6px;"><code>Zombie-fx/zombieGeluiden/</code></td><td style="padding:4px 6px;"><code>1.mp3</code>, ...</td></tr>
+      </table>
+      <p class="settings-note">Alle paden hierboven zijn relatief vanaf <code>audio/ZombieRun/</code> — dus volledig pad voor bv. het eerste intro-bestand is <code>audio/ZombieRun/Zombie-intro/1.mp3</code>.</p>
     </section>
   `,
   en: `
@@ -6978,6 +7063,10 @@ const DEV_NOTES_CONTENT = {
       <p>Place a <code>schema.json</code> file in <code>audio/evy5k/</code> (and/or <code>audio/evy10k/</code>) to customise the training schedule — no code needed. Format: a list of weeks, each week with 3 sessions, each session a list of <code>[minutes, "run"|"walk"]</code> pairs, e.g. <code>[[1,"run"],[1,"walk"],[2,"run"]]</code> = 1 min running, 1 min walking, 2 min running. If the file doesn't exist (or is broken), 5K falls back to the built-in default schedule; there's no built-in fallback for 10K, so without <code>schema.json</code> the duration display stays empty there (the audio itself keeps working regardless).</p>
     </section>
     <section>
+      <h3>🤖 AI Coach — customising the schedule</h3>
+      <p>The built-in 7.5K and 10K plans consist entirely of continuous runs (just like the real Hal Higdon "Novice 10K" programme they're based on) — no intervals at all, only the distance increases week by week. If you'd rather have a run/walk interval schedule (like the 5K plan already has), place a <code>schema.json</code> file in <code>audio/aicoach5k/</code>, <code>audio/aicoach7_5k/</code> and/or <code>audio/aicoach10k/</code> — the exact same <code>[minutes, "run"|"walk"]</code> format as EVY above, but with <b>3 sessions per week</b> instead of 1: <code>[{"title":"Week 1","days":[[[1,"run"],[1,"walk"]], [[1,"run"],[1,"walk"]], [[2,"run"],[2,"walk"]]]}, ...]</code>. <code>title</code> and <code>desc</code> are optional (auto-filled otherwise). If the file doesn't exist or is broken, the built-in schedule just stays active.</p>
+    </section>
+    <section>
       <h3>🧟 Zombie Run — folder structure</h3>
       <p>Upload these yourself next to <code>index.html</code>, all under <code>audio/ZombieRun/</code>, exact paths and names (case-sensitive). No need to type a file count anywhere — the app counts how many files are in each folder itself (1, 2, 3... until one's missing), so just add or remove files as you like:</p>
       <p><code>Zombie-intro/1.mp3</code>, ... — picked at random at the start of the run.</p>
@@ -6991,6 +7080,29 @@ const DEV_NOTES_CONTENT = {
       <p><code>Zombie-fx/alarm/1.mp3</code>, ... — short "zombies incoming" cue.</p>
       <p><code>Zombie-fx/zombieGeluiden/1.mp3</code>, ... — the "breathing down your neck" proximity layer during the chase. Can be long (up to an hour) — the app starts each clip at a random point, and the volume scales live with how close the zombies are (soft when far, loud right before you're caught). No need to cut these up yourself.</p>
       <p>Also configurable (via sliders in the setup screen, savable as a difficulty preset): lives, base zombie speed (defaults to your own running history, ramping up as the run progresses), chase duration, calm-period duration, and an optional goal (distance or time). During both the calm story part and the chase itself, a sustained sprint can earn bonus points (Supply Drop items) that regain lost lives; a close escape earns an extra "by the skin of your teeth" bonus through the same system.</p>
+      <h4>🔇 Files are there but you hear nothing? Checklist</h4>
+      <p>This is almost always a naming or path issue — the app fails silently (no error), it just can't find the file and plays nothing. Check these, roughly in order of how common they are:</p>
+      <p><b>1. Capitalization exactly right?</b> GitHub Pages is case-sensitive. <code>Zombie-Intro</code>, <code>zombie-intro</code> or <code>ZombieIntro</code> are all <i>not</i> the same as <code>Zombie-intro</code>. Copy the folder names literally from the table below rather than retyping them.</p>
+      <p><b>2. Numbered from 1, no gaps?</b> The app tries <code>1.mp3</code>, then <code>2.mp3</code>, etc., and stops at the first missing number. If a folder only has <code>2.mp3</code> (no <code>1.mp3</code>), the app thinks it's completely empty — even though a file is clearly sitting there.</p>
+      <p><b>3. Extension exactly <code>.mp3</code> lowercase?</b> <code>.MP3</code> or <code>.Mp3</code> won't work on a case-sensitive server.</p>
+      <p><b>4. Storylines: filename is <code>deel1.mp3</code>, not <code>1.mp3</code>.</b> Only inside <code>Zombie-storie/1/</code> through <code>/5/</code> does the app use the "deel" prefix (so <code>deel1.mp3</code>, <code>deel2.mp3</code>, ...) — every other folder just uses <code>1.mp3</code>, <code>2.mp3</code>, ...</p>
+      <p><b>5. Files actually sitting next to <code>index.html</code>?</b> The app looks under <code>audio/ZombieRun/...</code> relative to wherever <code>index.html</code> itself lives. If they're in a subfolder of your repo that doesn't match that path, the app won't find them.</p>
+      <p><b>6. Test it directly in the browser.</b> Paste a file's full URL (e.g. <code>https://yourusername.github.io/audio/ZombieRun/Zombie-intro/1.mp3</code>) into the address bar. If it doesn't play there, or you get a 404, the path/name is wrong — fix that first before testing further in the app.</p>
+      <p><b>7. Reopen the setup screen after uploading.</b> The app remembers how many files it found per folder for the rest of the session (so it doesn't have to re-check constantly) — after an upload, reload the page (or close and reopen the setup screen) so it counts again.</p>
+      <table style="width:100%; border-collapse:collapse; font-size:11.5px; margin-top:10px;">
+        <tr style="border-bottom:1px solid rgba(0,0,0,0.15);"><th style="text-align:left; padding:4px 6px;">Folder</th><th style="text-align:left; padding:4px 6px;">Filename</th></tr>
+        <tr><td style="padding:4px 6px;"><code>Zombie-intro/</code></td><td style="padding:4px 6px;"><code>1.mp3</code>, <code>2.mp3</code>, ...</td></tr>
+        <tr><td style="padding:4px 6px;"><code>Zombie-storie/1/</code> through <code>/5/</code></td><td style="padding:4px 6px;"><code>deel1.mp3</code>, <code>deel2.mp3</code>, ...</td></tr>
+        <tr><td style="padding:4px 6px;"><code>Zombie-startRun/</code></td><td style="padding:4px 6px;"><code>1.mp3</code>, ...</td></tr>
+        <tr><td style="padding:4px 6px;"><code>Zombie-StopRun/</code></td><td style="padding:4px 6px;"><code>1.mp3</code>, ...</td></tr>
+        <tr><td style="padding:4px 6px;"><code>Zombie-music-LowerPace/</code></td><td style="padding:4px 6px;"><code>1.mp3</code>, ...</td></tr>
+        <tr><td style="padding:4px 6px;"><code>Zombie-music-HigherPace/</code></td><td style="padding:4px 6px;"><code>1.mp3</code>, ...</td></tr>
+        <tr><td style="padding:4px 6px;"><code>Zombie-Winner/</code></td><td style="padding:4px 6px;"><code>1.mp3</code>, ...</td></tr>
+        <tr><td style="padding:4px 6px;"><code>Zombie-Looser/</code></td><td style="padding:4px 6px;"><code>1.mp3</code>, ...</td></tr>
+        <tr><td style="padding:4px 6px;"><code>Zombie-fx/alarm/</code></td><td style="padding:4px 6px;"><code>1.mp3</code>, ...</td></tr>
+        <tr><td style="padding:4px 6px;"><code>Zombie-fx/zombieGeluiden/</code></td><td style="padding:4px 6px;"><code>1.mp3</code>, ...</td></tr>
+      </table>
+      <p class="settings-note">All paths above are relative to <code>audio/ZombieRun/</code> — so the full path for e.g. the first intro file is <code>audio/ZombieRun/Zombie-intro/1.mp3</code>.</p>
     </section>
   `
 };
@@ -7975,6 +8087,8 @@ function rcSwitchTopTab(mode){
   $('rcLearnContent').style.display = mode==='learn' ? 'block' : 'none';
   $('rcEvyContent').style.display = mode==='evy' ? 'block' : 'none';
   $('rcFreeContent').style.display = mode==='free' ? 'block' : 'none';
+  // EVY speelt zijn eigen podcast-mp3's af — geen stemkeuze of eigen muziek nodig (zelfde als de Tailwind-versie)
+  document.querySelectorAll('.run-voice-section').forEach(el => { el.style.display = mode==='evy' ? 'none' : ''; });
 }
 $('rcTabLearnBtn').addEventListener('click', () => rcSwitchTopTab('learn'));
 $('rcTabEvyBtn').addEventListener('click', () => rcSwitchTopTab('evy'));
@@ -8018,8 +8132,9 @@ document.querySelectorAll('.rcEvyMarkDoneStd').forEach(el => {
 });
 async function renderEvyProgressStd(){
   const p5 = await getEvyProgress(5), p10 = await getEvyProgress(10);
-  $('rcEvyProg5Std').textContent = `Week ${p5.week} · Sessie ${p5.session}/3`;
-  $('rcEvyProg10Std').textContent = `Week ${p10.week} · Sessie ${p10.session}/3`;
+  const label = (w, s) => curLang()==='en' ? `Week ${w} · Session ${s}/3` : `Week ${w} · Sessie ${s}/3`;
+  $('rcEvyProg5Std').textContent = label(p5.week, p5.session);
+  $('rcEvyProg10Std').textContent = label(p10.week, p10.session);
 }
 // ---------- Vrij/Doel: Vrije Run-kaart en Target-knoppen starten meteen ----------
 $('rcFreeRunCardStd').addEventListener('click', () => startRunSession({ mode:'free' }));
@@ -8239,6 +8354,7 @@ $('runPlanSaveBtn').addEventListener('click', async () => {
 });
 
 $('runCoachBackBtn').addEventListener('click', closeRunCoachScreen);
+$('runCoachSettingsBtn').addEventListener('click', openActionMenu); // zelfde volledige instellingenmenu als op de fiets/wandel-pagina (waffleBtn)
 $('runCoachSpotifyBtn').addEventListener('click', openSpotifyModal);
 $('runCoachAudioHeaderBtn').addEventListener('click', () => {
   document.querySelectorAll('.rc-navbtn').forEach(b => b.classList.remove('active'));
@@ -8909,7 +9025,6 @@ function resumeRunSessionView(){
   $('runSessionScreen').classList.remove('hidden');
 }
 $('rsMinimizeBtn').addEventListener('click', minimizeRunSession);
-$('rsSettingsBtn').addEventListener('click', openActionMenu); // zelfde volledige instellingenmenu als op de fiets/wandel-pagina (waffleBtn)
 $('rsHrLine').addEventListener('click', () => { if (!hrDevice) connectHeartRateMonitor(); });
 $('dashHrTile').addEventListener('click', () => { if (!hrDevice) connectHeartRateMonitor(); });
 
@@ -10897,14 +11012,14 @@ function buildGarminRunCoachHtml(){
           <div class="text-xl font-black text-white">5 KM</div>
           <div class="text-[11px] text-emerald-300 mt-1">Ideaal om mee te starten</div>
           <div id="rcEvyProg5" class="text-xs text-amber-400 font-bold mt-2.5">Week – · Sessie –</div>
-          <div id="rcEvyDone5" class="rcEvyMarkDone text-[10px] text-slate-400 underline mt-2" data-dist="5">✅ Deze sessie al gedaan → volgende</div>
+          <div id="rcEvyDone5" class="rcEvyMarkDone text-[10px] text-slate-400 underline mt-2" data-dist="5">✅ Volgende sessie</div>
         </button>
         <button id="rcEvyStart10" class="w-full border-2 border-amber-500/40 bg-gradient-to-br from-rose-900/60 to-slate-900 rounded-3xl p-6 text-center mb-2">
           <div class="text-3xl mb-1.5">🔥</div>
           <div class="text-xl font-black text-white">10 KM</div>
           <div class="text-[11px] text-rose-300 mt-1">Voor als je verder wil bouwen</div>
           <div id="rcEvyProg10" class="text-xs text-amber-400 font-bold mt-2.5">Week – · Sessie –</div>
-          <div id="rcEvyDone10" class="rcEvyMarkDone text-[10px] text-slate-400 underline mt-2" data-dist="10">✅ Deze sessie al gedaan → volgende</div>
+          <div id="rcEvyDone10" class="rcEvyMarkDone text-[10px] text-slate-400 underline mt-2" data-dist="10">✅ Volgende sessie</div>
         </button>
         <div class="flex justify-center gap-5 mb-3.5">
           <button id="rcEvyReset5" class="text-[10px] text-slate-500 underline">🔄 5K herstarten</button>
@@ -11828,7 +11943,7 @@ $('settingDrinkInterval').addEventListener('change', (e) => { appSettings.drinkI
 $('settingEatReminder').addEventListener('change', (e) => { appSettings.eatReminderOn = e.target.checked; saveSettings(); if (navActive) setupFuelReminders(); });
 $('settingEatInterval').addEventListener('change', (e) => { appSettings.eatIntervalMin = parseInt(e.target.value, 10) || 45; saveSettings(); if (navActive) setupFuelReminders(); });
 $('settingBodyWeight').addEventListener('change', (e) => { appSettings.bodyWeightKg = parseInt(e.target.value, 10) || null; saveSettings(); });
-$('settingUserName').addEventListener('change', (e) => { appSettings.userName = e.target.value.trim(); saveSettings(); });
+$('settingUserName').addEventListener('input', (e) => { appSettings.userName = e.target.value.trim(); saveSettings(); }); // 'input' i.p.v. 'change': slaat meteen op bij elke toetsaanslag, ook als je zonder eerst te "blurren" meteen het scherm sluit
 $('settingBodyHeight').addEventListener('change', (e) => { appSettings.bodyHeightCm = parseInt(e.target.value, 10) || null; saveSettings(); });
 $('settingAge').addEventListener('change', (e) => { appSettings.bodyAge = parseInt(e.target.value, 10) || null; saveSettings(); });
 $('settingGender').addEventListener('change', (e) => { appSettings.bodyGender = e.target.value || ''; saveSettings(); });
@@ -16234,7 +16349,7 @@ const GARMIN_NL_EN_DICT = {
   '5K Start to Run': '5K Start to Run', '10-weken opbouwschema': '10-week training plan', '📅 Weekschema': '📅 Weekly plan',
   '🤖 AI Coach': '🤖 AI Coach', '🤖 AI Coach — kies je doel-afstand': '🤖 AI Coach — choose your target distance',
   '📚 Schema wisselen of zelf opbouwen': '📚 Switch plan or build your own', '5 KM': '5 KM', '10 KM': '10 KM', '7,5 KM': '7.5 KM',
-  'Week – · Dag –': 'Week – · Day –', 'Week – · Sessie –': 'Week – · Session –', '✅ Deze sessie al gedaan → volgende': '✅ This session already done → next',
+  'Week – · Dag –': 'Week – · Day –', 'Week – · Sessie –': 'Week – · Session –', '✅ Volgende sessie': '✅ Next session',
   '📍 Je zit hier nu': '📍 You are here now', 'Tik om hierheen te springen': 'Tap to jump here', '▼ Openen': '▼ Open',
   'Nog geen trainingen afgerond.': 'No training sessions completed yet.', 'Nog geen runs om te tonen.': 'No runs to show yet.',
   'Totaal km': 'Total km', 'Totale tijd': 'Total time', 'Kcal (geschat)': 'Kcal (estimated)',
@@ -17065,6 +17180,18 @@ $('weatherScroller').addEventListener('scroll', () => {
   const scroller = $('weatherScroller');
   const idx = Math.round(scroller.scrollLeft / (scroller.clientWidth || 1));
   document.querySelectorAll('.wgtab').forEach((btn, i) => btn.classList.toggle('active', i === idx));
+});
+$('weatherRefreshBtn').addEventListener('click', async () => {
+  const btn = $('weatherRefreshBtn');
+  btn.classList.add('locating');
+  try{
+    weatherSunCache = null; // forceer een volledig verse ophaling, zelfde locatie
+    await renderWeatherPanel();
+  }catch(e){
+    toast(tr('weatherNoLocation'), 3000);
+  }finally{
+    btn.classList.remove('locating');
+  }
 });
 $('weatherLocateBtn').addEventListener('click', async () => {
   const btn = $('weatherLocateBtn');
