@@ -881,6 +881,11 @@
   a.rc-tip:visited{ color:var(--cream); }
   .pain-zone-row{ display:flex; align-items:center; gap:8px; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.06); font-size:12px; }
   #painBodyImgWrap{ position:relative; width:130px; flex-shrink:0; border-radius:12px; overflow:hidden; }
+  .pain-view-btn{
+    flex:1; border:1.5px solid rgba(226,161,60,0.3); background:rgba(255,255,255,0.04); color:var(--cream);
+    border-radius:12px; padding:8px 4px; font-size:12px; font-weight:700;
+  }
+  .pain-view-btn.selected{ background:rgba(226,161,60,0.25); border-color:var(--amber); color:var(--amber); }
   #painBodyImgWrap img{ width:100%; display:block; }
   .pain-zone-dot{
     position:absolute; width:20px; height:20px; margin:-10px 0 0 -10px; border-radius:50%; cursor:pointer;
@@ -2938,9 +2943,13 @@
 
       <div class="bike-setup-title" style="text-align:left; font-size:14px; margin:18px 0 8px;">🧍 Pijn-check</div>
       <p style="font-size:11.5px; color:rgba(246,244,238,0.55); text-align:left; margin-bottom:10px;">Tik een lichaamszone aan om te registreren waar je iets voelt — puur voor je eigen overzicht, geen diagnose.</p>
+      <div style="display:flex; gap:6px; margin-bottom:10px;">
+        <button id="painViewFrontBtn" class="pain-view-btn selected">↑ Voorkant</button>
+        <button id="painViewBackBtn" class="pain-view-btn">↓ Achterkant</button>
+      </div>
       <div id="painBodyMapWrap" style="display:flex; gap:14px; align-items:flex-start;">
         <div id="painBodyImgWrap">
-          <img src="images/pain-body-front.png" alt="Lichaamsdiagram vooraanzicht">
+          <img id="painBodyImg" src="images/pain-body-front.png" alt="Lichaamsdiagram">
         </div>
         <div id="painZonePicker" style="flex:1;"></div>
       </div>
@@ -8424,33 +8433,49 @@ $('runCoachPlansBtn').addEventListener('click', openRunPlansModal);
 
 // ---------- Pijn-check: klikbare lichaamskaart, puur registratie, geen diagnose ----------
 const PAIN_ZONES = [
-  { id:'nek', label:'Nek', px:50, py:11 },
-  { id:'schouder', label:'Schouder', px:24, py:18 },
-  { id:'onderrug', label:'Onderrug', px:50, py:34 },
-  { id:'heup', label:'Heup', px:38, py:43 },
-  { id:'lies', label:'Lies', px:50, py:41 },
-  { id:'dijbeen', label:'Dijbeen/hamstring', px:40, py:57 },
-  { id:'itb', label:'ITB (buitenkant dij/knie)', px:62, py:60 },
-  { id:'knie', label:'Knie (lopersknie)', px:41, py:70 },
-  { id:'kuit', label:'Kuit/scheenbeen', px:42, py:80 },
-  { id:'achillespees', label:'Achillespees', px:58, py:89 },
-  { id:'enkel', label:'Enkel', px:42, py:91 },
-  { id:'voetzool', label:'Voetzool/hiel', px:58, py:96 },
-  { id:'voet', label:'Voet', px:42, py:96 }
+  { id:'nek', label:'Nek', front:{px:50,py:11}, back:{px:50,py:10} },
+  { id:'schouder', label:'Schouder', front:{px:24,py:18}, back:{px:25,py:20} },
+  { id:'bovenrug', label:'Bovenrug', back:{px:66,py:22} },
+  { id:'onderrug', label:'Onderrug', back:{px:50,py:38} },
+  { id:'lies', label:'Lies', front:{px:50,py:41} },
+  { id:'heup', label:'Heup', front:{px:38,py:43} },
+  { id:'bil', label:'Bil/piriformis', back:{px:38,py:48} },
+  { id:'dijbeen', label:'Dijbeen (voorkant)', front:{px:40,py:57} },
+  { id:'hamstring', label:'Hamstring (achterkant dij)', back:{px:38,py:62} },
+  { id:'itb', label:'ITB (buitenkant dij/knie)', front:{px:62,py:60} },
+  { id:'knie', label:'Knie (lopersknie)', front:{px:41,py:70}, back:{px:40,py:73} },
+  { id:'scheenbeen', label:'Scheenbeen', front:{px:42,py:80} },
+  { id:'kuit', label:'Kuit', back:{px:42,py:82} },
+  { id:'achillespees', label:'Achillespees', back:{px:42,py:92} },
+  { id:'enkel', label:'Enkel', front:{px:42,py:91} },
+  { id:'voetzool', label:'Voetzool/hiel', front:{px:58,py:96} },
+  { id:'voet', label:'Voet', front:{px:42,py:96} }
 ];
 const PAIN_LOG_KEY = 'pain_log_v1';
 let painSelectedZone = null;
 let painSelectedSeverity = 'matig';
+let painCurrentView = 'front'; // 'front' | 'back'
+function togglePainView(view){
+  painCurrentView = view;
+  $('painBodyImg').src = `images/pain-body-${view}.png`;
+  $('painViewFrontBtn').classList.toggle('selected', view==='front');
+  $('painViewBackBtn').classList.toggle('selected', view==='back');
+  renderPainBodySvg();
+  // Bij het wisselen van kant: een lopende selectie op de andere kant heeft geen zichtbaar puntje meer, dus opnieuw laten kiezen.
+  painSelectedZone = null;
+  $('painZonePicker').innerHTML = curLang()==='en' ? '<div style="font-size:11.5px; color:rgba(246,244,238,0.5);">Tap a zone to log it.</div>' : '<div style="font-size:11.5px; color:rgba(246,244,238,0.5);">Tik een zone aan om te registreren.</div>';
+}
 function renderPainBodySvg(){
   const wrap = $('painBodyImgWrap');
-  // Oude losse stippen weghalen (bv. bij taalwissel/herrender) voor we de nieuwe set toevoegt.
   wrap.querySelectorAll('.pain-zone-dot').forEach(el => el.remove());
   PAIN_ZONES.forEach(z => {
+    const coords = z[painCurrentView];
+    if (!coords) return; // deze zone is niet gedefinieerd voor de huidige kant (bv. "lies" bestaat enkel vooraan)
     const dot = document.createElement('div');
     dot.className = 'pain-zone-dot';
     dot.dataset.zone = z.id;
-    dot.style.left = z.px + '%';
-    dot.style.top = z.py + '%';
+    dot.style.left = coords.px + '%';
+    dot.style.top = coords.py + '%';
     dot.addEventListener('click', () => selectPainZone(z.id));
     wrap.appendChild(dot);
   });
@@ -8491,8 +8516,23 @@ async function renderPainLogList(){
     log.slice(0,10).map(r => `<div class="pain-log-row"><span>${sevIcon[r.severity]||''} ${r.zoneLabel}</span><span style="color:rgba(246,244,238,0.5);">${new Date(r.date).toLocaleDateString('nl-BE',{day:'2-digit',month:'short'})}</span></div>`).join('')
     : '';
 }
+// ---------- Brug tussen de Tailwind-iframe en de Pijn-check-opslag: één gedeelde geschiedenis, ongeacht de gebruikte stijl ----------
+async function logPainZoneFromFrame(zoneId, zoneLabel, severity){
+  const log = await storageGet(PAIN_LOG_KEY).then(v => v ? JSON.parse(v) : []).catch(() => []);
+  log.unshift({ date:new Date().toISOString(), zone:zoneId, zoneLabel, severity });
+  await storageSet(PAIN_LOG_KEY, JSON.stringify(log.slice(0,50)));
+  renderPainLogList(); // ook de Standaard-lijst meteen mee bijwerken, mocht die zichtbaar zijn
+  sendPainLogToFrame();
+}
+async function sendPainLogToFrame(){
+  const log = await storageGet(PAIN_LOG_KEY).then(v => v ? JSON.parse(v) : []).catch(() => []);
+  const frame = $('garminRunCoachFrame');
+  if (frame && frame.contentWindow) frame.contentWindow.postMessage({ source:'garminPainLog', log:log.slice(0,10) }, '*');
+}
 renderPainBodySvg();
 $('painZonePicker').innerHTML = '<div style="font-size:11.5px; color:rgba(246,244,238,0.5);">Tik een zone aan om te registreren.</div>';
+$('painViewFrontBtn').addEventListener('click', () => togglePainView('front'));
+$('painViewBackBtn').addEventListener('click', () => togglePainView('back'));
 document.querySelector('.rc-navbtn[data-panel="rcPijnPanel"]').addEventListener('click', renderPainLogList);
 $('runCoachStartBtn').addEventListener('click', () => startRunSession());
 
@@ -9563,6 +9603,8 @@ window.addEventListener('message', (ev) => {
     case 'setplan':       setActivePlanId(data.planId).then(sendRunCoachDataToFrame); break;
     case 'setweek':        jumpToRunWeek(data.week).then(sendRunCoachDataToFrame); break;
     case 'resumesession':  resumeRunSessionView(); break;
+    case 'painlog': logPainZoneFromFrame(data.zoneId, data.zoneLabel, data.severity); break;
+    case 'getpainlog': sendPainLogToFrame(); break;
     case 'other-not-built': toast(curLang()==='en' ? 'Not built yet — coming later.' : 'Nog niet gebouwd — komt later.', 2500); break;
     case 'getstats': sendGarminRunCoachStats(); break;
     case 'confetti': fireConfetti(); break;
@@ -10984,6 +11026,13 @@ function buildGarminRunCoachHtml(){
   .week-jump-card{ cursor:pointer; transition:transform 0.12s ease; }
   .week-jump-card:active{ transform:scale(0.97); }
   .gold-gradient{ background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+  .rcPainZoneDot{
+    position:absolute; width:20px; height:20px; margin:-10px 0 0 -10px; border-radius:50%; cursor:pointer;
+    background:rgba(251,191,36,0.35); border:1.5px solid rgba(251,191,36,0.7); transition:background .15s, transform .15s;
+  }
+  .rcPainZoneDot:hover, .rcPainZoneDot.selected{ background:rgba(251,191,36,0.9); transform:scale(1.15); }
+  .rcPainSevBtn{ flex:1; border:1.5px solid #1e293b; background:rgba(255,255,255,0.04); color:#cbd5e1; border-radius:10px; padding:7px 0; font-size:11px; font-weight:700; }
+  .rcPainSevBtn.selected{ background:rgba(251,191,36,0.25); border-color:#fbbf24; color:#fbbf24; }
 </style>
 <style>${TAILWIND_CARD_BG}</style>
 </head>
@@ -11237,6 +11286,11 @@ function buildGarminRunCoachHtml(){
           <span class="flex-1"><span class="block text-sm font-black text-white">Stretching — instructievideo's</span><span class="block text-[11px] text-slate-400">Voor en na het lopen</span></span>
           <span class="text-slate-500">›</span>
         </button>
+        <button class="rcPijnNavBtn w-full flex items-center gap-3 bg-slate-900/60 border border-purple-500/30 rounded-2xl p-4 text-left" data-target="rcPijnSubCheck">
+          <span class="text-2xl">🧍</span>
+          <span class="flex-1"><span class="block text-sm font-black text-white">Pijn-check</span><span class="block text-[11px] text-slate-400">Tik aan waar je iets voelt</span></span>
+          <span class="text-slate-500">›</span>
+        </button>
       </div>
 
       <!-- ---- Sub: Pijn/blessures ---- -->
@@ -11312,6 +11366,23 @@ function buildGarminRunCoachHtml(){
         <a href="https://www.youtube.com/watch?v=dVwzwkSOuhs" target="_blank" rel="noopener" class="flex items-center gap-3 bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5"><span class="text-xl">▶️</span><span class="flex-1 text-[12px] font-bold text-white">Do These Stretches After Every Run</span></a>
         <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wide block mt-2">Gericht op kuit/achillespees</span>
         <a href="https://www.youtube.com/watch?v=zGLD19PC_Jg" target="_blank" rel="noopener" class="flex items-center gap-3 bg-slate-900/60 border border-slate-800 rounded-2xl p-3.5"><span class="text-xl">▶️</span><span class="flex-1 text-[12px] font-bold text-white">Calf Stretch for Runners — wandstretch</span></a>
+      </div>
+
+      <!-- ---- Sub: Pijn-check (lichaamsdiagram) ---- -->
+      <div id="rcPijnSubCheck" class="hidden space-y-2">
+        <button class="rcPijnBackBtn text-[11px] font-bold text-slate-400 mb-1">‹ Terug</button>
+        <p class="text-[10px] text-slate-500 leading-relaxed mb-2">Tik een lichaamszone aan om te registreren waar je iets voelt — puur voor je eigen overzicht, geen diagnose.</p>
+        <div class="flex gap-1.5 mb-2">
+          <button id="rcPainViewFrontBtn" class="rcPainViewBtn flex-1 rounded-xl py-2 text-[11px] font-bold border border-amber-500/50 bg-amber-500/20 text-amber-400">↑ Voorkant</button>
+          <button id="rcPainViewBackBtn" class="rcPainViewBtn flex-1 rounded-xl py-2 text-[11px] font-bold border border-slate-700 bg-slate-900/60 text-slate-400">↓ Achterkant</button>
+        </div>
+        <div class="flex gap-3.5 items-start">
+          <div id="rcPainBodyWrap" style="position:relative; width:130px; flex-shrink:0; border-radius:12px; overflow:hidden;">
+            <img id="rcPainBodyImg" src="images/pain-body-front-tw.png" style="width:100%; display:block;" alt="Lichaamsdiagram">
+          </div>
+          <div id="rcPainZonePicker" class="flex-1"></div>
+        </div>
+        <div id="rcPainLogList" class="mt-3"></div>
       </div>
 
     </div>
@@ -11428,6 +11499,96 @@ ${GARMIN_MENU_BTN_JS}
         document.querySelectorAll('#rcPijnPanel > div').forEach(d => d.classList.add('hidden'));
         document.getElementById('rcPijnMenu').classList.remove('hidden');
       });
+    });
+    // ---- Pijn-check: lichaamsdiagram met tik-zones (zelfde 17 zones/coördinaten als de Standaard-pagina,
+    // opslag loopt via de parent zodat het één gedeelde geschiedenis blijft ongeacht de gebruikte stijl) ----
+    const RC_PAIN_ZONES = [
+      { id:'nek', label:'Nek', front:{px:50,py:11}, back:{px:50,py:10} },
+      { id:'schouder', label:'Schouder', front:{px:24,py:18}, back:{px:25,py:20} },
+      { id:'bovenrug', label:'Bovenrug', back:{px:66,py:22} },
+      { id:'onderrug', label:'Onderrug', back:{px:50,py:38} },
+      { id:'lies', label:'Lies', front:{px:50,py:41} },
+      { id:'heup', label:'Heup', front:{px:38,py:43} },
+      { id:'bil', label:'Bil/piriformis', back:{px:38,py:48} },
+      { id:'dijbeen', label:'Dijbeen (voorkant)', front:{px:40,py:57} },
+      { id:'hamstring', label:'Hamstring (achterkant dij)', back:{px:38,py:62} },
+      { id:'itb', label:'ITB (buitenkant dij/knie)', front:{px:62,py:60} },
+      { id:'knie', label:'Knie (lopersknie)', front:{px:41,py:70}, back:{px:40,py:73} },
+      { id:'scheenbeen', label:'Scheenbeen', front:{px:42,py:80} },
+      { id:'kuit', label:'Kuit', back:{px:42,py:82} },
+      { id:'achillespees', label:'Achillespees', back:{px:42,py:92} },
+      { id:'enkel', label:'Enkel', front:{px:42,py:91} },
+      { id:'voetzool', label:'Voetzool/hiel', front:{px:58,py:96} },
+      { id:'voet', label:'Voet', front:{px:42,py:96} }
+    ];
+    let rcPainView = 'front';
+    let rcPainSelectedZone = null;
+    let rcPainSelectedSeverity = 'matig';
+    function rcRenderPainDots(){
+      const wrap = document.getElementById('rcPainBodyWrap');
+      wrap.querySelectorAll('.rcPainZoneDot').forEach(el => el.remove());
+      RC_PAIN_ZONES.forEach(z => {
+        const c = z[rcPainView];
+        if (!c) return;
+        const dot = document.createElement('div');
+        dot.className = 'rcPainZoneDot';
+        dot.dataset.zone = z.id;
+        dot.style.left = c.px + '%'; dot.style.top = c.py + '%';
+        dot.addEventListener('click', () => rcSelectPainZone(z.id));
+        wrap.appendChild(dot);
+      });
+    }
+    function rcSelectPainZone(zoneId){
+      rcPainSelectedZone = zoneId;
+      document.querySelectorAll('.rcPainZoneDot').forEach(el => el.classList.toggle('selected', el.dataset.zone === zoneId));
+      const zone = RC_PAIN_ZONES.find(z => z.id === zoneId);
+      const sevs = [{id:'licht',label:'Licht'},{id:'matig',label:'Matig'},{id:'erg',label:'Erg'}];
+      let sevBtnsHtml = '';
+      sevs.forEach(s => { sevBtnsHtml += '<button class="rcPainSevBtn ' + (s.id===rcPainSelectedSeverity?'selected':'') + '" data-sev="' + s.id + '">' + s.label + '</button>'; });
+      document.getElementById('rcPainZonePicker').innerHTML =
+        '<div class="text-[13px] font-black text-white mb-2">' + zone.label + '</div>' +
+        '<div class="flex gap-1.5 mb-2.5">' + sevBtnsHtml + '</div>' +
+        '<button id="rcPainSaveBtn" class="w-full rounded-xl py-2.5 text-[12px] font-black" style="background:#fbbf24; color:#1e293b;">Registreren</button>';
+      document.querySelectorAll('.rcPainSevBtn').forEach(b => b.addEventListener('click', () => {
+        rcPainSelectedSeverity = b.dataset.sev;
+        document.querySelectorAll('.rcPainSevBtn').forEach(x => x.classList.toggle('selected', x.dataset.sev===rcPainSelectedSeverity));
+      }));
+      document.getElementById('rcPainSaveBtn').addEventListener('click', () => {
+        parent.postMessage({ source:'garminRunCoach', action:'painlog', zoneId, zoneLabel:zone.label, severity:rcPainSelectedSeverity }, '*');
+        rcPainSelectedZone = null;
+        document.querySelectorAll('.rcPainZoneDot').forEach(el => el.classList.remove('selected'));
+        document.getElementById('rcPainZonePicker').innerHTML = '<div class="text-[11px] text-slate-500">Tik een zone aan om te registreren.</div>';
+      });
+    }
+    document.getElementById('rcPainViewFrontBtn').addEventListener('click', () => {
+      rcPainView = 'front';
+      document.getElementById('rcPainBodyImg').src = 'images/pain-body-front-tw.png';
+      document.getElementById('rcPainViewFrontBtn').className = 'rcPainViewBtn flex-1 rounded-xl py-2 text-[11px] font-bold border border-amber-500/50 bg-amber-500/20 text-amber-400';
+      document.getElementById('rcPainViewBackBtn').className = 'rcPainViewBtn flex-1 rounded-xl py-2 text-[11px] font-bold border border-slate-700 bg-slate-900/60 text-slate-400';
+      rcRenderPainDots();
+    });
+    document.getElementById('rcPainViewBackBtn').addEventListener('click', () => {
+      rcPainView = 'back';
+      document.getElementById('rcPainBodyImg').src = 'images/pain-body-back-tw.png';
+      document.getElementById('rcPainViewBackBtn').className = 'rcPainViewBtn flex-1 rounded-xl py-2 text-[11px] font-bold border border-amber-500/50 bg-amber-500/20 text-amber-400';
+      document.getElementById('rcPainViewFrontBtn').className = 'rcPainViewBtn flex-1 rounded-xl py-2 text-[11px] font-bold border border-slate-700 bg-slate-900/60 text-slate-400';
+      rcRenderPainDots();
+    });
+    document.getElementById('rcPainZonePicker').innerHTML = '<div class="text-[11px] text-slate-500">Tik een zone aan om te registreren.</div>';
+    rcRenderPainDots();
+    parent.postMessage({ source:'garminRunCoach', action:'getpainlog' }, '*'); // vraag de huidige (gedeelde) geschiedenis op bij het openen
+    window.addEventListener('message', (ev) => {
+      const d = ev.data;
+      if (!d || d.source !== 'garminPainLog') return;
+      const sevIcon = { licht:'🟡', matig:'🟠', erg:'🔴' };
+      const list = document.getElementById('rcPainLogList');
+      if (!d.log.length){ list.innerHTML = ''; return; }
+      let rowsHtml = '<div class="text-[10px] font-bold text-slate-500 uppercase tracking-wide mb-1">Recente registraties</div>';
+      d.log.slice(0,10).forEach(r => {
+        const dateStr = new Date(r.date).toLocaleDateString('nl-BE',{day:'2-digit',month:'short'});
+        rowsHtml += '<div class="flex justify-between text-[11px] text-slate-300 py-1.5 border-b border-slate-800"><span>' + (sevIcon[r.severity]||'') + ' ' + r.zoneLabel + '</span><span class="text-slate-500">' + dateStr + '</span></div>';
+      });
+      list.innerHTML = rowsHtml;
     });
     document.getElementById('rcEvyStart5').addEventListener('click', () => {
       parent.postMessage({ source:'garminRunCoach', action:'starttraining', mode:'evy', evyDist:5 }, '*');
