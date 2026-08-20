@@ -840,7 +840,7 @@
     display:flex; align-items:center; justify-content:center; font-size:22px; font-weight:900; line-height:1;
   }
   #runCoachBackBtn:active{ background:rgba(226,161,60,0.22); }
-  #runCoachScreen .bike-setup-inner{ margin-top:54px; } /* overschrijft de -25px van .bike-setup-inner (bedoeld voor het fietsscherm) zodat de titel niet meer onder de terugknop/header-knoppen schuift — 54px geeft genoeg vrije ruimte onder de 38px-hoge knoppenrij (16px top-offset + hoogte) */
+  #runCoachScreen .bike-setup-inner{ margin-top:64px; } /* overschrijft de -25px van .bike-setup-inner (bedoeld voor het fietsscherm) zodat de titel niet meer onder de terugknop/header-knoppen schuift */
   .run-week-card{
     background:linear-gradient(160deg,#c23b3b,#7a1f1f); border-radius:18px; padding:18px;
     text-align:left; box-shadow:0 8px 20px rgba(0,0,0,0.3); margin-bottom:16px;
@@ -879,9 +879,14 @@
   .rc-week-row.current{ color:var(--amber); font-weight:800; }
   .rc-tip{ background:rgba(255,255,255,0.06); border-radius:14px; padding:13px 15px; margin-bottom:10px; font-size:12.5px; line-height:1.5; color:var(--cream); }
   a.rc-tip:visited{ color:var(--cream); }
-  .pain-zone{ cursor:pointer; fill:rgba(226,161,60,0.35); stroke:rgba(226,161,60,0.6); stroke-width:1; transition:fill .15s; }
-  .pain-zone:hover, .pain-zone.selected{ fill:rgba(226,161,60,0.85); }
   .pain-zone-row{ display:flex; align-items:center; gap:8px; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.06); font-size:12px; }
+  #painBodyImgWrap{ position:relative; width:130px; flex-shrink:0; border-radius:12px; overflow:hidden; }
+  #painBodyImgWrap img{ width:100%; display:block; }
+  .pain-zone-dot{
+    position:absolute; width:20px; height:20px; margin:-10px 0 0 -10px; border-radius:50%; cursor:pointer;
+    background:rgba(226,161,60,0.4); border:1.5px solid rgba(226,161,60,0.75); transition:background .15s, transform .15s;
+  }
+  .pain-zone-dot:hover, .pain-zone-dot.selected{ background:rgba(226,161,60,0.9); transform:scale(1.15); }
   .pain-sev-btn{ border:none; border-radius:8px; padding:5px 10px; font-size:11px; font-weight:700; background:rgba(255,255,255,0.08); color:var(--cream); }
   .pain-sev-btn.selected{ background:var(--amber); color:var(--green-900); }
   .pain-log-row{ display:flex; justify-content:space-between; align-items:center; padding:7px 0; border-bottom:1px solid rgba(255,255,255,0.06); font-size:11.5px; }
@@ -1028,7 +1033,7 @@
   }
   #bikeSetupBackBtn:active{ background:rgba(226,161,60,0.22); }
   .bike-setup-inner{ width:100%; max-width:380px; text-align:center; margin-top:-25px; }
-  #bikeSetupScreen .bike-setup-inner{ margin-top:54px; } /* overschrijft de -25px hierboven (die was afgestemd op de oude verticale centrering) — geeft nu genoeg vrije ruimte onder de terugknop */
+  #bikeSetupScreen .bike-setup-inner{ margin-top:64px; } /* overschrijft de -25px hierboven (die was afgestemd op de oude verticale centrering) — geeft nu genoeg vrije ruimte onder de terugknop */
   .bike-setup-title{ color:var(--cream); font-size:16px; font-weight:800; margin-bottom:16px; }
 
   .bike-type-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; }
@@ -2785,15 +2790,15 @@
           <div style="color:rgba(255,255,255,0.85); font-size:12px;">Tik je afstand aan om je volgende sessie te starten — de app onthoudt zelf bij welke week/sessie je zit.</div>
         </div>
         <div style="display:flex; flex-direction:column; gap:10px; margin:10px 0;">
-          <button id="rcEvyStart5Std" style="width:100%; border:2px solid rgba(226,161,60,0.4); background:rgba(255,255,255,0.04); border-radius:18px; padding:18px 20px; color:var(--cream); text-align:left;">
-            <div style="font-size:19px; margin-bottom:4px;">🏁 5 KM</div>
+          <button id="rcEvyStart5Std" style="width:100%; border:2px solid rgba(226,161,60,0.4); background:rgba(255,255,255,0.04); border-radius:18px; padding:22px 20px; color:var(--cream); text-align:left;">
+            <div style="font-size:19px; margin-bottom:6px;">🏁 5 KM</div>
             <div id="rcEvyProg5Std" style="font-size:12px; color:var(--amber); font-weight:700;">Week – · Sessie –</div>
-            <div id="rcEvyDone5Std" class="rcEvyMarkDoneStd" data-dist="5" data-i18n="evyMarkDone" style="font-size:10.5px; color:rgba(246,244,238,0.5); text-decoration:underline; margin-top:6px;">✅ Volgende sessie</div>
+            <div id="rcEvyDone5Std" class="rcEvyMarkDoneStd" data-dist="5" data-i18n="evyMarkDone" style="font-size:10.5px; color:rgba(246,244,238,0.5); text-decoration:underline; margin-top:10px;">✅ Volgende sessie</div>
           </button>
-          <button id="rcEvyStart10Std" style="width:100%; border:2px solid rgba(226,161,60,0.4); background:rgba(255,255,255,0.04); border-radius:18px; padding:18px 20px; color:var(--cream); text-align:left;">
-            <div style="font-size:19px; margin-bottom:4px;">🔥 10 KM</div>
+          <button id="rcEvyStart10Std" style="width:100%; border:2px solid rgba(226,161,60,0.4); background:rgba(255,255,255,0.04); border-radius:18px; padding:22px 20px; color:var(--cream); text-align:left;">
+            <div style="font-size:19px; margin-bottom:6px;">🔥 10 KM</div>
             <div id="rcEvyProg10Std" style="font-size:12px; color:var(--amber); font-weight:700;">Week – · Sessie –</div>
-            <div id="rcEvyDone10Std" class="rcEvyMarkDoneStd" data-dist="10" data-i18n="evyMarkDone" style="font-size:10.5px; color:rgba(246,244,238,0.5); text-decoration:underline; margin-top:6px;">✅ Volgende sessie</div>
+            <div id="rcEvyDone10Std" class="rcEvyMarkDoneStd" data-dist="10" data-i18n="evyMarkDone" style="font-size:10.5px; color:rgba(246,244,238,0.5); text-decoration:underline; margin-top:10px;">✅ Volgende sessie</div>
           </button>
         </div>
         <div style="display:flex; justify-content:center; gap:18px; margin-bottom:14px;">
@@ -2934,7 +2939,9 @@
       <div class="bike-setup-title" style="text-align:left; font-size:14px; margin:18px 0 8px;">🧍 Pijn-check</div>
       <p style="font-size:11.5px; color:rgba(246,244,238,0.55); text-align:left; margin-bottom:10px;">Tik een lichaamszone aan om te registreren waar je iets voelt — puur voor je eigen overzicht, geen diagnose.</p>
       <div id="painBodyMapWrap" style="display:flex; gap:14px; align-items:flex-start;">
-        <svg id="painBodySvg" viewBox="0 0 120 260" style="width:120px; flex-shrink:0;"></svg>
+        <div id="painBodyImgWrap">
+          <img src="images/pain-body-front.png" alt="Lichaamsdiagram vooraanzicht">
+        </div>
         <div id="painZonePicker" style="flex:1;"></div>
       </div>
       <div id="painLogList" style="margin-top:14px;"></div>
@@ -8417,42 +8424,40 @@ $('runCoachPlansBtn').addEventListener('click', openRunPlansModal);
 
 // ---------- Pijn-check: klikbare lichaamskaart, puur registratie, geen diagnose ----------
 const PAIN_ZONES = [
-  { id:'nek', label:'Nek', cx:60, cy:35, r:8 },
-  { id:'schouder', label:'Schouder', cx:38, cy:52, r:9 },
-  { id:'onderrug', label:'Onderrug', cx:60, cy:95, r:11 },
-  { id:'heup', label:'Heup', cx:45, cy:118, r:9 },
-  { id:'dijbeen', label:'Dijbeen/hamstring', cx:48, cy:155, r:10 },
-  { id:'knie', label:'Knie', cx:50, cy:190, r:9 },
-  { id:'kuit', label:'Kuit/scheenbeen', cx:52, cy:220, r:9 },
-  { id:'enkel', label:'Enkel', cx:53, cy:245, r:7 },
-  { id:'voet', label:'Voet', cx:55, cy:255, r:8 }
+  { id:'nek', label:'Nek', px:50, py:11 },
+  { id:'schouder', label:'Schouder', px:24, py:18 },
+  { id:'onderrug', label:'Onderrug', px:50, py:34 },
+  { id:'heup', label:'Heup', px:38, py:43 },
+  { id:'lies', label:'Lies', px:50, py:41 },
+  { id:'dijbeen', label:'Dijbeen/hamstring', px:40, py:57 },
+  { id:'itb', label:'ITB (buitenkant dij/knie)', px:62, py:60 },
+  { id:'knie', label:'Knie (lopersknie)', px:41, py:70 },
+  { id:'kuit', label:'Kuit/scheenbeen', px:42, py:80 },
+  { id:'achillespees', label:'Achillespees', px:58, py:89 },
+  { id:'enkel', label:'Enkel', px:42, py:91 },
+  { id:'voetzool', label:'Voetzool/hiel', px:58, py:96 },
+  { id:'voet', label:'Voet', px:42, py:96 }
 ];
 const PAIN_LOG_KEY = 'pain_log_v1';
 let painSelectedZone = null;
 let painSelectedSeverity = 'matig';
 function renderPainBodySvg(){
-  const svg = $('painBodySvg');
-  const stroke = 'rgba(246,244,238,0.85)';
-  const fill = 'rgba(246,244,238,0.15)';
-  const body = `
-    <ellipse cx="60" cy="18" rx="12" ry="14" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/>
-    <path d="M 45 40 Q 60 32 75 40 L 78 100 Q 60 108 42 100 Z" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/>
-    <path d="M 45 42 L 30 75" stroke="${stroke}" stroke-width="10" stroke-linecap="round"/>
-    <path d="M 75 42 L 90 75" stroke="${stroke}" stroke-width="10" stroke-linecap="round"/>
-    <path d="M 48 100 L 45 200" stroke="${stroke}" stroke-width="13" stroke-linecap="round"/>
-    <path d="M 72 100 L 70 200" stroke="${stroke}" stroke-width="13" stroke-linecap="round"/>
-    <path d="M 45 200 L 53 258" stroke="${stroke}" stroke-width="10" stroke-linecap="round"/>
-    <path d="M 70 200 L 62 258" stroke="${stroke}" stroke-width="10" stroke-linecap="round"/>
-  `;
-  const zones = PAIN_ZONES.map(z => `<circle class="pain-zone" data-zone="${z.id}" cx="${z.cx}" cy="${z.cy}" r="${z.r}"></circle>`).join('');
-  svg.innerHTML = body + zones;
-  svg.querySelectorAll('.pain-zone').forEach(el => {
-    el.addEventListener('click', () => selectPainZone(el.dataset.zone));
+  const wrap = $('painBodyImgWrap');
+  // Oude losse stippen weghalen (bv. bij taalwissel/herrender) voor we de nieuwe set toevoegt.
+  wrap.querySelectorAll('.pain-zone-dot').forEach(el => el.remove());
+  PAIN_ZONES.forEach(z => {
+    const dot = document.createElement('div');
+    dot.className = 'pain-zone-dot';
+    dot.dataset.zone = z.id;
+    dot.style.left = z.px + '%';
+    dot.style.top = z.py + '%';
+    dot.addEventListener('click', () => selectPainZone(z.id));
+    wrap.appendChild(dot);
   });
 }
 function selectPainZone(zoneId){
   painSelectedZone = zoneId;
-  $('painBodySvg').querySelectorAll('.pain-zone').forEach(el => el.classList.toggle('selected', el.dataset.zone === zoneId));
+  $('painBodyImgWrap').querySelectorAll('.pain-zone-dot').forEach(el => el.classList.toggle('selected', el.dataset.zone === zoneId));
   const zone = PAIN_ZONES.find(z => z.id === zoneId);
   const sevOptions = [{ id:'licht', label:'Licht' }, { id:'matig', label:'Matig' }, { id:'erg', label:'Erg' }];
   $('painZonePicker').innerHTML = `
@@ -8474,7 +8479,7 @@ function selectPainZone(zoneId){
     await storageSet(PAIN_LOG_KEY, JSON.stringify(log.slice(0,50)));
     toast(curLang()==='en' ? 'Logged.' : 'Geregistreerd.', 2000);
     painSelectedZone = null;
-    $('painBodySvg').querySelectorAll('.pain-zone').forEach(el => el.classList.remove('selected'));
+    $('painBodyImgWrap').querySelectorAll('.pain-zone-dot').forEach(el => el.classList.remove('selected'));
     $('painZonePicker').innerHTML = '<div style="font-size:11.5px; color:rgba(246,244,238,0.5);">Tik een zone aan om te registreren.</div>';
     renderPainLogList();
   });
