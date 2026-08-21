@@ -2405,7 +2405,7 @@
       <label class="settings-check"><input type="checkbox" data-coach-cat="lastInterval" checked> <span>Aankondiging van je laatste loop-interval</span></label>
       <label class="settings-check"><input type="checkbox" data-coach-cat="progressPercent" checked> <span>Voortgang in procenten bij een doelrun</span></label>
       <label class="settings-check"><input type="checkbox" data-coach-cat="sessionStreak" checked> <span>Aantal trainingen deze week</span></label>
-      <label class="settings-check"><input type="checkbox" data-coach-cat="didYouKnow" checked> <span>Wist-je-datjes (houding, cadans, hydratatie…)</span></label>
+      <label class="settings-check"><input type="checkbox" data-coach-cat="didYouKnow" checked> <span>Looptips & wist-je-datjes (houding, schoenen, rust, voeding…)</span></label>
       <label class="settings-check"><input type="checkbox" data-coach-cat="weatherWarning" checked> <span>Weer-waarschuwing bij start (warm/koud/regen)</span></label>
       <label class="settings-check"><input type="checkbox" data-coach-cat="liveMedal" checked> <span>Medaille meteen vieren tijdens de run</span></label>
     </div>
@@ -8835,8 +8835,30 @@ const COACH_MESSAGES = {
     en: (n) => n === 1 ? 'This is your first session this week — great start.' : `This is already your ${n}th session this week — strong consistency.`
   },
   didYouKnow: {
-    nl: ['Wist je dat: een lichte voorwaartse leun vanuit je enkels je loophouding verbetert?', 'Wist je dat: een hogere cadans (kortere, snellere passen) vaak blessures voorkomt?', 'Wist je dat: op tijd drinken vóór je dorst hebt je prestatie merkbaar verbetert?', 'Wist je dat: een goede opwarming je risico op blessures flink verlaagt?', 'Wist je dat: ontspannen handen en schouders je energie besparen tijdens het lopen?'],
-    en: ['Did you know: a slight forward lean from your ankles improves your running form?', 'Did you know: a higher cadence (shorter, quicker steps) often helps prevent injury?', 'Did you know: drinking before you feel thirsty noticeably improves performance?', 'Did you know: a good warm-up significantly lowers your injury risk?', 'Did you know: relaxed hands and shoulders save energy while you run?']
+    nl: [
+      'Wist je dat: een lichte voorwaartse leun vanuit je enkels je loophouding verbetert?',
+      'Wist je dat: een hogere cadans (kortere, snellere passen) vaak blessures voorkomt?',
+      'Wist je dat: op tijd drinken vóór je dorst hebt je prestatie merkbaar verbetert?',
+      'Wist je dat: een goede opwarming je risico op blessures flink verlaagt?',
+      'Wist je dat: ontspannen handen en schouders je energie besparen tijdens het lopen?',
+      'Looptip: vervang je loopschoenen na zo\'n 600 à 800 km — versleten demping is een van de vaakste oorzaken van blessures.',
+      'Looptip: je lichaam wordt sterker tíjdens rust, niet tijdens het lopen zelf. Bouw minstens 1 à 2 rustdagen per week in.',
+      'Looptip: bouw je afstand per week met maximaal zo\'n 10% op — te snel opbouwen is een klassieke blessure-oorzaak.',
+      'Voedingstip: een lichte snack met koolhydraten, zo\'n 1 à 2 uur vóór het lopen, geeft merkbaar meer energie.',
+      'Voedingstip: eet binnen het half uur na het lopen iets met zowel eiwitten als koolhydraten — dat versnelt je herstel.'
+    ],
+    en: [
+      'Did you know: a slight forward lean from your ankles improves your running form?',
+      'Did you know: a higher cadence (shorter, quicker steps) often helps prevent injury?',
+      'Did you know: drinking before you feel thirsty noticeably improves performance?',
+      'Did you know: a good warm-up significantly lowers your injury risk?',
+      'Did you know: relaxed hands and shoulders save energy while you run?',
+      'Running tip: replace your running shoes after roughly 600-800 km — worn-out cushioning is one of the most common injury causes.',
+      'Running tip: your body actually gets stronger during rest, not during the run itself. Build in at least 1-2 rest days a week.',
+      'Running tip: increase your weekly distance by no more than about 10% at a time — ramping up too fast is a classic cause of injury.',
+      'Nutrition tip: a light carb snack about 1-2 hours before running noticeably boosts your energy.',
+      'Nutrition tip: eat something with both protein and carbs within 30 minutes of finishing — it speeds up recovery.'
+    ]
   },
   weatherWarning: {
     hot: { nl:(t) => `Het is best warm vandaag, ${t}°. Drink op tijd en bouw rustig op.`, en:(t) => `It's quite warm today, ${t}°. Drink on time and build up steadily.` },
@@ -9236,8 +9258,10 @@ function handleRunGpsUpdate(pos){
 function tickRunSession(){
   if (!rsState || rsState.paused) return;
   if (rsState.freeform){
-    // Vrije run/doelrun: geen vaste intervallen, dus geen halverwege-punt — wel af en toe aanmoediging
-    if (rsState.zombie) tickZombieState(); else maybeSpeakEncouragement();
+    // Vrije run/doelrun: geen vaste intervallen, dus geen halverwege-punt — wel af en toe aanmoediging en,
+    // op een eigen rustiger ritme, een looptip (bij EVY blijft dit stil, want speakForRun() onderdrukt daar
+    // toch alle app-stem — de podcast zelf is dan de coaching).
+    if (rsState.zombie) tickZombieState(); else { maybeSpeakEncouragement(); maybeSpeakDidYouKnow(); }
     if (rsState.evyIntervals) renderRunProgressRail();
     updateRunSessionUI();
     return;
@@ -9290,8 +9314,19 @@ function maybeSpeakMidpoint(){
   speakForRun(pickCoachLine('midpoint'));
 }
 function maybeSpeakDidYouKnow(){
-  // Enkel tijdens wandelpauzes, af en toe, en enkel als "wist-je-datjes" aanstaan — géén dubbeling met breathingTip
-  if (!rsState || rsState.freeform || !coachCatEnabled('didYouKnow')) return;
+  if (!rsState || !coachCatEnabled('didYouKnow')) return;
+  if (rsState.freeform){
+    // Vrije Run/Doelrun heeft geen wandelpauzes om een looptip aan te knopen — geef ze hier op een eigen,
+    // rustiger ritme (zo'n 4,5 à 6,5 min), los van de aanmoediging (~80-105s) zodat ze niet door elkaar
+    // lopen, en enkel terwijl je ook écht in beweging bent (zelfde logica als bij de aanmoediging).
+    const elapsedSec = (Date.now() - rsState.startedAt - rsState.pausedMs) / 1000;
+    if (elapsedSec - (rsState.lastTipAt || 0) < 270 + Math.random()*120) return;
+    if (smoothedSpeedKmh(rsState.breadcrumbs, 20) < 2) return;
+    rsState.lastTipAt = elapsedSec;
+    speakForRun(pickCoachLine('didYouKnow'));
+    return;
+  }
+  // Schema-run: enkel tijdens wandelpauzes, af en toe — géén dubbeling met breathingTip
   const curType = rsState.intervals[rsState.idx].type;
   if (curType !== 'walk' && curType !== 'warmup' && curType !== 'cooldown') return;
   if (Math.random() < 0.008) speakForRun(pickCoachLine('didYouKnow'));
