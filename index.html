@@ -1394,6 +1394,11 @@
   body.theme-garmin #helpContent b{ color:#e2a13c; }
   body.theme-garmin .settings-radio, body.theme-garmin .settings-check{ color:rgba(241,245,249,0.85); }
   body.theme-garmin .settings-accordion summary::after{ color:rgba(241,245,249,0.5); }
+  body.theme-garmin .settings-check-label{ color:#f1f5f9; }
+  body.theme-garmin .settings-note{ color:rgba(241,245,249,0.55); }
+  body.theme-garmin .loopgen-biketype-opt, body.theme-garmin .pin-biketype-opt{ background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.12); color:#f1f5f9; }
+  body.theme-garmin .loopgen-biketype-opt.active, body.theme-garmin .pin-biketype-opt.active{ color:#fff; }
+  body.theme-garmin .loopgen-save-btn{ background:rgba(255,255,255,0.1); color:#f1f5f9; }
   body.theme-garmin .glass-card{
     background:linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
     backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
@@ -1604,6 +1609,20 @@
     <p class="simple-modal-text" data-i18n="welcomeText">Hoe mogen we je noemen? Enkel gebruikt om je persoonlijk aan te spreken in de app — blijft op je eigen toestel, wordt nergens naartoe verstuurd.</p>
     <input type="text" id="welcomeNameInput" placeholder="Je voornaam…" data-i18n-placeholder="welcomeNamePlaceholder" class="settings-text-input" style="text-align:center; margin-bottom:12px;" maxlength="30">
     <button id="welcomeNameSaveBtn" class="simple-modal-btn primary" style="width:100%;" data-i18n="welcomeStartBtn">Start de app</button>
+  </div>
+</div>
+
+<!-- Herbruikbare mooie confirm/prompt/alert-modal — vervangt de lelijke browser-eigen confirm()/prompt()/alert() overal in de hoofdpagina. Erft automatisch de juiste kleuren mee via de bestaande .simple-modal thema-CSS (Standaard én Garmin). -->
+<div id="customConfirmModal" class="simple-modal" style="z-index:9999;">
+  <div class="simple-modal-card" style="max-width:340px;">
+    <p id="customConfirmMessage" class="simple-modal-text" style="white-space:pre-line;"></p>
+    <div id="customConfirmInputRow" style="display:none;">
+      <input type="text" id="customConfirmInput" class="settings-text-input" style="width:100%; margin-bottom:10px;">
+    </div>
+    <div class="simple-modal-actions">
+      <button id="customConfirmCancelBtn" class="simple-modal-btn"></button>
+      <button id="customConfirmOkBtn" class="simple-modal-btn primary"></button>
+    </div>
   </div>
 </div>
 
@@ -2475,6 +2494,18 @@
     </div>
 
     <div class="settings-section">
+      <h4><span data-i18n="settingsRouteDeviation">Afwijking van route</span></h4>
+      <p class="settings-note"><span data-i18n="settingsDeviationNote">Hoe ver je van de route mag afwijken vóór de waarschuwing verschijnt.</span></p>
+      <label class="settings-radio"><input type="radio" name="offRouteDist" value="20"> <span><span data-i18n="settingsDevSensitive">🎯 Gevoelig (20 m)</span></span></label>
+      <label class="settings-radio"><input type="radio" name="offRouteDist" value="35" checked> <span><span data-i18n="settingsDevNormal">⚖️ Normaal (35 m)</span></span></label>
+      <label class="settings-radio"><input type="radio" name="offRouteDist" value="60"> <span><span data-i18n="settingsDevRelaxed">😌 Soepel (60 m)</span></span></label>
+      <label class="settings-check" style="margin-top:10px;"><input type="checkbox" id="settingAutoReroute"> <span><span data-i18n="settingsAutoReroute">🔄 Automatisch herberekenen zodra ik afwijk</span></span></label>
+      <div class="settings-subnote"><span data-i18n="settingsAutoRerouteSub">Zonder deze optie krijg je enkel de waarschuwing, en moet je zelf op "Weg hier afgesloten — herbereken" drukken.</span></div>
+      <label class="settings-check" style="margin-top:10px;"><input type="checkbox" id="settingSilentReroute"> <span><span data-i18n="settingsSilentReroute">🤫 Stil herberekenen (geen melding, trilling of banner)</span></span></label>
+      <div class="settings-subnote"><span data-i18n="settingsSilentRerouteSub">Werkt enkel samen met "Automatisch herberekenen" hierboven — de route past zich dan gewoon live aan zonder dat je er iets van merkt.</span></div>
+    </div>
+
+    <div class="settings-section">
       <h4 data-i18n="settingsFuelHeading">Eet- &amp; drinkherinneringen</h4>
       <p class="settings-note" data-i18n="settingsFuelNote">Herinnert je tijdens navigatie om op tijd te eten/drinken — elk apart in/uit te schakelen, met eigen interval.</p>
       <label class="settings-check"><input type="checkbox" id="settingDrinkReminder"> <span data-i18n="settingsDrinkReminderLabel">💧 Drink-herinnering</span></label>
@@ -2501,9 +2532,9 @@
     <details class="settings-accordion"><summary><span class="settings-summary-row"><span data-i18n="settingsGroupPersonal">👤 Persoonlijk</span><span class="settings-scope-tag" data-i18n="scopeAll"></span></span></summary>
     <div class="settings-section">
       <p class="settings-note">Alles hieronder blijft uitsluitend op je eigen toestel (in de opslag van je browser) — er wordt niets naar een server verstuurd, met niemand gedeeld, en je kan het op elk moment hier weer wissen of aanpassen.</p>
-      <h4 style="margin-top:10px;">Naam</h4>
-      <p class="settings-note">Enkel om je persoonlijk aan te spreken in de app.</p>
-      <input type="text" id="settingUserName" placeholder="Je voornaam…" class="settings-text-input" maxlength="30">
+      <h4 style="margin-top:10px;" data-i18n="settingsNameHeading">Naam</h4>
+      <p class="settings-note" data-i18n="settingsNameNote">Enkel om je persoonlijk aan te spreken in de app.</p>
+      <input type="text" id="settingUserName" placeholder="Je voornaam…" data-i18n-placeholder="settingsNamePlaceholder" class="settings-text-input" maxlength="30">
 
       <h4 style="margin-top:16px;" data-i18n="settingsWeightHeading">Lichaamsgewicht</h4>
       <p class="settings-note" data-i18n="settingsWeightNote">Optioneel — enkel gebruikt voor de ruwe calorie-schatting bij je rit-statistieken.</p>
@@ -2643,18 +2674,6 @@
       <label class="settings-radio"><input type="radio" name="dashTextSize" value="small"> <span><span data-i18n="settingsTextSmaller">🔎 Kleiner (handig op kleinere schermen)</span></span></label>
       <label class="settings-check" style="margin-top:6px;"><input type="checkbox" id="settingDashBold" checked> <span><span data-i18n="settingsBold">🅱️ Vetgedrukt</span></span></label>
       <label class="settings-check" style="margin-top:10px;"><input type="checkbox" id="settingLargeNodes"> <span data-i18n="settingsLargeNodes">🔍 Grotere knopen en cijfers op de kaart (slechtziend-vriendelijk)</span></label>
-    </div>
-
-    <div class="settings-section">
-      <h4><span data-i18n="settingsRouteDeviation">Afwijking van route</span></h4>
-      <p class="settings-note"><span data-i18n="settingsDeviationNote">Hoe ver je van de route mag afwijken vóór de waarschuwing verschijnt.</span></p>
-      <label class="settings-radio"><input type="radio" name="offRouteDist" value="20"> <span><span data-i18n="settingsDevSensitive">🎯 Gevoelig (20 m)</span></span></label>
-      <label class="settings-radio"><input type="radio" name="offRouteDist" value="35" checked> <span><span data-i18n="settingsDevNormal">⚖️ Normaal (35 m)</span></span></label>
-      <label class="settings-radio"><input type="radio" name="offRouteDist" value="60"> <span><span data-i18n="settingsDevRelaxed">😌 Soepel (60 m)</span></span></label>
-      <label class="settings-check" style="margin-top:10px;"><input type="checkbox" id="settingAutoReroute"> <span><span data-i18n="settingsAutoReroute">🔄 Automatisch herberekenen zodra ik afwijk</span></span></label>
-      <div class="settings-subnote"><span data-i18n="settingsAutoRerouteSub">Zonder deze optie krijg je enkel de waarschuwing, en moet je zelf op "Weg hier afgesloten — herbereken" drukken.</span></div>
-      <label class="settings-check" style="margin-top:10px;"><input type="checkbox" id="settingSilentReroute"> <span><span data-i18n="settingsSilentReroute">🤫 Stil herberekenen (geen melding, trilling of banner)</span></span></label>
-      <div class="settings-subnote"><span data-i18n="settingsSilentRerouteSub">Werkt enkel samen met "Automatisch herberekenen" hierboven — de route past zich dan gewoon live aan zonder dat je er iets van merkt.</span></div>
     </div>
 
     </details>
@@ -4671,9 +4690,10 @@ const PROVINCE_BOUNDS = {
 };
 
 async function downloadRegionOffline(){
-  const wantsLimburg = confirm(curLang()==='en'
+  const wantsLimburg = await customConfirm(curLang()==='en'
     ? 'Download all of Limburg offline?\n\nOK = the entire province of Limburg (takes a few minutes, do this on wifi)\nCancel = just the current map area (~15×15km, faster)'
-    : 'Heel Limburg offline downloaden?\n\nOK = volledige provincie Limburg (duurt enkele minuten, doe dit op wifi)\nAnnuleren = alleen het huidige kaartgebied (~15×15km, sneller)');
+    : 'Heel Limburg offline downloaden?\n\nOK = volledige provincie Limburg (duurt enkele minuten, doe dit op wifi)\nAnnuleren = alleen het huidige kaartgebied (~15×15km, sneller)',
+    { okText: curLang()==='en' ? 'All of Limburg' : 'Heel Limburg', cancelText: curLang()==='en' ? 'Current area' : 'Huidig gebied' });
   const bounds = wantsLimburg
     ? L.latLngBounds(PROVINCE_BOUNDS['Limburg'])
     : (() => { const c = map.getCenter(); const half = 0.15; return L.latLngBounds([c.lat-half, c.lng-half], [c.lat+half, c.lng+half]); })();
@@ -4856,10 +4876,10 @@ $('fileInput').addEventListener('change', async (e) => {
   e.target.value = '';
 });
 // ---------- Export: schrijf jouw samengestelde route naar een downloadbaar JSON-bestand ----------
-$('exportBtn').addEventListener('click', () => {
+$('exportBtn').addEventListener('click', async () => {
   if (route.length > 0){
     const namePrompt = curLang()==='en' ? 'Name for this route (optional)' : 'Naam voor deze route (optioneel)';
-    const rawName = prompt(namePrompt, '');
+    const rawName = await customPrompt(namePrompt, '');
     if (rawName === null) return; // geannuleerd — niets opslaan
     const routeName = rawName.trim();
     const points = route.map(r => ({ id:r.id, ref:r.ref, lat:r.lat, lon:r.lon, isVia: r.isVia || undefined }));
@@ -5143,6 +5163,66 @@ document.querySelectorAll('.simple-modal').forEach(modal => {
     closeModal(modal.id);
   });
 });
+
+// ---------- Mooie confirm()/prompt()/alert() vervanging — gebruikt overal in de hoofdpagina i.p.v. de
+// lelijke, niet-stijlbare browser-eigen dialogen. customConfirm()/customPrompt()/customAlert() geven een
+// Promise terug, exact zoals je confirm()/prompt() als synchrone waarde zou verwachten (dus: await ervoor
+// zetten). De modal zelf hergebruikt .simple-modal, en erft zo automatisch de Standaard- en Garmin-thema
+// kleuren mee zonder aparte styling nodig te hebben.
+let _ccResolve = null;
+let _ccIsPrompt = false;
+function _ccFinish(confirmed){
+  closeModal('customConfirmModal');
+  if (_ccResolve){
+    const result = _ccIsPrompt ? (confirmed ? $('customConfirmInput').value : null) : confirmed;
+    const resolve = _ccResolve;
+    _ccResolve = null;
+    resolve(result);
+  }
+}
+$('customConfirmCancelBtn').addEventListener('click', () => _ccFinish(false));
+$('customConfirmOkBtn').addEventListener('click', () => _ccFinish(true));
+$('customConfirmModal').addEventListener('click', (e) => { if (e.target === $('customConfirmModal')) _ccFinish(false); });
+$('customConfirmInput').addEventListener('keydown', (e) => { if (e.key === 'Enter'){ e.preventDefault(); _ccFinish(true); } });
+function customConfirm(message, opts){
+  opts = opts || {};
+  _ccIsPrompt = false;
+  $('customConfirmMessage').textContent = message;
+  $('customConfirmInputRow').style.display = 'none';
+  $('customConfirmCancelBtn').style.display = '';
+  $('customConfirmCancelBtn').textContent = opts.cancelText || (curLang()==='en' ? 'Cancel' : 'Annuleren');
+  $('customConfirmOkBtn').textContent = opts.okText || 'OK';
+  $('customConfirmOkBtn').style.background = opts.danger ? '#c0392b' : '';
+  openModal('customConfirmModal');
+  return new Promise((resolve) => { _ccResolve = resolve; });
+}
+function customPrompt(message, defaultValue, opts){
+  opts = opts || {};
+  _ccIsPrompt = true;
+  $('customConfirmMessage').textContent = message;
+  $('customConfirmInputRow').style.display = '';
+  const inp = $('customConfirmInput');
+  inp.value = defaultValue || '';
+  inp.placeholder = opts.placeholder || '';
+  $('customConfirmCancelBtn').style.display = '';
+  $('customConfirmCancelBtn').textContent = curLang()==='en' ? 'Cancel' : 'Annuleren';
+  $('customConfirmOkBtn').textContent = opts.okText || (curLang()==='en' ? 'Save' : 'Opslaan');
+  $('customConfirmOkBtn').style.background = '';
+  openModal('customConfirmModal');
+  setTimeout(() => { inp.focus(); inp.select(); }, 60);
+  return new Promise((resolve) => { _ccResolve = resolve; });
+}
+function customAlert(message, opts){
+  opts = opts || {};
+  _ccIsPrompt = false;
+  $('customConfirmMessage').textContent = message;
+  $('customConfirmInputRow').style.display = 'none';
+  $('customConfirmCancelBtn').style.display = 'none'; // een alert heeft maar 1 knop
+  $('customConfirmOkBtn').textContent = opts.okText || 'OK';
+  $('customConfirmOkBtn').style.background = '';
+  openModal('customConfirmModal');
+  return new Promise((resolve) => { _ccResolve = resolve; });
+}
 
 // ---------- Hardlopen: 5K-opbouwschema (loop/wandel-intervallen), voortgang, echte systeemstemmen ----------
 // ---------- Echt EVY 5K-opbouwschema (hardloop.net "Beginnen met hardlopen", 10 weken × 3 sessies/week) ----------
@@ -5624,7 +5704,7 @@ function navigateToPinpoint(lat, lon){
 async function saveCurrentPinAsPinpoint(){
   if (!pinLatLng) return;
   const defaultName = tr('pinpointNamePrompt');
-  const name = (prompt(defaultName, '') || '').trim();
+  const name = ((await customPrompt(defaultName, '')) || '').trim();
   if (!name) return;
   const pins = await getPinpoints();
   pins.push({ id:'pp-' + Date.now(), name, lat:pinLatLng.lat, lon:pinLatLng.lon });
@@ -5792,7 +5872,7 @@ $('logbookClearBtn').addEventListener('click', () => {
   storageSet('appEventLog', JSON.stringify(appEventLog));
   renderLogbook();
 });
-$('menuSettingsBtn').addEventListener('click', () => { closeActionMenu(); openModal('settingsModal'); runOfflineDiagnostics(); checkBatteryLevel(); $('settingsVersionFooter').textContent = APP_VERSION_TEXT; });
+$('menuSettingsBtn').addEventListener('click', () => { closeActionMenu(); if ($('settingUserName')) $('settingUserName').value = appSettings.userName || ''; openModal('settingsModal'); runOfflineDiagnostics(); checkBatteryLevel(); $('settingsVersionFooter').textContent = APP_VERSION_TEXT; });
 $('modeSelectSettingsBtn').addEventListener('click', () => { syncThemeSwitchRadios(); $('themeSwitchResetSection').classList.remove('hidden'); openModal('themeSwitchModal'); });
 $('openResetLoopBtn').addEventListener('click', () => { closeModal('themeSwitchModal'); openModal('resetLoopModal'); });
 $('openResetFietsWandelBtn').addEventListener('click', () => { closeModal('themeSwitchModal'); openModal('resetFietsWandelModal'); });
@@ -5803,7 +5883,7 @@ $('confirmResetLoopBtn').addEventListener('click', async () => {
   const doCustom = $('resetLoopCustomPlans').checked;
   const doHistory = $('resetLoopHistory').checked;
   if (!doAiCoach && !doEvy && !doCustom && !doHistory){ toast('Niets aangevinkt om te wissen.', 2000); return; }
-  if (!confirm('Zeker? Dit kan niet ongedaan gemaakt worden.')) return;
+  if (!(await customConfirm('Zeker? Dit kan niet ongedaan gemaakt worden.', { danger:true }))) return;
   if (doAiCoach){
     // Voortgang van alle 3 ingebouwde schema's wissen, plus van elk eigen schema (elk heeft z'n eigen sleutel).
     await storageSet(RUN_PROGRESS_KEY, JSON.stringify({ week:1, day:1, sessionsDone:0 }));
@@ -5825,7 +5905,7 @@ $('confirmResetFwBtn').addEventListener('click', async () => {
   const doMapPrefs = $('resetFwMapPrefs').checked;
   const doDash = $('resetFwDash').checked;
   if (!doBikeType && !doMapPrefs && !doDash){ toast('Niets aangevinkt om te wissen.', 2000); return; }
-  if (!confirm('Zeker? Dit kan niet ongedaan gemaakt worden.')) return;
+  if (!(await customConfirm('Zeker? Dit kan niet ongedaan gemaakt worden.', { danger:true }))) return;
   if (doBikeType) appSettings.bikeType = 'regular';
   if (doMapPrefs){
     appSettings.mapStyle = 'standard';
@@ -6216,6 +6296,9 @@ const TRANSLATIONS = {
   loopAdvancedOverlapSub: { nl:'Een voorstel dat voor meer dan dit percentage over hetzelfde tracé heen en terug loopt, telt niet meer als een "echte" lus/omweg en wordt apart gemarkeerd. Kleiner = strenger (meer kans op de ⚠️-melding "geen echte lus gevonden"), groter = soepeler.', en:'A suggestion that runs back and forth over the same path for more than this percentage no longer counts as a "real" loop/detour and gets flagged separately. Smaller = stricter (more chance of the ⚠️ "no real loop found" message), larger = more lenient.' },
   loopAdvancedResetBtn: { nl:'↺ Terug naar standaardwaarden (18 m / 8%)', en:'↺ Reset to defaults (18 m / 8%)' },
   settingsCompassHeading: { nl:'Kompas-kalibratie', en:'Compass calibration' },
+  settingsNameHeading: { nl:'Naam', en:'Name' },
+  settingsNameNote: { nl:'Enkel om je persoonlijk aan te spreken in de app.', en:'Only used to address you personally in the app.' },
+  settingsNamePlaceholder: { nl:'Je voornaam…', en:'Your first name…' },
   settingsWeightHeading: { nl:'Lichaamsgewicht', en:'Body weight' },
   settingsWeightNote: { nl:'Optioneel — enkel gebruikt voor de ruwe calorie-schatting bij je rit-statistieken.', en:'Optional — only used for the rough calorie estimate in your ride statistics.' },
   settingsApkHeading: { nl:'Positionering', en:'Positioning' },
@@ -8240,16 +8323,16 @@ document.querySelectorAll('.rc-dist-btn').forEach(btn => {
 $('rcEvyStart5Std').addEventListener('click', () => startRunSession({ mode:'evy', targetKm:5, evyDist:5 }));
 $('rcEvyStart10Std').addEventListener('click', () => startRunSession({ mode:'evy', targetKm:10, evyDist:10 }));
 $('rcEvyReset5Std').addEventListener('click', async () => {
-  if (confirm('De 5K-reeks terugzetten naar Week 1 · Sessie 1?')){ await resetEvyProgress(5); await renderEvyProgressStd(); }
+  if (await customConfirm('De 5K-reeks terugzetten naar Week 1 · Sessie 1?')){ await resetEvyProgress(5); await renderEvyProgressStd(); }
 });
 $('rcEvyReset10Std').addEventListener('click', async () => {
-  if (confirm('De 10K-reeks terugzetten naar Week 1 · Sessie 1?')){ await resetEvyProgress(10); await renderEvyProgressStd(); }
+  if (await customConfirm('De 10K-reeks terugzetten naar Week 1 · Sessie 1?')){ await resetEvyProgress(10); await renderEvyProgressStd(); }
 });
 document.querySelectorAll('.rcEvyMarkDoneStd').forEach(el => {
   el.addEventListener('click', async (e) => {
     e.stopPropagation(); // anders start het klikken hier ook meteen een nieuwe sessie (zit binnen dezelfde knop)
     const dist = Number(el.dataset.dist);
-    if (confirm((curLang()==='en' ? `Mark this session (${dist} km) as already done and advance to the next?` : `Deze sessie (${dist} km) markeren als al gedaan en doorschuiven naar de volgende?`))){
+    if (await customConfirm((curLang()==='en' ? `Mark this session (${dist} km) as already done and advance to the next?` : `Deze sessie (${dist} km) markeren als al gedaan en doorschuiven naar de volgende?`))){
       await advanceEvyProgress(dist);
       await renderEvyProgressStd();
     }
@@ -8368,7 +8451,7 @@ async function renderRunSchemaPanel(){
     card.addEventListener('click', async () => {
       const week = parseInt(card.dataset.week, 10);
       if (week === p.week) return;
-      if (confirm(`Naar week ${week} springen?`)){ await jumpToRunWeek(week); await renderRunCoachScreen(); await renderRunSchemaPanel(); }
+      if (await customConfirm(`Naar week ${week} springen?`)){ await jumpToRunWeek(week); await renderRunCoachScreen(); await renderRunSchemaPanel(); }
     });
   });
 }
@@ -8904,7 +8987,16 @@ function renderRunProgressRail(){
   const evyList = rsState.evyIntervals;
   const usingEvy = !!evyList;
   const list = usingEvy ? evyList : rsState.intervals;
-  if (rsState.freeform || usingEvy || !list || list.length > 40){
+  if (rsState.freeform){
+    // Vrije Run / 5K- en 10K-Target Run: geen rail én geen km-tempo-sparkline. Bij deze vrije vormen is
+    // die kolom vaak leeg (nog geen volledige km gelopen) en dus verwarrend — hoofdinhoud krijgt hier de
+    // volledige breedte. AI Coach-schema's en EVY behouden hun eigen zij-kolom hieronder, onveranderd.
+    rail.style.display = 'none';
+    document.body.classList.add('rs-rail-hidden');
+    $('rsKmSparkline').style.display = 'none';
+    return;
+  }
+  if (usingEvy || !list || list.length > 40){
     rail.style.display = 'none';
     document.body.classList.add('rs-rail-hidden'); // geen rail: hoofdinhoud mag de volledige breedte gebruiken
     $('rsKmSparkline').style.display = 'flex'; // toont in plaats daarvan de km-tempo-sparkline
@@ -9893,7 +9985,7 @@ ${GARMIN_MENU_BTN_JS}
       });
     });
     document.querySelectorAll('.stub-tile').forEach(tile => {
-      tile.addEventListener('click', () => alert('Deze functie is nog in opbouw.'));
+      tile.addEventListener('click', () => customAlert(curLang()==='en' ? 'This feature is still being built.' : 'Deze functie is nog in opbouw.'));
     });
     const floraScannerInput = document.getElementById('floraScannerInput');
     if (floraScannerInput){
@@ -11130,6 +11222,15 @@ function buildGarminRunCoachHtml(){
 <style>${TAILWIND_CARD_BG}</style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen">
+<div id="rcConfirmModal" class="fixed inset-0 z-[999] hidden items-center justify-center p-6" style="background:rgba(0,0,0,0.6);">
+  <div class="w-full max-w-sm rounded-3xl p-6" style="background:#0f172a; border:1px solid rgba(226,161,60,0.35);">
+    <p id="rcConfirmMessage" class="text-sm text-slate-200 mb-5" style="white-space:pre-line;"></p>
+    <div class="flex gap-3">
+      <button id="rcConfirmCancelBtn" class="flex-1 rounded-xl py-3 font-bold text-sm" style="background:rgba(255,255,255,0.08); color:#f1f5f9;">Annuleren</button>
+      <button id="rcConfirmOkBtn" class="flex-1 rounded-xl py-3 font-bold text-sm" style="background:#f59e0b; color:#0f172a;">OK</button>
+    </div>
+  </div>
+</div>
   <div class="w-full min-h-screen p-5 pb-24 flex flex-col">
 
     <div class="flex justify-between items-start mb-5">
@@ -11488,6 +11589,25 @@ function buildGarminRunCoachHtml(){
 
   <script>
 ${GARMIN_MENU_BTN_JS}
+    var _rcConfirmResolve = null;
+    function _rcConfirmFinish(v){
+      var m = document.getElementById('rcConfirmModal');
+      m.classList.add('hidden'); m.classList.remove('flex');
+      if (_rcConfirmResolve){ var r = _rcConfirmResolve; _rcConfirmResolve = null; r(v); }
+    }
+    document.getElementById('rcConfirmCancelBtn').addEventListener('click', function(){ _rcConfirmFinish(false); });
+    document.getElementById('rcConfirmOkBtn').addEventListener('click', function(){ _rcConfirmFinish(true); });
+    document.getElementById('rcConfirmModal').addEventListener('click', function(e){ if (e.target.id === 'rcConfirmModal') _rcConfirmFinish(false); });
+    function rcConfirm(message, opts){
+      opts = opts || {};
+      document.getElementById('rcConfirmMessage').textContent = message;
+      document.getElementById('rcConfirmCancelBtn').textContent = opts.cancelText || 'Annuleren';
+      document.getElementById('rcConfirmOkBtn').textContent = opts.okText || 'OK';
+      document.getElementById('rcConfirmOkBtn').style.background = opts.danger ? '#ef4444' : '#f59e0b';
+      var m = document.getElementById('rcConfirmModal');
+      m.classList.remove('hidden'); m.classList.add('flex');
+      return new Promise(function(resolve){ _rcConfirmResolve = resolve; });
+    }
     document.getElementById('rcBackBtn').addEventListener('click', () => parent.postMessage({ source:'garminRunCoach', action:'back' }, '*'));
     document.getElementById('rcSettingsHeaderBtn').addEventListener('click', () => parent.postMessage({ source:'garminRunCoach', action:'opensettings' }, '*'));
     document.getElementById('rcAudioHeaderBtn').addEventListener('click', () => {
@@ -11685,17 +11805,17 @@ ${GARMIN_MENU_BTN_JS}
     document.getElementById('rcEvyStart10').addEventListener('click', () => {
       parent.postMessage({ source:'garminRunCoach', action:'starttraining', mode:'evy', evyDist:10 }, '*');
     });
-    document.getElementById('rcEvyReset5').addEventListener('click', () => {
-      if (confirm('De 5K-reeks terugzetten naar Week 1 · Sessie 1?')) parent.postMessage({ source:'garminRunCoach', action:'resetevy', evyDist:5 }, '*');
+    document.getElementById('rcEvyReset5').addEventListener('click', async () => {
+      if (await rcConfirm('De 5K-reeks terugzetten naar Week 1 · Sessie 1?')) parent.postMessage({ source:'garminRunCoach', action:'resetevy', evyDist:5 }, '*');
     });
-    document.getElementById('rcEvyReset10').addEventListener('click', () => {
-      if (confirm('De 10K-reeks terugzetten naar Week 1 · Sessie 1?')) parent.postMessage({ source:'garminRunCoach', action:'resetevy', evyDist:10 }, '*');
+    document.getElementById('rcEvyReset10').addEventListener('click', async () => {
+      if (await rcConfirm('De 10K-reeks terugzetten naar Week 1 · Sessie 1?')) parent.postMessage({ source:'garminRunCoach', action:'resetevy', evyDist:10 }, '*');
     });
     document.querySelectorAll('.rcEvyMarkDone').forEach(el => {
-      el.addEventListener('click', (e) => {
+      el.addEventListener('click', async (e) => {
         e.stopPropagation(); // anders start het klikken hier ook meteen een nieuwe sessie (zit binnen dezelfde knop)
         const dist = Number(el.dataset.dist);
-        if (confirm('Deze sessie (' + dist + ' km) markeren als al gedaan en doorschuiven naar de volgende?')){
+        if (await rcConfirm('Deze sessie (' + dist + ' km) markeren als al gedaan en doorschuiven naar de volgende?')){
           parent.postMessage({ source:'garminRunCoach', action:'advanceevy', evyDist:dist }, '*');
         }
       });
@@ -11737,10 +11857,10 @@ ${GARMIN_MENU_BTN_JS}
         document.getElementById('rcWeeksSwiper').innerHTML = cardsHtml;
         document.getElementById('rcSchemaSwiper').innerHTML = cardsHtml;
         document.querySelectorAll('.week-jump-card').forEach(card => {
-          card.addEventListener('click', () => {
+          card.addEventListener('click', async () => {
             const wk = parseInt(card.dataset.week);
             if (wk === d.week) return; // al actief, niets te doen
-            if (confirm('Wil je je voortgang verzetten naar Week ' + wk + ' · Dag 1? Je huidige plek (Week ' + d.week + ') gaat dan verloren.')){
+            if (await rcConfirm('Wil je je voortgang verzetten naar Week ' + wk + ' · Dag 1? Je huidige plek (Week ' + d.week + ') gaat dan verloren.', { danger:true })){
               parent.postMessage({ source:'garminRunCoach', action:'setweek', week: wk }, '*');
             }
           });
@@ -12371,6 +12491,10 @@ $('welcomeNameSaveBtn').addEventListener('click', () => {
   const name = $('welcomeNameInput').value.trim();
   appSettings.userName = name || (curLang()==='en' ? 'there' : 'daar'); // lege naam toch opslaan zodat de vraag niet blijft terugkomen
   saveSettings();
+  // Het instellingenpaneel z'n "Naam"-veld wordt normaal enkel bij de allereerste keer opstarten gevuld
+  // (in loadSettings()) — zonder deze regel toont Instellingen > Persoonlijk dus een leeg naamveld totdat
+  // je de pagina herlaadt, ook al is de naam zelf gewoon correct opgeslagen.
+  if ($('settingUserName')) $('settingUserName').value = appSettings.userName;
   closeModal('welcomeNameModal');
 });
 handleSpotifyCallbackIfPresent();
@@ -12931,13 +13055,13 @@ function onViaDragEnd(){
   toast(curLang()==='en' ? 'Via point added — route now passes through here' : 'Tussenpunt toegevoegd — route loopt nu hierlangs', 3000);
 }
 // ---------- Route afknippen: een tik (geen sleep) op de lijn biedt aan om alles na dat punt te schrappen ----------
-function offerCutRouteHere(cutIndex){
+async function offerCutRouteHere(cutIndex){
   if (cutIndex >= route.length) return; // dit was al het allerlaatste punt, niets om af te knippen
   const removedCount = route.length - cutIndex;
   const msg = curLang()==='en'
     ? `Cut the route off here? This removes the last ${removedCount} point(s) (the "tail" beyond this spot).`
     : `Route vanaf hier afknippen? Dit verwijdert de laatste ${removedCount} punt(en) (het "staartje" voorbij dit punt).`;
-  if (!confirm(msg)) return;
+  if (!(await customConfirm(msg, { danger:true }))) return;
   const removedIds = route.slice(cutIndex).map(r => r.id);
   route.length = cutIndex;
   removedIds.forEach(id => {
@@ -15055,7 +15179,7 @@ function loadSharedRouteFromData(data){
 $('shareRouteLinkBtn').addEventListener('click', async () => {
   if (!route.length){ toast(tr('toastAssembleRouteFirst')); return; }
   const namePrompt = curLang()==='en' ? 'Name for this route (optional)' : 'Naam voor deze route (optioneel)';
-  const rawName = prompt(namePrompt, '');
+  const rawName = await customPrompt(namePrompt, '');
   if (rawName === null) return; // geannuleerd — niets delen
   const routeName = rawName.trim();
   const payload = { mode: appMode, name: routeName || null, points: route.map(r => ({ ref:r.ref, lat:r.lat, lon:r.lon, isVia: r.isVia || undefined })) };
@@ -16087,7 +16211,7 @@ async function saveLoopGenResult(i){
   const r = loopGenResults[i];
   if (!r) return;
   const namePrompt = curLang()==='en' ? 'Name for this route (optional)' : 'Naam voor deze route (optioneel)';
-  const rawName = prompt(namePrompt, '');
+  const rawName = await customPrompt(namePrompt, '');
   if (rawName === null) return; // geannuleerd — niets bewaren
   const routeName = rawName.trim();
   let pointsToSave = r.points;
@@ -19822,10 +19946,13 @@ $('modeCompassBtn').addEventListener('click', () => {
 // geblokkeerd tijdens een actieve navigatiesessie, zodat je die niet per ongeluk verlaat.
 $('mapBackToHubBtn').addEventListener('click', () => {
   if (navActive){ toast(curLang()==='en' ? 'Stop the current session first.' : 'Stop eerst de huidige sessie.', 3000); return; }
+  appMode = null; // anders denkt de app na terugkeer nog steeds "in" fietsen/wandelen te zitten — dat hield o.a.
+  // een stijlwissel (Standaard/Tailwind) tegen om het keuzescherm te verversen zolang je niet ook nog eens naar
+  // een ander scherm en terug navigeerde, wat leek op een kapot/overlappend scherm.
   showHubScreen();
 });
-$('sunPanelBackBtn').addEventListener('click', () => showHubScreen());
-$('weatherPanelBackBtn').addEventListener('click', () => showHubScreen());
+$('sunPanelBackBtn').addEventListener('click', () => { appMode = null; showHubScreen(); });
+$('weatherPanelBackBtn').addEventListener('click', () => { appMode = null; showHubScreen(); });
 
 // Service worker voor offline-gebruik (kaarttegels + de app zelf). Werkt enkel op https:// of localhost —
 // faalt stil binnen claude.ai's voorvertoning of bij een lokaal geopend bestand, zonder de rest te breken.
