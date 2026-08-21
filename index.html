@@ -16,6 +16,14 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
+  /* ================================================================================
+     Eén groot stijlblad voor beide thema's: Standaard-stijl (crème/groen) hieronder als basis,
+     Garmin/Tailwind-stijl (donker) als overrides verderop via body.theme-garmin-selectors.
+     Grote herkenbare stukken: topbar/zoekbalk, kaart/kompas/zon, bottom sheet, navigatiepaneel,
+     startscherm-tegels, hardloopscherm (rail/sparkline), Zombie Run, modals/instellingen.
+     ================================================================================ */
+  :root{
+<style>
   :root{
     --extra-top-inset:0px; /* extra ruimte bovenaan voor APK-wrappers die env(safe-area-inset-top) niet ondersteunen — zie de instelling "Extra ruimte bovenaan" */
     --extra-bottom-inset:0px; /* idem, maar onderaan (momenteel ongebruikt, klaar voor later) */
@@ -749,6 +757,9 @@
   /* Startscherm: honingraat-tegels fiets/wandel */
   /* Dissolve-overgang bij het wisselen van stijl: een volschermige laag die eerst ondoorzichtig wordt
      (huidige stijl verdwijnt), dan — ná de omwisseling zelf — weer wegvloeit (nieuwe stijl verschijnt). */
+  /* ---------- Garmin/Tailwind-stijl: dissolve-overgang + de kleur-/vorm-overrides hieronder (vanaf hier
+     tot het einde van deze <style>) passen enkel toe zolang body.theme-garmin actief is — de Standaard-
+     stijl hierboven blijft ongewijzigd de basis. ---------- */
   #themeDissolveOverlay{
     position:fixed; top:0; left:0; right:0; bottom:0; z-index:9999; background:#050914;
     opacity:0; pointer-events:none; transition:opacity 0.95s ease;
@@ -989,7 +1000,7 @@
     position:fixed; right:12px;
     top:calc(14px + env(safe-area-inset-top,0px) + var(--extra-top-inset));
     bottom:calc(20px + env(safe-area-inset-bottom,0px) + var(--extra-bottom-inset));
-    width:36px; z-index:20; display:none; flex-direction:column; align-items:center; gap:7px;
+    width:36px; z-index:20; display:none; flex-direction:column; align-items:center; justify-content:space-between; gap:7px;
     overflow-y:auto; padding:4px 0; scrollbar-width:none;
   }
   #rsKmSparkline::-webkit-scrollbar{ display:none; }
@@ -1002,12 +1013,19 @@
      vervangen door een echt gekleurd staafje zodra die kilometer voltooid is. */
   .rs-km-bar-ghost{
     width:32px; height:32px; border-radius:11px; flex-shrink:0; box-sizing:border-box; display:flex;
-    align-items:center; justify-content:center; font-size:11px; font-weight:900;
+    align-items:center; justify-content:center; font-size:11px; font-weight:900; position:relative; overflow:hidden;
     border:1.5px dashed rgba(15,61,41,0.25); color:rgba(15,61,41,0.35); background:rgba(15,61,41,0.045);
   }
   body.theme-garmin .rs-km-bar-ghost{
     border-color:rgba(255,255,255,0.22); color:rgba(255,255,255,0.32); background:rgba(255,255,255,0.05);
   }
+  /* Vult het vage kadertje van de kilometer die je NU aan het lopen bent geleidelijk van onder naar boven op
+     (elke GPS-update, dus in de praktijk zo'n beetje per 50-100m), in de kleur van je huidige tempo — zo zie
+     je ook binnen die kilometer al voortgang i.p.v. pas een sprong zodra de volle km voltooid is. */
+  .rs-km-bar-fill{
+    position:absolute; left:0; right:0; bottom:0; height:0%; transition:height 0.4s ease, background 0.4s ease;
+  }
+  .rs-km-bar-ghost .rs-km-bar-num{ position:relative; z-index:1; }
   .rs-rail-item{
     width:40px; min-height:40px; border-radius:14px; display:flex; flex-direction:column; align-items:center; justify-content:center;
     flex-shrink:0; opacity:0.75; transition:all 0.2s; padding:5px 2px; gap:1px;
@@ -1408,7 +1426,12 @@
   body.theme-garmin .settings-check-label{ color:#f1f5f9; }
   body.theme-garmin .settings-note{ color:rgba(241,245,249,0.55); }
   body.theme-garmin .loopgen-biketype-opt, body.theme-garmin .pin-biketype-opt{ background:rgba(255,255,255,0.06); border-color:rgba(255,255,255,0.12); color:#f1f5f9; }
-  body.theme-garmin .loopgen-biketype-opt.active, body.theme-garmin .pin-biketype-opt.active{ color:#fff; }
+  /* De .active (geselecteerd) toestand had hier voorheen enkel een net-niet-waarneembaar tekstkleurverschil
+     (#fff t.o.v. #f1f5f9) — geen rand/achtergrond-verschil zoals in de Standaard-stijl — waardoor je fietstype
+     wél degelijk geselecteerd werd (de klik-logica werkte prima), maar dat gewoon niet te zíen was. */
+  body.theme-garmin .loopgen-biketype-opt.active, body.theme-garmin .pin-biketype-opt.active{
+    border-color:var(--amber); background:rgba(226,161,60,0.18); color:#fff;
+  }
   body.theme-garmin .loopgen-save-btn{ background:rgba(255,255,255,0.1); color:#f1f5f9; }
   body.theme-garmin .glass-card{
     background:linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
@@ -1614,6 +1637,7 @@
 
 <div id="themeDissolveOverlay"></div>
 
+<!-- ---------- Welkomstscherm (eerste bezoek): vraagt enkel je voornaam ---------- -->
 <div id="welcomeNameModal" class="simple-modal">
   <div class="simple-modal-card" style="max-width:320px; text-align:center;">
     <div class="simple-modal-head" style="justify-content:center;"><b data-i18n="welcomeTitle">👋 Welkom!</b></div>
@@ -1637,6 +1661,9 @@
   </div>
 </div>
 
+<!-- ---------- Startscherm (hub): Fiets/Wandel/Kompas/Weer-tegels. Standaard-stijl hieronder in gewone
+     HTML; de Garmin/Tailwind-stijl-versies van dezelfde schermen (hub/kompas/weer/setup/runcoach)
+     staan verderop als lege <iframe>'s, pas gevuld door de builder-functies in het hoofdscript. ---------- -->
 <div id="modeSelectScreen">
   <button id="modeSelectSettingsBtn" aria-label="Instellingen"><span class="waffle-grid"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></button>
   <div id="modeSelectTitle" data-i18n="modeSelectTitle">Waar ga je vandaag voor?</div>
@@ -1897,6 +1924,8 @@
   </div>
 </div>
 
+<!-- ---------- Kleine hulp-modals: route via link, wiki-info bij een knooppunt, sessie stoppen bevestigen,
+     stijl wisselen (Standaard/Garmin) ---------- -->
 <div id="urlImportModal" class="simple-modal">
   <div class="simple-modal-card">
     <div class="simple-modal-head"><b>🔗 <span data-i18n="menuUrlImport">Route via link</span></b><button class="simple-modal-close" data-close="urlImportModal">✕</button></div>
@@ -1948,6 +1977,7 @@
   </div>
 </div>
 
+<!-- ---------- Strava-koppeling & Zombie Run: instelscherm en de "grafsteen" game-over-modal ---------- -->
 <div id="rideStravaModal" class="simple-modal">
   <div class="simple-modal-card" style="max-width:320px; text-align:center;">
     <div class="simple-modal-head"><b data-i18n="rsTitle">🟠 Naar Strava?</b><button class="simple-modal-close" data-close="rideStravaModal">✕</button></div>
@@ -2055,6 +2085,8 @@
   </div>
 </div>
 
+<!-- ---------- Spotify-status, sessie-feedback achteraf, en de reset-modals (rondrit-generator /
+     fiets&wandel-instellingen) ---------- -->
 <div id="spotifyModal" class="simple-modal">
   <div class="simple-modal-card" style="max-width:320px; text-align:center;">
     <div class="simple-modal-head"><b>🎧 Spotify</b><button class="simple-modal-close" data-close="spotifyModal">✕</button></div>
@@ -2150,6 +2182,7 @@
   </div>
 </div>
 
+<!-- ---------- Opgeslagen links, pinpoints, geplande routes & rit-geschiedenis ---------- -->
 <div id="savedLinksModal" class="simple-modal">
   <div class="simple-modal-card">
     <div class="simple-modal-head"><b>📚 <span data-i18n="menuSavedLinks">Mijn opgeslagen links</span></b><button class="simple-modal-close" data-close="savedLinksModal">✕</button></div>
@@ -2182,6 +2215,7 @@
   </div>
 </div>
 
+<!-- ---------- 🎲 Rondrit-generator-modal (3 lus-voorstellen rond een punt) ---------- -->
 <div id="loopGenModal" class="simple-modal">
   <div class="simple-modal-card">
     <div class="simple-modal-head"><b data-i18n="loopGenTitle">🎲 Rondrit-generator</b><button class="simple-modal-close" data-close="loopGenModal">✕</button></div>
@@ -2229,6 +2263,8 @@
   </div>
 </div>
 
+<!-- ---------- Navigatie-hulp-modals: knooppunten-invoer, omweg, pauze zoeken, vertrekrichting,
+     terugkeer-optie, GPX-richting ---------- -->
 <div id="nodeListModal" class="simple-modal">
   <div class="simple-modal-card">
     <div class="simple-modal-head"><b>🔢 Knooppunten-invoer</b><button class="simple-modal-close" data-close="nodeListModal">✕</button></div>
@@ -2329,6 +2365,9 @@
   </div>
 </div>
 
+<!-- ---------- ⚙️ Instellingen-paneel: alle instellingen-groepen (uitklapbare <details>-accordions),
+     elk met een eigen data-i18n-titel + scope-label (bv. "🧭 Onderweg & navigatie", "📊 Dashboard").
+     Zoek op de emoji of Nederlandse groepsnaam om een specifieke groep snel terug te vinden. ---------- -->
 <div id="settingsModal" class="simple-modal">
   <div class="simple-modal-card">
     <div class="simple-modal-head"><b>⚙️ <span data-i18n="menuSettings">Instellingen</span></b><button class="simple-modal-close" data-close="settingsModal">✕</button></div>
@@ -2794,6 +2833,7 @@
   </div>
 </div>
 
+<!-- ---------- Hulp-modal & technische ontwikkelaarsnotities ---------- -->
 <div id="helpModal" class="simple-modal">
   <div class="simple-modal-card" id="helpCard">
     <div class="simple-modal-head"><b id="helpTitle">❓ Hulp</b><button class="simple-modal-close" data-close="helpModal">✕</button></div>
@@ -2808,6 +2848,8 @@
   </div>
 </div>
 
+<!-- ---------- RunCoach-startscherm (Standaard-stijl): tabbladen Home/Sessie/Stats/Schema/Pijn-Tips —
+     de Garmin/Tailwind-tegenhanger hiervan zit in buildGarminRunCoachHtml() in het hoofdscript ---------- -->
 <div id="runCoachScreen" class="hidden">
   <button id="runCoachBackBtn" aria-label="Terug"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg></button>
   <button id="runCoachSettingsBtn" title="Instellingen" data-i18n-title="titleMoreOptions" aria-label="Instellingen" style="position:absolute; top:16px; right:104px; z-index:10; width:38px; height:38px; border-radius:50%; border:1.5px solid rgba(226,161,60,0.4); background:rgba(0,0,0,0.25); display:flex; align-items:center; justify-content:center;">
@@ -3032,6 +3074,8 @@
 <audio id="zombieMusicPlayer" preload="auto" loop></audio>
 <audio id="zombieEffectsPlayer" preload="auto"></audio>
 
+<!-- ---------- Live trainingssessie-scherm: timer, mini-kaart, intervalrail/km-tempo-sparkline,
+     bedieningsknoppen (pauze/split/stop) ---------- -->
 <div id="runSessionScreen" class="hidden">
   <button id="rsMinimizeBtn" aria-label="Minimaliseren" data-i18n-aria="rsMinimizeAria" title="Naar andere tabbladen — de sessie blijft gewoon lopen" data-i18n-title="rsMinimizeTitle">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
@@ -3080,6 +3124,7 @@
   </div>
 </div>
 
+<!-- ---------- Bike Routing Pro: analysescherm ná de rit (tempo-segmenten op de kaart) ---------- -->
 <div id="analyseScreen" class="hidden">
   <div id="analyseHeader">
     <button id="analyseCloseBtn" aria-label="Sluiten">✕</button>
@@ -3106,6 +3151,7 @@
   </div>
 </div>
 
+<!-- ---------- Logboek-modal ---------- -->
 <div id="logbookModal" class="simple-modal">
   <div class="simple-modal-card" id="logbookCard">
     <div class="simple-modal-head"><b id="logbookTitle">📋 Logboek</b><button class="simple-modal-close" data-close="logbookModal">✕</button></div>
@@ -3130,6 +3176,7 @@
     </div>
   </div>
 </div>
+<!-- ---------- Navigatiepaneel: verschijnt onderin tijdens een actieve navigatiesessie ---------- -->
 <div id="navPanel">
   <div class="navTop">
     <div class="navSpeed"><span id="speedVal">0</span><small data-i18n="dashKmu">km/u</small></div>
@@ -3161,6 +3208,7 @@
 
 <div id="toast"></div>
 
+<!-- ---------- Dashboard-paneel: levenslange statistieken, zichtbaar wanneer er geen actieve route is ---------- -->
 <div id="dashboardPanel">
   <div id="dashTurnBanner">
     <svg id="dashTurnArrow" viewBox="0 0 24 24" fill="none"><path d="M12 2L4 21l8-5 8 5-8-19z" fill="#e2a13c" stroke="#0f3d29" stroke-width="1"/></svg>
@@ -3227,6 +3275,7 @@
   </div>
 </div>
 
+<!-- ---------- Kompas + Zon-paneel (Standaard-stijl) ---------- -->
 <div id="sunPanel">
   <button id="sunPanelBackBtn" aria-label="Terug" data-i18n-title="titleBackToHub" title="Terug naar start"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg></button>
   <div id="sunDialWrap">
@@ -3257,6 +3306,8 @@
   <div id="sunSub" data-i18n="compassSensorNote">Kompas gebruikt de magnetische sensor van je toestel — kan een beetje afwijken van echt noorden.</div>
 </div>
 
+<!-- ---------- Weer-paneel (Standaard-stijl): 4 swipe-schermen — huidig weer, uurlijkse tijdlijn,
+     neerslagradar, gauges/luchtkwaliteit/geschiktheid ---------- -->
 <div id="weatherPanel">
   <button id="weatherPanelBackBtn" aria-label="Terug" data-i18n-title="titleBackToHub" title="Terug naar start"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg></button>
   <div id="weatherLocationBar">
@@ -3426,6 +3477,8 @@
   <div id="weatherDots"><span class="wdot active"></span><span class="wdot"></span><span class="wdot"></span><span class="wdot"></span></div>
 </div>
 
+<!-- ---------- Kaartscherm-kern: bovenste tabbalk (Kaart/Dashboard/Kompas/Weer + locatie/noorden/Spotify)
+     en de onderste "sheet" met routelijst en actieknoppen (Wis/Vertrek/Hoogte/Omweg/Start) ---------- -->
 <div id="topBarRow">
   <button id="waffleBtn" type="button" title="Meer opties" data-i18n-title="titleMoreOptions" class="top-tile">
     <span class="waffle-grid"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span>
@@ -3463,6 +3516,7 @@
   </div>
 </div>
 
+<!-- ---------- Hoogteprofiel-modal ---------- -->
 <div id="elevationModal">
   <div id="elevationHeader">
     <div id="elevationLegend">
@@ -3483,6 +3537,13 @@
 </div>
 
 <script>
+// ================================================================================
+// Hoofdscript van de app. Begint met kaart-initialisatie en tegelbronnen hieronder; de rest van dit
+// bestand is opgedeeld in genummerde "// ---------- Naam-van-het-onderdeel ----------"-banners — zoek
+// gerust op zo'n banner-tekst om een feature snel terug te vinden. De grote Garmin/Tailwind-schermen
+// (Hub/Kompas/Weer/Setup/RunCoach) zijn losse builder-functies die een volledig HTML-document als
+// tekst teruggeven voor een <iframe srcdoc>, en communiceren enkel via postMessage met dit hoofdscript.
+// ================================================================================
 const map = L.map('map', { zoomControl:false, attributionControl:false }).setView([50.931, 5.338], 14); // Hasselt
 document.getElementById('zoomInBtn').addEventListener('click', () => map.zoomIn());
 document.getElementById('zoomOutBtn').addEventListener('click', () => map.zoomOut());
@@ -9001,9 +9062,30 @@ function initKmSparklinePlaceholders(totalKm){
     const ghost = document.createElement('div');
     ghost.className = 'rs-km-bar-ghost';
     ghost.dataset.kmSlot = i;
-    ghost.textContent = i;
+    const fill = document.createElement('div');
+    fill.className = 'rs-km-bar-fill';
+    const num = document.createElement('span');
+    num.className = 'rs-km-bar-num';
+    num.textContent = i;
+    ghost.appendChild(fill);
+    ghost.appendChild(num);
     wrap.appendChild(ghost);
   }
+}
+// Werkt het vage kadertje van de kilometer die nu bezig is bij, op basis van hoe ver je al in die km zit —
+// wordt bij elke GPS-update aangeroepen, dus vult zich in de praktijk stilletjes op (elke ~50-100m), i.p.v.
+// pas in één sprong bij de volle kilometer. Kleur volgt je huidige tempo, net als de routelijn op de kaart.
+function updateKmSparklineProgress(km, speedKmh){
+  const wrap = $('rsKmSparkline');
+  if (!wrap || wrap.style.display === 'none') return;
+  const currentSlot = Math.floor(km) + 1;
+  const ghost = wrap.querySelector(`.rs-km-bar-ghost[data-km-slot="${currentSlot}"]`);
+  if (!ghost) return;
+  const fill = ghost.querySelector('.rs-km-bar-fill');
+  if (!fill) return;
+  const fracPct = Math.max(0, Math.min(100, (km - Math.floor(km)) * 100));
+  fill.style.height = fracPct + '%';
+  fill.style.background = paceColorForSpeed(speedKmh || 0);
 }
 // Herbouwt de volledige sparkline in één keer (bv. na het minimaliseren/heropenen van het loopscherm).
 function renderKmSparklineFull(){
@@ -9016,12 +9098,16 @@ function renderRunProgressRail(){
   const rail = $('rsProgressRail');
   if (!rail) return;
   const evyList = rsState.evyIntervals;
-  const usingEvy = !!evyList;
+  // rsState.evyDist staat vanaf de allereerste render synchroon vast (rsState.evyIntervals komt pas later
+  // async binnen) — dat is de betrouwbare manier om EVY te herkennen, want startRunSession() zet voor EVY
+  // óók rsState.freeform=true (intervals is er net als bij Vrije Run één lang dummy-segment), dus enkel op
+  // "freeform" filteren zou EVY hier ten onrechte meenemen en de kolom voor EVY nooit tonen.
+  const usingEvy = !!evyList || !!rsState.evyDist;
   const list = usingEvy ? evyList : rsState.intervals;
-  if (rsState.freeform){
-    // Vrije Run / 5K- en 10K-Target Run: geen rail én geen km-tempo-sparkline. Bij deze vrije vormen is
-    // die kolom vaak leeg (nog geen volledige km gelopen) en dus verwarrend — hoofdinhoud krijgt hier de
-    // volledige breedte. AI Coach-schema's en EVY behouden hun eigen zij-kolom hieronder, onveranderd.
+  if (rsState.freeform && !usingEvy){
+    // Echte Vrije Run / 5K- en 10K-Target Run (geen EVY): geen rail én geen km-tempo-sparkline. Bij deze
+    // vrije vormen is die kolom vaak leeg (nog geen volledige km gelopen) en dus verwarrend — hoofdinhoud
+    // krijgt hier de volledige breedte. AI Coach-schema's en EVY behouden hun eigen zij-kolom hieronder.
     rail.style.display = 'none';
     document.body.classList.add('rs-rail-hidden');
     $('rsKmSparkline').style.display = 'none';
@@ -9088,6 +9174,7 @@ function handleRunGpsUpdate(pos){
   }
   rsState.lastPos = pos;
   const km = rsState.distanceM / 1000;
+  updateKmSparklineProgress(km, smoothedSpeedKmh(rsState.breadcrumbs, 4));
   if (Math.floor(km) > rsState.lastAnnouncedKm){
     rsState.lastAnnouncedKm = Math.floor(km);
     const nowMs = Date.now() - rsState.startedAt - rsState.pausedMs;
@@ -9195,10 +9282,12 @@ function tickRunSession(){
 function maybeSpeakMidpoint(){
   if (!rsState || rsState.midpointSpoken || !rsState.totalPlannedSec || !coachCatEnabled('midpoint')) return;
   const elapsedSec = (Date.now() - rsState.startedAt - rsState.pausedMs) / 1000;
-  if (elapsedSec >= rsState.totalPlannedSec / 2){
-    rsState.midpointSpoken = true;
-    speakForRun(pickCoachLine('midpoint'));
-  }
+  if (elapsedSec < rsState.totalPlannedSec / 2) return;
+  // Ook hier: "je bent lekker opgewarmd" klinkt net zo onterecht als je op dat moment stilstaat — wacht dan
+  // gewoon tot de eerstvolgende tik waarop je écht (netto, over de laatste ~20s) in beweging bent.
+  if (smoothedSpeedKmh(rsState.breadcrumbs, 20) < 2) return;
+  rsState.midpointSpoken = true;
+  speakForRun(pickCoachLine('midpoint'));
 }
 function maybeSpeakDidYouKnow(){
   // Enkel tijdens wandelpauzes, af en toe, en enkel als "wist-je-datjes" aanstaan — géén dubbeling met breathingTip
@@ -9213,10 +9302,16 @@ function maybeSpeakEncouragement(){
   if (curType !== 'run') return;
   const elapsedSec = (Date.now() - rsState.startedAt - rsState.pausedMs) / 1000;
   // Ongeveer om de 75-100s een korte aanmoediging tijdens het lopen zelf — niet te opdringerig
-  if (elapsedSec - rsState.lastEncouragementAt >= 80 + Math.random()*25){
-    rsState.lastEncouragementAt = elapsedSec;
-    speakForRun(pickCoachLine('encouragement'));
-  }
+  if (elapsedSec - rsState.lastEncouragementAt < 80 + Math.random()*25) return;
+  // Geen "goed tempo!"/"you're doing amazing" als je in werkelijkheid stilstaat — muziek/podcast speelt
+  // gewoon door, enkel de gesproken lof wordt hier tegengehouden. We meten dit via de NETTOVERPLAATSING
+  // over de laatste ~20s (dezelfde smoothedSpeedKmh die ook de routekleur bepaalt), niet via de opgetelde
+  // totaalafstand: die laatste blijft bij stilstaan gewoon stijgen door GPS-"trilling" die punt voor punt
+  // optelt, terwijl begin- en eindpunt van een tijdvenster dan gewoon dicht bij elkaar blijven liggen.
+  const recentSpeedKmh = smoothedSpeedKmh(rsState.breadcrumbs, 20);
+  if (recentSpeedKmh < 2) return; // amper beweging gemeten: gewoon opnieuw checken bij de volgende tik
+  rsState.lastEncouragementAt = elapsedSec;
+  speakForRun(pickCoachLine('encouragement'));
 }
 function updateRunSessionUI(){
   if (!rsState) return;
@@ -19963,6 +20058,7 @@ async function loadAnalyseTab(tabName){
   $('analysePlaceholder').innerHTML = `<div>${tr('analyseComingSoon')}</div>`;
   $('analysePlaceholder').style.display = 'flex';
 }
+// ---------- Modus-knoppen op de hub (Fiets/Wandel/Hardlopen/Kompas/Weer) & service worker-registratie ----------
 $('modeWandelBtn').addEventListener('click', () => openBikeSetupScreen('wandel'));
 $('modeHardloopBtn').addEventListener('click', () => openRunCoachScreen());
 $('modeWeatherBtn').addEventListener('click', () => {
