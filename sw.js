@@ -2,7 +2,7 @@
 // Zorgt dat de app zelf en bekeken kaarttegels offline beschikbaar blijven.
 // Werkt enkel op https:// (of localhost) — browsers staan service workers niet toe op file://.
 
-const CACHE_VERSION = 'fietsapp-v60';
+const CACHE_VERSION = 'fietsapp-v61';
 
 const APP_SHELL = [
   './',
