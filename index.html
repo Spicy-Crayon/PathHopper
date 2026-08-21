@@ -997,6 +997,17 @@
     width:32px; height:32px; border-radius:11px; flex-shrink:0; display:flex; align-items:center; justify-content:center;
     font-size:11px; font-weight:900; color:rgba(11,15,10,0.75); box-shadow:0 2px 6px rgba(0,0,0,0.25);
   }
+  /* Vage "nog te lopen"-plekhouders in de km-tempo-sparkline — staan er al vanaf de start (zie
+     initKmSparklinePlaceholders), zodat die kolom niet als lege dode ruimte aanvoelt. Worden één voor één
+     vervangen door een echt gekleurd staafje zodra die kilometer voltooid is. */
+  .rs-km-bar-ghost{
+    width:32px; height:32px; border-radius:11px; flex-shrink:0; box-sizing:border-box; display:flex;
+    align-items:center; justify-content:center; font-size:11px; font-weight:900;
+    border:1.5px dashed rgba(15,61,41,0.25); color:rgba(15,61,41,0.35); background:rgba(15,61,41,0.045);
+  }
+  body.theme-garmin .rs-km-bar-ghost{
+    border-color:rgba(255,255,255,0.22); color:rgba(255,255,255,0.32); background:rgba(255,255,255,0.05);
+  }
   .rs-rail-item{
     width:40px; min-height:40px; border-radius:14px; display:flex; flex-direction:column; align-items:center; justify-content:center;
     flex-shrink:0; opacity:0.75; transition:all 0.2s; padding:5px 2px; gap:1px;
@@ -8971,14 +8982,34 @@ function addKmSparklineBar(kmNumber, kmSec){
   bar.style.background = paceColorForSpeed(kmh);
   bar.textContent = kmNumber;
   bar.title = kmh > 0 ? `${kmh.toFixed(1)} km/u` : '';
-  wrap.appendChild(bar);
+  // Staat er al een vage plekhouder klaar voor deze km (zie initKmSparklinePlaceholders)? Vervang die dan
+  // gewoon op dezelfde plek, zodat de kolom zich netjes "opvult" i.p.v. onderaan te blijven aangroeien.
+  const ghost = wrap.querySelector(`.rs-km-bar-ghost[data-km-slot="${kmNumber}"]`);
+  if (ghost){ ghost.replaceWith(bar); }
+  else { wrap.appendChild(bar); }
   wrap.scrollTop = wrap.scrollHeight; // automatisch meescrollen naar de nieuwste (onderste) km
+}
+// Zet van bij de start alvast vage, lege kadertjes klaar voor elke verwachte kilometer (op basis van de
+// gekende doelafstand, bv. EVY 5/10 km) — puur cosmetisch, zodat de kolom niet als dode ruimte aanvoelt
+// vóór er ook maar één km voltooid is. Geen gekende doelafstand: start gewoon leeg zoals voorheen.
+function initKmSparklinePlaceholders(totalKm){
+  const wrap = $('rsKmSparkline');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  if (!totalKm || totalKm < 1) return;
+  for (let i = 1; i <= Math.ceil(totalKm); i++){
+    const ghost = document.createElement('div');
+    ghost.className = 'rs-km-bar-ghost';
+    ghost.dataset.kmSlot = i;
+    ghost.textContent = i;
+    wrap.appendChild(ghost);
+  }
 }
 // Herbouwt de volledige sparkline in één keer (bv. na het minimaliseren/heropenen van het loopscherm).
 function renderKmSparklineFull(){
   const wrap = $('rsKmSparkline');
   if (!wrap || !rsState || !rsState.kmSplitsSec) return;
-  wrap.innerHTML = '';
+  initKmSparklinePlaceholders(rsState.targetKm);
   rsState.kmSplitsSec.forEach((sec, i) => addKmSparklineBar(i+1, sec));
 }
 function renderRunProgressRail(){
