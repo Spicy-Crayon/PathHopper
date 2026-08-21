@@ -2,12 +2,17 @@
 // Zorgt dat de app zelf en bekeken kaarttegels offline beschikbaar blijven.
 // Werkt enkel op https:// (of localhost) — browsers staan service workers niet toe op file://.
 
-const CACHE_VERSION = 'fietsapp-v48';
+const CACHE_VERSION = 'fietsapp-v60';
 
 const APP_SHELL = [
   './',
   './index.html',
   './manifest.json',
+  './base.css',
+  './theme-tailwind.css',
+  './theme-tailwind-screens.js',
+  './zombie-run.js',
+  './integrations.js',
   'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css',
   'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js'
 ];
@@ -23,11 +28,11 @@ const TILE_HOSTS = [
 // weinig dat cache-first (met achtergrond-ververs) veel betrouwbaarder is dan network-first op een
 // trage/wisselvallige mobiele verbinding, waar een groot bestand halverwege kan afbreken.
 const STATIC_DATA_FILES = [
-  'FietsWandelknoopBE.json', 'FietsWandelknoopNL.geojson', 'FietsWandelknoopDU.geojson',
-  'PoiBelgie.geojson', 'PoiNederland.geojson', 'PoiDuitsland.geojson', 'fietsknoop.json'
+  'FietsWandelknoopBE.json', 'FietsWandelknoopNL.geojson',
+  'PoiBelgie.geojson', 'PoiNederland.geojson'
 ];
-// Kleine SVG-weericoontjes (eigen, gelicenseerde set) — plat in de root (geen submap, want GitHub's
-// upload-via-browser maakt geen mapjes aan uit losse bestanden), herkenbaar aan het "wicon-"-voorvoegsel.
+// Kleine SVG-weericoontjes (eigen, gelicenseerde set), in images/weather/, herkenbaar aan het
+// "wicon-"-voorvoegsel.
 const STATIC_DATA_PREFIX = '/wicon-';
 
 self.addEventListener('install', (event) => {
