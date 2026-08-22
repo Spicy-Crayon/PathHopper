@@ -38,7 +38,14 @@
     --shadow:0 8px 24px rgba(15,61,41,0.22), 0 2px 6px rgba(15,61,41,0.15);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   }
-  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  /* Voelt zo meer als een echte app dan als een webpagina: geen tekstselectie-bolletjes/kopieer-balk en
+     geen "afbeelding opslaan"-lang-indruk-menu bij per ongeluk lang aantikken. Formuliervelden (waar je
+     wél moet kunnen typen/selecteren/plakken, bv. je API-sleutels) krijgen dat gedrag hieronder expliciet terug. */
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; -webkit-touch-callout:none; -webkit-user-select:none; user-select:none;}
+  input, textarea, select, [contenteditable], [contenteditable] *{
+    -webkit-touch-callout:default; -webkit-user-select:text; user-select:text;
+  }
+  img{ -webkit-user-drag:none; user-drag:none; }
   html,body{height:100%; margin:0; overflow:hidden; background:var(--green-900); color:var(--ink);}
   #map{position:absolute; top:0;left:0;right:0;bottom:0;}
 
@@ -10971,6 +10978,12 @@ function buildGarminSetupHtml(mode){
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap');
   body { font-family: 'Inter', sans-serif; }
+  /* Voelt zo meer als een echte app dan als een webpagina — zie dezelfde toelichting in het hoofdbestand. */
+  *{ -webkit-touch-callout:none; -webkit-user-select:none; user-select:none; }
+  input, textarea, select, [contenteditable], [contenteditable] *{
+    -webkit-touch-callout:default; -webkit-user-select:text; user-select:text;
+  }
+  img{ -webkit-user-drag:none; user-drag:none; }
 </style>
 <style>${TAILWIND_CARD_BG}</style>
 </head>
@@ -11383,9 +11396,18 @@ function buildGarminKompasHtml(){
     <title>Kompas - Fietsapp</title>
     <script src="https://cdn.tailwindcss.com"><\/script>
     <style>
+        /* Voelt zo meer als een echte app dan als een webpagina — zie dezelfde toelichting in het hoofdbestand. */
         * {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
             user-select: none;
         }
+        input, textarea, select, [contenteditable], [contenteditable] * {
+            -webkit-touch-callout: default;
+            -webkit-user-select: text;
+            user-select: text;
+        }
+        img { -webkit-user-drag: none; user-drag: none; }
 
         @keyframes floatingCompass {
             0% { transform: translateY(0px) rotate(0deg); }
@@ -11718,6 +11740,12 @@ function buildGarminWeerHtml(){
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"><\/script>
   <style>
+    /* Voelt zo meer als een echte app dan als een webpagina — zie dezelfde toelichting in het hoofdbestand. */
+    * { -webkit-touch-callout:none; -webkit-user-select:none; user-select:none; }
+    input, textarea, select, [contenteditable], [contenteditable] * {
+      -webkit-touch-callout:default; -webkit-user-select:text; user-select:text;
+    }
+    img { -webkit-user-drag:none; user-drag:none; }
     .custom-scroll::-webkit-scrollbar { width: 4px; }
     .custom-scroll::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.6); border-radius: 8px; }
     .custom-scroll::-webkit-scrollbar-thumb { background: #334155; border-radius: 8px; }
@@ -12193,6 +12221,12 @@ function buildGarminHubHtml(){
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap');
   body { font-family: 'Inter', sans-serif; }
+  /* Voelt zo meer als een echte app dan als een webpagina — zie dezelfde toelichting in het hoofdbestand. */
+  *{ -webkit-touch-callout:none; -webkit-user-select:none; user-select:none; }
+  input, textarea, select, [contenteditable], [contenteditable] *{
+    -webkit-touch-callout:default; -webkit-user-select:text; user-select:text;
+  }
+  img{ -webkit-user-drag:none; user-drag:none; }
   .glass-ribbon {
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
     backdrop-filter: blur(25px);
@@ -12329,6 +12363,12 @@ function buildGarminRunCoachHtml(){
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap');
   body{ font-family:'Inter',sans-serif; }
+  /* Voelt zo meer als een echte app dan als een webpagina — zie dezelfde toelichting in het hoofdbestand. */
+  *{ -webkit-touch-callout:none; -webkit-user-select:none; user-select:none; }
+  input, textarea, select, [contenteditable], [contenteditable] *{
+    -webkit-touch-callout:default; -webkit-user-select:text; user-select:text;
+  }
+  img{ -webkit-user-drag:none; user-drag:none; }
   .rc-panel{ display:none; }
   .rc-panel.active{ display:block; }
   .rc-navbtn.active{ color:#fbbf24 !important; }
