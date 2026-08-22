@@ -976,7 +976,9 @@
     border:none; border-radius:12px; padding:10px 18px; font-weight:800; font-size:12px;
     background:rgba(255,255,255,0.1); color:#f1f5f9; flex-shrink:0;
   }
-  #rsMapWrap{ position:relative; width:100%; max-width:440px; height:225px; border-radius:22px; overflow:hidden; flex-shrink:0; box-shadow:0 8px 24px rgba(0,0,0,0.4); }
+  /* margin-top houdt hier bewust afstand tot #rsMinimizeBtn (top-links, hoogte 36px + startpositie 14px) —
+     zonder die marge lag de kaart er letterlijk overheen, met haar ronde hoek half over de knop. */
+  #rsMapWrap{ position:relative; width:100%; max-width:440px; height:200px; margin-top:46px; border-radius:22px; overflow:hidden; flex-shrink:0; box-shadow:0 8px 24px rgba(0,0,0,0.4); }
   #rsMapContainer{ width:100%; height:100%; background:#1a1f2b; }
   #rsMapBadge{
     position:absolute; top:10px; left:10px; z-index:500; background:var(--amber); color:var(--green-900);
@@ -1056,13 +1058,14 @@
   /* Vage "nog te lopen"-plekhouders in de km-tempo-sparkline — staan er al vanaf de start (zie
      initKmSparklinePlaceholders), zodat die kolom niet als lege dode ruimte aanvoelt. Worden één voor één
      vervangen door een echt gekleurd staafje zodra die kilometer voltooid is. */
+  /* Het loopsessiescherm zelf is in BEIDE thema's altijd donker (#0b0f0a/#050914, zie #runSessionScreen
+     hierboven) — deze kleur gold hier vroeger enkel voor het Garmin-thema, maar hoort dus gewoon altijd te
+     gelden. Was voordien per ongeluk berekend als tegen een lichte achtergrond (donkergroen op bijna-zwart),
+     waardoor de stippellijn-cirkels in het Standaard-thema vrijwel onzichtbaar waren. */
   .rs-km-bar-ghost{
     width:32px; height:32px; border-radius:11px; flex-shrink:0; box-sizing:border-box; display:flex;
     align-items:center; justify-content:center; font-size:11px; font-weight:900; position:relative; overflow:hidden;
-    border:1.5px dashed rgba(15,61,41,0.25); color:rgba(15,61,41,0.35); background:rgba(15,61,41,0.045);
-  }
-  body.theme-garmin .rs-km-bar-ghost{
-    border-color:rgba(255,255,255,0.22); color:rgba(255,255,255,0.32); background:rgba(255,255,255,0.05);
+    border:1.5px dashed rgba(255,255,255,0.22); color:rgba(255,255,255,0.32); background:rgba(255,255,255,0.05);
   }
   /* Vult het vage kadertje van de kilometer die je NU aan het lopen bent geleidelijk van onder naar boven op
      (elke GPS-update, dus in de praktijk zo'n beetje per 50-100m), in de kleur van je huidige tempo — zo zie
@@ -1084,6 +1087,10 @@
   .rs-rail-item.rail-current span{ font-size:18px; }
   .rs-rail-item.rail-done{ opacity:0.4; }
   #rsStatsRow{ display:flex; justify-content:center; gap:24px; width:100%; max-width:440px; flex-shrink:0; }
+  /* Basisbreedte hier gezet via CSS i.p.v. de vorige inline stijl op het element zelf — die won namelijk
+     altijd van de regel hierboven (body.rs-rail-hidden ... #rsSpeedRow), waardoor deze rij bij Vrije Run/
+     Doelrun/Zombie Run nooit méé verbreedde met de rest van het scherm zoals #rsStatsRow wel deed. */
+  #rsSpeedRow{ max-width:440px; }
   body.rs-rail-hidden #rsStatsRow, body.rs-rail-hidden #rsSpeedRow{ max-width:520px; }
   .rs-stat{ display:flex; flex-direction:column; align-items:center; flex:1; }
   body.theme-garmin .rs-stat{
@@ -1371,6 +1378,7 @@
   .simple-modal-head b{ font-size:16px; color:var(--green-900); }
   .simple-modal-close{ border:none; background:rgba(15,61,41,0.08); color:var(--green-900); width:30px; height:30px; border-radius:50%; font-size:14px; }
   .simple-modal-text{ font-size:13px; color:#4b5f54; margin:0 0 10px; }
+  .rfPainChip{ color:var(--green-900); }
   .rfMoodBtn.rf-selected{ border-color:var(--amber) !important; background:rgba(226,161,60,0.15) !important; }
   .rfPainChip.rf-selected{ border-color:var(--amber) !important; background:rgba(226,161,60,0.15) !important; color:var(--amber) !important; }
   .simple-modal-note{ font-size:11.5px; color:#7a8c81; margin-top:10px; }
@@ -1478,6 +1486,9 @@
   body.theme-garmin .simple-modal-head b{ color:#f1f5f9; }
   body.theme-garmin .simple-modal-close{ background:rgba(255,255,255,0.08); color:#f1f5f9; }
   body.theme-garmin .simple-modal-text{ color:rgba(241,245,249,0.75); }
+  /* Zelfde bug, gemist omdat de pijn-chips (na een run: "Had je ergens pijn?") hun kleur vroeger inline
+     zetten i.p.v. via deze klasse — vielen dus niet onder de fix hierboven en bleven zo goed als onzichtbaar. */
+  body.theme-garmin .rfPainChip{ color:#f1f5f9; }
   body.theme-garmin .settings-reset{ background:rgba(255,255,255,0.08); color:#f1f5f9; }
   body.theme-garmin .settings-subnote{ color:rgba(241,245,249,0.55); }
   body.theme-garmin .settings-section{ border-color:rgba(255,255,255,0.08); }
@@ -2240,14 +2251,14 @@
     </div>
     <p class="simple-modal-text" style="margin-bottom:8px;" data-i18n="rfPainQuestion">Had je ergens pijn?</p>
     <div style="display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-bottom:6px;">
-      <button class="rfPainChip rf-selected" data-area="none" style="border:1.5px solid var(--line); background:none; border-radius:20px; padding:6px 14px; font-size:12.5px; font-weight:700; color:var(--green-900); cursor:pointer;" data-i18n="rfNoPain">Geen pijn 👍</button>
-      <button class="rfPainChip" data-area="rug" style="border:1.5px solid var(--line); background:none; border-radius:20px; padding:6px 14px; font-size:12.5px; font-weight:700; color:var(--green-900); cursor:pointer;" data-i18n="rfBack">Rug</button>
-      <button class="rfPainChip" data-area="heup" style="border:1.5px solid var(--line); background:none; border-radius:20px; padding:6px 14px; font-size:12.5px; font-weight:700; color:var(--green-900); cursor:pointer;" data-i18n="rfHip">Heup</button>
-      <button class="rfPainChip" data-area="dij" style="border:1.5px solid var(--line); background:none; border-radius:20px; padding:6px 14px; font-size:12.5px; font-weight:700; color:var(--green-900); cursor:pointer;" data-i18n="rfThigh">Dij</button>
-      <button class="rfPainChip" data-area="knie" style="border:1.5px solid var(--line); background:none; border-radius:20px; padding:6px 14px; font-size:12.5px; font-weight:700; color:var(--green-900); cursor:pointer;" data-i18n="rfKnee">Knie</button>
-      <button class="rfPainChip" data-area="kuit" style="border:1.5px solid var(--line); background:none; border-radius:20px; padding:6px 14px; font-size:12.5px; font-weight:700; color:var(--green-900); cursor:pointer;" data-i18n="rfCalf">Kuit</button>
-      <button class="rfPainChip" data-area="achilles" style="border:1.5px solid var(--line); background:none; border-radius:20px; padding:6px 14px; font-size:12.5px; font-weight:700; color:var(--green-900); cursor:pointer;" data-i18n="rfAchilles">Achilles</button>
-      <button class="rfPainChip" data-area="voet" style="border:1.5px solid var(--line); background:none; border-radius:20px; padding:6px 14px; font-size:12.5px; font-weight:700; color:var(--green-900); cursor:pointer;" data-i18n="rfFoot">Voet</button>
+      <button class="rfPainChip rf-selected" data-area="none" style="border:1.5px solid var(--line); background:none; border-radius:20px; padding:6px 14px; font-size:12.5px; font-weight:700; cursor:pointer;" data-i18n="rfNoPain">Geen pijn 👍</button>
+      <button class="rfPainChip" data-area="rug" style="border:1.5px solid var(--line); background:none; border-radius:20px; padding:6px 14px; font-size:12.5px; font-weight:700; cursor:pointer;" data-i18n="rfBack">Rug</button>
+      <button class="rfPainChip" data-area="heup" style="border:1.5px solid var(--line); background:none; border-radius:20px; padding:6px 14px; font-size:12.5px; font-weight:700; cursor:pointer;" data-i18n="rfHip">Heup</button>
+      <button class="rfPainChip" data-area="dij" style="border:1.5px solid var(--line); background:none; border-radius:20px; padding:6px 14px; font-size:12.5px; font-weight:700; cursor:pointer;" data-i18n="rfThigh">Dij</button>
+      <button class="rfPainChip" data-area="knie" style="border:1.5px solid var(--line); background:none; border-radius:20px; padding:6px 14px; font-size:12.5px; font-weight:700; cursor:pointer;" data-i18n="rfKnee">Knie</button>
+      <button class="rfPainChip" data-area="kuit" style="border:1.5px solid var(--line); background:none; border-radius:20px; padding:6px 14px; font-size:12.5px; font-weight:700; cursor:pointer;" data-i18n="rfCalf">Kuit</button>
+      <button class="rfPainChip" data-area="achilles" style="border:1.5px solid var(--line); background:none; border-radius:20px; padding:6px 14px; font-size:12.5px; font-weight:700; cursor:pointer;" data-i18n="rfAchilles">Achilles</button>
+      <button class="rfPainChip" data-area="voet" style="border:1.5px solid var(--line); background:none; border-radius:20px; padding:6px 14px; font-size:12.5px; font-weight:700; cursor:pointer;" data-i18n="rfFoot">Voet</button>
     </div>
     <p class="simple-modal-text" style="font-size:10.5px; margin-bottom:14px;" data-i18n="rfMultiHint">Meerdere plekken mogelijk — wordt bewaard bij deze sessie in je stats.</p>
     <button id="runFeedbackStravaBtn" style="width:100%; margin-bottom:10px; padding:9px; border:none; border-radius:12px; background:#fc4c02; color:#fff; font-weight:800; font-size:12.5px; cursor:pointer;" data-i18n="rfStravaBtn">🟠 Ook naar Strava uploaden</button>
@@ -3233,8 +3244,11 @@
 <!-- ---------- Live trainingssessie-scherm: timer, mini-kaart, intervalrail/km-tempo-sparkline,
      bedieningsknoppen (pauze/split/stop) ---------- -->
 <div id="runSessionScreen" class="hidden">
+  <!-- Chevron-omlaag i.p.v. de vorige terug-pijl: een pijl naar links oogt als "verlaat/stop de run", terwijl
+       deze knop de sessie juist laat DOORLOPEN op de achtergrond — het pictogram voor "minimaliseren"
+       (zoals bij een videospeler) maakt dat onderscheid meteen duidelijker dan tekst/tooltip alleen kon. -->
   <button id="rsMinimizeBtn" aria-label="Minimaliseren" data-i18n-aria="rsMinimizeAria" title="Naar andere tabbladen — de sessie blijft gewoon lopen" data-i18n-title="rsMinimizeTitle">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
   </button>
   <div id="rsMapWrap">
     <div id="rsMapBadge"><span id="rsMapBadgeText">0m @ 0.0 km/u</span></div>
@@ -3264,7 +3278,7 @@
     <div class="rs-stat"><b id="rsDistance">0.00</b><span>afstand</span></div>
     <div class="rs-stat"><b id="rsSplitLabel">1 km</b><span>split</span></div>
   </div>
-  <div id="rsSpeedRow" style="display:flex; justify-content:center; gap:24px; width:100%; max-width:440px; flex-shrink:0; margin-top:8px;">
+  <div id="rsSpeedRow" style="display:flex; justify-content:center; gap:24px; width:100%; flex-shrink:0; margin-top:8px;">
     <div class="rs-stat"><b id="rsCurrentSpeed">–</b><span>snelheid</span></div>
     <div class="rs-stat"><b id="rsAvgSpeed">–</b><span>gem. snelheid</span></div>
   </div>
