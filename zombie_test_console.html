@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zombie Run — testconsole</title>
+<style>
+  :root{
+    --bg:#0b0f0a; --panel:#11170f; --panel2:#161d13; --line:#243021; --txt:#e6f2df; --muted:#8ba17e;
+    --green:#4ade80; --red:#f87171; --amber:#fbbf24; --blue:#60a5fa;
+  }
+  *{ box-sizing:border-box; }
+  body{ margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; background:var(--bg); color:var(--txt); }
+  .wrap{ display:flex; height:100vh; }
+  .panel{ width:400px; min-width:340px; overflow-y:auto; background:var(--panel); border-right:1px solid var(--line); padding:16px; }
+  .stage{ flex:1; display:flex; align-items:center; justify-content:center; background:#05070a; padding:16px; }
+  iframe{ width:390px; height:844px; max-height:96vh; border:2px solid var(--line); border-radius:20px; background:#000; }
+  h1{ font-size:16px; margin:0 0 4px; }
+  h2{ font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin:20px 0 8px; border-bottom:1px solid var(--line); padding-bottom:6px; }
+  h2:first-of-type{ margin-top:14px; }
+  p.note{ font-size:12.5px; color:var(--muted); line-height:1.5; margin:6px 0 0; }
+  .row{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:6px; }
+  button{ font:inherit; font-size:12.5px; padding:8px 10px; border-radius:8px; border:1px solid var(--line); background:var(--panel2); color:var(--txt); cursor:pointer; flex:1; min-width:0; }
+  button:hover{ border-color:#3a4a30; }
+  button:active{ transform:translateY(1px); }
+  button.primary{ background:#1c7c3e; border-color:#1c7c3e; color:#fff; font-weight:600; }
+  button.danger{ background:#5b1414; border-color:#7a1c1c; color:#ffd7d7; }
+  button.warn{ background:#5b3f14; border-color:#7a5a1c; color:#ffe9c2; }
+  button:disabled{ opacity:.35; cursor:not-allowed; }
+  label{ font-size:12px; color:var(--muted); display:block; margin:6px 0 2px; }
+  input[type=number]{ width:100%; padding:6px 8px; border-radius:6px; border:1px solid var(--line); background:#0d130a; color:var(--txt); font-size:13px; }
+  select{ width:100%; padding:6px 8px; border-radius:6px; border:1px solid var(--line); background:#0d130a; color:var(--txt); font-size:13px; }
+  .cfg-grid{ display:grid; grid-template-columns:1fr 1fr; gap:6px 10px; }
+  .status{ background:#0d130a; border:1px solid var(--line); border-radius:10px; padding:10px 12px; font-size:12.5px; line-height:1.7; }
+  .status b{ color:var(--amber); }
+  .status .ok{ color:var(--green); } .status .bad{ color:var(--red); }
+  .speedval{ font-size:22px; font-weight:700; text-align:center; margin:4px 0; }
+  input[type=range]{ width:100%; }
+  .pill{ display:inline-block; padding:2px 8px; border-radius:999px; font-size:11px; font-weight:600; background:#22301b; color:#c8f0b0; }
+  .flash{ animation:flash .5s; }
+  @keyframes flash{ 0%{ background:#1c7c3e33; } 100%{ background:transparent; } }
+  code{ background:#0d130a; padding:1px 5px; border-radius:4px; font-size:12px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="panel">
+    <h1>🧟 Zombie Run — testconsole</h1>
+    <p class="note">
+      Dit bestand wijzigt <code>index.html</code> niet. Het laadt je echte app hiernaast in een frame en
+      bestuurt hem via dezelfde functies die de app zelf gebruikt — inclusief een nagemaakte GPS-beweging,
+      zodat je een volledige Zombie Run (met je eigen audiobestanden) kan beluisteren zonder buiten te
+      moeten lopen.
+    </p>
+
+    <h2>1. Configuratie (test-instellingen)</h2>
+    <p class="note">Standaard hieronder staan <b>korte</b> tijden zodat je snel door alle fases heen komt.
+      Zet ze hoger als je de échte timing wil testen.</p>
+    <div class="cfg-grid">
+      <div><label>Levens</label><input type="number" id="cfgLives" value="3" min="1" max="9"></div>
+      <div><label>Basissnelheid (km/u)</label><input type="number" id="cfgBase" value="8" step="0.5"></div>
+      <div><label>Ramp (km/u erbij)</label><input type="number" id="cfgRamp" value="0.5" step="0.1"></div>
+      <div><label>Ramp elke (min)</label><input type="number" id="cfgRampInt" value="5" step="1"></div>
+      <div><label>Jacht min (sec)</label><input type="number" id="cfgChaseMin" value="10"></div>
+      <div><label>Jacht max (sec)</label><input type="number" id="cfgChaseMax" value="15"></div>
+      <div><label>Rustdeel min (sec)</label><input type="number" id="cfgIntMin" value="6"></div>
+      <div><label>Rustdeel max (sec)</label><input type="number" id="cfgIntMax" value="12"></div>
+      <div>
+        <label>Bij gepakt worden</label>
+        <select id="cfgConsequence">
+          <option value="life" selected>Verlies een leven</option>
+          <option value="points">Verlies punten</option>
+          <option value="extend">Jacht gaat door</option>
+        </select>
+      </div>
+      <div>
+        <label>Moeilijkheid</label>
+        <select id="cfgDifficulty">
+          <option value="easy">Makkelijk</option>
+          <option value="normal" selected>Normaal</option>
+          <option value="hard">Moeilijk</option>
+        </select>
+      </div>
+    </div>
+    <div class="row" style="margin-top:10px;">
+      <button class="primary" id="btnStart">🧟 Start test-Zombie-Run</button>
+      <button id="btnReset">🔁 Reset (herlaad app)</button>
+    </div>
+
+    <h2>2. Simuleer je looptempo</h2>
+    <p class="note">Geen GPS nodig — dit stuurt om de seconde een nagemaakte positie naar de app, alsof je
+      echt aan het lopen bent op de gekozen snelheid.</p>
+    <div class="speedval"><span id="speedReadout">0.0</span> km/u</div>
+    <input type="range" id="speedSlider" min="0" max="20" step="0.5" value="0">
+    <div class="row" style="margin-top:8px;">
+      <button id="spd0">⏹ Stil (0)</button>
+      <button id="spd4">🚶 Wandel (4)</button>
+      <button id="spd9">🏃 Joggen (9)</button>
+      <button id="spd15">⚡ Sprint (15)</button>
+    </div>
+
+    <h2>3. Forceer een fase (audio meteen testen)</h2>
+    <div class="row">
+      <button id="btnAlarm">🚨 Forceer alarm</button>
+      <button id="btnStartcue">🏃‍♂️ "Ren voor je leven!" → jacht</button>
+    </div>
+    <div class="row">
+      <button id="btnEscape">✅ Forceer ontsnapping</button>
+      <button class="warn" id="btnBite">🩸 Forceer beet (-1 leven)</button>
+    </div>
+    <div class="row">
+      <button id="btnBonus">🎒 Forceer Supply Drop-bonus</button>
+    </div>
+    <div class="row">
+      <button class="primary" id="btnWinner">🏆 Forceer Winner-einde</button>
+      <button class="danger" id="btnLooser">💀 Forceer Game Over</button>
+    </div>
+
+    <h2>4. Status (ververst elke seconde)</h2>
+    <div class="status" id="statusBox">Nog geen run gestart.</div>
+
+    <h2>Audiobestanden op de juiste plek?</h2>
+    <p class="note">
+      Deze pagina moet naast <code>index.html</code> staan, met daarnaast een map
+      <code>audio/ZombieRun/…</code> met jouw eigen bestanden (zelfde structuur als beschreven onder
+      Instellingen → 🧟 Zombie Run — help in de app zelf). Open deze pagina via een lokale server
+      (bv. <code>python3 -m http.server</code> in die map, dan naar
+      <code>http://localhost:8000/zombie_test_console.html</code>) — rechtstreeks vanaf schijf openen
+      (<code>file://…</code>) werkt niet voor het ophalen van audio.
+    </p>
+  </div>
+  <div class="stage">
+    <iframe id="appFrame" src="index.html"></iframe>
+  </div>
+</div>
+
+<script>
+let win = null;
+let gpsTimer = null;
+let statusTimer = null;
+let simSpeedKmh = 0;
+let simLat = 50.8503, simLng = 4.3517; // startpunt, doet er verder niet toe
+
+const frame = document.getElementById('appFrame');
+frame.addEventListener('load', () => {
+  win = frame.contentWindow;
+  waitForApp();
+});
+
+function waitForApp(tries){
+  tries = tries || 0;
+  if (win && typeof win.startRunSession === 'function'){
+    console.log('App geladen, testconsole klaar.');
+    return;
+  }
+  if (tries > 100) { console.warn('App lijkt niet (volledig) geladen.'); return; }
+  setTimeout(() => waitForApp(tries+1), 100);
+}
+
+function readConfig(){
+  return {
+    lives: parseInt(document.getElementById('cfgLives').value, 10) || 3,
+    baseSpeedKmh: parseFloat(document.getElementById('cfgBase').value) || 8,
+    rampKmh: parseFloat(document.getElementById('cfgRamp').value) || 0,
+    rampIntervalMin: parseFloat(document.getElementById('cfgRampInt').value) || 5,
+    chaseMin: parseFloat(document.getElementById('cfgChaseMin').value) || 10,
+    chaseMax: parseFloat(document.getElementById('cfgChaseMax').value) || 15,
+    interludeMin: parseFloat(document.getElementById('cfgIntMin').value) || 0,
+    interludeMax: parseFloat(document.getElementById('cfgIntMax').value) || 0,
+    consequence: document.getElementById('cfgConsequence').value,
+    targetMinutes: null,
+    difficulty: document.getElementById('cfgDifficulty').value,
+    audioParams: null
+  };
+}
+
+function flashStatus(){
+  const box = document.getElementById('statusBox');
+  box.classList.remove('flash'); void box.offsetWidth; box.classList.add('flash');
+}
+
+// Belangrijk: `rsState` is in de app een top-level "let" — in tegenstelling tot functies (die WEL gewoon
+// als window.functienaam bereikbaar zijn) hangt zo'n "let" NIET aan window.rsState, dus van buitenaf
+// (iframe.contentWindow.rsState) is dat altijd undefined, ook al bestaat de sessie gewoon. We lezen 'm
+// daarom via win.eval(...) — dat draait, net als de Console-tab van de devtools, wél in dezelfde
+// scriptscope van de app en heeft dus gewoon toegang tot rsState. Alle acties hieronder (starten, fases
+// forceren, ...) lopen om diezelfde reden ook via evalInApp() i.p.v. rechtstreekse win.xxx-aanroepen.
+function evalInApp(code){
+  if (!win) throw new Error('App nog niet geladen');
+  return win.eval(code);
+}
+function getRsState(){
+  try{ return evalInApp('(window.rsState = rsState, rsState ? JSON.parse(JSON.stringify(rsState)) : null)'); }
+  catch(e){ return null; }
+}
+
+async function startTestRun(){
+  if (!win){ alert('App is nog niet geladen — even wachten en opnieuw proberen.'); return; }
+  try{
+    if (evalInApp('typeof startRunSession') !== 'function'){ alert('App is nog niet volledig geladen — even wachten en opnieuw proberen.'); return; }
+  }catch(e){ alert('App is nog niet geladen — even wachten en opnieuw proberen.'); return; }
+  // Eventuele welkomst-/onboarding-modal uit de weg, net zoals bij echte tests: die zou anders visueel
+  // over het loopscherm blijven staan (functioneel maakt het niets uit, maar zo zie je alles netjes).
+  try{
+    win.document.querySelectorAll('.modal-overlay, .modal').forEach(m => m.classList.add('hidden'));
+  }catch(e){}
+  // mode:'free' is nodig zodat startRunSession() de vrije-modus-tak neemt (freeform intervals) i.p.v. te
+  // proberen een AI-coach-schema te laden — exact zoals de echte Zombie Run-startknop in de app dat doet.
+  const cfg = readConfig();
+  await evalInApp(`startRunSession({ mode:'free', targetKm:null, zombieConfig: ${JSON.stringify(cfg)} })`);
+  startGpsSim();
+  startStatusLoop();
+}
+
+function startGpsSim(){
+  stopGpsSim();
+  gpsTimer = setInterval(() => {
+    if (!win) return;
+    let hasSession = false;
+    try{ hasSession = !!evalInApp('!!rsState'); }catch(e){}
+    if (!hasSession) return;
+    // 1 seconde bewegen aan simSpeedKmh, altijd rechtdoor naar het noorden — de app rekent zelf de
+    // afstand/snelheid uit via haversine op deze coördinaten, exact zoals bij een echte GPS-fix.
+    const metersPerSec = simSpeedKmh * 1000 / 3600;
+    simLat += metersPerSec / 111320; // ruwe omzetting meter -> graden breedte, precies genoeg voor deze test
+    const pos = {
+      coords: { latitude: simLat, longitude: simLng, altitude: 0, accuracy: 5, speed: metersPerSec },
+      timestamp: Date.now()
+    };
+    // handleRunGpsUpdate is een gewone top-level "function" (geen "let"), dus die IS wel gewoon bereikbaar
+    // als win.handleRunGpsUpdate — hier is de eval-omweg dus niet nodig.
+    try{ win.handleRunGpsUpdate(pos); }catch(e){ console.warn('GPS-sim call faalde:', e); }
+  }, 1000);
+}
+function stopGpsSim(){ if (gpsTimer){ clearInterval(gpsTimer); gpsTimer = null; } }
+
+function setSpeed(v){
+  simSpeedKmh = v;
+  document.getElementById('speedSlider').value = v;
+  document.getElementById('speedReadout').textContent = v.toFixed(1);
+}
+document.getElementById('speedSlider').addEventListener('input', e => setSpeed(parseFloat(e.target.value)));
+document.getElementById('spd0').addEventListener('click', () => setSpeed(0));
+document.getElementById('spd4').addEventListener('click', () => setSpeed(4));
+document.getElementById('spd9').addEventListener('click', () => setSpeed(9));
+document.getElementById('spd15').addEventListener('click', () => setSpeed(15));
+
+document.getElementById('btnStart').addEventListener('click', startTestRun);
+document.getElementById('btnReset').addEventListener('click', () => {
+  stopGpsSim(); stopStatusLoop(); setSpeed(0);
+  frame.src = 'index.html';
+  document.getElementById('statusBox').textContent = 'App wordt herladen…';
+});
+
+function withZombie(fn, label){
+  return () => {
+    const rs = getRsState();
+    if (!win || !rs || !rs.zombie){ alert('Start eerst een test-Zombie-Run (stap 1).'); return; }
+    try{ fn(); flashStatus(); }
+    catch(e){ console.error(label + ' faalde:', e); alert(label + ' gaf een fout — zie console (F12) voor details.'); }
+  };
+}
+document.getElementById('btnAlarm').addEventListener('click', withZombie(() => {
+  evalInApp("if (rsState && rsState.zombie){ clearTimeout(rsState.zombie.interludeTimeoutId); finishZombieInterlude('alarm'); }");
+}, 'Forceer alarm'));
+document.getElementById('btnStartcue').addEventListener('click', withZombie(() => win.playZombieStartCue(), '"Ren voor je leven"'));
+document.getElementById('btnEscape').addEventListener('click', withZombie(() => win.resolveZombieChase(true), 'Forceer ontsnapping'));
+document.getElementById('btnBite').addEventListener('click', withZombie(() => win.resolveZombieChase(false), 'Forceer beet'));
+document.getElementById('btnBonus').addEventListener('click', withZombie(() => win.awardZombieBonus({ icon:'🎒', pts:1, label:'Testbonus' }), 'Forceer bonus'));
+document.getElementById('btnWinner').addEventListener('click', withZombie(() => win.finishRunSession(true), 'Forceer Winner-einde'));
+document.getElementById('btnLooser').addEventListener('click', withZombie(() => win.handleZombieDeath(), 'Forceer Game Over'));
+
+function shortSrc(player){
+  if (!player || !player.src) return '–';
+  const parts = player.src.split('/');
+  return decodeURIComponent(parts.slice(-2).join('/'));
+}
+function startStatusLoop(){
+  stopStatusLoop();
+  statusTimer = setInterval(renderStatus, 1000);
+  renderStatus();
+}
+function stopStatusLoop(){ if (statusTimer){ clearInterval(statusTimer); statusTimer = null; } document.getElementById('statusBox').textContent = 'Nog geen run gestart.'; }
+function renderStatus(){
+  const rs = getRsState();
+  if (!win || !rs){ document.getElementById('statusBox').textContent = 'Sessie gestopt.'; return; }
+  const z = rs.zombie;
+  if (!z){ document.getElementById('statusBox').textContent = 'Geen Zombie Run actief in deze sessie.'; return; }
+  const km = (rs.distanceM/1000).toFixed(2);
+  const doc = win.document;
+  const musicSrc = shortSrc(doc.getElementById('runMusicPlayer'));
+  const bgSrc = shortSrc(doc.getElementById('zombieMusicPlayer'));
+  const fxSrc = shortSrc(doc.getElementById('zombieEffectsPlayer'));
+  document.getElementById('statusBox').innerHTML = `
+    <span class="pill">${z.phase}</span> &nbsp; ${z.finished ? (z.died ? '<span class="bad">💀 gestorven</span>' : '<span class="ok">✅ afgerond</span>') : ''}<br>
+    Levens: <b>${z.lives}/${z.livesStart}</b> &nbsp; Score: <b>${z.score}</b> &nbsp; Bonus: <b>${(z.totalBonusEarned||0).toFixed(1)}</b><br>
+    Drempel: <b>${z.currentThresholdKmh}</b> km/u &nbsp; Jij: <b>${simSpeedKmh.toFixed(1)}</b> km/u &nbsp; Afstand: <b>${km}</b> km<br>
+    Ontsnapt: <b>${z.escapedCount}×</b> &nbsp; Gepakt: <b>${z.caughtCount}×</b> &nbsp; Verhaallijn: <b>#${z.storyline}</b><br>
+    <span style="color:#8ba17e">verhaal/cue-speler:</span> ${musicSrc}<br>
+    <span style="color:#8ba17e">achtergrondmuziek:</span> ${bgSrc}<br>
+    <span style="color:#8ba17e">fx/enge-geluiden:</span> ${fxSrc}
+  `;
+}
+</script>
+</body>
+</html>
